@@ -12,6 +12,7 @@ Components are models that are used to build up each of the core files. These in
    components/connections
    components/coordinates
    components/devices
+   components/geometry
    components/identifiers
    components/measurements
    components/reagent
