@@ -35,7 +35,7 @@ from biodata_schema.components.subject_procedures import BrainInjection, Injecti
 from biodata_schema.components.surgery_procedures import CatheterImplant, Craniotomy, CraniotomyType
 from biodata_schema.core.procedures import Procedures
 from biodata_schema.utils.exceptions import OneOfError
-from tests.coordinate_systems import BREGMA_ARI, BREGMA_ARID
+from tests.coordinate_systems import BREGMA_ARI, BREGMA_RAS
 
 
 class TestProcedures:
@@ -160,7 +160,7 @@ class TestProcedures:
                     experimenters=["Mam Moth"],
                     ethics_review_id="234",
                     protocol_id="123",
-                    global_coordinate_system=BREGMA_ARID,
+                    global_coordinate_system=BREGMA_ARI,
                     measured_coordinates={
                         Origin.BREGMA: Translation(
                             translation=[0, 0, 0],
@@ -767,7 +767,7 @@ class TestProcedures:
 
         p2 = Procedures(
             subject_id="12345",
-            global_coordinate_system=BREGMA_ARID,  # Different coordinate system
+            global_coordinate_system=BREGMA_RAS,  # Different coordinate system
         )
 
         # Test that combining procedures with different coordinate systems raises ValueError
@@ -776,7 +776,7 @@ class TestProcedures:
 
         assert "Cannot merge differing coordinate systems" in str(context.value)
         assert "BREGMA_ARI" in str(context.value)
-        assert "BREGMA_ARID" in str(context.value)
+        assert "BREGMA_RAS" in str(context.value)
 
         # Test that combining procedures with same coordinate systems works
         p3 = Procedures(

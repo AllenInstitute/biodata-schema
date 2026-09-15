@@ -20,6 +20,7 @@ The `aind-metadata-upgrader` package handles automatic metadata upgrades separat
 10. [Removed helper](#10-removed-helper)
 11. [Warnings now raise errors](#11-warnings-promoted-to-errors)
 12. [Warnings that remain](#12-validators-still-emitting-warnings)
+13. [Stop using `DEPTH` axes](#13-stop-using-depth-axes)
 
 ---
 
@@ -380,8 +381,64 @@ warnings.
 | `utils/validators.py` | `recursive_check_paths` | An `AssetPath` does not exist on disk | The working directory controls path resolution. |
 | `base.py` | `DataCoreModel.write_standard_file` | A serialized file exceeds `MAX_FILE_SIZE` (500 KB) | The write path warns instead of discarding data. |
 
-### `DEPTH` axes
+## 13. Stop using `DEPTH` axes
 
-Version 3 accepts `DEPTH` axes without warning. Projects can define their own coordinate
-systems, and the package no longer supplies a `DEPTH`-based system through
-`CoordinateSystemLibrary`.
+Do not add an `AxisName.DEPTH` axis to a `CoordinateSystem`.
+
+Record insertion depth as a **local translation along the device's own
+depth axis** instead.
+
+**Before**
+
+```python
+BREGMA_ARID = CoordinateSystem(
+    name="BREGMA_ARID",
+    origin=Origin.BREGMA,
+    axis_unit=SizeUnit.MM,
+    axes=[
+        Axis(name=AxisName.AP, direction=Direction.PA),
+        Axis(name=AxisName.ML, direction=Direction.LR),
+        Axis(name=AxisName.SI, direction=Direction.SI),
+        Axis(name=AxisName.DEPTH, direction=Direction.UD),
+    ],
+)
+
+BrainInjection(
+    ...,
+    coordinate_system_name="BREGMA_ARID",
+    coordinates=[[Translation(translation=[-0.85, -3.8, 0, 3.3])]],
+)
+```
+
+**After**
+
+```python
+BREGMA_ARI = CoordinateSystem(
+    name="BREGMA_ARI",
+    origin=Origin.BREGMA,
+    axis_unit=SizeUnit.MM,
+    axes=[
+        Axis(name=AxisName.AP, direction=Direction.PA),
+        Axis(name=AxisName.ML, direction=Direction.LR),
+        Axis(name=AxisName.SI, direction=Direction.SI),
+    ],
+)
+
+BrainInjection(
+    ...,
+    coordinate_system_name="BREGMA_ARI",
+    coordinates=[
+        [
+            Translation(translation=[-0.85, -3.8, 0]),
+            Rotation(angles=[0, 10, 0]),
+            Translation(
+                translation=[0, 0, 3.3],
+                reference_coordinate_system=ReferenceCoordinateSystem.LOCAL,
+            ),
+        ],
+    ],
+)
+```
+
+See the [coordinate systems page](https://biodata-schema.readthedocs.io/en/latest/coordinate_systems.html)
+and the examples in `examples/` for the full pattern.

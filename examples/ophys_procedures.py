@@ -13,7 +13,7 @@ from biodata_models.species import Species
 from biodata_models.units import SizeUnit, VolumeUnit
 
 from biodata_schema.components.configs import ProbeConfig
-from biodata_schema.components.coordinates import Axis, CoordinateSystem, Translation
+from biodata_schema.components.coordinates import Axis, CoordinateSystem, ReferenceCoordinateSystem, Translation
 from biodata_schema.components.devices import FiberProbe
 from biodata_schema.components.injection_procedures import InjectionDynamics, InjectionProfile, ViralMaterial
 from biodata_schema.components.reagent import FluorescentStain, Fluorophore, ProbeReagent, ProteinProbe
@@ -31,15 +31,14 @@ from biodata_schema.core.procedures import (
     WaterRestriction,
 )
 
-BREGMA_ARID = CoordinateSystem(
-    name="BREGMA_ARID",
+BREGMA_ARI = CoordinateSystem(
+    name="BREGMA_ARI",
     origin=Origin.BREGMA,
     axis_unit=SizeUnit.MM,
     axes=[
         Axis(name=AxisName.AP, direction=Direction.PA),
         Axis(name=AxisName.ML, direction=Direction.LR),
         Axis(name=AxisName.SI, direction=Direction.SI),
-        Axis(name=AxisName.DEPTH, direction=Direction.UD),
     ],
 )
 
@@ -70,7 +69,12 @@ config = ProbeConfig(
     local_coordinate_system=MPM_MANIP_RFB,
     transform=[
         Translation(
-            translation=[-600, -3050, 0, 4200],
+            translation=[-600, -3050, 0],
+        ),
+        # insertion depth runs along the probe's own Z axis, which points down
+        Translation(
+            translation=[0, 0, 4200],
+            reference_coordinate_system=ReferenceCoordinateSystem.LOCAL,
         ),
     ],
 )
@@ -88,7 +92,7 @@ p = Procedures(
             anaesthesia=Anaesthetic(anaesthetic_type="Isoflurane", duration=180, level=1.5),
             workstation_id="SWS 3",
             protocol_id="doi",
-            global_coordinate_system=BREGMA_ARID,
+            global_coordinate_system=BREGMA_ARI,
             procedures=[
                 Headframe(
                     protocol_id="2109",
@@ -109,11 +113,16 @@ p = Procedures(
                             titer=20000000000000,
                         )
                     ],
-                    coordinate_system_name=BREGMA_ARID.name,
+                    coordinate_system_name=BREGMA_ARI.name,
                     coordinates=[
                         [
                             Translation(
-                                translation=[-600, -3050, 0, 4200],
+                                translation=[-600, -3050, 0],
+                            ),
+                            # depth runs down the needle's own axis; SI is positive downward
+                            Translation(
+                                translation=[0, 0, 4200],
+                                reference_coordinate_system=ReferenceCoordinateSystem.LOCAL,
                             ),
                         ],
                     ],

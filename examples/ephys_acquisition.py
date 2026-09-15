@@ -20,6 +20,7 @@ from biodata_schema.components.coordinates import (
     AtlasLibrary,
     Axis,
     CoordinateSystem,
+    ReferenceCoordinateSystem,
     Rotation,
     Translation,
 )
@@ -32,15 +33,14 @@ from biodata_schema.core.acquisition import (
     StimulusEpoch,
 )
 
-BREGMA_ARID = CoordinateSystem(
-    name="BREGMA_ARID",
+BREGMA_ARI = CoordinateSystem(
+    name="BREGMA_ARI",
     origin=Origin.BREGMA,
     axis_unit=SizeUnit.MM,
     axes=[
         Axis(name=AxisName.AP, direction=Direction.PA),
         Axis(name=AxisName.ML, direction=Direction.LR),
         Axis(name=AxisName.SI, direction=Direction.SI),
-        Axis(name=AxisName.DEPTH, direction=Direction.UD),
     ],
 )
 
@@ -77,10 +77,15 @@ ephys_assembly_a_config = EphysAssemblyConfig(
             local_coordinate_system=MPM_MANIP_RFB,
             transform=[
                 Translation(
-                    translation=[5000, 5000, 0, 1],
+                    translation=[5000, 5000, 0],
                 ),
                 Rotation(
-                    angles=[8, 5.2, 0, 0],
+                    angles=[8, 5.2, 0],
+                ),
+                # insertion depth runs along the probe's own Z axis, which points down
+                Translation(
+                    translation=[0, 0, 1],
+                    reference_coordinate_system=ReferenceCoordinateSystem.LOCAL,
                 ),
             ],
             notes=(
@@ -111,7 +116,12 @@ ephys_assembly_b_config = EphysAssemblyConfig(
             local_coordinate_system=MPM_MANIP_RFB,
             transform=[
                 Translation(
-                    translation=[5000, 5000, 0, 1],
+                    translation=[5000, 5000, 0],
+                ),
+                # insertion depth runs along the probe's own Z axis, which points down
+                Translation(
+                    translation=[0, 0, 1],
+                    reference_coordinate_system=ReferenceCoordinateSystem.LOCAL,
                 ),
             ],
             notes=(
@@ -138,7 +148,7 @@ acquisition = Acquisition(
     subject_details=AcquisitionSubjectDetails(
         mouse_platform_name="Running Wheel",
     ),
-    global_coordinate_system=BREGMA_ARID,
+    global_coordinate_system=BREGMA_ARI,
     stimulus_epochs=[
         StimulusEpoch(
             stimulus_name="Visual Stimulation",

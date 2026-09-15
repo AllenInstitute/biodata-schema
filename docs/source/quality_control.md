@@ -6,7 +6,7 @@ Quality control is a collection of **metrics** evaluated on a data asset.
 
 [QCMetric](#qcmetric) objects should be generated during pipelines: from raw data, during processing, and during analysis by researchers.
 
-Every [QCMetric](#qcmetric) has a `biodata_schema.quality_control.State` which takes the value of the metric and compares it to some rule. Metrics can only pass or fail. Metrics that require manual evaluation are set to pending.
+Every [QCMetric](#qcmetric) has a `Status` which takes the value of the metric and compares it to some rule. Metrics can only pass or fail. Metrics that require manual evaluation are set to pending.
 
 ## Details
 

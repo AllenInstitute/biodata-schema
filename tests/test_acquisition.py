@@ -7,7 +7,6 @@ from zoneinfo import ZoneInfo
 
 import pydantic
 import pytest
-from biodata_models.brain_atlas import CCFv3
 from biodata_models.modalities import Modality
 from pydantic import ValidationError
 
@@ -16,13 +15,10 @@ from biodata_schema.components.configs import (
     EphysAssemblyConfig,
     ImagingConfig,
     Immersion,
-    ManipulatorConfig,
-    MISModuleConfig,
     MRIScan,
     SampleChamberConfig,
 )
 from biodata_schema.components.connections import Connection
-from biodata_schema.components.coordinates import Translation
 from biodata_schema.core.acquisition import (
     NON_IANA_TIMEZONES,
     Acquisition,
@@ -35,7 +31,6 @@ from examples.ephys_acquisition import acquisition as ephys_acquisition
 from examples.exaspim_acquisition import acq as exaspim_acquisition
 from examples.mri_acquisition import acquisition as mri_acquisition
 from examples.mri_acquisition import scan1
-from tests.coordinate_systems import BREGMA_ARID
 
 
 class TestAcquisition:
@@ -116,55 +111,10 @@ class TestAcquisition:
 
     def test_specimen_required(self):
         """Test that specimen ID is required for in vitro imaging modalities"""
-        with pytest.raises(ValueError):
-            Acquisition(
-                experimenters=["Mam Moth"],
-                acquisition_start_time=datetime.now(),
-                acquisition_end_time=datetime.now(),
-                subject_id="123456",
-                acquisition_type="Test",
-                instrument_id="1234",
-                subject_details=AcquisitionSubjectDetails(
-                    mouse_platform_name="Running wheel",
-                ),
-                global_coordinate_system=BREGMA_ARID,
-                data_streams=[
-                    DataStream(
-                        stream_start_time=datetime.now(),
-                        stream_end_time=datetime.now(),
-                        modalities=[Modality.SPIM],
-                        active_devices=["Stick_assembly", "Ephys_assemblyA"],
-                        configurations=[
-                            MISModuleConfig(
-                                device_name="Stick_assembly",
-                                arc_angle=24,
-                                module_angle=10,
-                            ),
-                            ManipulatorConfig(
-                                device_name="Ephys_assemblyA",
-                                arc_angle=0,
-                                module_angle=10,
-                                primary_targeted_structure=CCFv3.VISL,
-                                atlas_coordinates=[
-                                    Translation(
-                                        translation=[1, 1, 1, 0],
-                                    ),
-                                ],
-                                manipulator_coordinates=[
-                                    Translation(
-                                        translation=[1, 1, 1, 1],
-                                    )
-                                ],
-                                manipulator_axis_positions=[
-                                    Translation(
-                                        translation=[1, 1, 1, 0],
-                                    )
-                                ],
-                            ),
-                        ],
-                    )
-                ],
-            )
+        acq = exaspim_acquisition.model_copy()
+        acq.specimen_id = None
+        with pytest.raises(ValidationError, match="Specimen ID is required for modalities"):
+            Acquisition.model_validate_json(acq.model_dump_json())
 
     def test_check_modality_config_requirements(self):
         """Test that modality configuration requirements are enforced"""

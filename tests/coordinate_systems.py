@@ -19,26 +19,14 @@ BREGMA_ARI = CoordinateSystem(
         Axis(name=AxisName.SI, direction=Direction.SI),
     ],
 )
-BREGMA_ARID = CoordinateSystem(
-    name="BREGMA_ARID",
-    origin=Origin.BREGMA,
-    axis_unit=SizeUnit.MM,
-    axes=[
-        Axis(name=AxisName.AP, direction=Direction.PA),
-        Axis(name=AxisName.ML, direction=Direction.LR),
-        Axis(name=AxisName.SI, direction=Direction.SI),
-        Axis(name=AxisName.DEPTH, direction=Direction.UD),
-    ],
-)
-BREGMA_RASD = CoordinateSystem(
-    name="BREGMA_RASD",
+BREGMA_RAS = CoordinateSystem(
+    name="BREGMA_RAS",
     origin=Origin.BREGMA,
     axis_unit=SizeUnit.MM,
     axes=[
         Axis(name=AxisName.ML, direction=Direction.LR),
         Axis(name=AxisName.AP, direction=Direction.PA),
         Axis(name=AxisName.SI, direction=Direction.IS),
-        Axis(name=AxisName.DEPTH, direction=Direction.UD),
     ],
 )
 MPM_MANIP_RFB = CoordinateSystem(
