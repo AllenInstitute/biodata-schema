@@ -5,13 +5,14 @@ from zoneinfo import ZoneInfo
 
 import pandas as pd
 from biodata_models.brain_atlas import CCFv3
+from biodata_models.coordinates import AxisName, Direction, Origin
 from biodata_models.data_name_patterns import DataLevel
 from biodata_models.modalities import Modality
 from biodata_models.organizations import Organization
 from biodata_models.species import Strain
-from biodata_models.units import VolumeUnit
+from biodata_models.units import SizeUnit, VolumeUnit
 
-from biodata_schema.components.coordinates import CoordinateSystemLibrary, Rotation, Translation
+from biodata_schema.components.coordinates import Axis, CoordinateSystem, Rotation, Translation
 from biodata_schema.components.identifiers import Person
 from biodata_schema.components.injection_procedures import InjectionDynamics, InjectionProfile, ViralMaterial
 from biodata_schema.components.subject_procedures import BrainInjection, Perfusion
@@ -35,6 +36,19 @@ subject_sex_lookup = {
 
 # everything is covered by the same IACUC protocol
 ethics_review_id = "2109"
+
+# bregma origin with axes pointing anterior, right, inferior, plus an insertion depth axis
+BREGMA_ARID = CoordinateSystem(
+    name="BREGMA_ARID",
+    origin=Origin.BREGMA,
+    axis_unit=SizeUnit.MM,
+    axes=[
+        Axis(name=AxisName.AP, direction=Direction.PA),
+        Axis(name=AxisName.ML, direction=Direction.LR),
+        Axis(name=AxisName.SI, direction=Direction.SI),
+        Axis(name=AxisName.DEPTH, direction=Direction.UD),
+    ],
+)
 
 
 def generate_data_description(subject_id: str, creation_time: datetime) -> DataDescription:
@@ -76,7 +90,6 @@ def generate_subject(
                 maternal_genotype=maternal_genotype,
                 paternal_id=paternal_id,
                 paternal_genotype=paternal_genotype,
-                breeding_group="unknown",  # not in spreadsheet
             ),
             housing=Housing(
                 home_cage_enrichment=[HomeCageEnrichment.RUNNING_WHEEL],  # all subjects had a running wheel
@@ -119,7 +132,7 @@ def generate_procedures(
 
     brain_injection = BrainInjection(
         protocol_id=protocol,
-        coordinate_system_name=CoordinateSystemLibrary.BREGMA_ARID.name,
+        coordinate_system_name=BREGMA_ARID.name,
         injection_materials=[
             ViralMaterial(
                 name=virus_name,
@@ -141,7 +154,7 @@ def generate_procedures(
         start_date=injection_date,
         protocol_id=protocol,
         ethics_review_id=ethics_review_id,
-        experimenters=[experimenter],
+        experimenters=[experimenter.name],
         procedures=[
             brain_injection,
         ],
@@ -150,7 +163,7 @@ def generate_procedures(
     # Create the second surgery (perfusion)
     perfusion_surgery = Surgery(
         start_date=perfusion_date,
-        experimenters=[experimenter],
+        experimenters=[experimenter.name],
         ethics_review_id=ethics_review_id,
         protocol_id=protocol,
         procedures=[Perfusion(protocol_id=protocol, output_specimen_ids=["1"])],
@@ -159,7 +172,7 @@ def generate_procedures(
     # Return the full Procedures object
     return Procedures(
         subject_id=subject_id,
-        coordinate_system=CoordinateSystemLibrary.BREGMA_ARID,
+        global_coordinate_system=BREGMA_ARID,
         subject_procedures=[
             brain_injection_surgery,
             perfusion_surgery,

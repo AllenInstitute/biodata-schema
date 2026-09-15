@@ -88,9 +88,7 @@ more ontologies into our schema. We currently use:
 
 ## Flexibility, versioning, and upgrading
 
-`biodata-schema` is versioned using [Semantic Versioning](https://semver.org/). The core schemas listed above
-also have their own version numbers, which are documented in the `schema_version` field of any JSON file 
-they are used to generate.
+`biodata-schema` is versioned using [Semantic Versioning](https://semver.org/).
 
 When new versions of schemas are released, data collectors can decide if they want to update the metadata
 from their existing data assets to the new schema. Metadata upgrading capabilities can be found in 

@@ -46,7 +46,7 @@ Each [CoordinateSystem](components/coordinates.md#coordinatesystem) defines the 
 
 The **Global Coordinate System** is the coordinate system in which an experiment is performed. For example, in an instrument these are the three axes and origin that define how devices are positioned while in a procedure these are the origin and axes used to position injections and chronic or acute implants.
 
-We provide a coordinate system builder to help you develop your global coordinate systems, which comes with a variety of sensible defaults. You can export 
+We provide a coordinate system builder to help you develop your global coordinate systems, which comes with a variety of sensible defaults. You can export your Python code directly from the builder.
 
 ```{raw} html
 <p style="margin-bottom:6px">
