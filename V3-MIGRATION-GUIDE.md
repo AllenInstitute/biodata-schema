@@ -171,7 +171,7 @@ Remove uses of `OlfactoryStimulation.channels` and `OlfactoryStimulation.notes` 
 ## 7. `DataDescription.from_*` classmethods
 
 Replace the three `DataDescription` derivation classmethods from `core/data_description.py`
-with the functions in `aind_data_schema.utils.inheritance`:
+with the functions in `biodata_schema.utils.inheritance`:
 
 | Remove | Use |
 | --- | --- |
@@ -182,7 +182,7 @@ with the functions in `aind_data_schema.utils.inheritance`:
 The signatures stay the same. Change the import and function name:
 
 ```python
-from aind_data_schema.utils.inheritance import (
+from biodata_schema.utils.inheritance import (
     derive_data_description,
     derive_data_description_from_derived,
     derive_data_description_from_raw,
@@ -217,7 +217,7 @@ list of tuples of strings.
 
 ## 9. `CoordinateSystemLibrary` removed
 
-Version 3 removes `aind_data_schema.components.coordinates.CoordinateSystemLibrary` and its
+Version 3 removes `biodata_schema.components.coordinates.CoordinateSystemLibrary` and its
 fixed set of named `CoordinateSystem` constants, including `BREGMA_ARI`, `BREGMA_RAS`,
 `BREGMA_ARID`, `BREGMA_RASD`, `ARENA_RBT`, `SIPE_CAMERA_RBF`, `SIPE_MONITOR_RTF`,
 `SIPE_SPEAKER_LTF`, `MPM_MANIP_RFB`, `PINPOINT_PROBE_RSAB`, `SPIM_RPI`, `SPIM_IJK`,
@@ -229,7 +229,7 @@ you need them. `CoordinateSystem`, `Axis`, `Origin`, `AxisName`, and `Direction`
 **Before**
 
 ```python
-from aind_data_schema.components.coordinates import CoordinateSystemLibrary
+from biodata_schema.components.coordinates import CoordinateSystemLibrary
 
 Acquisition(..., global_coordinate_system=CoordinateSystemLibrary.BREGMA_ARI)
 ```
@@ -240,7 +240,7 @@ Acquisition(..., global_coordinate_system=CoordinateSystemLibrary.BREGMA_ARI)
 from biodata_models.coordinates import AxisName, Direction, Origin
 from biodata_models.units import SizeUnit
 
-from aind_data_schema.components.coordinates import Axis, CoordinateSystem
+from biodata_schema.components.coordinates import Axis, CoordinateSystem
 
 BREGMA_ARI = CoordinateSystem(
     name="BREGMA_ARI",
@@ -263,7 +263,7 @@ Keep using `AtlasLibrary`; version 3 still ships it.
 
 ## 10. Removed helper
 
-Version 3 removes `aind_data_schema.base.migrate_deprecated_coordinate_system`. No
+Version 3 removes `biodata_schema.base.migrate_deprecated_coordinate_system`. No
 replacement exists because the helper only copied the old coordinate field forward.
 
 `recursive_get_all_names` in `utils/validators.py` now handles the fields directly and no
