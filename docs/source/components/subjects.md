@@ -57,7 +57,7 @@ Description of a human subject
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `species` | `biodata_models.species.SpeciesModel` | Species  |
+| `species` | [Species](../biodata_models/species.md#species) | Species  |
 | `sex` | [Sex](#sex) | Sex  |
 | `year_of_birth` | `int` | Year of birth  |
 | `source` | [Organization](../biodata_models/organizations.md#organization) | Source (Where the subject was acquired from.) |

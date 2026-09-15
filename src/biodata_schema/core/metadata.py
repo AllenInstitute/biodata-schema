@@ -284,17 +284,16 @@ class Metadata(DataCoreModel):
 
     @model_validator(mode="after")
     def validate_calibration_object_tags(self):
-        """Validator to ensure 'calibration' tag is present when subject is a CalibrationObject"""
+        """Validator to ensure a CalibrationObject subject has the expected subject ID"""
 
         if (
             self.subject
             and self.subject.subject_details
             and isinstance(self.subject.subject_details, CalibrationObject)
-            and self.data_description
         ):
-            if "calibration" not in (self.data_description.tags or []):
-                warnings.warn(
-                    "Subject is a CalibrationObject but 'calibration' tag is missing from data_description.tags."
+            if self.subject.subject_id != "calibration":
+                raise ValueError(
+                    "CalibrationObject subject_id must be 'calibration'."
                 )
 
         return self

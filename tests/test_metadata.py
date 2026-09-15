@@ -865,7 +865,7 @@ class TestMetadata:
         assert "start_date_time" in str(context.value)
 
     def test_validate_calibration_object_tags(self):
-        """Tests that calibration tag warning is issued when subject is CalibrationObject but tag is missing"""
+        """Tests that CalibrationObject subjects use the calibration subject ID"""
 
         # Create a subject with CalibrationObject
         calibration_subject = Subject(
@@ -875,26 +875,22 @@ class TestMetadata:
             ),
         )
 
-        # Use the existing data_description from class setup (which doesn't have 'calibration' tag)
-        dd = data_description.model_copy()
-        dd.tags = None  # Ensure no tags are set
-
-        # This should trigger a warning since subject is CalibrationObject but no 'calibration' tag
-        with pytest.warns(UserWarning) as w:
-            metadata = Metadata(
+        with pytest.raises(ValueError, match="CalibrationObject subject_id must be 'calibration'"):
+            Metadata(
                 name="Test Metadata",
                 location="Test Location",
                 subject=calibration_subject,
-                data_description=dd,
+                data_description=data_description,
             )
 
-        warning_messages = [str(warning.message) for warning in w]
-        assert (
-            "Subject is a CalibrationObject but 'calibration' tag is missing from data_description.tags."
-        ) in warning_messages
+        calibration_subject.subject_id = "calibration"
+        metadata = Metadata(
+            name="Test Metadata",
+            location="Test Location",
+            subject=calibration_subject,
+            data_description=data_description,
+        )
         assert metadata is not None
-        # The validator warns but no longer mutates data_description.tags
-        assert metadata.data_description.tags is None
 
     def test_validate_subject_details_if_not_specimen(self):
         """Tests that subject details are required if acquisition.specimen_id is not provided"""

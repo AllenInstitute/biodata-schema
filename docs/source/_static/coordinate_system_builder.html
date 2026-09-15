@@ -252,7 +252,8 @@
         <select id="dev-long-dir">
           <option value="PA">+Anterior</option><option value="AP">+Posterior</option>
           <option value="IS">+Superior</option><option value="SI">+Inferior</option>
-          <option value="UD" selected>+Inferior (up-to-down)</option>
+          <option value="DU" selected>+Superior (down-to-up)</option>
+          <option value="UD">+Inferior (up-to-down)</option>
           <option value="LR">+Right</option><option value="RL">+Left</option>
         </select>
       </div>
@@ -505,13 +506,13 @@ let state = {
   device: {
     type: 'probe', name: 'Probe',
     csName: 'Probe', csOrigin: 'TIP', csUnit: 'mm',
-    longDir: 'UD',  // device +Y (long axis) points along this instrument direction at rest
+    longDir: 'DU',  // device +Y (long axis) points along this instrument direction at rest
     widDir:  'AP',  // device +X (width axis) points along this instrument direction at rest
   },
   transforms: exampleEnabled ? [
     { type: 'R', angles: [-15, 0, 0], direction: 'right_hand', referenceCoordinateSystem: 'local', pivot: 'global' },
     { type: 'T', translation: [1.2, -2, -0.5], frame: 'global' },
-    { type: 'T', translation: [0, 4, 0], frame: 'local' },
+    { type: 'T', translation: [0, -4, 0], frame: 'local' },
   ] : [],
 };
 
@@ -906,7 +907,7 @@ function rebuildScene() {
     if (state.device.type === 'probe') {
       const PROBE_W = 0.7, PROBE_T = 0.12, PROBE_L = 8;
       const box = new THREE.Mesh(new THREE.BoxGeometry(PROBE_W, PROBE_T, PROBE_L), mat);
-      const probeBodyDir = probeDir.clone().negate();
+      const probeBodyDir = probeDir;
       box.matrixAutoUpdate = false;
       box.matrix.makeBasis(probeWid, probeUp, probeBodyDir);
       box.matrix.setPosition(new THREE.Vector3(px, py, pz).addScaledVector(probeBodyDir, PROBE_L / 2));
@@ -1124,7 +1125,7 @@ document.getElementById('cs-preset').addEventListener('change', e => {
     state.device.type    = document.getElementById('dev-type').value;
     if (id === 'dev-type') {
       const isMonitor = state.device.type === 'monitor';
-      document.getElementById('dev-long-dir').value = isMonitor ? 'PA' : 'UD';
+      document.getElementById('dev-long-dir').value = isMonitor ? 'PA' : 'DU';
       document.getElementById('dev-wid-dir').value = isMonitor ? 'LR' : 'AP';
     }
     state.device.name    = document.getElementById('dev-name').value;

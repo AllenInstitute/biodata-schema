@@ -344,14 +344,16 @@ Monitor(..., contrast=50)  # ValidationError
 Monitor(..., contrast=50, contrast_unit=UnitlessUnit.PERCENT)  # ok
 ```
 
-### Add the `calibration` tag yourself
+### Use `calibration` as the `CalibrationObject` subject ID
 
-When a `CalibrationObject` subject lacks the `"calibration"` tag,
-`Metadata.validate_calibration_object_tags` still warns. It no longer adds the tag to
-`data_description.tags`:
+`CalibrationObject` subjects must use `"calibration"` as their `subject_id`.
+`Metadata.validate_calibration_object_tags` raises a validation error for any other value:
 
 ```python
-DataDescription(..., tags=["calibration"])
+Subject(
+    subject_id="calibration",
+    subject_details=CalibrationObject(...),
+)
 ```
 
 ## 12. Warnings that remain
@@ -364,7 +366,6 @@ warnings.
 | Location | Validator | Fires when | Reason |
 | --- | --- | --- | --- |
 | `core/metadata.py` | `Metadata.validate_expected_files_by_modality` | A required file is missing | Metadata can arrive in pieces. |
-| `core/metadata.py` | `Metadata.validate_calibration_object_tags` | A `CalibrationObject` subject lacks the `"calibration"` tag | The check provides advice only. |
 | `core/metadata.py` | `Metadata.validate_training_protocol_references` | `StimulusEpoch.training_protocol_name` has no match in `Procedures` | The reference matters only when both files exist. |
 | `core/metadata.py` | `Metadata.validate_data_description_name_time_consistency` | The name's creation time differs greatly from `acquisition_end_time` | The check uses a heuristic. |
 | `core/processing.py` | `Processing.__add__` | Merged objects share process names | The merge renames the processes. |
@@ -375,7 +376,7 @@ warnings.
 | Location | Validator | Fires when | Reason |
 | --- | --- | --- | --- |
 | `core/metadata.py` | `Metadata.validate_core_fields` | A core field fails its own validation | The helper can wrap partially invalid cores. |
-| `core/acquisition.py` | `DataStream.__add__` | Two merged data streams disagree | The message describes a merge condition. |
+| `core/acquisition.py` | `DataStream.__add__` | Two overlapping streams contain the same active device | The duplicate device is removed; only DAQ devices should be shared between overlapping streams. |
 | `utils/validators.py` | `recursive_check_paths` | An `AssetPath` does not exist on disk | The working directory controls path resolution. |
 | `base.py` | `DataCoreModel.write_standard_file` | A serialized file exceeds `MAX_FILE_SIZE` (500 KB) | The write path warns instead of discarding data. |
 
