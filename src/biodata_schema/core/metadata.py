@@ -292,9 +292,7 @@ class Metadata(DataCoreModel):
             and isinstance(self.subject.subject_details, CalibrationObject)
         ):
             if self.subject.subject_id != "calibration":
-                raise ValueError(
-                    "CalibrationObject subject_id must be 'calibration'."
-                )
+                raise ValueError("CalibrationObject subject_id must be 'calibration'.")
 
         return self
 
