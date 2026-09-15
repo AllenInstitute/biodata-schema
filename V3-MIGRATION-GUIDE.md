@@ -29,6 +29,8 @@ Version 2 split `coordinate_system` into `global_coordinate_system` for top-leve
 container models, and `local_coordinate_system` for device and config models. Version 3
 removes the old field and the validators that copied its value forward.
 
+Please see the [coordinate systems page on the documentation](https://biodata-schema.readthedocs.io/en/latest/coordinate_systems.html) for more details about coordinate systems specifically.
+
 ### Use `global_coordinate_system` for these models
 
 | Model | Module |
