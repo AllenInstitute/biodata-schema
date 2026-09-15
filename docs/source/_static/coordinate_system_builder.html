@@ -17,7 +17,7 @@
     body { display: flex; min-width: 700px; min-height: 600px; height: 100vh; font: 13px/1.5 system-ui, sans-serif; background: #f5f5f5; overflow: auto; }
 
     #sidebar {
-      width: 360px; min-width: 300px; flex-shrink: 0; overflow-y: auto; overflow-x: hidden;
+      width: 400px; min-width: 340px; flex-shrink: 0; overflow-y: auto; overflow-x: hidden;
       background: #fff; border-right: 1px solid #ddd; padding: 12px;
       display: flex; flex-direction: column; gap: 12px;
     }
@@ -316,15 +316,22 @@
         <div id="xf-rotation-fields" style="display:none;flex-direction:column;gap:4px;">
           <div class="field-row">
             <span class="field-label" id="xf-rot-label">R0 / R1 / R2</span>
-            <input type="number" id="xf-rx" value="0" step="1" style="width:65px">
-            <input type="number" id="xf-ry" value="0" step="1" style="width:65px">
-            <input type="number" id="xf-rz" value="0" step="1" style="width:65px">
+            <input type="number" id="xf-rx" value="0" step="1" style="width:56px">
+            <input type="number" id="xf-ry" value="0" step="1" style="width:56px">
+            <input type="number" id="xf-rz" value="0" step="1" style="width:56px">
           </div>
           <div class="field-row">
             <span class="field-label">Direction</span>
             <select id="xf-r-dir">
               <option value="right_hand">Right-hand (CCW positive)</option>
               <option value="left_hand">Left-hand (CW positive)</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <span class="field-label">Axes</span>
+            <select id="xf-r-reference">
+              <option value="global">Global</option>
+              <option value="local">Local</option>
             </select>
           </div>
           <div class="field-row">
@@ -502,6 +509,7 @@ let state = {
     widDir:  'AP',  // device +X (width axis) points along this instrument direction at rest
   },
   transforms: exampleEnabled ? [
+    { type: 'R', angles: [-15, 0, 0], direction: 'right_hand', referenceCoordinateSystem: 'local', pivot: 'global' },
     { type: 'T', translation: [1.2, -2, -0.5], frame: 'global' },
     { type: 'T', translation: [0, 4, 0], frame: 'local' },
   ] : [],
@@ -814,10 +822,14 @@ function applyTransformToState(pos, dir, wid, xf, basis) {
       pos = applyBasisTranslation(pos, t, basis);
     }
   } else if (xf.type === 'R') {
-    dir = applyRotation(dir, xf.angles, basis, xf.direction);
-    wid = applyRotation(wid, xf.angles, basis, xf.direction);
+    const localUp = getDeviceNormal(wid, dir);
+    const rotationBasis = xf.referenceCoordinateSystem === 'local'
+      ? [wid, dir, localUp]
+      : basis;
+    dir = applyRotation(dir, xf.angles, rotationBasis, xf.direction);
+    wid = applyRotation(wid, xf.angles, rotationBasis, xf.direction);
     if (xf.pivot !== 'local') {
-      pos = applyRotation(pos, xf.angles, basis, xf.direction);
+      pos = applyRotation(pos, xf.angles, rotationBasis, xf.direction);
     }
   }
   return { pos, dir, wid };
@@ -927,13 +939,10 @@ function rebuildScene() {
   }
 
   // Step markers
-  const rgb = [74, 144, 226];
   for (let s = 1; showDevice && s < steps.length; s++) {
     const step = steps[s];
     const [spx, spy, spz] = step.pos;
-    const [sdx, sdy, sdz] = norm3(step.dir);
     const origin = new THREE.Vector3(spx, spy, spz);
-    const sDir = new THREE.Vector3(sdx, sdy, sdz);
     const frac = s / (steps.length);
     const col = new THREE.Color(0.2 + 0.6 * frac, 0.4 + 0.4 * frac, 0.9);
 
@@ -941,14 +950,6 @@ function rebuildScene() {
       const sp = new THREE.Mesh(new THREE.SphereGeometry(0.28, 10, 10), new THREE.MeshBasicMaterial({ color: col }));
       sp.position.copy(origin);
       stepGroup.add(sp);
-    } else {
-      const cyl = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.12, 0.12, 2.5, 8),
-        new THREE.MeshBasicMaterial({ color: col })
-      );
-      cyl.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), sDir);
-      cyl.position.copy(origin).addScaledVector(sDir, 1.25);
-      stepGroup.add(cyl);
     }
   }
 
@@ -1009,6 +1010,7 @@ function buildExport() {
     } else {
       const vals = xf.angles.map(v => v.toFixed(4)).join(', ');
       const extras = [];
+      if (xf.referenceCoordinateSystem && xf.referenceCoordinateSystem !== 'global') extras.push(`        reference_coordinate_system=ReferenceCoordinateSystem.LOCAL,`);
       if (xf.direction && xf.direction !== 'right_hand') extras.push(`        rotation_direction=RotationDirection.LEFT_HAND,`);
       if (xf.pivot && xf.pivot !== 'global') extras.push(`        pivot=ReferenceCoordinateSystem.LOCAL,`);
       const ex = extras.length ? '\n' + extras.join('\n') : '';
@@ -1161,6 +1163,7 @@ function openEditPanel(xf) {
     document.getElementById('xf-ry').value = xf.angles[1] ?? 0;
     document.getElementById('xf-rz').value = xf.angles[2] ?? 0;
     document.getElementById('xf-r-dir').value = xf.direction || 'right_hand';
+    document.getElementById('xf-r-reference').value = xf.referenceCoordinateSystem || 'global';
     document.getElementById('xf-pivot').value = xf.pivot || 'global';
   }
   updateTranslationLabel();
@@ -1189,6 +1192,7 @@ document.getElementById('add-rotation-btn').addEventListener('click', () => {
   document.getElementById('xf-ry').value = 0;
   document.getElementById('xf-rz').value = 0;
   document.getElementById('xf-r-dir').value = 'right_hand';
+  document.getElementById('xf-r-reference').value = 'global';
   document.getElementById('xf-pivot').value = 'global';
   document.getElementById('xform-edit').classList.remove('hidden');
   clearSelection();
@@ -1216,6 +1220,7 @@ document.getElementById('xf-apply-btn').addEventListener('click', () => {
         parseFloat(document.getElementById('xf-rz').value) || 0,
       ],
       direction: document.getElementById('xf-r-dir').value,
+      referenceCoordinateSystem: document.getElementById('xf-r-reference').value,
       pivot: document.getElementById('xf-pivot').value,
     };
   }

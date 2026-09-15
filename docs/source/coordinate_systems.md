@@ -78,7 +78,7 @@ The **Local Coordinate System** is the definition of how a device appears in the
 </iframe>
 ```
 
-Finally, the **Local to Global Transform(s)** define the actual rotation and position of the device during the experiment. The transforms are local to global because they tell you how a position on the device, e.g. the device origin (0, 0, 0) should be located in the scene. We encourage users to develop chains of transforms because they are more intuitive for humans. For example, the scene below chains together a global translation from bregma to the entry coordinate on the brain surface, followed by a local translation on the probe depth axis. [Open this IBL insertion example in the builder](_static/coordinate_system_builder.html?mode=transform&example=true) and export your own transform chain.
+Finally, the **Local to Global Transform(s)** define the actual rotation and position of the device during the experiment. The transforms are local to global because they tell you how a position on the device, e.g. the device origin (0, 0, 0) should be located in the scene. We encourage users to develop chains of transforms because they are more intuitive for humans. For example, the scene below chains together a local rotation to set the probe pitch, a global translation from bregma to the entry coordinate on the brain surface, and finally a local translation on the probe depth axis.
 
 ```{raw} html
 <p style="margin-bottom:6px">
