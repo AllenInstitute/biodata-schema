@@ -198,6 +198,25 @@ class TestDAQChannel:
 class TestMonitor:
     """tests Monitor schemas"""
 
+    @pytest.mark.parametrize("setting", ["contrast", "brightness"])
+    def test_zero_setting_requires_units(self, setting):
+        """Zero is a supplied monitor setting, not a missing value."""
+        values = dict(
+            name="test_monitor",
+            manufacturer=Organization.ASUS,
+            refresh_rate=60,
+            width=1920,
+            height=1080,
+            viewing_distance=15.0,
+            relative_position=[],
+        )
+        assert getattr(Monitor(**values), setting) is None
+        values[setting] = 0
+        with pytest.raises(ValidationError, match=f"Unit {setting}_unit is required"):
+            Monitor(**values)
+        values[f"{setting}_unit"] = UnitlessUnit.PERCENT
+        assert getattr(Monitor(**values), setting) == 0
+
     def test_contrast_brightness_units_not_inferred(self):
         """Units for contrast and brightness are no longer filled in automatically"""
 

@@ -101,6 +101,19 @@ class TestBase:
         test3 = MultiModel(value_multi_unit="unit")
         assert test3 is not None
 
+    def test_zero_multi_value_requires_unit(self):
+        """A zero-valued member of a measurement group still needs units."""
+
+        class Measurement(DataModel):
+            """Measurement with shared units."""
+
+            value_start: Optional[float] = None
+            value_unit: Optional[str] = None
+
+        with pytest.raises(ValidationError, match="Unit value_unit is required"):
+            Measurement(value_start=0)
+        assert Measurement(value_start=0, value_unit="mm").value_start == 0
+
     def test_is_dict_corrupt(self):
         """Tests is_dict_corrupt method"""
         good_contents = [

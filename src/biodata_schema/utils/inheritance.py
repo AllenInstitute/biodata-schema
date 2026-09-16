@@ -70,6 +70,7 @@ def derive_data_description_from_raw(
 
     return DataDescription(
         subject_id=_get_or_default(data_description, "subject_id", kwargs),
+        license=_get_or_default(data_description, "license", kwargs),
         creation_time=creation_time,
         tags=_get_or_default(data_description, "tags", kwargs),
         name=derived_name,
@@ -134,6 +135,7 @@ def derive_data_description_from_derived(
 
     return DataDescription(
         subject_id=_get_or_default(data_description, "subject_id", kwargs),
+        license=_get_or_default(data_description, "license", kwargs),
         creation_time=creation_time,
         tags=_get_or_default(data_description, "tags", kwargs),
         name=derived_name,
@@ -232,6 +234,7 @@ def derive_data_description_analyzed(
 
     return DataDescription(
         subject_id=_get_or_default(data_description, "subject_id", kwargs),
+        license=_get_or_default(data_description, "license", kwargs),
         creation_time=creation_time,
         tags=_get_or_default(data_description, "tags", kwargs),
         name=analyzed_name,

@@ -62,9 +62,12 @@ ProbeConfig(..., coordinate_system=CoordinateSystemLibrary.BREGMA_ARI)
 
 **After**
 
+Here `BREGMA_ARI` is a coordinate system defined by your project, as shown in
+[section 9](#9-coordinatesystemlibrary-removed).
+
 ```python
-Acquisition(..., global_coordinate_system=CoordinateSystemLibrary.BREGMA_ARI)
-ProbeConfig(..., local_coordinate_system=CoordinateSystemLibrary.BREGMA_ARI)
+Acquisition(..., global_coordinate_system=BREGMA_ARI)
+ProbeConfig(..., local_coordinate_system=BREGMA_ARI)
 ```
 
 Keep `AtlasCoordinate.coordinate_system`. It stores an `Atlas` and does not use the renamed
@@ -101,10 +104,12 @@ PlanarSection(
     coordinate_system_name="BREGMA_ARI",
     start_coordinate=Translation(translation=[0.3, 0, 0]),
     thickness=0.1,
+    thickness_unit=SizeUnit.MM,
 )
 ```
 
-`PlanarSection` requires `coordinate_system_name` and `start_coordinate`.
+`PlanarSection` requires `coordinate_system_name`, `start_coordinate`, and either
+`end_coordinate` or `thickness`. When supplying `thickness`, also supply `thickness_unit`.
 
 ## 3. Device size fields replaced by `shape`
 
@@ -214,7 +219,7 @@ Use a dictionary for `QCMetric.tags`. Version 3 removes the `fix_tag_lists` vali
 ### Related removal: `fix_default_grouping_list`
 
 Version 3 removes `QualityControl.fix_default_grouping_list`. Pass `default_grouping` as a
-list of tuples of strings.
+list of strings or for multi-branch hierarchies a list of tuples of strings.
 
 ## 9. `CoordinateSystemLibrary` removed
 
@@ -388,57 +393,62 @@ Do not add an `AxisName.DEPTH` axis to a `CoordinateSystem`.
 Record insertion depth as a **local translation along the device's own
 depth axis** instead.
 
-**Before**
+The coordinate system builder's probe example rotates the probe locally, translates
+to the entry point in the global frame, then inserts along the probe's local Y axis.
+The local positive Y axis points up the probe, so insertion uses a negative translation.
 
 ```python
-BREGMA_ARID = CoordinateSystem(
-    name="BREGMA_ARID",
+from biodata_models.coordinates import AxisName, Direction, Origin
+from biodata_models.units import AngleUnit, SizeUnit
+from biodata_schema.components.coordinates import (
+    Axis,
+    CoordinateSystem,
+    Handedness,
+    ReferenceCoordinateSystem,
+    Rotation,
+    Translation,
+)
+
+instrument_cs = CoordinateSystem(
+    name="BREGMA_RAS",
     origin=Origin.BREGMA,
     axis_unit=SizeUnit.MM,
+    handedness=Handedness.RIGHT,
     axes=[
-        Axis(name=AxisName.AP, direction=Direction.PA),
         Axis(name=AxisName.ML, direction=Direction.LR),
-        Axis(name=AxisName.SI, direction=Direction.SI),
-        Axis(name=AxisName.DEPTH, direction=Direction.UD),
+        Axis(name=AxisName.AP, direction=Direction.PA),
+        Axis(name=AxisName.SI, direction=Direction.IS),
     ],
 )
 
-BrainInjection(
-    ...,
-    coordinate_system_name="BREGMA_ARID",
-    coordinates=[[Translation(translation=[-0.85, -3.8, 0, 3.3])]],
-)
-```
-
-**After**
-
-```python
-BREGMA_ARI = CoordinateSystem(
-    name="BREGMA_ARI",
-    origin=Origin.BREGMA,
+device_cs = CoordinateSystem(
+    name="Probe",
+    origin=Origin.TIP,
     axis_unit=SizeUnit.MM,
+    handedness=Handedness.LEFT,
     axes=[
-        Axis(name=AxisName.AP, direction=Direction.PA),
-        Axis(name=AxisName.ML, direction=Direction.LR),
-        Axis(name=AxisName.SI, direction=Direction.SI),
+        Axis(name=AxisName.X, direction=Direction.AP),
+        Axis(name=AxisName.Y, direction=Direction.DU),
+        Axis(name=AxisName.Z, direction=Direction.LR),
     ],
 )
 
-BrainInjection(
-    ...,
-    coordinate_system_name="BREGMA_ARI",
-    coordinates=[
-        [
-            Translation(translation=[-0.85, -3.8, 0]),
-            Rotation(angles=[0, 10, 0]),
-            Translation(
-                translation=[0, 0, 3.3],
-                reference_coordinate_system=ReferenceCoordinateSystem.LOCAL,
-            ),
-        ],
-    ],
-)
+transform = [
+    Rotation(
+        angles=[-15, 0, 0],
+        angles_unit=AngleUnit.DEG,
+        reference_coordinate_system=ReferenceCoordinateSystem.LOCAL,
+    ),
+    Translation(translation=[1.2, -2, -0.5]),
+    Translation(
+        translation=[0, -4, 0],
+        reference_coordinate_system=ReferenceCoordinateSystem.LOCAL,
+    ),
+]
 ```
+
+Use `instrument_cs` as the acquisition's `global_coordinate_system`, `device_cs` as
+the `ProbeConfig.local_coordinate_system`, and `transform` as `ProbeConfig.transform`.
 
 See the [coordinate systems page](https://biodata-schema.readthedocs.io/en/latest/coordinate_systems.html)
 and the examples in `examples/` for the full pattern.

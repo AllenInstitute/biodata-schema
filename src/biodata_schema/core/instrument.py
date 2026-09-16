@@ -56,7 +56,7 @@ from biodata_schema.components.devices import (
 )
 from biodata_schema.components.measurements import CALIBRATIONS
 from biodata_schema.utils.merge import merge_notes, merge_optional_list, merge_str_alphabetical
-from biodata_schema.utils.validators import recursive_get_all_names, recursive_get_named_objects
+from biodata_schema.utils.validators import recursive_get_device_names, recursive_get_named_objects
 
 logger = logging.getLogger(__name__)
 
@@ -172,10 +172,7 @@ class Instrument(DataCoreModel):
     def get_component_names(self) -> List[str]:
         """Get the name field of all components, recurse into assemblies."""
 
-        names = []
-        for component in self.components:
-            names.extend(recursive_get_all_names(component))
-        names = [name for name in names if name is not None]
+        names = recursive_get_device_names(self.components)
 
         # Include the instrument ID as a valid name
         names = names + [self.instrument_id]

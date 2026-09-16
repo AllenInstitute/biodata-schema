@@ -596,13 +596,22 @@ function getDeviceNormal(wid, long) {
   ];
 }
 
+function getDeviceBasis(wid, long) {
+  const width = Array.isArray(wid) ? wid : [wid.x, wid.y, wid.z];
+  const direction = Array.isArray(long) ? long : [long.x, long.y, long.z];
+  const normal = getDeviceNormal(width, direction);
+  return state.device.type === 'probe'
+    ? [width, direction, normal]
+    : [width, normal, direction];
+}
+
 function inferDevHandedness() {
   const lv = DIR_TO_THREEJS[state.device.longDir] || [0,0,1];
   const wv = DIR_TO_THREEJS[state.device.widDir]  || [1,0,0];
-  const nv = getDeviceNormal(wv, lv);
-  const cross = [wv[1]*lv[2]-wv[2]*lv[1], wv[2]*lv[0]-wv[0]*lv[2], wv[0]*lv[1]-wv[1]*lv[0]];
-  const dot = cross[0]*nv[0] + cross[1]*nv[1] + cross[2]*nv[2];
-  const mag = Math.sqrt(nv[0]**2+nv[1]**2+nv[2]**2);
+  const [axisX, axisY, axisZ] = getDeviceBasis(wv, lv);
+  const cross = [axisX[1]*axisY[2]-axisX[2]*axisY[1], axisX[2]*axisY[0]-axisX[0]*axisY[2], axisX[0]*axisY[1]-axisX[1]*axisY[0]];
+  const dot = cross[0]*axisZ[0] + cross[1]*axisZ[1] + cross[2]*axisZ[2];
+  const mag = Math.sqrt(axisZ[0]**2+axisZ[1]**2+axisZ[2]**2);
   return mag < 1e-6 ? null : (dot > 0 ? 'right' : 'left');
 }
 
@@ -642,15 +651,21 @@ function updateTranslationLabel() {
   const axNames = state.cs.axes.map(a => a.name);
   const tLabel = document.getElementById('xf-t-label');
   if (!tLabel) return;
-  const editPos = editIdx !== null ? editIdx : state.transforms.length;
-  const hasPriorRotation = state.transforms.slice(0, editPos).some(xf => xf.type === 'R');
-  if (frame === 'local' && hasPriorRotation) {
+  if (frame === 'local') {
     tLabel.textContent = 'X / Y / Z';
   } else {
     tLabel.textContent = axNames.length >= 3
       ? `${axNames[0]} / ${axNames[1]} / ${axNames[2]}`
       : 'Axis0 / Axis1 / Axis2';
   }
+}
+
+function updateRotationLabel() {
+  const label = document.getElementById('xf-rot-label');
+  const axes = state.cs.axes.map(axis => axis.name);
+  label.textContent = document.getElementById('xf-r-reference').value === 'local'
+    ? 'R(X) / R(Y) / R(Z)'
+    : axes.length >= 3 ? `R(${axes[0]}) / R(${axes[1]}) / R(${axes[2]})` : 'R0 / R1 / R2';
 }
 
 function getBasis(cs) {
@@ -813,19 +828,13 @@ function applyTransformToState(pos, dir, wid, xf, basis) {
   if (xf.type === 'T') {
     const t = xf.translation;
     if (xf.frame === 'local') {
-      const localUp = [
-        wid[1]*dir[2] - wid[2]*dir[1],
-        wid[2]*dir[0] - wid[0]*dir[2],
-        wid[0]*dir[1] - wid[1]*dir[0],
-      ];
-      pos = applyBasisTranslation(pos, t, [wid, dir, localUp]);
+      pos = applyBasisTranslation(pos, t, getDeviceBasis(wid, dir));
     } else {
       pos = applyBasisTranslation(pos, t, basis);
     }
   } else if (xf.type === 'R') {
-    const localUp = getDeviceNormal(wid, dir);
     const rotationBasis = xf.referenceCoordinateSystem === 'local'
-      ? [wid, dir, localUp]
+      ? getDeviceBasis(wid, dir)
       : basis;
     dir = applyRotation(dir, xf.angles, rotationBasis, xf.direction);
     wid = applyRotation(wid, xf.angles, rotationBasis, xf.direction);
@@ -879,13 +888,7 @@ function rebuildScene() {
   basis.forEach((b, i) => mkArrow(b, axColors[i], axLabels[i], axisArrowGroup));
 
   // Update rotation and translation input labels to match CS axis names
-  const axNames = state.cs.axes.map(a => a.name);
-  const rotLabel = document.getElementById('xf-rot-label');
-  if (rotLabel) {
-    rotLabel.textContent = axNames.length >= 3
-      ? `R(${axNames[0]}) / R(${axNames[1]}) / R(${axNames[2]})`
-      : 'R0 / R1 / R2';
-  }
+  updateRotationLabel();
   updateTranslationLabel();
 
   const showDevice = isFullMode || builderMode !== 'global';
@@ -982,24 +985,14 @@ function buildExport() {
   // The device normal follows the same orientation as the rendered device.
   const lv = DIR_TO_THREEJS[devCs.longDir] || [0,0,1];
   const wv = DIR_TO_THREEJS[devCs.widDir]  || [1,0,0];
-  const upv = getDeviceNormal(wv, lv);
-  const upDir = vecToDir(upv) || 'POS';
-  let devAxLines;
-  if (state.device.type === 'probe') {
-    // Probe: X=width, Y=long(insertion), Z=normal/thickness
-    devAxLines = [
-      `        Axis(name=AxisName.X, direction=Direction.${devCs.widDir}),  # width`,
-      `        Axis(name=AxisName.Y, direction=Direction.${devCs.longDir}),  # long/insertion`,
-      `        Axis(name=AxisName.Z, direction=Direction.${upDir}),  # normal/thickness`,
-    ].join('\n');
-  } else {
-    // Monitor: X=width, Y=up/height, Z=facing (normal to screen)
-    devAxLines = [
-      `        Axis(name=AxisName.X, direction=Direction.${devCs.widDir}),  # width`,
-      `        Axis(name=AxisName.Y, direction=Direction.${upDir}),  # up/height`,
-      `        Axis(name=AxisName.Z, direction=Direction.${devCs.longDir}),  # facing (normal to screen)`,
-    ].join('\n');
-  }
+  const deviceBasis = getDeviceBasis(wv, lv);
+  const deviceAxisNames = ['X', 'Y', 'Z'];
+  const deviceAxisLabels = state.device.type === 'probe'
+    ? ['width', 'long/insertion', 'normal/thickness']
+    : ['width', 'up/height', 'facing (normal to screen)'];
+  const devAxLines = deviceBasis.map((axis, index) =>
+    `        Axis(name=AxisName.${deviceAxisNames[index]}, direction=Direction.${vecToDir(axis) || 'POS'}),  # ${deviceAxisLabels[index]}`
+  ).join('\n');
   const devHandedness = inferDevHandedness();
   const devHanded = devHandedness ? `\n    handedness=Handedness.${devHandedness.toUpperCase()},` : '';
 
@@ -1168,9 +1161,11 @@ function openEditPanel(xf) {
     document.getElementById('xf-pivot').value = xf.pivot || 'global';
   }
   updateTranslationLabel();
+  updateRotationLabel();
 }
 
 document.getElementById('xf-t-frame').addEventListener('change', updateTranslationLabel);
+document.getElementById('xf-r-reference').addEventListener('change', updateRotationLabel);
 
 document.getElementById('add-translation-btn').addEventListener('click', () => {
   editIdx = null;
@@ -1196,6 +1191,7 @@ document.getElementById('add-rotation-btn').addEventListener('click', () => {
   document.getElementById('xf-r-reference').value = 'global';
   document.getElementById('xf-pivot').value = 'global';
   document.getElementById('xform-edit').classList.remove('hidden');
+  updateRotationLabel();
   clearSelection();
 });
 

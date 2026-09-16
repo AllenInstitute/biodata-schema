@@ -13,7 +13,7 @@ from biodata_models.units import ConcentrationUnit, CurrentUnit, SizeUnit, TimeU
 from pydantic import ValidationError
 
 from biodata_schema.components.configs import CatheterConfig
-from biodata_schema.components.coordinates import Origin, Translation
+from biodata_schema.components.coordinates import Origin, ReferenceCoordinateSystem, Translation
 from biodata_schema.components.devices import Catheter, Device
 from biodata_schema.components.injection_procedures import (
     InjectionDynamics,
@@ -241,7 +241,11 @@ class TestProcedures:
                             coordinates=[
                                 [
                                     Translation(
-                                        translation=[0.5, 1, 0, 1],
+                                        translation=[0.5, 1, 0],
+                                    ),
+                                    Translation(
+                                        translation=[0, 0, 1],
+                                        reference_coordinate_system=ReferenceCoordinateSystem.LOCAL,
                                     ),
                                 ],
                             ],

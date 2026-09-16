@@ -7,11 +7,24 @@ from typing import Annotated
 from unittest.mock import MagicMock, patch
 
 import pytest
+from biodata_models.units import SizeUnit, VolumeUnit
 from pydantic import BaseModel
 from pydantic_extra_types.timezone_name import TimeZoneName
 
 from biodata_schema.base import AwareDatetimeWithDefault, DataModel
-from biodata_schema.components.coordinates import Rotation, Scale, Translation
+from biodata_schema.components.configs import DeviceConfig, ManipulatorConfig
+from biodata_schema.components.coordinates import (
+    Affine,
+    AtlasCoordinate,
+    AtlasLibrary,
+    ReferenceCoordinateSystem,
+    Rotation,
+    Scale,
+    Translation,
+)
+from biodata_schema.components.injection_procedures import InjectionDynamics, InjectionProfile, ViralMaterial
+from biodata_schema.components.specimen_procedures import PlanarSection
+from biodata_schema.components.surgery_procedures import BrainInjection
 from biodata_schema.components.wrappers import AssetPath
 from biodata_schema.utils.validators import (
     TimeValidation,
@@ -28,6 +41,7 @@ from biodata_schema.utils.validators import (
     subject_specimen_id_compatibility,
     validate_creation_time_after_midnight,
 )
+from tests.coordinate_systems import BREGMA_ARI
 
 
 class TestCompatibilityCheck:
@@ -284,6 +298,104 @@ class TestRecursiveCoordSystemCheck:
 
         # Should pass validation - only the object with transforms is checked
         recursive_coord_system_check(container, self.coordinate_system_name, axis_count=2)
+
+
+@pytest.mark.parametrize("system_name", ["ARI", "", "NONEXISTENT"])
+def test_section_requires_exact_system_name(system_name):
+    """A substring of the coordinate system name is not a valid reference."""
+    section = PlanarSection(
+        output_specimen_id="123456_001",
+        coordinate_system_name=system_name,
+        start_coordinate=Translation(translation=[0, 0, 0]),
+        thickness=0.1,
+        thickness_unit=SizeUnit.MM,
+    )
+    with pytest.raises(ValueError, match="System name mismatch"):
+        recursive_coord_system_check(section, "BREGMA_ARI", 3)
+
+
+@pytest.mark.parametrize("field_name", ["start_coordinate", "end_coordinate"])
+def test_section_checks_coordinate_dimensions(field_name):
+    """Both endpoints use the containing coordinate system's dimensions."""
+    values = dict(
+        output_specimen_id="123456_001",
+        coordinate_system_name="BREGMA_ARI",
+        start_coordinate=Translation(translation=[0, 0, 0]),
+        end_coordinate=Translation(translation=[0, 0, 1]),
+    )
+    values[field_name] = Translation(translation=[0, 0])
+    with pytest.raises(ValueError, match="Axis count mismatch"):
+        recursive_coord_system_check(PlanarSection(**values), "BREGMA_ARI", 3)
+
+
+@pytest.mark.parametrize(
+    "system_name, axis_count, coordinate, error",
+    [
+        (None, None, [0, 0, 0], "CoordinateSystem is required"),
+        ("OTHER", 3, [0, 0, 0], "System name mismatch"),
+        ("BREGMA_ARI", 3, [0, 0], "Axis count mismatch"),
+    ],
+)
+def test_injection_checks_nested_transform_lists(system_name, axis_count, coordinate, error):
+    """Nested injection coordinates must not bypass frame validation."""
+    injection = BrainInjection(
+        coordinate_system_name="BREGMA_ARI",
+        coordinates=[[Translation(translation=coordinate)]],
+        injection_materials=[ViralMaterial(name="example")],
+        dynamics=[InjectionDynamics(profile=InjectionProfile.BOLUS, volume=1, volume_unit=VolumeUnit.UL)],
+    )
+    with pytest.raises(ValueError, match=error):
+        recursive_coord_system_check(injection, system_name, axis_count)
+
+
+@pytest.mark.parametrize(
+    "transform",
+    [
+        Translation(translation=[0, 0]),
+        Rotation(angles=[0, 0]),
+        Scale(scale=[1, 1]),
+        Affine(affine_transform=[[1, 0, 0]]),
+    ],
+)
+def test_device_transform_dimensions(transform):
+    """Device transform lists are validated without a coordinate_system_name field."""
+
+    class Config(DeviceConfig):
+        """Device config with a transform list."""
+
+        transform: list[Translation | Rotation | Scale | Affine]
+
+    with pytest.raises(ValueError, match="Axis count mismatch"):
+        recursive_coord_system_check(Config(device_name="probe", transform=[transform]), "BREGMA_ARI", 3)
+
+
+def test_measured_coordinate_dictionary():
+    """Measured coordinates inside mappings retain their containing frame."""
+    with pytest.raises(ValueError, match="Axis count mismatch"):
+        recursive_coord_system_check({"lambda": Translation(translation=[-4.1, 0])}, "BREGMA_ARI", 3)
+
+
+def test_local_and_atlas_coordinate_frames():
+    """Local positions and atlas coordinates use their own frames."""
+    manipulator = ManipulatorConfig(
+        device_name="manipulator",
+        local_coordinate_system=BREGMA_ARI,
+        local_axis_positions=Translation(translation=[0, 0, 0]),
+    )
+    recursive_coord_system_check(manipulator, None, None)
+    recursive_coord_system_check(
+        AtlasCoordinate(translation=[0, 0, 0], coordinate_system=AtlasLibrary.CCFv3_10um), None, None
+    )
+    recursive_coord_system_check(
+        Translation(translation=[0, 0, 1], reference_coordinate_system=ReferenceCoordinateSystem.LOCAL),
+        "planar",
+        2,
+        local_coordinate_system=BREGMA_ARI,
+    )
+    with pytest.raises(ValueError, match="Axis count mismatch"):
+        recursive_coord_system_check(
+            Translation(translation=[0, 0, 1]), "planar", 2, local_coordinate_system=BREGMA_ARI
+        )
 
 
 class MockEnum(Enum):

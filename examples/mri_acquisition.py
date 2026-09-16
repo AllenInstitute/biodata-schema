@@ -66,7 +66,7 @@ scan2 = MRIScan(
     repetition_time_unit=TimeUnit.S,
     affine_transform=[
         Affine(
-            affine_transform=[[1.0, 0.0, 0.0], [0.0, 0.0, -1.0], [0.0, 1.0, 0.0]],
+            affine_transform=[[1.0, 0.0, 0.0, 0.0], [0.0, 0.0, -1.0, 0.0], [0.0, 1.0, 0.0, 0.0]],
         ),
         Translation(
             translation=[-6.1, 7.0, 7.9],

@@ -110,7 +110,7 @@ a = Acquisition(
                             channel_name="Green channel",
                             image_to_acquisition_transform=[
                                 Translation(
-                                    translation=[1.5, 1.5],
+                                    translation=[1.5, 1.5, 0],
                                 ),
                             ],
                             dimensions=Scale(

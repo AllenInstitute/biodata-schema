@@ -852,6 +852,31 @@ class TestInstrument:
 
         assert inst_no_dup.validate_unique_component_names() is inst_no_dup
 
+    @pytest.mark.parametrize("endpoint", ["source_device", "target_device"])
+    def test_connections_reject_software_names(self, endpoint):
+        """Software is not a device endpoint even when it is attached to a camera."""
+        camera = Camera(
+            name="Camera",
+            detector_type=DetectorType.CAMERA,
+            manufacturer=Organization.AIND,
+            data_interface="USB",
+            recording_software=Software(name="Bonsai", version="2.5"),
+        )
+        values = dict(
+            instrument_id="rig",
+            modification_date=date(2026, 1, 1),
+            modalities=[],
+            global_coordinate_system=BREGMA_ARI,
+            components=[camera],
+        )
+        instrument = Instrument(**values)
+        assert instrument.get_component_names() == ["Camera", "rig"]
+        endpoints = dict(source_device="Camera", target_device="rig")
+        assert Instrument(**values, connections=[Connection(**endpoints)])
+        endpoints[endpoint] = "Bonsai"
+        with pytest.raises(ValidationError, match="Bonsai.*not part of the instrument"):
+            Instrument(**values, connections=[Connection(**endpoints)])
+
     def test_shared_software_name_allowed(self):
         """The same Software recorded on several devices is not a name collision"""
         shared_software = Software(name="Bonsai", version="2.5")

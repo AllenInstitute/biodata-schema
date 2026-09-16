@@ -165,14 +165,14 @@ class DataModel(BaseModel):
                 # Go through all the values again, if any value matches the variable name
                 # and is set, then the unit needs to be set as well
                 for variable_name, variable_value in values:
-                    if variable_name == var_name and variable_value:
+                    if variable_name == var_name and variable_value is not None:
                         raise ValueError(f"Unit {unit_name} is required when {variable_name} is set.")
 
                 # One more time, now looking for the multi-variable condition
                 for variable_name, variable_value in values:
                     # skip the unit itself
-                    if var_name is not unit_name:
-                        if var_name in variable_name and variable_value:
+                    if variable_name != unit_name:
+                        if var_name in variable_name and variable_value is not None:
                             raise ValueError(f"Unit {unit_name} is required when {variable_name} is set.")
         return self
 

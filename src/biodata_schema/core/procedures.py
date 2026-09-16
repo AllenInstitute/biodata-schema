@@ -16,7 +16,7 @@ from biodata_schema.components.subject_procedures import (
     WaterRestriction,
 )
 from biodata_schema.utils.merge import merge_coordinate_systems, merge_notes
-from biodata_schema.utils.validators import subject_specimen_id_compatibility
+from biodata_schema.utils.validators import recursive_get_device_names, subject_specimen_id_compatibility
 
 
 class Procedures(DataCoreModel):
@@ -64,7 +64,7 @@ class Procedures(DataCoreModel):
                         hasattr(surgery_procedure, "implanted_device")
                         and surgery_procedure.implanted_device is not None
                     ):
-                        device_names.add(surgery_procedure.implanted_device.name)
+                        device_names.update(recursive_get_device_names(surgery_procedure.implanted_device))
 
         # These commented lines are left in case we added implanted_devices to a specimen procedure
         # for spec_proc in self.specimen_procedures:

@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 
 import pytest
 from biodata_models.data_name_patterns import DataLevel
+from biodata_models.licenses import License
 from biodata_models.modalities import Modality
 from biodata_models.organizations import Organization
 
@@ -21,7 +22,10 @@ from biodata_schema.utils.inheritance import (
     _inherit_instrument_and_acquisition,
     _inherit_subject_and_procedures,
     derive_data_description_analyzed,
+    derive_data_description_from_derived,
+    derive_data_description_from_raw,
 )
+from examples.data_description import d as example_data_description
 from examples.ephys_instrument import inst as example_inst
 from examples.processing import p as example_processing
 from examples.quality_control import q as example_qc
@@ -59,6 +63,21 @@ def _make_metadata(subject_id="123456"):
         processing=example_processing,
         quality_control=example_qc,
     )
+
+
+@pytest.mark.parametrize(
+    "derive",
+    [derive_data_description_from_raw, derive_data_description_from_derived, derive_data_description_analyzed],
+)
+@pytest.mark.parametrize("override", [None, License.CC_BY_40])
+def test_derivation_preserves_or_overrides_license(derive, override):
+    """Every derivation path preserves the license unless explicitly overridden."""
+    source = example_data_description.model_copy(update={"license": License.MIT})
+    if derive is derive_data_description_from_derived:
+        source = derive_data_description_from_raw(source, "first", creation_time=t)
+    kwargs = {} if override is None else {"license": override}
+    result = derive(source, "analysis", creation_time=t, **kwargs)
+    assert result.license == (override or License.MIT)
 
 
 class TestFromMetadataSingleSource:

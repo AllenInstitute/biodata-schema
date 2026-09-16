@@ -114,7 +114,7 @@ stage_offset_from_origin = None
 
 image_to_acquisition_transform = [
     Scale(
-        scale=[0.25, 0.25],
+        scale=[0.25, 0.25, 1],
     ),
 ]
 if stage_offset_from_origin is not None:
