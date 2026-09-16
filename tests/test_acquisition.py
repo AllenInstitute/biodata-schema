@@ -7,23 +7,20 @@ from zoneinfo import ZoneInfo
 
 import pydantic
 import pytest
-from aind_data_schema_models.brain_atlas import CCFv3
-from aind_data_schema_models.modalities import Modality
+from biodata_models.modalities import Modality
 from pydantic import ValidationError
 
-from aind_data_schema.components.configs import (
+from biodata_schema.components.configs import (
     DeviceConfig,
     EphysAssemblyConfig,
     ImagingConfig,
     Immersion,
-    ManipulatorConfig,
-    MISModuleConfig,
     MRIScan,
     SampleChamberConfig,
 )
-from aind_data_schema.components.connections import Connection
-from aind_data_schema.components.coordinates import CoordinateSystemLibrary, Translation
-from aind_data_schema.core.acquisition import (
+from biodata_schema.components.connections import Connection
+from biodata_schema.core.acquisition import (
+    NON_IANA_TIMEZONES,
     Acquisition,
     AcquisitionSubjectDetails,
     DataStream,
@@ -114,55 +111,10 @@ class TestAcquisition:
 
     def test_specimen_required(self):
         """Test that specimen ID is required for in vitro imaging modalities"""
-        with pytest.raises(ValueError):
-            Acquisition(
-                experimenters=["Mam Moth"],
-                acquisition_start_time=datetime.now(),
-                acquisition_end_time=datetime.now(),
-                subject_id="123456",
-                acquisition_type="Test",
-                instrument_id="1234",
-                subject_details=AcquisitionSubjectDetails(
-                    mouse_platform_name="Running wheel",
-                ),
-                coordinate_system=CoordinateSystemLibrary.BREGMA_ARID,
-                data_streams=[
-                    DataStream(
-                        stream_start_time=datetime.now(),
-                        stream_end_time=datetime.now(),
-                        modalities=[Modality.SPIM],
-                        active_devices=["Stick_assembly", "Ephys_assemblyA"],
-                        configurations=[
-                            MISModuleConfig(
-                                device_name="Stick_assembly",
-                                arc_angle=24,
-                                module_angle=10,
-                            ),
-                            ManipulatorConfig(
-                                device_name="Ephys_assemblyA",
-                                arc_angle=0,
-                                module_angle=10,
-                                primary_targeted_structure=CCFv3.VISL,
-                                atlas_coordinates=[
-                                    Translation(
-                                        translation=[1, 1, 1, 0],
-                                    ),
-                                ],
-                                manipulator_coordinates=[
-                                    Translation(
-                                        translation=[1, 1, 1, 1],
-                                    )
-                                ],
-                                manipulator_axis_positions=[
-                                    Translation(
-                                        translation=[1, 1, 1, 0],
-                                    )
-                                ],
-                            ),
-                        ],
-                    )
-                ],
-            )
+        acq = exaspim_acquisition.model_copy()
+        acq.specimen_id = None
+        with pytest.raises(ValidationError, match="Specimen ID is required for modalities"):
+            Acquisition.model_validate_json(acq.model_dump_json())
 
     def test_check_modality_config_requirements(self):
         """Test that modality configuration requirements are enforced"""
@@ -318,7 +270,7 @@ class TestAcquisition:
         """
 
         # Import the calibration and maintenance base classes to exclude them
-        from aind_data_schema.components.measurements import Calibration, Maintenance
+        from biodata_schema.components.measurements import Calibration, Maintenance
 
         # Get all subclasses of DeviceConfig using introspection
         def get_all_subclasses(cls):
@@ -607,3 +559,20 @@ class TestAcquisition:
         assert Acquisition.coerce_fixed_offset_tz_string(None) is None
         assert Acquisition.coerce_fixed_offset_tz_string(-7) == -7
         assert Acquisition.coerce_fixed_offset_tz_string("America/Los_Angeles") == "America/Los_Angeles"
+
+    def test_reject_non_iana_tz(self):
+        """Host timezone artifacts are rejected, real zones and offsets pass through"""
+        for name in NON_IANA_TIMEZONES:
+            with pytest.raises(ValueError) as context:
+                Acquisition.reject_non_iana_tz(name)
+            assert "is not an IANA timezone name" in str(context.value)
+
+        assert Acquisition.reject_non_iana_tz("America/Los_Angeles") == "America/Los_Angeles"
+        assert Acquisition.reject_non_iana_tz(-7) == -7
+        assert Acquisition.reject_non_iana_tz(None) is None
+
+    def test_non_iana_tz_absent_from_schema(self):
+        """The generated enum never advertises host timezone artifacts"""
+        enum = Acquisition.model_json_schema()["properties"]["acquisition_start_tz"]["anyOf"][1]["enum"]
+        assert not NON_IANA_TIMEZONES.intersection(enum)
+        assert "America/Los_Angeles" in enum

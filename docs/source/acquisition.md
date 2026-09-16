@@ -1,6 +1,6 @@
 # Acquisition
 
-[Link to code](https://github.com/AllenNeuralDynamics/biodata-schema/blob/dev/src/aind_data_schema/core/acquisition.py)
+[Link to code](https://github.com/AllenNeuralDynamics/biodata-schema/blob/dev/src/biodata_schema/core/acquisition.py)
 
 An acquisition is single episode of data collection that creates one data asset.
 
@@ -87,7 +87,6 @@ while the StimulusEpoch represents all stimuli being presented.
 | `instrument_id` | `Optional[str]` | Instrument ID (Should match the Instrument.instrument_id. Required when instrument metadata is available.) |
 | `acquisition_type` | `str` | Acquisition type (Descriptive string detailing the type of acquisition, should be consistent across similar acquisitions for the same experiment.) |
 | `notes` | `Optional[str]` | Notes  |
-| <del>`coordinate_system`</del> | Optional[[CoordinateSystem](components/coordinates.md#coordinatesystem)] | **[DEPRECATED]** Deprecated: use global_coordinate_system instead. Coordinate system (Origin and axis definitions for determining the configured position of devices during acquisition. Required when coordinates are provided within the Acquisition) |
 | `global_coordinate_system` | Optional[[CoordinateSystem](components/coordinates.md#coordinatesystem)] | Global coordinate system (Origin and axis definitions for determining the configured position of devices during acquisition. Required when coordinates are provided within the Acquisition) |
 | `calibrations` | List[[Calibration](components/measurements.md#calibration) or [VolumeCalibration](components/measurements.md#volumecalibration) or [PowerCalibration](components/measurements.md#powercalibration)] | Calibrations (List of calibration measurements taken prior to acquisition.) |
 | `maintenance` | List[[Maintenance](components/measurements.md#maintenance)] | Maintenance (List of maintenance on instrument prior to acquisition.) |
@@ -108,11 +107,11 @@ Details about the subject during an acquisition
 |-------|------|-------------|
 | `animal_weight_prior` | `Optional[decimal.Decimal]` | Animal weight (g) (Animal weight before procedure) |
 | `animal_weight_post` | `Optional[decimal.Decimal]` | Animal weight (g) (Animal weight after procedure) |
-| `weight_unit` | [MassUnit](aind_data_schema_models/units.md#massunit) | Weight unit  |
+| `weight_unit` | [MassUnit](biodata_models/units.md#massunit) | Weight unit  |
 | `anaesthesia` | Optional[[Anaesthetic](components/surgery_procedures.md#anaesthetic)] | Anaesthesia (Anaesthesia present during entire acquisition, use Manipulation for partial anaesthesia) |
 | `mouse_platform_name` | `str` | Mouse platform (The surface that the mouse is on during the acquisition) |
 | `reward_consumed_total` | `Optional[decimal.Decimal]` | Total reward consumed (mL)  |
-| `reward_consumed_unit` | Optional[[VolumeUnit](aind_data_schema_models/units.md#volumeunit)] | Reward consumed unit  |
+| `reward_consumed_unit` | Optional[[VolumeUnit](biodata_models/units.md#volumeunit)] | Reward consumed unit  |
 
 
 ### DataStream
@@ -124,7 +123,7 @@ same time.
 |-------|------|-------------|
 | `stream_start_time` | `datetime (timezone-aware)` | Stream start time  |
 | `stream_end_time` | `datetime (timezone-aware)` | Stream stop time  |
-| `modalities` | List[[Modality](aind_data_schema_models/modalities.md#modality)] | Modalities (Modalities that are acquired in this stream) |
+| `modalities` | List[[Modality](biodata_models/modalities.md#modality)] | Modalities (Modalities that are acquired in this stream) |
 | `code` | Optional[List[[Code](components/identifiers.md#code)]] | Acquisition code  |
 | `notes` | `Optional[str]` | Notes  |
 | `active_devices` | `List[str]` | Active devices (Device names must match devices in the Instrument) |
@@ -140,7 +139,7 @@ A simplified data stream for acquisitions where instrument metadata is unavailab
 |-------|------|-------------|
 | `stream_start_time` | `datetime (timezone-aware)` | Stream start time  |
 | `stream_end_time` | `datetime (timezone-aware)` | Stream stop time  |
-| `modalities` | List[[Modality](aind_data_schema_models/modalities.md#modality)] | Modalities (Modalities that are acquired in this stream) |
+| `modalities` | List[[Modality](biodata_models/modalities.md#modality)] | Modalities (Modalities that are acquired in this stream) |
 | `notes` | `Optional[str]` | Notes  |
 
 
@@ -166,7 +165,7 @@ Summary of a StimulusEpoch
 |-------|------|-------------|
 | `output_parameters` | `Optional[dict]` | Additional metrics  |
 | `reward_consumed_during_epoch` | `Optional[decimal.Decimal]` | Reward consumed during training (uL)  |
-| `reward_consumed_unit` | Optional[[VolumeUnit](aind_data_schema_models/units.md#volumeunit)] | Reward consumed unit  |
+| `reward_consumed_unit` | Optional[[VolumeUnit](biodata_models/units.md#volumeunit)] | Reward consumed unit  |
 | `trials_total` | `Optional[int]` | Total trials  |
 | `trials_finished` | `Optional[int]` | Finished trials  |
 | `trials_rewarded` | `Optional[int]` | Rewarded trials  |
@@ -183,7 +182,7 @@ same time. Not all acquisitions have StimulusEpochs.
 | `stimulus_end_time` | `datetime (timezone-aware)` | Stimulus end time (When a specific stimulus ends. This might be the same as the acquisition end time.) |
 | `stimulus_name` | `str` | Stimulus name  |
 | `code` | Optional[[Code](components/identifiers.md#code)] | Code or script (Custom code/script used to control the behavior/stimulus. Use the Code.parameters field to store stimulus properties) |
-| `stimulus_modalities` | List[[StimulusModality](aind_data_schema_models/stimulus_modality.md#stimulusmodality)] | Stimulus modalities  |
+| `stimulus_modalities` | List[[StimulusModality](biodata_models/stimulus_modality.md#stimulusmodality)] | Stimulus modalities  |
 | `performance_metrics` | Optional[[PerformanceMetrics](acquisition.md#performancemetrics)] | Performance metrics  |
 | `notes` | `Optional[str]` | Notes  |
 | `active_devices` | `List[str]` | Active devices (Device names must match devices in the Instrument) |

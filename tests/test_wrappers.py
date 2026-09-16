@@ -2,7 +2,7 @@
 
 from pathlib import Path, PureWindowsPath
 
-from aind_data_schema.components.wrappers import AssetPath
+from biodata_schema.components.wrappers import AssetPath
 
 
 class TestAssetPath:

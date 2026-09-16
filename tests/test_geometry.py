@@ -1,8 +1,8 @@
 """Tests for the geometry module"""
 
-from aind_data_schema_models.units import SizeUnit
+from biodata_models.units import SizeUnit
 
-from aind_data_schema.components.geometry import Circle, Rectangle
+from biodata_schema.components.geometry import Circle, Rectangle
 
 
 class TestRectangle:

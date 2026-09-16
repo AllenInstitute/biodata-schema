@@ -1,0 +1,626 @@
+"""Configurations for devices, software, and other components during acquisition"""
+
+from decimal import Decimal
+from enum import Enum
+from typing import List, Optional
+
+from biodata_models.brain_atlas import BrainStructureModel
+from biodata_models.coordinates import AnatomicalRelative
+from biodata_models.devices import ImmersionMedium
+from biodata_models.mouse_anatomy import MouseAnatomyModel
+from biodata_models.slap2_acquisition_type import Slap2AcquisitionType
+from biodata_models.units import (
+    AngleUnit,
+    ConcentrationUnit,
+    FrequencyUnit,
+    PowerUnit,
+    PressureUnit,
+    SizeUnit,
+    SoundIntensityUnit,
+    TimeUnit,
+    VolumeUnit,
+)
+from pydantic import Field, field_validator, model_validator
+from pydantic_core.core_schema import ValidationInfo
+
+from biodata_schema.base import (
+    AwareDatetimeWithDefault,
+    DataModel,
+    Discriminated,
+    DiscriminatedList,
+    GenericModel,
+)
+from biodata_schema.components.coordinates import (
+    TRANSFORM_TYPES,
+    AtlasCoordinate,
+    CoordinateSystem,
+    Scale,
+    Translation,
+)
+from biodata_schema.components.devices import DevicePosition
+from biodata_schema.components.geometry import Rectangle
+from biodata_schema.components.identifiers import Code
+from biodata_schema.components.wrappers import AssetPath
+
+
+class PowerFunction(str, Enum):
+    """Power functions"""
+
+    CONSTANT = "Constant"
+    LINEAR = "Linear"
+    EXPONENTIAL = "Exponential"
+    OTHER = "Other"
+
+
+class Valence(str, Enum):
+    """Valence of a stimulus"""
+
+    POSITIVE = "Positive"
+    NEGATIVE = "Negative"
+    NEUTRAL = "Neutral"
+    UNKNOWN = "Unknown"
+
+
+class Liquid(str, Enum):
+    """Solution names"""
+
+    WATER = "Water"
+    SUCROSE = "Sucrose"
+    QUININE = "Quinine"
+    CITRIC_ACID = "Citric acid"
+    OTHER = "Other"
+
+
+class TriggerType(str, Enum):
+    """Types of detector triggers"""
+
+    INTERNAL = "Internal"
+    EXTERNAL = "External"
+    ANALOG = "Analog"
+
+
+class PulseSequenceType(str, Enum):
+    """MRI pulse sequence type"""
+
+    RARE = "RARE"
+    FLASH = "FLASH"
+    MSME = "MSME"
+    OTHER = "Other"
+
+
+class MRAcquisitionType(str, Enum):
+    """MRI acquisition type"""
+
+    SCAN_2D = "2D"
+    SCAN_3D = "3D"
+
+
+class SubjectPosition(str, Enum):
+    """Subject position"""
+
+    PRONE = "Prone"
+    SUPINE = "Supine"
+
+
+class NeuronStructure(str, Enum):
+    """Neuronal structures captured in imaging planes"""
+
+    SOMA = "Soma"
+    DENDRITE = "Dendrite"
+    AXON = "Axon"
+    OTHER = "Other"
+
+
+class DeviceConfig(DataModel):
+    """Parent class for all configurations"""
+
+    device_name: str = Field(..., title="Device name", description="Must match a device defined in the instrument.json")
+
+
+# IMAGING CONFIGS
+
+
+class DetectorConfig(DeviceConfig):
+    """Configuration of detector settings"""
+
+    exposure_time: Optional[float] = Field(default=None, title="Exposure time")
+    exposure_time_unit: TimeUnit = Field(default=TimeUnit.MS, title="Exposure time unit")
+    trigger_type: TriggerType = Field(..., title="Trigger type")
+
+    compression: Optional[Code] = Field(
+        default=None,
+        title="Compression",
+        description="Compression algorithm used during acquisition",
+    )
+    crop_offset_x: Optional[int] = Field(
+        default=None, title="Crop offset x", description="Overrides any value set in the Instrument metadata"
+    )
+    crop_offset_y: Optional[int] = Field(
+        default=None, title="Crop offset y", description="Overrides any value set in the Instrument metadata"
+    )
+    crop_width: Optional[int] = Field(
+        default=None, title="Crop width", description="Overrides any value set in the Instrument metadata"
+    )
+    crop_height: Optional[int] = Field(
+        default=None, title="Crop height", description="Overrides any value set in the Instrument metadata"
+    )
+    crop_unit: Optional[SizeUnit] = Field(default=SizeUnit.PX, title="Crop size unit")
+
+
+class LaserConfig(DeviceConfig):
+    """Configuration of laser settings in an acquisition"""
+
+    wavelength: int = Field(..., title="Wavelength (nm)")
+    wavelength_unit: SizeUnit = Field(default=SizeUnit.NM, title="Wavelength unit")
+    power: Optional[float] = Field(default=None, title="Excitation power")
+    power_unit: Optional[PowerUnit] = Field(default=None, title="Excitation power unit")
+    power_measured_at: Optional[str] = Field(
+        default=None, title="Power measurement location", description="For example: objective, patch cable, etc"
+    )
+
+
+class LightEmittingDiodeConfig(DeviceConfig):
+    """Configuration of LED settings"""
+
+    power: Optional[float] = Field(default=None, title="Excitation power")
+    power_unit: Optional[PowerUnit] = Field(default=None, title="Excitation power unit")
+    power_measured_at: Optional[str] = Field(
+        default=None, title="Power measurement location", description="For example: objective, patch cable, etc"
+    )
+
+
+LIGHT_CONFIGS = DiscriminatedList[LaserConfig | LightEmittingDiodeConfig]
+
+
+class Channel(DataModel):
+    """Configuration of a channel"""
+
+    channel_name: str = Field(..., title="Channel")
+    intended_measurement: Optional[str] = Field(
+        default=None, title="Intended measurement", description="What signal is this channel measuring"
+    )
+    detector: DetectorConfig = Field(..., title="Detector configuration")
+    additional_device_names: Optional[List[DeviceConfig]] = Field(
+        default=None, title="Additional device names", description="Mirrors, dichroics, etc"
+    )
+
+    # excitation
+    light_sources: LIGHT_CONFIGS = Field(default=[], title="Light source configurations")
+    variable_power: Optional[bool] = Field(
+        default=False,
+        title="Variable power",
+        description="Set to true when the power varies across Planes -- put the power in the Plane.power field",
+    )
+    excitation_filters: Optional[List[DeviceConfig]] = Field(default=None, title="Excitation filters")
+    # emission
+    emission_filters: Optional[List[DeviceConfig]] = Field(default=None, title="Emission filters")
+    emission_wavelength: Optional[int] = Field(default=None, title="Emission wavelength")
+    emission_wavelength_unit: Optional[SizeUnit] = Field(default=None, title="Emission wavelength unit")
+
+
+class PatchCordConfig(DeviceConfig):
+    """Configuration of a patch cord and its output power to another device"""
+
+    channels: List[Channel] = Field(..., title="Channels")
+
+
+class Immersion(DataModel):
+    """Configuration of immersion medium"""
+
+    medium: ImmersionMedium = Field(..., title="Immersion medium")
+    refractive_index: float = Field(..., title="Index of refraction")
+
+
+class SampleChamberConfig(DeviceConfig):
+    """Configuration of a sample chamber"""
+
+    chamber_immersion: Immersion = Field(..., title="Acquisition chamber immersion data")
+    sample_immersion: Optional[Immersion] = Field(default=None, title="Acquisition sample immersion data")
+
+
+class Plane(DataModel):
+    """Configuration of an imaging plane"""
+
+    depth: float = Field(..., title="Depth")
+    depth_unit: SizeUnit = Field(..., title="Depth unit")
+
+    power: float = Field(..., title="Power")
+    power_unit: PowerUnit = Field(..., title="Power unit")
+    targeted_structure: BrainStructureModel = Field(..., title="Targeted structure")
+
+
+class CoupledPlane(Plane):
+    """Configuration of a pair of coupled imaging plane"""
+
+    plane_index: int = Field(..., title="Plane index")
+    coupled_plane_index: int = Field(..., title="Coupled plane index", description="Plane index of the coupled plane")
+    power_ratio: float = Field(..., title="Power ratio")
+
+
+class Slap2Plane(Plane):
+    """Configuration of a SLAP2 imaging plane (all imaging ROIs of a specific acquisition type at a particular depth)"""
+
+    slap2_acquisition_type: Slap2AcquisitionType = Field(..., title="SLAP2 ROI acquisition type")
+
+    specimen_id: Optional[str] = Field(
+        default=None,
+        title="Specimen ID",
+        description="Unique index identifying the cell being imaged: <subject_id>_###",
+    )
+    fov_index: Optional[int] = Field(
+        default=None,
+        title="Field of view index",
+        description="For FOVs that are imaged multiple times, assign a shared index to each instance of the FOV",
+    )
+    structure_types: Optional[List[NeuronStructure]] = Field(default=None, title="Structure type")
+
+    y_dilations: List[int] = Field(..., title="Unique Y dilations")
+    y_dilations_unit: SizeUnit = Field(default=SizeUnit.PX, title="Dilation unit")
+
+    frame_rates: List[float] = Field(..., title="Unique frame rates")
+    frame_rates_unit: FrequencyUnit = Field(default=FrequencyUnit.HZ, title="Frame rate unit")
+
+
+class Image(DataModel):
+    """Description of an N-D image"""
+
+    channel_name: str = Field(..., title="Channel name")
+    dimensions_unit: SizeUnit = Field(default=SizeUnit.PX, title="Dimensions unit")
+    image_to_acquisition_transform: TRANSFORM_TYPES = Field(
+        ...,
+        title="Image to acquisition transform",
+        description="Position, rotation, and scale of the image. Note that depth should be in the planes.",
+    )
+
+    dimensions: Optional[Discriminated[Scale | Rectangle]] = Field(default=None, title="Dimensions")
+
+
+class ImageSPIM(Image):
+    """Description of an N-D image acquired with SPIM"""
+
+    file_name: AssetPath = Field(..., title="File name")
+    imaging_angle: int = Field(
+        default=0,
+        title="Imaging angle",
+        description="Angle of the detector relative to the image plane relative to perpendicular",
+    )
+    imaging_angle_unit: AngleUnit = Field(default=AngleUnit.DEG, title="Imaging angle unit")
+
+    image_start_time: Optional[AwareDatetimeWithDefault] = Field(default=None, title="Image acquisition start time")
+    image_end_time: Optional[AwareDatetimeWithDefault] = Field(default=None, title="Image acquisition end time")
+
+
+class PlanarImage(Image):
+    """Description of an N-D image acquired in a specific imaging plane"""
+
+    planes: DiscriminatedList[Plane | CoupledPlane | Slap2Plane] = Field(..., title="Imaging planes")
+
+    @model_validator(mode="after")
+    def limit_plane_to_one(self):
+        """Check that only one plane is defined"""
+
+        if any(not isinstance(plane, CoupledPlane) for plane in self.planes) and len(self.planes) > 1:
+            raise ValueError("For single-plane optical physiology only a single Plane should be in PlanarImage.planes")
+
+        return self
+
+
+class PlanarImageStack(PlanarImage):
+    """Description of a stack of images acquired in a specific imaging plane"""
+
+    power_function: PowerFunction = Field(..., title="Power function")
+    depth_start: float = Field(..., title="Starting depth")
+    depth_end: float = Field(..., title="Ending depth")
+    depth_step: float = Field(..., title="Step size")
+    depth_unit: SizeUnit = Field(..., title="Depth unit")
+
+
+class SamplingStrategy(DataModel):
+    """Description of an image sampling strategy"""
+
+    frame_rate: float = Field(..., title="Frame rate")
+    frame_rate_unit: FrequencyUnit = Field(default=FrequencyUnit.HZ, title="Frame rate unit")
+
+
+class InterleavedStrategy(SamplingStrategy):
+    """Description of an interleaved image sampling strategy"""
+
+    image_index_sequence: List[int] = Field(..., title="Interleaving sequence")
+
+
+class StackStrategy(SamplingStrategy):
+    """Description of a stack image sampling strategy"""
+
+    image_repeats: int = Field(..., title="Number of image repeats")
+    stack_repeats: int = Field(..., title="Number of stack repeats")
+
+
+class ImagingConfig(DeviceConfig):
+    """Configuration of an imaging instrument"""
+
+    channels: DiscriminatedList[Channel] = Field()
+    local_coordinate_system: Optional[CoordinateSystem] = Field(
+        default=None,
+        title="Local coordinate system",
+        description=(
+            "Required for ImageSPIM objects and when the imaging coordinate system differs from the "
+            "Acquisition.global_coordinate_system"
+        ),
+    )
+    images: DiscriminatedList[PlanarImage | PlanarImageStack | ImageSPIM] = Field(..., title="Images")
+    sampling_strategy: Optional[SamplingStrategy] = Field(
+        default=None,
+        title="Sampling strategy",
+    )
+
+    @model_validator(mode="after")
+    def check_image_channels(self):
+        """Check that the required channels are present for the images"""
+
+        channel_names = [channel.channel_name for channel in self.channels]
+
+        for image in self.images:
+            if image.channel_name not in channel_names:
+                raise ValueError(f"Channel {image.channel_name} must be defined in the ImagingConfig.channels list")
+
+        return self
+
+    @model_validator(mode="after")
+    def require_cs_images(self):
+        """Check that a coordinate system is present if any images are Image"""
+
+        if any(isinstance(image, ImageSPIM) for image in self.images) and not self.local_coordinate_system:
+            raise ValueError(
+                "ImagingConfig.local_coordinate_system is required when ImagingConfig.images are ImageSPIM objects"
+            )
+        return self
+
+
+# MOUSE PLATFORM CONFIGS
+
+
+class MousePlatformConfig(DeviceConfig):
+    """Configuration for mouse platforms"""
+
+    objects_in_arena: Optional[List[str]] = Field(default=None, title="Objects in area")
+    active_control: bool = Field(
+        default=False,
+        title="Active control",
+        description="True when movement of the mouse platform is dynamically controlled by the experimenter",
+    )
+
+
+class LickSpoutConfig(DeviceConfig):
+    """Lick spout acquisition information"""
+
+    solution: Liquid = Field(..., title="Solution")
+    solution_valence: Valence = Field(..., title="Valence")
+
+    volume: float = Field(..., title="Volume")
+    volume_unit: VolumeUnit = Field(..., title="Volume unit")
+
+    relative_position: List[AnatomicalRelative] = Field(..., title="Initial relative position")
+
+    # Transform
+    local_coordinate_system: Optional[CoordinateSystem] = Field(default=None, title="Device local coordinate system")
+    transform: Optional[TRANSFORM_TYPES] = Field(
+        default=None,
+        title="Local to global transform",
+        description="Entry coordinate, depth, and rotation in the Acquisition.global_coordinate_system",
+    )
+    notes: Optional[str] = Field(default=None, title="Notes", validate_default=True)
+
+    @model_validator(mode="after")
+    def validate_other(self):
+        """Validator for other/notes"""
+
+        if self.solution == Liquid.OTHER and not self.notes:
+            raise ValueError(
+                "Notes cannot be empty if LickSpoutConfig.solution is Other.Describe the solution in the notes field."
+            )
+        return self
+
+
+class AirPuffConfig(DeviceConfig):
+    """Air puff device configuration"""
+
+    valence: Valence = Field(default=Valence.NEGATIVE, title="Valence")
+    relative_position: List[AnatomicalRelative] = Field(..., title="Initial relative position")
+
+    # Transform
+    local_coordinate_system: Optional[CoordinateSystem] = Field(default=None, title="Device local coordinate system")
+    transform: Optional[TRANSFORM_TYPES] = Field(
+        default=None,
+        title="Local to global transform",
+        description="Entry coordinate, depth, and rotation in the Acquisition.global_coordinate_system",
+    )
+
+    pressure: Optional[float] = Field(default=None, title="Pressure")
+    pressure_unit: Optional[PressureUnit] = Field(default=None, title="Pressure unit")
+
+    duration: Optional[float] = Field(default=None, title="Duration")
+
+
+class SpeakerConfig(DeviceConfig):
+    """Configuration of auditory speaker configuration"""
+
+    volume: Optional[float] = Field(default=None, title="Volume (dB)")
+    volume_unit: Optional[SoundIntensityUnit] = Field(default=None, title="Volume unit")
+
+
+class OlfactometerChannelInfo(DataModel):
+    """Configuration of a channel in an olfactometer"""
+
+    channel_index: int = Field(..., title="Channel index")
+    odorant: str = Field(..., title="Odorant")
+    dilution: Decimal = Field(..., title="Odorant dilution")
+    dilution_unit: ConcentrationUnit = Field(default=ConcentrationUnit.VOLUME_PERCENT, title="Dilution unit")
+
+
+class OlfactometerConfig(DeviceConfig):
+    """Configuration of olfactometer"""
+
+    channel_configs: List[OlfactometerChannelInfo] = Field(
+        ...,
+        title="Channel configurations",
+        description="List of channels with their odorant and concentration",
+    )
+
+
+class JoystickConfig(DeviceConfig):
+    """Configuration of joystick"""
+
+    is_isometric: bool = Field(
+        ..., title="Is isometric", description="Whether the joystick is use isometrically or non-isometrically"
+    )
+
+
+# EPHYS CONFIGS
+
+
+class ManipulatorConfig(DeviceConfig):
+    """Configuration of a manipulator"""
+
+    local_coordinate_system: CoordinateSystem = Field(..., title="Device local coordinate system")
+    local_axis_positions: Translation = Field(..., title="Local axis positions")
+
+
+class ProbeConfig(DeviceConfig):
+    """Configuration for a device inserted into a brain"""
+
+    # Target
+    primary_targeted_structure: BrainStructureModel = Field(..., title="Targeted structure")
+    other_targeted_structure: Optional[List[BrainStructureModel]] = Field(
+        default=None, title="Other targeted structure"
+    )
+    atlas_coordinate: Optional[AtlasCoordinate] = Field(
+        default=None,
+        title="Target coordinate in Acquisition.atlas",
+    )
+
+    # Transform
+    local_coordinate_system: CoordinateSystem = Field(
+        ...,
+        title="Device local coordinate system",
+        description=(
+            "Device coordinate system, defines un-rotated probe's orientation relative to the "
+            "Acquisition.global_coordinate_system"
+        ),
+    )
+    transform: TRANSFORM_TYPES = Field(
+        ...,
+        title="Local to global transform",
+        description="Entry coordinate, depth, and rotation in the Acquisition.global_coordinate_system",
+    )
+
+    dye: Optional[str] = Field(default=None, title="Dye")
+    notes: Optional[str] = Field(default=None, title="Notes")
+
+
+class MISModuleConfig(DataModel):
+    """Modular insertion system module configuration"""
+
+    arc_angle: float = Field(..., title="Arc Angle (deg)")
+    module_angle: float = Field(..., title="Module Angle (deg)")
+    rotation_angle: Optional[float] = Field(default=None, title="Rotation Angle (deg)")
+    angle_unit: AngleUnit = Field(default=AngleUnit.DEG, title="Angle unit")
+    notes: Optional[str] = Field(default=None, title="Notes")
+
+
+class EphysAssemblyConfig(DeviceConfig):
+    """Group of configurations for an ephys assembly"""
+
+    manipulator: ManipulatorConfig = Field(..., title="Manipulator configuration")
+    probes: List[ProbeConfig] = Field(..., title="Probe configurations")
+
+    modules: Optional[List[MISModuleConfig]] = Field(
+        default=None,
+        title="Modules",
+        description=("Configurations for conveniently tracking manipulator modules, e.g. on the New Scale dome."),
+    )
+
+
+class MISCameraConfig(DeviceConfig, DevicePosition):
+    """Configuration for a camera used in a New Scale modular insertion system"""
+
+    detector_config: DetectorConfig = Field(..., title="Detector configuration")
+    module: MISModuleConfig = Field(..., title="Module")
+
+
+class FiberAssemblyConfig(DeviceConfig):
+    """Inserted fiber photometry probe recorded in a stream"""
+
+    manipulator: ManipulatorConfig = Field(..., title="Manipulator configuration")
+    probes: List[ProbeConfig] = Field(..., title="Probe configurations")
+    patch_cords: List[PatchCordConfig] = Field(default=[], title="Fiber photometry devices")
+
+
+# MRI CONFIGS
+
+
+class MRIScan(DeviceConfig):
+    """Configuration of a 3D scan"""
+
+    # Meta-metadata
+    index: int = Field(..., title="Index", description="Index of the scan in the session, starting at 1")
+    setup: bool = Field(..., title="Setup", description="Positioning, shim, and other pre-scan adjustments")
+
+    # Scan info
+    pulse_sequence_type: PulseSequenceType = Field(..., title="Scan sequence", description="BIDS PulseSequenceType")
+    mr_acquisition_type: MRAcquisitionType = Field(
+        ..., title="MR acquisition type", description="BIDS MRAcquisitionType / DICOM Tag 0018,0023"
+    )
+    resolution: Optional[Scale] = Field(default=None, title="Voxel resolution")
+    resolution_unit: Optional[SizeUnit] = Field(default=None, title="Voxel resolution unit")
+    additional_scan_parameters: Optional[GenericModel] = Field(default=None, title="Parameters")
+
+    # Pulse sequence properties
+    rare_factor: Optional[int] = Field(default=None, title="RARE factor")
+    echo_time: Decimal = Field(..., title="Echo time (s)", description="BIDS EchoTime / DICOM Tag 0018,0081")
+    echo_time_unit: TimeUnit = Field(default=TimeUnit.S, title="Echo time unit")
+    effective_echo_time: Optional[Decimal] = Field(default=None, title="Effective echo time")
+    repetition_time: Decimal = Field(
+        ..., title="Repetition time (s)", description="BIDS RepetitionTime / DICOM Tag 0018,0080"
+    )
+    repetition_time_unit: TimeUnit = Field(default=TimeUnit.S, title="Repetition time unit")
+
+    # fields required to get correct orientation
+    scanner_coordinate_system: Optional[CoordinateSystem] = Field(default=None, title="Scanner coordinate system")
+    affine_transform: Optional[TRANSFORM_TYPES] = Field(
+        default=None, title="MRI Scan affine transform", description="NIFTI sform/qform, Bruker vc_transform, etc"
+    )
+    subject_position: SubjectPosition = Field(..., title="Subject position")
+
+    # other fields
+    notes: Optional[str] = Field(default=None, title="Notes", validate_default=True)
+
+    @field_validator("notes", mode="after")
+    def validate_other(cls, value: Optional[str], info: ValidationInfo) -> Optional[str]:
+        """Validator for other/notes"""
+
+        if info.data.get("pulse_sequence_type") == PulseSequenceType.OTHER and not value:
+            raise ValueError(
+                "Notes cannot be empty if pulse_sequence_type is Other."
+                " Describe the pulse_sequence_type in the notes field."
+            )
+        return value
+
+    @model_validator(mode="after")
+    def validate_non_setup(self):
+        """Validate that non-setup scans have affine_transform and resolution fields"""
+
+        if not self.setup and (not self.affine_transform or not self.resolution):
+            raise ValueError("Primary scan must have affine_transform and resolution fields")
+
+        return self
+
+
+# SURGERY CONFIGS
+
+
+class CatheterConfig(DeviceConfig):
+    """Configuration of a catheter"""
+
+    targeted_structure: MouseAnatomyModel = Field(
+        ..., title="Targeted blood vessel", description="Use options from MouseBloodVessels"
+    )

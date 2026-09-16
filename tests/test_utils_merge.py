@@ -4,8 +4,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from aind_data_schema.components.coordinates import CoordinateSystemLibrary
-from aind_data_schema.utils.merge import (
+from biodata_schema.utils.merge import (
     merge_coordinate_systems,
     merge_notes,
     merge_optional_list,
@@ -13,6 +12,7 @@ from aind_data_schema.utils.merge import (
     merge_str_alphabetical,
     merge_str_tuple_lists,
 )
+from tests.coordinate_systems import BREGMA_ARI, MPM_MANIP_RFB
 
 
 class TestMergeStrTupleLists:
@@ -128,19 +128,19 @@ class TestRemoveDuplicates:
 
     def test_empty_list(self):
         """Test with empty list"""
-        from aind_data_schema.utils.merge import remove_duplicates
+        from biodata_schema.utils.merge import remove_duplicates
 
         assert remove_duplicates([]) == []
 
     def test_no_duplicates(self):
         """Test with list that has no duplicates"""
-        from aind_data_schema.utils.merge import remove_duplicates
+        from biodata_schema.utils.merge import remove_duplicates
 
         assert remove_duplicates([1, 2, 3, 4]) == [1, 2, 3, 4]
 
     def test_with_duplicates(self, caplog):
         """Test with list that has duplicates"""
-        from aind_data_schema.utils.merge import remove_duplicates
+        from biodata_schema.utils.merge import remove_duplicates
 
         with caplog.at_level("INFO"):
             assert remove_duplicates([1, 2, 2, 3, 3, 4]) == [1, 2, 3, 4]
@@ -149,19 +149,19 @@ class TestRemoveDuplicates:
 
     def test_preserves_order(self):
         """Test that order is preserved when removing duplicates"""
-        from aind_data_schema.utils.merge import remove_duplicates
+        from biodata_schema.utils.merge import remove_duplicates
 
         assert remove_duplicates([3, 1, 2, 1, 3, 4]) == [3, 1, 2, 4]
 
     def test_string_duplicates(self):
         """Test with string duplicates"""
-        from aind_data_schema.utils.merge import remove_duplicates
+        from biodata_schema.utils.merge import remove_duplicates
 
         assert remove_duplicates(["a", "b", "a", "c", "b"]) == ["a", "b", "c"]
 
     def test_all_duplicates(self):
         """Test with all elements being duplicates"""
-        from aind_data_schema.utils.merge import remove_duplicates
+        from biodata_schema.utils.merge import remove_duplicates
 
         assert remove_duplicates([1, 1, 1, 1]) == [1]
 
@@ -203,8 +203,8 @@ class TestMergeCoordinateSystems:
 
     def setup_method(self):
         """Set up test cases"""
-        self.CSA = CoordinateSystemLibrary.BREGMA_ARI
-        self.CSB = CoordinateSystemLibrary.MPM_MANIP_RFB
+        self.CSA = BREGMA_ARI
+        self.CSB = MPM_MANIP_RFB
 
     def test_both_none(self):
         """Test when both inputs are None"""

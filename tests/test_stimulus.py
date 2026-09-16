@@ -1,6 +1,6 @@
 """Test components.stimulus"""
 
-from aind_data_schema.components.stimulus import AuditoryStimulation
+from biodata_schema.components.stimulus import AuditoryStimulation
 
 
 class TestStimulus:

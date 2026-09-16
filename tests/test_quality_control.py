@@ -3,10 +3,10 @@
 from datetime import datetime
 
 import pytest
-from aind_data_schema_models.modalities import Modality
+from biodata_models.modalities import Modality
 from pydantic import ValidationError
 
-from aind_data_schema.core.quality_control import (
+from biodata_schema.core.quality_control import (
     QCMetric,
     QCStatus,
     QualityControl,
@@ -28,24 +28,6 @@ class TestQualityControl:
             QualityControl()
 
         assert quality_control is not None
-
-    def test_tags_list_to_dict_conversion(self):
-        """test that old list[str] tags get converted to dict[str, str]"""
-
-        metric_dict = {
-            "name": "Test metric",
-            "modality": {"name": "Extracellular electrophysiology", "abbreviation": "ecephys"},
-            "stage": "Processing",
-            "value": 42,
-            "status_history": [{"evaluator": "Test", "timestamp": "2020-10-10", "status": "Pass"}],
-            "tags": ["tag1", "tag2", "tag3"],
-        }
-
-        with pytest.warns(DeprecationWarning):
-            metric = QCMetric.model_validate(metric_dict)
-
-        assert isinstance(metric.tags, dict)
-        assert metric.tags == {"tag_1": "tag1", "tag_2": "tag2", "tag_3": "tag3"}
 
     def test_tags_property(self):
         """test that QualityControl.tags returns all unique tag values"""
@@ -786,33 +768,6 @@ class TestQualityControl:
         late_date = datetime.fromisoformat("2020-08-01T00:00:00+00:00")
         late_status = qc.evaluate_status(date=late_date, tag="group:time_sensitive")
         assert late_status == Status.FAIL
-
-    def test_backwards_compatibility_default_grouping(self):
-        """Test that fix_default_grouping_list validator handles old v2.2.X format correctly"""
-
-        # Test old v2.2.X format: list of strings for default_grouping + list-based tags
-        old_format_dict = {
-            "metrics": [
-                {
-                    "object_type": "QC metric",
-                    "name": "Old format metric",
-                    "modality": {"name": "Extracellular electrophysiology", "abbreviation": "ecephys"},
-                    "stage": "Processing",
-                    "value": 42,
-                    "status_history": [{"evaluator": "Test", "timestamp": "2020-10-10", "status": "Pass"}],
-                    "tags": ["old_tag1", "old_tag2"],
-                }
-            ],
-            "default_grouping": ["group1", "group2"],
-        }
-
-        with pytest.warns(DeprecationWarning):
-            qc_old = QualityControl.model_validate(old_format_dict)
-
-        # Should convert to [("modality",), ("tag_1",)] for backwards compatibility
-        assert qc_old.default_grouping == [("modality",), ("tag_1",)]
-        # Tags should be converted to dict
-        assert qc_old.metrics[0].tags == {"tag_1": "old_tag1", "tag_2": "old_tag2"}
 
     def test_new_format_default_grouping_all_strings(self):
         """Test that new format with all strings in default_grouping is NOT converted"""

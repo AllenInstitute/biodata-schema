@@ -3,17 +3,28 @@
 import argparse
 from datetime import date, datetime, timezone
 
-from aind_data_schema_models.coordinates import AnatomicalRelative
-from aind_data_schema_models.modalities import Modality
-from aind_data_schema_models.units import FrequencyUnit, PowerUnit
+from biodata_models.coordinates import AnatomicalRelative, AxisName, Direction, Origin
+from biodata_models.modalities import Modality
+from biodata_models.units import FrequencyUnit, PowerUnit, SizeUnit
 
-import aind_data_schema.components.devices as d
-import aind_data_schema.core.instrument as r
-from aind_data_schema.components.connections import Connection
-from aind_data_schema.components.coordinates import CoordinateSystemLibrary
-from aind_data_schema.components.devices import Computer
-from aind_data_schema.components.identifiers import Software
-from aind_data_schema.components.measurements import Calibration
+import biodata_schema.components.devices as d
+import biodata_schema.core.instrument as r
+from biodata_schema.components.connections import Connection
+from biodata_schema.components.coordinates import Axis, CoordinateSystem
+from biodata_schema.components.devices import Computer
+from biodata_schema.components.identifiers import Software
+from biodata_schema.components.measurements import Calibration
+
+BREGMA_ARI = CoordinateSystem(
+    name="BREGMA_ARI",
+    origin=Origin.BREGMA,
+    axis_unit=SizeUnit.MM,
+    axes=[
+        Axis(name=AxisName.AP, direction=Direction.PA),
+        Axis(name=AxisName.ML, direction=Direction.LR),
+        Axis(name=AxisName.SI, direction=Direction.SI),
+    ],
+)
 
 bonsai_software = Software(name="Bonsai", version="2.5")
 
@@ -332,7 +343,7 @@ instrument = r.Instrument(
     instrument_id="FIP1",
     modification_date=date(2023, 10, 3),
     modalities=[Modality.FIB],
-    coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+    global_coordinate_system=BREGMA_ARI,
     components=[
         camera_assembly_1,
         camera_assembly_2,

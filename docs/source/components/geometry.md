@@ -9,7 +9,7 @@ Circle geometry
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `radius` | `float` | Radius  |
-| `radius_unit` | [SizeUnit](../aind_data_schema_models/units.md#sizeunit) | Radius unit  |
+| `radius_unit` | [SizeUnit](../biodata_models/units.md#sizeunit) | Radius unit  |
 
 
 ### Rectangle
@@ -20,6 +20,6 @@ Rectangle geometry
 |-------|------|-------------|
 | `width` | `float` | Width  |
 | `height` | `float` | Height  |
-| `size_unit` | [SizeUnit](../aind_data_schema_models/units.md#sizeunit) | Size unit  |
+| `size_unit` | [SizeUnit](../biodata_models/units.md#sizeunit) | Size unit  |
 
 

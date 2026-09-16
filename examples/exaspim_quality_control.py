@@ -3,10 +3,10 @@
 import argparse
 from datetime import datetime
 
-from aind_data_schema_models.brain_atlas import CCFv3
-from aind_data_schema_models.modalities import Modality
+from biodata_models.brain_atlas import CCFv3
+from biodata_models.modalities import Modality
 
-from aind_data_schema.core.quality_control import QCMetric, QCStatus, QualityControl, Stage, Status
+from biodata_schema.core.quality_control import QCMetric, QCStatus, QualityControl, Stage, Status
 
 metrics = [
     # N001 metrics

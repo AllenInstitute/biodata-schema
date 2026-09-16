@@ -3,18 +3,19 @@
 from datetime import datetime, timezone
 
 import pytest
-from aind_data_schema_models.modalities import Modality
-from aind_data_schema_models.organizations import Organization
+from biodata_models.modalities import Modality
+from biodata_models.organizations import Organization
 from pydantic import ValidationError
 
-from aind_data_schema.components.configs import Image
-from aind_data_schema.components.coordinates import Affine, CoordinateSystemLibrary, Rotation, Scale, Translation
-from aind_data_schema.components.devices import Laser, Objective, ScanningStage
-from aind_data_schema.components.identifiers import Code
-from aind_data_schema.core.acquisition import Acquisition
-from aind_data_schema.core.instrument import Instrument
-from aind_data_schema.core.processing import DataProcess, ProcessName, ProcessStage
+from biodata_schema.components.configs import Image
+from biodata_schema.components.coordinates import Affine, Rotation, Scale, Translation
+from biodata_schema.components.devices import Laser, Objective, ScanningStage
+from biodata_schema.components.identifiers import Code
+from biodata_schema.core.acquisition import Acquisition
+from biodata_schema.core.instrument import Instrument
+from biodata_schema.core.processing import DataProcess, ProcessName, ProcessStage
 from examples.exaspim_acquisition import acq
+from tests.coordinate_systems import BREGMA_ARI
 
 
 class TestImaging:
@@ -61,7 +62,7 @@ class TestImaging:
         i = Instrument(
             instrument_id="room_exaSPIM1-1_20231004",
             modalities=[Modality.SPIM],
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
             modification_date=datetime.now().date(),
             components=[objective, laser, scan_stage],
         )
@@ -75,7 +76,7 @@ class TestImaging:
                 instrument_id="room_exaSPIM1-1_20231004",
                 modalities=[Modality.SPIM],
                 modification_date=datetime(2020, 10, 10, 0, 0, 0).date(),
-                coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+                global_coordinate_system=BREGMA_ARI,
                 components=[],
             )
 
@@ -117,6 +118,7 @@ class TestImaging:
             code=Code(
                 url="https://github.com/abcd",
                 parameters=parameters,
+                version="0.0.1",
             ),
         )
 

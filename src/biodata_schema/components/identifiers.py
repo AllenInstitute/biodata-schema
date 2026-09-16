@@ -1,0 +1,138 @@
+"""Schema for identifiers"""
+
+import re
+from enum import Enum
+from pathlib import Path
+from typing import Annotated, Dict, List, Optional
+
+from biodata_models.registries import Registry
+from pydantic import BaseModel, Field, StringConstraints, model_validator
+
+from biodata_schema.base import DataModel, DiscriminatedList, GenericModel
+
+
+class Database(str, Enum):
+    """Database platforms that can host data assets"""
+
+    CODEOCEAN = "Code Ocean"
+    DANDI = "DANDI"
+
+
+DatabaseIdentifiers = Dict[Database, List[str]]
+
+
+class DataAsset(DataModel):
+    """Description of a single data asset"""
+
+    name: Optional[str] = Field(default=None, title="Asset name", description="Name of the data asset")
+    url: Optional[str] = Field(default=None, title="Asset location", description="URL pointing to the data asset")
+
+    @model_validator(mode="after")
+    def validate_name(self):
+        """Validator to be sure name or url is provided
+        If name isn't provided, attempt to parse name from url. If url is also not provided, raise error.
+        """
+        if not self.name:
+            if not self.url:
+                raise ValueError("Either 'name' or 'url' must be provided for a DataAsset.")
+            match = re.match("^s3://aind-open-data/([^/]+)(/.*)?$", self.url)
+            if match is not None:
+                self.name = match.group(1)
+        return self
+
+
+class CombinedData(DataModel):
+    """Description of a group of data assets"""
+
+    assets: List[DataAsset] = Field(..., title="Data assets", min_length=1)
+    name: Optional[str] = Field(default=None, title="Name")
+    database_identifier: Optional[DatabaseIdentifiers] = Field(
+        default=None,
+        title="Database identifier",
+        description="ID or link to the Combined Data asset, if materialized.",
+    )
+    description: Optional[str] = Field(
+        default=None, title="Description", description="Intention or approach used to select group of assets"
+    )
+
+
+class Person(DataModel):
+    """Person identifier"""
+
+    name: str = Field(..., title="Person's name", description="First and last name OR anonymous ID")
+
+    registry: Registry = Field(default=Registry.ORCID, title="Registry")
+    registry_identifier: Optional[str] = Field(default=None, title="ORCID ID")
+
+
+class ProtocolMixin(BaseModel):
+    """Mixin that adds a protocol_id field (single DOI string)"""
+
+    protocol_id: Optional[str] = Field(default=None, title="Protocol ID", description="DOI for protocols.io")
+
+
+class ProtocolListMixin(BaseModel):
+    """Mixin that adds a protocol_id field (list of DOI strings)"""
+
+    protocol_id: Optional[List[str]] = Field(default=None, title="Protocol ID", description="DOI for protocols.io")
+
+
+class Software(DataModel):
+    """Software package identifier"""
+
+    name: str = Field(..., title="Software name", description="Name of the software package")
+    version: Optional[str] = Field(
+        default=None, title="Software version", description="Version of the software package"
+    )
+
+
+class Container(DataModel):
+    """Code container identifier, e.g. Docker"""
+
+    container_type: str = Field(..., title="Type", description="Type of container, e.g. Docker, Singularity")
+    tag: str = Field(..., title="Tag", description="Tag of the container, e.g. version number")
+    uri: str = Field(..., title="URI", description="URI of the container, e.g. Docker Hub URL")
+
+
+CommitHash = Annotated[
+    str,
+    StringConstraints(
+        pattern=r"^[0-9a-fA-F]{7,60}$",
+        strip_whitespace=True,
+    ),
+]
+
+
+class Code(DataModel):
+    """Code or script identifier"""
+
+    url: str = Field(..., title="Code URL", description="URL to code repository")
+    name: Optional[str] = Field(default=None, title="Name")
+    version: Optional[str] = Field(default=None, title="Code version")
+    commit_hash: Optional[CommitHash] = Field(default=None, title="Commit hash", description="Commit hash of the code.")
+
+    container: Optional[Container] = Field(default=None, title="Container")
+    run_script: Optional[Path] = Field(default=None, title="Run script", description="Path to run script")
+
+    language: Optional[str] = Field(default=None, title="Programming language", description="Programming language used")
+    language_version: Optional[str] = Field(default=None, title="Programming language version")
+
+    input_data: Optional[DiscriminatedList[DataAsset | CombinedData]] = Field(
+        default=None, title="Input data", description="Input data used in the code or script"
+    )
+    parameters: Optional[GenericModel] = Field(
+        default=None, title="Parameters", description="Parameters used in the code or script"
+    )
+
+    core_dependency: Optional[Software] = Field(
+        default=None,
+        title="Core dependency",
+        description="For code with a core software package dependency, e.g. Bonsai",
+    )
+
+    @model_validator(mode="after")
+    def _ensure_commit_hash_or_version(self) -> "Code":
+        """Ensure that at least one of commit_hash or version is provided for code identification"""
+        if not self.commit_hash and not self.version:
+            raise ValueError("Either commit_hash or version must be provided for Code to ensure reproducibility.")
+        return self

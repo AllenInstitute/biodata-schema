@@ -3,12 +3,11 @@
 from decimal import Decimal
 
 import pytest
-from aind_data_schema_models.brain_atlas import CCFv3
-from aind_data_schema_models.units import AngleUnit, FrequencyUnit, SizeUnit, TimeUnit, VolumeUnit
+from biodata_models.brain_atlas import CCFv3
+from biodata_models.units import AngleUnit, FrequencyUnit, SizeUnit, TimeUnit, VolumeUnit
 from pydantic import ValidationError
 
-from aind_data_schema.components.configs import (
-    AirPuffConfig,
+from biodata_schema.components.configs import (
     Channel,
     DetectorConfig,
     ImageSPIM,
@@ -25,7 +24,8 @@ from aind_data_schema.components.configs import (
     SubjectPosition,
     Valence,
 )
-from aind_data_schema.components.coordinates import Affine, CoordinateSystemLibrary, Translation
+from biodata_schema.components.coordinates import Affine, Translation
+from tests.coordinate_systems import SPIM_IJK
 
 
 class TestMRIScan:
@@ -163,7 +163,7 @@ class TestImagingConfig:
                 )
             ],
         )
-        self.coordinate_system = CoordinateSystemLibrary.SPIM_IJK
+        self.coordinate_system = SPIM_IJK
         self.sampling_strategy = SamplingStrategy(
             frame_rate=30.0,
             frame_rate_unit=FrequencyUnit.HZ,
@@ -197,7 +197,7 @@ class TestImagingConfig:
                 ),
             ],
             sampling_strategy=self.sampling_strategy,
-            coordinate_system=self.coordinate_system,
+            local_coordinate_system=self.coordinate_system,
         )
         assert imaging_config is not None
 
@@ -230,7 +230,7 @@ class TestImagingConfig:
                     )
                 ],
                 sampling_strategy=self.sampling_strategy,
-                coordinate_system=self.coordinate_system,
+                local_coordinate_system=self.coordinate_system,
             )
         assert "Channel InvalidChannel must be defined in the ImagingConfig.channels list" in str(context.value)
 
@@ -250,7 +250,7 @@ class TestImagingConfig:
                     imaging_angle_unit=AngleUnit.DEG,
                 ),
             ],
-            coordinate_system=self.coordinate_system,
+            local_coordinate_system=self.coordinate_system,
         )
         assert imaging_config is not None
 
@@ -271,7 +271,7 @@ class TestImagingConfig:
                         imaging_angle_unit=AngleUnit.DEG,
                     ),
                 ],
-                coordinate_system=None,
+                local_coordinate_system=None,
             )
         assert (
             "ImagingConfig.local_coordinate_system is required when ImagingConfig.images are ImageSPIM objects"
@@ -281,17 +281,3 @@ class TestImagingConfig:
 
 class TestAirPuffConfig:
     """Tests for the AirPuffConfig class"""
-
-    def test_migrate_deprecated_coordinate_system(self):
-        """Test that deprecated coordinate_system is copied to local_coordinate_system"""
-        import warnings
-
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            config = AirPuffConfig(
-                device_name="AirPuff1",
-                relative_position=[],
-                coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
-            )
-        assert config.local_coordinate_system == CoordinateSystemLibrary.BREGMA_ARI
-        assert any(issubclass(warning.category, DeprecationWarning) for warning in w)

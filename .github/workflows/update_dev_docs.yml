@@ -14,16 +14,16 @@ jobs:
           token: ${{ secrets.SERVICE_TOKEN }}
           ref: ${{ github.head_ref }}
       - name: Install uv
-        uses: astral-sh/setup-uv@v9
+        uses: astral-sh/setup-uv@v10.0.1
         with:
           python-version: '3.10'
       - name: Install dependencies
         run: uv sync --locked --group dev --group docs
       - name: Generate docs
         run: |
-          uv run python src/aind_data_schema/utils/docs/model_generator.py
-          uv run python src/aind_data_schema/utils/docs/registries_generator.py
-          uv run python src/aind_data_schema/utils/docs/doc_generator.py
+          uv run python src/biodata_schema/utils/docs/model_generator.py
+          uv run python src/biodata_schema/utils/docs/registries_generator.py
+          uv run python src/biodata_schema/utils/docs/doc_generator.py
           uv run sphinx-build -b html docs/source/ docs/build/html
       - name: Commit changes
         uses: EndBug/add-and-commit@v9

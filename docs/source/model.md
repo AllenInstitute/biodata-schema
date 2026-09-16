@@ -1,6 +1,6 @@
 # Model
 
-[Link to code](https://github.com/AllenNeuralDynamics/biodata-schema/blob/dev/src/aind_data_schema/core/model.py)
+[Link to code](https://github.com/AllenNeuralDynamics/biodata-schema/blob/dev/src/biodata_schema/core/model.py)
 
 The Model metadata schema is an extension of the Processing schema tailored to model weights and other data and code artifacts underlying machine learning models - these may be trained on one dataset and evaluated on others, and may be intended to undergo further training iteratively in future versions.
 
@@ -17,7 +17,7 @@ Description of a machine learning model including architecture, training, and ev
 | `name` | `str` | Name  |
 | `version` | `str` | Version  |
 | `example_run_code` | [Code](components/identifiers.md#code) | Example run code (Code to run the model, possibly including example parameters/data) |
-| `architecture` | [ModelArchitecture](aind_data_schema_models/system_architecture.md#modelarchitecture) | architecture (Model architecture / type of model) |
+| `architecture` | [ModelArchitecture](biodata_models/system_architecture.md#modelarchitecture) | architecture (Model architecture / type of model) |
 | `software_framework` | Optional[[Software](components/identifiers.md#software)] | Software framework  |
 | `architecture_parameters` | `Optional[dict]` | Architecture parameters (Parameters of model architecture, such as input signature or number of layers.) |
 | `intended_use` | `str` | Intended model use (Semantic description of intended use) |
@@ -35,9 +35,9 @@ Description of model evaluation
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `process_type` | [ProcessName](aind_data_schema_models/process_names.md#processname) |   |
+| `process_type` | [ProcessName](biodata_models/process_names.md#processname) |   |
 | `performance` | List[[PerformanceMetric](model.md#performancemetric)] | Evaluation performance  |
-| `name` | `str` | Name (('Unique name of the processing step.', ' If not provided, the type will be used as the name.')) |
+| `name` | `str` | Name (Unique name of the processing step. If not provided, the type will be used as the name.) |
 | `stage` | [ProcessStage](processing.md#processstage) | Processing stage  |
 | `code` | [Code](components/identifiers.md#code) | Code (Code used for processing) |
 | `experimenters` | `List[str]` | Experimenters (People responsible for processing) |
@@ -65,11 +65,11 @@ Description of model training
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `process_type` | [ProcessName](aind_data_schema_models/process_names.md#processname) |   |
+| `process_type` | [ProcessName](biodata_models/process_names.md#processname) |   |
 | `train_performance` | List[[PerformanceMetric](model.md#performancemetric)] | Training performance (Performance on training set) |
 | `test_performance` | Optional[List[[PerformanceMetric](model.md#performancemetric)]] | Test performance (Performance on test data, evaluated during training) |
 | `test_evaluation_method` | `Optional[str]` | Test evaluation method (Approach to cross-validation or Train/test splitting) |
-| `name` | `str` | Name (('Unique name of the processing step.', ' If not provided, the type will be used as the name.')) |
+| `name` | `str` | Name (Unique name of the processing step. If not provided, the type will be used as the name.) |
 | `stage` | [ProcessStage](processing.md#processstage) | Processing stage  |
 | `code` | [Code](components/identifiers.md#code) | Code (Code used for processing) |
 | `experimenters` | `List[str]` | Experimenters (People responsible for processing) |

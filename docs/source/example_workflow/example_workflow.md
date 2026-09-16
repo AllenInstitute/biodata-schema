@@ -54,14 +54,14 @@ First, we'll set up the Python environment and define some shared variables.
 
 ```{literalinclude} example_workflow.py
 :language: python
-:lines: 1-39
+:lines: 1-56
 ```
 
 ### How did we know which `biodata-schema` classes to import?
 
-Our general recommendation for metadata is to navigate the documentation starting from the core class you are working on. So for the data description you would go to that page: [DataDescription](../data_description.md). The import for any object can be read from the URL of the page, core classes are found in the core subfolder `from aind_data_schema.core import DataDescription`.
+Our general recommendation for metadata is to navigate the documentation starting from the core class you are working on. So for the data description you would go to that page: [DataDescription](../data_description.md). The import for any object can be read from the URL of the page, core classes are found in the core subfolder `from biodata_schema.core import DataDescription`.
 
-One of the objects you'll need to build is going to be the [Person](../components/identifiers.md#person). From the [DataDescription](../data_description.md) page you can click-through (we recommend you ctrl+click or command+click to open the link in a new tab) to the [Person](../components/identifiers.md#person) page. Again read the URL to know where to import the file, in this case we're in a subfolder components in the file identifiers `from aind_data_schema.components.identifiers import Person`. After importing the class and populating it in your Python code you can close the extra tab.
+One of the objects you'll need to build is going to be the [Person](../components/identifiers.md#person). From the [DataDescription](../data_description.md) page you can click-through (we recommend you ctrl+click or command+click to open the link in a new tab) to the [Person](../components/identifiers.md#person) page. Again read the URL to know where to import the file, in this case we're in a subfolder components in the file identifiers `from biodata_schema.components.identifiers import Person`. After importing the class and populating it in your Python code you can close the extra tab.
 
 Let's move on to build the actual data description now.
 
@@ -72,10 +72,10 @@ how was it funded, etc. We'll define a function to generate this, and re-use it 
 
 ```{literalinclude} example_workflow.py
 :language: python
-:lines: 40-55
+:lines: 59-72
 ```
 
-A few of the fields in the data description required us to use enumerated variables, like [DataLevel](../aind_data_schema_models/data_name_patterns.md#datalevel). Controlled vocabularies like this one are used to standardize the metadata and make it easier for people to search across assets from different experiments. We also use controlled vocabularies that are linked to external registries, like for [Organization](../aind_data_schema_models/organizations.md#organization)
+A few of the fields in the data description required us to use enumerated variables, like [DataLevel](../biodata_models/data_name_patterns.md#datalevel). Controlled vocabularies like this one are used to standardize the metadata and make it easier for people to search across assets from different experiments. We also use controlled vocabularies that are linked to external registries, like for [Organization](../biodata_models/organizations.md#organization)
 
 ## Subject
 
@@ -85,7 +85,7 @@ Some of the required metadata, like the `cage_id` wasn't available to us. We'll 
 
 ```{literalinclude} example_workflow.py
 :language: python
-:lines: 56-90
+:lines: 75-106
 ```
 
 ## Procedures
@@ -94,7 +94,7 @@ We'll next write a function that will construct the [Procedures](../procedures.m
 
 ```{literalinclude} example_workflow.py
 :language: python
-:lines: 91-169
+:lines: 109-190
 ```
 
 This is the point at which we need to also discuss the [coordinate systems](../coordinate_systems.md). To know the position of an object or procedure across experiments we need to record position, rotation, and scale information in a standardized system. This step in metadata creation can be a bit intimidating but know that we've created tools to help simplify it! The two things to think about are:
@@ -102,13 +102,14 @@ This is the point at which we need to also discuss the [coordinate systems](../c
 - What was the origin that you used as a reference coordinate? For many animal experiments it's probably bregma on the skull.
 - How did you go from the origin to your target coordinate? For many animal experiments you likely used a stereotax and should know the exact anterior-posterior, left-to-right (or medial-lateral), and superior-to-inferior position you went to, plus the depth you moved down along the injection axis. Make sure to also note any rotation you performed and which axis you rotated around.
 
-For most mouse experiments like the one here, the coordinate system used had the origin at Bregma and the axes pointing anterior, right, and inferior (or ventral), plus a depth coordinate. To make your life easier you can import this coordinate system from the library so that you don't have to worry about constructing it yourself.
+For most mouse experiments like the one here, the coordinate system used had the origin at Bregma and the axes pointing anterior, right, and inferior (or ventral). Define it once at the top of your script and re-use it wherever a coordinate system is needed:
 
+```{literalinclude} example_workflow.py
+:language: python
+:lines: 46-56
 ```
-from aind_data_schema.coordinates.components import CoordinateSystemLibrary
 
-coordinate_system = CoordinateSystemLibrary.BREGMA_ARID
-```
+Note that there is no separate depth axis. Insertion depth is recorded as a *local* translation applied after the rotation, so it runs down the axis of the needle rather than straight down in the brain. You can see that chain — entry coordinate, rotation, then depth — in the `coord` list in the function above.
 
 ## Generating metadata
 
@@ -116,7 +117,7 @@ Finally, we're ready to generate all the metadata files. We'll loop over the ses
 
 ```{literalinclude} example_workflow.py
 :language: python
-:lines: 170-251
+:lines: 193-272
 ```
 
 ## Instrument and Acquisition and other metadata

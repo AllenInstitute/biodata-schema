@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from aind_data_schema.utils.examples_generator import ExamplesGenerator
+from biodata_schema.utils.examples_generator import ExamplesGenerator
 
 EXAMPLES_DIR = Path(__file__).parents[1] / "examples"
 

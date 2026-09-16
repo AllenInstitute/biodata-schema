@@ -1,17 +1,17 @@
 # Coordinate systems
 
-The metadata schema supports flexible definitions of coordinate systems, both relative to anatomy and devices. This allows us to store the positions of devices, insertion coordinates, etc, all with one standardized system.
+The metadata schema supports flexible definitions of coordinate systems. This allows us to store the positions of devices, insertion coordinates, etc, within a standardized system.
 
 Unlike many parts of the metadata schema where fields are just floats or strings, it is critical to understand **how coordinate systems are stored in the schema** to be able to use them properly. There are two rules to be aware of:
 
-1. Each [Instrument](instrument.md), [Acquisition](acquisition.md), and [Procedures](procedures.md) has its own `.coordinate_system` field. In most assets, the coordinate system is the same in all three files.
-2. Any transform (i.e. a [Translation](components/coordinates.md#translation), [Rotation](components/coordinates.md#rotation), or [Scale](components/coordinates.md#scale)) defined for a device or configuration of a device **must be defined in it's core file's coordinate system**. To help you avoid mistakes, transform fields are paired with a `.coordinate_system_name` field and the coordinate system name must match the name of the coordinate system defined in the core file.
+1. Each [Instrument](instrument.md), [Acquisition](acquisition.md), and [Procedures](procedures.md) has its own `.global_coordinate_system` field. In most assets, the global coordinate system is the same in all three files.
+2. Local to global transforms (i.e. a [Translation](components/coordinates.md#translation), [Rotation](components/coordinates.md#rotation), or [Scale](components/coordinates.md#scale)) that position devices or configurations of devices **must be defined in it's core file's coordinate system**. To help you avoid mistakes, these transform fields are paired with a `.coordinate_system_name` field which must match the name of the global coordinate system defined in the core file.
 
-The top-level coordinate systems in the instrument, acquisition, and procedures are generally defined in *in vivo* space, usually relative to an origin on an animal's skull. Often when targeting coordinates in the brain we plan our experiments in a **standardized atlas** like the mouse common coordinate framework. When you encounter a field that that requires an atlas transform (i.e. a point or vector in an atlas), you'll see that an [Atlas](components/coordinates.md#atlas) will have to be defined alongside that transform. An Atlas library is available in `aind_data_schema.components.coordinates.AtlasLibrary` for your convenience.
+The top-level coordinate systems in the instrument, acquisition, and procedures are generally defined in *in vivo* space, usually relative to an origin on an animal's skull. Often when targeting coordinates in the brain we plan our experiments in a **standardized atlas** like the mouse common coordinate framework. When you encounter a field that that requires an atlas transform (i.e. a point or vector in an atlas), you'll see that an [Atlas](components/coordinates.md#atlas) will have to be defined alongside that transform. An Atlas library is available in `biodata_schema.components.coordinates.AtlasLibrary` for your convenience.
 
 ## CoordinateSystem
 
-A [CoordinateSystem](components/coordinates.md#coordinatesystem) is defined by an [Origin](aind_data_schema_models/coordinates.md#origin) and a list of [AxisName](aind_data_schema_models/coordinates.md#axisname) and [Direction](aind_data_schema_models/coordinates.md#direction) pairs. The name of a coordinate system is created by combining the origin and positive directions of the axes. For example, `BREGMA_ARI` is a coordinate system with an origin at bregma and three axes pointing anterior, right, and inferior. This is made explicit in the full definition:
+A [CoordinateSystem](components/coordinates.md#coordinatesystem) is defined by an [Origin](biodata_models/coordinates.md#origin) and a list of [AxisName](biodata_models/coordinates.md#axisname) and [Direction](biodata_models/coordinates.md#direction) pairs. We recommend naming coordinate systems by combining the origin and positive directions of the axes. For example, `BREGMA_ARI` is a coordinate system with an origin at bregma and three axes pointing anterior, right, and inferior:
 
 ```{code} python
 CoordinateSystem(
@@ -26,15 +26,9 @@ CoordinateSystem(
 )
 ```
 
-This matches the image below:
-
-<div align="center">
-    <img src="_static/coordinates2.png" alt="BREGMA_ARI Coordinate System" width="50%">
-</div>
-
 ### Origin
 
-An [Origin](aind_data_schema_models/coordinates.md#origin) is a point in space, often relative to the mouse's anatomy but it can also be a point on a device. Standard anatomical references are positions like Bregma or Lambda
+An [Origin](biodata_models/coordinates.md#origin) is a point in space, often relative to the mouse's anatomy but it can also be a point on a device. The Origin defines the (0, 0, 0) coordinate in a coordinate system. Standard anatomical references are positions like Bregma or Lambda
 
 <div align="center">
     <img src="_static/bregma_and_lambda2.png" alt="BREGMA_ARI Coordinate System" width="50%">
@@ -42,34 +36,67 @@ An [Origin](aind_data_schema_models/coordinates.md#origin) is a point in space, 
 
 ### Axis
 
-Each [Axis](components/coordinates.md#axis) is a combination of an [AxisName](aind_data_schema_models/coordinates.md#axisname) and [Direction](aind_data_schema_models/coordinates.md#direction).
+Each [Axis](components/coordinates.md#axis) is a combination of an [AxisName](biodata_models/coordinates.md#axisname) and [Direction](biodata_models/coordinates.md#direction).
 
 ### Units
 
-Each [CoordinateSystem](components/coordinates.md#coordinatesystem) defines its origin, axis direction, and units. All of this information is inherited by the [Translation](components/coordinates.md#translation), [Rotation](components/coordinates.md#rotation), and [Scale](components/coordinates.md#scale) transforms that are applied. The only exception is for rotations, where we ask you to specify for each rotation the units (degrees or radians). 
+Each [CoordinateSystem](components/coordinates.md#coordinatesystem) defines the active units. Units are inherited by the [Translation](components/coordinates.md#translation), [Rotation](components/coordinates.md#rotation), and [Scale](components/coordinates.md#scale) transforms that are applied. The only exception is for rotations, where we ask you to specify for each rotation the units (degrees or radians). 
 
-#### 3D vs 4D and Depth
+## Global vs Local Coordinate Systems
 
-Because skull shapes vary across animals the most useful coordinates to re-create insertions across animals are often the AP/ML position of the entry coordinate and then the "depth", i.e. the insertion distance of the tip of the inserted device from the brain (or dura) surface, whether a probe, fiber, needle, whatever. To support these kinds of insertions we include a depth axis option.
+The **Global Coordinate System** is the coordinate system in which an experiment is performed. For example, in an instrument these are the three axes and origin that define how devices are positioned while in a procedure these are the origin and axes used to position injections and chronic or acute implants.
 
-In most cases users should report the coordinates of the *entry coordinate* at the brain/dura surface using the first three (AP, ML, SI) values and then the depth *from the brain/dura surface* in the fourth depth coordinate. Recording all three coordinates disambiguates between the two ways that a probe can be "dropped" to the brain surface (either along the SI axis or down the probe depth axis). You can also use a 3-dimensional coordinate system (AP, ML, Depth) but we don't recommend it, since you need to either report in a protocol or in the notes how you dropped from the AP/ML plane down to the brain surface.
+We provide a coordinate system builder to help you develop your global coordinate systems, which comes with a variety of sensible defaults. You can export your Python code directly from the builder.
 
-Note that in general, the process by which you perform an insertion should be recorded in a protocol, especially if there are specific details a user would need to know about how to interpret coordinates.
-
-### CoordinateSystemLibrary
-
-We know that allowing complete flexibility with coordinate systems will be a source of confusion. With that in mind, we encourage everybody to use the `CoordinateSystemLibrary` class, which comes with a pre-defined set of standard coordinate systems. For example, you can import the `BREGMA_ARI` coordinate system and then re-use it as follows:
-
-```{code} python
-from aind_data_schema.components.coordinates import CoordinateSystemLibrary
-
-...
-
-coordinate_system = CoordinateSystemLibrary.BREGMA_ARI
-coordinate_system_name = CoordinateSystemLibrary.BREGMA_ARI.name
+```{raw} html
+<p style="margin-bottom:6px">
+    <a href="_static/coordinate_system_builder.html?mode=global" target="_blank" rel="noopener">
+    Open builder in full screen ↗
+  </a>
+</p>
+<iframe
+    src="_static/coordinate_system_builder.html?mode=global"
+  style="width:100%; min-width:820px; height:780px; border:1px solid #ddd; border-radius:6px; overflow:auto;"
+  scrolling="yes"
+  title="AIND Coordinate System Builder">
+</iframe>
 ```
 
-You can always define your own coordinate system. If you find yourself re-using a coordinate system that isn't available in the library across multiple projects, please request an update to the library by opening an [issue](https://github.com/AllenNeuralDynamics/biodata-schema/issues).
+The **Local Coordinate System** is the definition of how a device appears in the global coordinate system when no translation or rotation is applied. Again the builder can help you develop the local coordinate system. Note how in this mode an X, Y, and Z axis appear and need to be aligned to the global axes.
+
+```{raw} html
+<p style="margin-bottom:6px">
+    <a href="_static/coordinate_system_builder.html?mode=device" target="_blank" rel="noopener">
+    Open builder in full screen ↗
+  </a>
+</p>
+<iframe
+    src="_static/coordinate_system_builder.html?mode=device"
+  style="width:100%; min-width:820px; height:780px; border:1px solid #ddd; border-radius:6px; overflow:auto;"
+  scrolling="yes"
+  title="AIND Coordinate System Builder">
+</iframe>
+```
+
+Finally, the **Local to Global Transform(s)** define the actual rotation and position of the device during the experiment. The transforms are local to global because they tell you how a position on the device, e.g. the device origin (0, 0, 0) should be located in the scene. We encourage users to develop chains of transforms because they are more intuitive for humans. For example, the scene below chains together a local rotation to set the probe pitch, a global translation from bregma to the entry coordinate on the brain surface, and finally a local translation on the probe depth axis.
+
+```{raw} html
+<p style="margin-bottom:6px">
+    <a href="_static/coordinate_system_builder.html?mode=transform&example=true" target="_blank" rel="noopener">
+    Open builder in full screen ↗
+  </a>
+</p>
+<iframe
+    src="_static/coordinate_system_builder.html?mode=transform&example=true"
+  style="width:100%; min-width:820px; height:780px; border:1px solid #ddd; border-radius:6px; overflow:auto;"
+  scrolling="yes"
+  title="AIND Coordinate System Builder">
+</iframe>
+```
+
+### Relative Position
+
+For devices where the exact position is not important or is unknown, simply tell us where the device is *roughly* relative to the origin. By combining several [AnatomicalRelative](biodata_models/coordinates.md#anatomicalrelative) directions in a list, for example `[AnatomicalRelative.ANTERIOR, AnatomicalRelative.SUPERIOR]`, etc.
 
 ## Measured Coordinates
 
@@ -81,62 +108,22 @@ measured_coordinates = {
 }
 ```
 
-Some notes: the position is *negative* because in BREGMA_ARI the AP axis points positive in the anterior direction, the other two axes are zero because this skull has apparently already been leveled, and finally no units are included in the translation itself because they are implied by the coordinate system, see [units](#units) above.
-
-## Rotations
-
-Rotations are applied using the [scipy Euler angle conventions](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.transform.Rotation.from_euler.html#scipy.spatial.transform.Rotation.from_euler), in "xyz" order. Positive angles rotate around the extrinsic axes counter-clockwise (right-hand rule).
-
-It can be complicated to translate your rotations into the default conventions in situations where you aren't in control of the coordinate system definition. In that situation, it is preferable to construct an affine rotation matrix directly and pass it using the [Affine](components/coordinates.md#affine) object.
-
-## Device transforms
-
-To understand the position and orientation of a **device** in an instrument requires knowing three things: (1) the coordinate system for the instrument, (2) the coordinate system for the device, and (3) the coordinate system transform i.e. how a point in one coordinate system is translated, rotated, and scaled to the other. For example, a [CameraAssembly](components/devices.md#cameraassembly) is a positioned device: it has three special fields `relative_position`, `coordinate_system`, and `transform`. The relative position is required for all positioned devices while the transform and coordinate system are only required when a device's exact position will have an impact on the interpretation/analysis of data.
-
-### Relative Position
-
-For devices where the exact position is not important or is unknown, simply tell us where the device is *roughly* relative to the origin. By combining several [AnatomicalRelative](aind_data_schema_models/coordinates.md#anatomicalrelative) directions in a list, for example `[AnatomicalRelative.ANTERIOR, AnatomicalRelative.SUPERIOR]`, etc, you can describe the position.
-
-### Exact Position
-
-The transform we require for devices is the device to instrument transform. I.e. given the origin of the device (0, 0, 0) and the three axis directions, what will be the position of the origin and what direction will the three axes point in the instrument's coordinate system.
-
-#### Building an exact position from scratch
-
-The easiest way to construct the exact position is to start by drawing two pictures of your device. First, draw your device in the instrument coordinate system at the origin. Define a "neutral" position: for example, a monitor at neutral might be facing posterior as if the mouse is looking at it. Select an origin coordinate for the device, a logical point for a monitor is the center of the screen. Then, define this device coordinate system by adding axis direction information matching the picture you drew so that the X, Y, and Z axes are matched between your instrument coordinate system and the device. Assuming that our instrument coordinate system is BREGMA_ARI, i.e. +X = +Anterior, +Y = +Right, and +Z = +Inferior, then our monitor should be defined as:
-
-```{code} python
-CoordinateSystem(
-    name="MONITOR_BRU",
-    origin=Origin.FRONT_CENTER,
-    axis_unit=SizeUnit.MM,
-    axes=[
-        Axis(name=AxisName.X, direction=Direction.FB),
-        Axis(name=AxisName.Y, direction=Direction.LR),
-        Axis(name=AxisName.Z, direction=Direction.DU),
-    ],
-)
-```
-
-The device is now defined in the instrument coordinate system, but at a physically impossible location overlapping the mouse. Now draw a second picture, which is the actual location of your monitor relative to the mouse. In our case, lets assume that this monitor is facing the mouse's right eye, at a 45 degree angle to the axis of the mouse's body (i.e. the eye to monitor vector is perpendicular to the monitor surface.), and at a viewing distance of 100 mm.
-
-Now we calculate the transforms needed to correctly position the device in the acquisition coordinate system. First we translate the monitor to the correct position by applying `Translation(translation=70.7, 70.7, 0)`. Then, we rotate *clockwise* around the Z axis by applying `Rotation(angles=[0, 0, -45], angles_unit=AngleUnit.DEG)`.
+The position is *negative* because in BREGMA_ARI the AP axis points positive in the anterior direction and no units are included in the translation itself because they are implied by the coordinate system, see [units](#units) above.
 
 ## Interactive Coordinate System Builder
 
-The builder below lets you set up your instrument coordinate system, add a probe or monitor device, and construct the transform list interactively. The 3D viewport shows a semi-transparent brain mesh with the device rendered in its final position. When you are satisfied, copy the generated Python code from the Export panel.
+The builder below lets you set up your instrument coordinate system, add a probe (long rectangle) or monitor (very large rectangle), and construct the transform list interactively. The 3D viewport shows a semi-transparent brain mesh with the device rendered in its final position. When you are satisfied, copy the generated Python code from the Export panel.
 
 ```{raw} html
 <p style="margin-bottom:6px">
-  <a href="_static/coordinate_system_builder.html" target="_blank" rel="noopener">
+    <a href="_static/coordinate_system_builder.html?mode=full" target="_blank" rel="noopener">
     Open builder in full screen ↗
   </a>
 </p>
 <iframe
-  src="_static/coordinate_system_builder.html"
+    src="_static/coordinate_system_builder.html?mode=full"
   style="width:100%; min-width:820px; height:780px; border:1px solid #ddd; border-radius:6px; overflow:auto;"
   scrolling="yes"
   title="AIND Coordinate System Builder">
 </iframe>
 ```
-

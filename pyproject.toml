@@ -14,15 +14,10 @@ readme = "README.md"
 dynamic = ["version"]
 
 dependencies = [
-    'aind-data-schema-models>=6.1.0,<7',
-    'pydantic>=2.7, <2.12',
+    'biodata-models>=1.0.1,<2',
+    'pydantic>=2.7, <3',
     'pydantic-extra-types',
     'tzdata',
-]
-
-[project.optional-dependencies]
-transforms = [
-    'scipy',
 ]
 
 [dependency-groups]
@@ -34,7 +29,6 @@ dev = [
     'pytest>=8.3',
     'pytest-cov>=6',
     'ruff>=0.11',
-    'scipy',
     'semver',
 ]
 
@@ -51,17 +45,17 @@ docs = [
 where = ["src"]
 
 [tool.setuptools.dynamic]
-version = {attr = "aind_data_schema.__version__"}
+version = {attr = "biodata_schema.__version__"}
 readme = {file = ["README.md"]}
 
 [tool.coverage.run]
 omit = [
     "*__init__*",
-    "*/aind_data_schema/visualizations/*",
+    "*/biodata_schema/visualizations/*",
     "*/tests/test_diagram_builder.py",
-    "*/aind_data_schema/utils/schema_tree.py"
+    "*/biodata_schema/utils/schema_tree.py"
 ]
-source = ["aind_data_schema", "tests"]
+source = ["biodata_schema", "tests"]
 
 [tool.coverage.report]
 exclude_lines = ["if __name__ == .__main__.:", "pragma: no cover"]

@@ -3,13 +3,14 @@
 import argparse
 import datetime
 
-from aind_data_schema_models.modalities import Modality
-from aind_data_schema_models.organizations import Organization
-from aind_data_schema_models.units import FrequencyUnit
+from biodata_models.coordinates import AxisName, Direction, Origin
+from biodata_models.modalities import Modality
+from biodata_models.organizations import Organization
+from biodata_models.units import FrequencyUnit, SizeUnit
 
-from aind_data_schema.components.connections import Connection
-from aind_data_schema.components.coordinates import CoordinateSystemLibrary
-from aind_data_schema.components.devices import (
+from biodata_schema.components.connections import Connection
+from biodata_schema.components.coordinates import Axis, CoordinateSystem
+from biodata_schema.components.devices import (
     AdditionalImagingDevice,
     Computer,
     DAQChannel,
@@ -22,7 +23,18 @@ from aind_data_schema.components.devices import (
     Objective,
     ScanningStage,
 )
-from aind_data_schema.core.instrument import Instrument
+from biodata_schema.core.instrument import Instrument
+
+SPIM_RPI = CoordinateSystem(
+    name="SPIM_RPI",
+    origin=Origin.ORIGIN,
+    axis_unit=SizeUnit.MM,
+    axes=[
+        Axis(name=AxisName.X, direction=Direction.LR),
+        Axis(name=AxisName.Y, direction=Direction.AP),
+        Axis(name=AxisName.Z, direction=Direction.SI),
+    ],
+)
 
 objectives = [
     Objective(
@@ -272,7 +284,7 @@ inst = Instrument(
     instrument_id="exaSPIM1",
     modalities=[Modality.SPIM],
     modification_date=datetime.date(2023, 10, 4),
-    coordinate_system=CoordinateSystemLibrary.SPIM_RPI,
+    global_coordinate_system=SPIM_RPI,
     components=[
         *objectives,
         *detectors,

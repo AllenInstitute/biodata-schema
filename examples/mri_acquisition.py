@@ -5,16 +5,28 @@ from datetime import datetime
 from decimal import Decimal
 from zoneinfo import ZoneInfo
 
-from aind_data_schema_models.modalities import Modality
-from aind_data_schema_models.units import MagneticFieldUnit, SizeUnit, TimeUnit
+from biodata_models.coordinates import AxisName, Direction, Origin
+from biodata_models.modalities import Modality
+from biodata_models.units import MagneticFieldUnit, SizeUnit, TimeUnit
 
-from aind_data_schema.components.configs import MRAcquisitionType, MRIScan, PulseSequenceType, SubjectPosition
-from aind_data_schema.components.coordinates import Affine, CoordinateSystemLibrary, Scale, Translation
-from aind_data_schema.components.devices import Scanner
-from aind_data_schema.core.acquisition import (
+from biodata_schema.components.configs import MRAcquisitionType, MRIScan, PulseSequenceType, SubjectPosition
+from biodata_schema.components.coordinates import Affine, Axis, CoordinateSystem, Scale, Translation
+from biodata_schema.components.devices import Scanner
+from biodata_schema.core.acquisition import (
     Acquisition,
     AcquisitionSubjectDetails,
     DataStream,
+)
+
+MRI_LPS = CoordinateSystem(
+    name="MRI_LPS",
+    origin=Origin.ORIGIN,
+    axis_unit=SizeUnit.MM,
+    axes=[
+        Axis(name=AxisName.X, direction=Direction.RL),
+        Axis(name=AxisName.Y, direction=Direction.AP),
+        Axis(name=AxisName.Z, direction=Direction.IS),
+    ],
 )
 
 mri_scanner = Scanner(
@@ -54,7 +66,7 @@ scan2 = MRIScan(
     repetition_time_unit=TimeUnit.S,
     affine_transform=[
         Affine(
-            affine_transform=[[1.0, 0.0, 0.0], [0.0, 0.0, -1.0], [0.0, 1.0, 0.0]],
+            affine_transform=[[1.0, 0.0, 0.0, 0.0], [0.0, 0.0, -1.0, 0.0], [0.0, 1.0, 0.0, 0.0]],
         ),
         Translation(
             translation=[-6.1, 7.0, 7.9],
@@ -83,7 +95,7 @@ acquisition = Acquisition(
     ethics_review_id=["1234"],
     acquisition_type="3D MRI Volume",
     instrument_id="NA",
-    coordinate_system=CoordinateSystemLibrary.MRI_LPS,
+    global_coordinate_system=MRI_LPS,
     subject_details=AcquisitionSubjectDetails(
         mouse_platform_name="cradle",
     ),

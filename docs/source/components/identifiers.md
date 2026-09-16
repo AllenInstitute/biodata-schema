@@ -71,7 +71,7 @@ Person identifier
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `name` | `str` | Person's name (First and last name OR anonymous ID) |
-| `registry` | [Registry](../aind_data_schema_models/registries.md#registry) | Registry  |
+| `registry` | [Registry](../biodata_models/registries.md#registry) | Registry  |
 | `registry_identifier` | `Optional[str]` | ORCID ID  |
 
 

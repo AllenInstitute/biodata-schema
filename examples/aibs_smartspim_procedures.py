@@ -3,12 +3,25 @@
 import argparse
 from datetime import date
 
-from aind_data_schema_models.organizations import Organization
+from biodata_models.coordinates import AxisName, Direction, Origin
+from biodata_models.organizations import Organization
+from biodata_models.units import SizeUnit
 
-from aind_data_schema.components.coordinates import CoordinateSystemLibrary
-from aind_data_schema.components.reagent import Reagent
-from aind_data_schema.components.subject_procedures import Perfusion
-from aind_data_schema.core import procedures
+from biodata_schema.components.coordinates import Axis, CoordinateSystem
+from biodata_schema.components.reagent import Reagent
+from biodata_schema.components.subject_procedures import Perfusion
+from biodata_schema.core import procedures
+
+BREGMA_ARI = CoordinateSystem(
+    name="BREGMA_ARI",
+    origin=Origin.BREGMA,
+    axis_unit=SizeUnit.MM,
+    axes=[
+        Axis(name=AxisName.AP, direction=Direction.PA),
+        Axis(name=AxisName.ML, direction=Direction.LR),
+        Axis(name=AxisName.SI, direction=Direction.SI),
+    ],
+)
 
 experimenters = ["John Smith"]
 specimen_id = "651286"
@@ -30,7 +43,7 @@ perfusion = procedures.Surgery(
     start_date=date(2022, 11, 17),
     experimenters=["LAS"],
     ethics_review_id="2234",
-    coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+    global_coordinate_system=BREGMA_ARI,
     procedures=[
         Perfusion(
             protocol_id="dx.doi.org/10.17504/protocols.io.8epv51bejl1b/v6",

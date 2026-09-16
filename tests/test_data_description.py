@@ -5,13 +5,18 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-from aind_data_schema_models.data_name_patterns import DataLevel
-from aind_data_schema_models.modalities import Modality
-from aind_data_schema_models.organizations import Organization
+from biodata_models.data_name_patterns import DataLevel
+from biodata_models.modalities import Modality
+from biodata_models.organizations import Organization
 from pydantic import ValidationError
 
-from aind_data_schema.components.identifiers import Person
-from aind_data_schema.core.data_description import DataDescription, Funding, build_data_name
+from biodata_schema.components.identifiers import Person
+from biodata_schema.core.data_description import DataDescription, Funding, build_data_name
+from biodata_schema.utils.inheritance import (
+    derive_data_description,
+    derive_data_description_from_derived,
+    derive_data_description_from_raw,
+)
 from examples.data_description import d as example_data_description
 
 DATA_DESCRIPTION_FILES_PATH = Path(__file__).parent / "resources" / "ephys_data_description"
@@ -51,7 +56,7 @@ class TestDataDescription:
         name = build_data_name("project", dt)
         assert name == "project_2022-10-12_23-23-11"
 
-    @patch("aind_data_schema.core.data_description.build_data_name")
+    @patch("biodata_schema.core.data_description.build_data_name")
     def test_build_name_validation_error(self, mock_build_data_name: MagicMock):
         """Test build_data_name function to trigger validation error"""
         mock_build_data_name.return_value = "invalid"
@@ -83,7 +88,7 @@ class TestDataDescription:
             investigators=[Person(name="Jane Smith")],
             project_name="Test",
         )
-        r1 = DataDescription.from_raw(da, "spikesort-ks25", creation_time=dt)
+        r1 = derive_data_description_from_raw(da, "spikesort-ks25", creation_time=dt)
         assert r1 is not None
 
     def test_nested_derived_data_description_construction(self):
@@ -100,9 +105,9 @@ class TestDataDescription:
             investigators=[Person(name="Jane Smith")],
             project_name="Test",
         )
-        r1 = DataDescription.from_raw(da, "spikesort-ks25", creation_time=dt)
-        r2 = DataDescription.from_derived(r1, "some-model", creation_time=dt)
-        r3 = DataDescription.from_derived(r2, "a-paper", creation_time=dt)
+        r1 = derive_data_description_from_raw(da, "spikesort-ks25", creation_time=dt)
+        r2 = derive_data_description_from_derived(r1, "some-model", creation_time=dt)
+        r3 = derive_data_description_from_derived(r2, "a-paper", creation_time=dt)
         assert r3 is not None
 
     def test_data_description_construction(self):
@@ -161,7 +166,7 @@ class TestDataDescription:
         )
 
         # also over-write with specimen ID
-        dd = DataDescription.from_raw(dr, "process", subject_id="1234-56")
+        dd = derive_data_description_from_raw(dr, "process", subject_id="1234-56")
         assert dd is not None
 
     def test_raw_no_subject_id(self):
@@ -197,7 +202,7 @@ class TestDataDescription:
         )
 
         with pytest.raises(ValueError) as context:
-            DataDescription.from_raw(da, "spikesort-ks25", creation_time="invalid creation time")
+            derive_data_description_from_raw(da, "spikesort-ks25", creation_time="invalid creation time")
 
         assert "creation_time" in str(context.value)
 
@@ -308,7 +313,7 @@ class TestDataDescription:
             investigators=[Person(name="Jane Smith")],
             project_name="Test",
         )
-        r1 = DataDescription.from_raw(da, "spikesort-ks25", creation_time=dt)
+        r1 = derive_data_description_from_raw(da, "spikesort-ks25", creation_time=dt)
         assert r1.source_data is not None
         assert len(r1.source_data) == 1
         assert r1.source_data[0] == da.name
@@ -332,7 +337,7 @@ class TestDataDescription:
 
         # Test scenario 3: RAW data → DERIVED with explicit source_data
         explicit_source = ["external_dataset_1", "external_dataset_2"]
-        r1 = DataDescription.from_raw(da, "spikesort-ks25", source_data=explicit_source, creation_time=dt)
+        r1 = derive_data_description_from_raw(da, "spikesort-ks25", source_data=explicit_source, creation_time=dt)
 
         # Should use the explicit source_data instead of the original name
         assert r1.source_data is not None
@@ -342,7 +347,7 @@ class TestDataDescription:
 
         # Test scenario 4: DERIVED data → DERIVED with explicit source_data
         additional_source = ["another_external_dataset"]
-        r2 = DataDescription.from_derived(r1, "clustering", source_data=additional_source, creation_time=dt)
+        r2 = derive_data_description_from_derived(r1, "clustering", source_data=additional_source, creation_time=dt)
 
         # Should use the explicit source_data (not combine with existing)
         assert r2.source_data is not None
@@ -367,16 +372,16 @@ class TestDataDescription:
         )
 
         # First derivation: RAW → DERIVED (should set source_data to original name)
-        r1 = DataDescription.from_raw(da, "spikesort-ks25", creation_time=dt)
+        r1 = derive_data_description_from_raw(da, "spikesort-ks25", creation_time=dt)
         assert r1.source_data == [da.name]
 
         # Second derivation: DERIVED → DERIVED (should use only the immediate predecessor)
-        r2 = DataDescription.from_derived(r1, "clustering", creation_time=dt)
+        r2 = derive_data_description_from_derived(r1, "clustering", creation_time=dt)
         assert len(r2.source_data) == 1
         assert r2.source_data[0] == r1.name  # Only the immediate predecessor
 
         # Third derivation: should only reference the immediate predecessor
-        r3 = DataDescription.from_derived(r2, "analysis", creation_time=dt)
+        r3 = derive_data_description_from_derived(r2, "analysis", creation_time=dt)
         assert len(r3.source_data) == 1
         assert r3.source_data[0] == r2.name  # Only the immediate predecessor
 
@@ -385,7 +390,7 @@ class TestDataDescription:
         dt = datetime.datetime(2022, 10, 12, 23, 23, 11)
 
         # Create first derived from example data
-        derived1 = DataDescription.from_raw(example_data_description, "spike_sorting", creation_time=dt)
+        derived1 = derive_data_description_from_raw(example_data_description, "spike_sorting", creation_time=dt)
 
         # Verify first derived name structure
         assert derived1.name.startswith(example_data_description.name)
@@ -395,7 +400,7 @@ class TestDataDescription:
 
         # Create second derived using from_derived
         dt2 = datetime.datetime(2022, 10, 13, 10, 15, 30)
-        derived2 = DataDescription.from_derived(derived1, "quality_control", creation_time=dt2)
+        derived2 = derive_data_description_from_derived(derived1, "quality_control", creation_time=dt2)
 
         # Verify second derived uses original input, not full derived name
         assert derived2.name.startswith(example_data_description.name)
@@ -416,7 +421,7 @@ class TestDataDescription:
         dt = datetime.datetime.now()
 
         with pytest.raises(ValueError) as context:
-            DataDescription.from_derived(example_data_description, "process", creation_time=dt)
+            derive_data_description_from_derived(example_data_description, "process", creation_time=dt)
 
         assert "must have data_level=DERIVED" in str(context.value)
 
@@ -426,11 +431,13 @@ class TestDataDescription:
         dt2 = datetime.datetime(2022, 10, 13, 10, 15, 30)
 
         # Create first derived from example data
-        derived1 = DataDescription.from_raw(example_data_description, "preprocessing", creation_time=dt)
+        derived1 = derive_data_description_from_raw(example_data_description, "preprocessing", creation_time=dt)
 
         # Create second derived with explicit source_data
         explicit_source = ["external_dataset_1", "external_dataset_2"]
-        derived2 = DataDescription.from_derived(derived1, "analysis", source_data=explicit_source, creation_time=dt2)
+        derived2 = derive_data_description_from_derived(
+            derived1, "analysis", source_data=explicit_source, creation_time=dt2
+        )
 
         # Should use the explicit source_data (not combine with existing)
         assert len(derived2.source_data) == 2  # Just the explicit source_data
@@ -443,9 +450,9 @@ class TestDataDescription:
         dt3 = datetime.datetime(2022, 10, 14, 14, 20, 45)
 
         # Create chain: RAW → DERIVED → DERIVED → DERIVED
-        derived1 = DataDescription.from_raw(example_data_description, "process1", creation_time=dt1)
-        derived2 = DataDescription.from_derived(derived1, "process2", creation_time=dt2)
-        derived3 = DataDescription.from_derived(derived2, "process3", creation_time=dt3)
+        derived1 = derive_data_description_from_raw(example_data_description, "process1", creation_time=dt1)
+        derived2 = derive_data_description_from_derived(derived1, "process2", creation_time=dt2)
+        derived3 = derive_data_description_from_derived(derived2, "process3", creation_time=dt3)
 
         # All derived names should start with the original raw name
         original_prefix = example_data_description.name
@@ -464,12 +471,12 @@ class TestDataDescription:
         dt2 = datetime.datetime(2022, 10, 13, 10, 15, 30)
 
         # Create a derived data with complex process name
-        derived1 = DataDescription.from_raw(
+        derived1 = derive_data_description_from_raw(
             example_data_description, "spike-sorting-v2.1_with-params", creation_time=dt1
         )
 
         # Create another derived from the first
-        derived2 = DataDescription.from_derived(derived1, "cluster-analysis_final", creation_time=dt2)
+        derived2 = derive_data_description_from_derived(derived1, "cluster-analysis_final", creation_time=dt2)
 
         # Verify the second derived uses the original input correctly
         assert derived2.name.startswith(example_data_description.name)
@@ -481,11 +488,11 @@ class TestDataDescription:
         dt = datetime.datetime(2022, 10, 12, 23, 23, 11)
 
         # Should behave exactly like from_raw
-        result_from_data_description = DataDescription.from_data_description(
+        result_from_data_description = derive_data_description(
             example_data_description, "test_process", creation_time=dt
         )
 
-        result_from_raw = DataDescription.from_raw(example_data_description, "test_process", creation_time=dt)
+        result_from_raw = derive_data_description_from_raw(example_data_description, "test_process", creation_time=dt)
 
         # Results should be identical
         assert result_from_data_description.name == result_from_raw.name
@@ -498,14 +505,12 @@ class TestDataDescription:
         dt2 = datetime.datetime(2022, 10, 13, 10, 15, 30)
 
         # Create derived data first
-        derived1 = DataDescription.from_raw(example_data_description, "first_process", creation_time=dt1)
+        derived1 = derive_data_description_from_raw(example_data_description, "first_process", creation_time=dt1)
 
         # Should behave exactly like from_derived
-        result_from_data_description = DataDescription.from_data_description(
-            derived1, "second_process", creation_time=dt2
-        )
+        result_from_data_description = derive_data_description(derived1, "second_process", creation_time=dt2)
 
-        result_from_derived = DataDescription.from_derived(derived1, "second_process", creation_time=dt2)
+        result_from_derived = derive_data_description_from_derived(derived1, "second_process", creation_time=dt2)
 
         # Results should be identical
         assert result_from_data_description.name == result_from_derived.name
@@ -518,11 +523,11 @@ class TestDataDescription:
 
         # Create a mock DataDescription with unsupported data_level
         # We'll create a derived one and then manually change its data_level
-        derived = DataDescription.from_raw(example_data_description, "test", creation_time=dt)
+        derived = derive_data_description_from_raw(example_data_description, "test", creation_time=dt)
         derived.data_level = DataLevel.SIMULATED  # Not supported by from_data_description
 
         with pytest.raises(ValueError) as context:
-            DataDescription.from_data_description(derived, "process", creation_time=dt)
+            derive_data_description(derived, "process", creation_time=dt)
 
         assert "Unsupported data_level: simulated" in str(context.value)
 
@@ -535,7 +540,7 @@ class TestDataDescription:
         custom_tags = ["custom", "test"]
         explicit_source = ["external_source"]
 
-        result_raw = DataDescription.from_data_description(
+        result_raw = derive_data_description(
             example_data_description, "test_process", source_data=explicit_source, creation_time=dt1, tags=custom_tags
         )
 
@@ -543,9 +548,9 @@ class TestDataDescription:
         assert result_raw.source_data == explicit_source
 
         # Test with DERIVED input
-        derived = DataDescription.from_raw(example_data_description, "first", creation_time=dt1)
+        derived = derive_data_description_from_raw(example_data_description, "first", creation_time=dt1)
 
-        result_derived = DataDescription.from_data_description(
+        result_derived = derive_data_description(
             derived, "second_process", source_data=explicit_source, creation_time=dt2, tags=custom_tags
         )
 
@@ -558,10 +563,10 @@ class TestDataDescription:
         dt = datetime.datetime.now()
 
         # Create first derived data
-        derived1 = DataDescription.from_raw(example_data_description, "preprocessing", creation_time=dt)
+        derived1 = derive_data_description_from_raw(example_data_description, "preprocessing", creation_time=dt)
 
         with pytest.raises(ValueError) as context:
-            DataDescription.from_derived(derived1, "analysis", creation_time="not_a_datetime")
+            derive_data_description_from_derived(derived1, "analysis", creation_time="not_a_datetime")
 
         assert "creation_time(not_a_datetime) must be a datetime object" in str(context.value)
 
@@ -570,11 +575,11 @@ class TestDataDescription:
         dt = datetime.datetime.now()
 
         # Create derived data first
-        derived = DataDescription.from_raw(example_data_description, "preprocessing", creation_time=dt)
+        derived = derive_data_description_from_raw(example_data_description, "preprocessing", creation_time=dt)
 
         # Try to use from_raw on derived data (should fail)
         with pytest.raises(ValueError) as context:
-            DataDescription.from_raw(derived, "another_process", creation_time=dt)
+            derive_data_description_from_raw(derived, "another_process", creation_time=dt)
 
         assert "Input data_description must have data_level=RAW, got derived" in str(context.value)
 
@@ -590,7 +595,7 @@ class TestDataDescription:
 
         # Try to create derived data - should trigger the PydanticUndefined error path
         with pytest.raises(ValueError) as context:
-            DataDescription.from_data_description(base_data, "test_process", creation_time=dt)
+            derive_data_description(base_data, "test_process", creation_time=dt)
 
         # Should raise error about the missing required field
         assert "Required field investigators must have a value" in str(context.value)
@@ -601,14 +606,14 @@ class TestDataDescription:
 
         # Create a copy of the valid DataDescription to avoid modifying the original
         base_data = DataDescription.model_validate(example_data_description.model_dump())
-        derived_data = DataDescription.from_raw(base_data, "process", creation_time=dt)
+        derived_data = derive_data_description_from_raw(base_data, "process", creation_time=dt)
 
         # Remove a required field to make it invalid
         delattr(derived_data, "investigators")
 
         # Try to create derived data - should trigger the PydanticUndefined error path
         with pytest.raises(ValueError) as context:
-            DataDescription.from_data_description(derived_data, "process-2", creation_time=dt)
+            derive_data_description(derived_data, "process-2", creation_time=dt)
 
         # Should raise error about the missing required field
         assert "Required field investigators must have a value" in str(context.value)

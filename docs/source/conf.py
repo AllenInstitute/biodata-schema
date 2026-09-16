@@ -9,7 +9,7 @@ from datetime import date
 from os.path import abspath, dirname
 from pathlib import Path
 
-from aind_data_schema import __version__ as package_version
+from biodata_schema import __version__ as package_version
 
 INSTITUTE_NAME = "Allen Institute for Neural Dynamics"
 
@@ -58,7 +58,7 @@ myst_heading_anchors = 3
 
 
 def _write_schema_diagram_json():
-    from aind_data_schema.utils.schema_tree import write_schema_diagram_json
+    from biodata_schema.utils.schema_tree import write_schema_diagram_json
 
     write_schema_diagram_json(Path(dirname(this_file_path)) / "_static" / "schema-diagram" / "schema_diagram.json")
 

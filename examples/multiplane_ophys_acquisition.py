@@ -4,12 +4,13 @@ import argparse
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from aind_data_schema_models.brain_atlas import CCFv3
-from aind_data_schema_models.modalities import Modality
-from aind_data_schema_models.stimulus_modality import StimulusModality
-from aind_data_schema_models.units import FrequencyUnit, PowerUnit, SizeUnit, VolumeUnit
+from biodata_models.brain_atlas import CCFv3
+from biodata_models.coordinates import AxisName, Direction, Origin
+from biodata_models.modalities import Modality
+from biodata_models.stimulus_modality import StimulusModality
+from biodata_models.units import FrequencyUnit, PowerUnit, SizeUnit, VolumeUnit
 
-from aind_data_schema.components.configs import (
+from biodata_schema.components.configs import (
     Channel,
     CoupledPlane,
     DetectorConfig,
@@ -19,14 +20,25 @@ from aind_data_schema.components.configs import (
     SamplingStrategy,
     TriggerType,
 )
-from aind_data_schema.components.coordinates import CoordinateSystemLibrary, Scale, Translation
-from aind_data_schema.components.identifiers import Code, Software
-from aind_data_schema.core.acquisition import (
+from biodata_schema.components.coordinates import Axis, CoordinateSystem, Scale, Translation
+from biodata_schema.components.identifiers import Code, Software
+from biodata_schema.core.acquisition import (
     Acquisition,
     AcquisitionSubjectDetails,
     DataStream,
     PerformanceMetrics,
     StimulusEpoch,
+)
+
+BREGMA_ARI = CoordinateSystem(
+    name="BREGMA_ARI",
+    origin=Origin.BREGMA,
+    axis_unit=SizeUnit.MM,
+    axes=[
+        Axis(name=AxisName.AP, direction=Direction.PA),
+        Axis(name=AxisName.ML, direction=Direction.LR),
+        Axis(name=AxisName.SI, direction=Direction.SI),
+    ],
 )
 
 # If a timezone isn't specified, the timezone of the computer running this
@@ -50,7 +62,7 @@ a = Acquisition(
     subject_details=AcquisitionSubjectDetails(
         mouse_platform_name="disc",
     ),
-    coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+    global_coordinate_system=BREGMA_ARI,
     data_streams=[
         DataStream(
             stream_start_time=t,
@@ -98,7 +110,7 @@ a = Acquisition(
                             channel_name="Green channel",
                             image_to_acquisition_transform=[
                                 Translation(
-                                    translation=[1.5, 1.5],
+                                    translation=[1.5, 1.5, 0],
                                 ),
                             ],
                             dimensions=Scale(

@@ -40,6 +40,7 @@
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                            "Allied": "#/$defs/_Allied",
+                           "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                            "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                            "Arduino": "#/$defs/_Arduino",
                            "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -125,6 +126,7 @@
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
                            "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                           "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                            "SICGEN": "#/$defs/_Sicgen",
                            "Same Sky": "#/$defs/_Same_Sky",
                            "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -136,6 +138,7 @@
                            "Spectra-Physics": "#/$defs/_Spectra_Physics",
                            "Spinnaker": "#/$defs/_Spinnaker",
                            "Stanford University": "#/$defs/_Stanford_University",
+                           "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                            "TE Connectivity": "#/$defs/_Te_Connectivity",
                            "Tamron": "#/$defs/_Tamron",
                            "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -185,6 +188,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Allied"
+                        },
+                        {
+                           "$ref": "#/$defs/_Antibodies_Inc"
                         },
                         {
                            "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -442,6 +448,9 @@
                            "$ref": "#/$defs/_Raspberry_Pi"
                         },
                         {
+                           "$ref": "#/$defs/_Rockland_Immunochemicals"
+                        },
+                        {
                            "$ref": "#/$defs/_Sicgen"
                         },
                         {
@@ -473,6 +482,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Stanford_University"
+                        },
+                        {
+                           "$ref": "#/$defs/_Synaptic_Systems"
                         },
                         {
                            "$ref": "#/$defs/_Te_Connectivity"
@@ -655,6 +667,7 @@
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                            "Allied": "#/$defs/_Allied",
+                           "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                            "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                            "Arduino": "#/$defs/_Arduino",
                            "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -740,6 +753,7 @@
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
                            "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                           "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                            "SICGEN": "#/$defs/_Sicgen",
                            "Same Sky": "#/$defs/_Same_Sky",
                            "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -751,6 +765,7 @@
                            "Spectra-Physics": "#/$defs/_Spectra_Physics",
                            "Spinnaker": "#/$defs/_Spinnaker",
                            "Stanford University": "#/$defs/_Stanford_University",
+                           "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                            "TE Connectivity": "#/$defs/_Te_Connectivity",
                            "Tamron": "#/$defs/_Tamron",
                            "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -800,6 +815,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Allied"
+                        },
+                        {
+                           "$ref": "#/$defs/_Antibodies_Inc"
                         },
                         {
                            "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -1057,6 +1075,9 @@
                            "$ref": "#/$defs/_Raspberry_Pi"
                         },
                         {
+                           "$ref": "#/$defs/_Rockland_Immunochemicals"
+                        },
+                        {
                            "$ref": "#/$defs/_Sicgen"
                         },
                         {
@@ -1088,6 +1109,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Stanford_University"
+                        },
+                        {
+                           "$ref": "#/$defs/_Synaptic_Systems"
                         },
                         {
                            "$ref": "#/$defs/_Te_Connectivity"
@@ -1273,6 +1297,7 @@
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                            "Allied": "#/$defs/_Allied",
+                           "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                            "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                            "Arduino": "#/$defs/_Arduino",
                            "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -1358,6 +1383,7 @@
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
                            "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                           "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                            "SICGEN": "#/$defs/_Sicgen",
                            "Same Sky": "#/$defs/_Same_Sky",
                            "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -1369,6 +1395,7 @@
                            "Spectra-Physics": "#/$defs/_Spectra_Physics",
                            "Spinnaker": "#/$defs/_Spinnaker",
                            "Stanford University": "#/$defs/_Stanford_University",
+                           "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                            "TE Connectivity": "#/$defs/_Te_Connectivity",
                            "Tamron": "#/$defs/_Tamron",
                            "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -1418,6 +1445,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Allied"
+                        },
+                        {
+                           "$ref": "#/$defs/_Antibodies_Inc"
                         },
                         {
                            "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -1675,6 +1705,9 @@
                            "$ref": "#/$defs/_Raspberry_Pi"
                         },
                         {
+                           "$ref": "#/$defs/_Rockland_Immunochemicals"
+                        },
+                        {
                            "$ref": "#/$defs/_Sicgen"
                         },
                         {
@@ -1706,6 +1739,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Stanford_University"
+                        },
+                        {
+                           "$ref": "#/$defs/_Synaptic_Systems"
                         },
                         {
                            "$ref": "#/$defs/_Te_Connectivity"
@@ -1809,40 +1845,22 @@
                "default": null,
                "title": "Notes"
             },
-            "size": {
-               "$ref": "#/$defs/Scale",
-               "deprecated": true,
-               "title": "3D Size"
-            },
-            "size_unit": {
-               "$ref": "#/$defs/SizeUnit",
-               "deprecated": true,
-               "title": "Size unit"
-            },
             "shape": {
-               "anyOf": [
+               "discriminator": {
+                  "mapping": {
+                     "Circle": "#/$defs/Circle",
+                     "Rectangle": "#/$defs/Rectangle"
+                  },
+                  "propertyName": "object_type"
+               },
+               "oneOf": [
                   {
-                     "discriminator": {
-                        "mapping": {
-                           "Circle": "#/$defs/Circle",
-                           "Rectangle": "#/$defs/Rectangle"
-                        },
-                        "propertyName": "object_type"
-                     },
-                     "oneOf": [
-                        {
-                           "$ref": "#/$defs/Rectangle"
-                        },
-                        {
-                           "$ref": "#/$defs/Circle"
-                        }
-                     ]
+                     "$ref": "#/$defs/Rectangle"
                   },
                   {
-                     "type": "null"
+                     "$ref": "#/$defs/Circle"
                   }
                ],
-               "default": null,
                "title": "Shape of the arena"
             },
             "objects_in_arena": {
@@ -1856,8 +1874,7 @@
          },
          "required": [
             "name",
-            "size",
-            "size_unit"
+            "shape"
          ],
          "title": "Arena",
          "type": "object"
@@ -2234,6 +2251,7 @@
                      "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                      "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                      "Allied": "#/$defs/_Allied",
+                     "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                      "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                      "Arduino": "#/$defs/_Arduino",
                      "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -2319,6 +2337,7 @@
                      "Prizmatix": "#/$defs/_Prizmatix",
                      "Quantifi": "#/$defs/_Quantifi",
                      "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                     "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                      "SICGEN": "#/$defs/_Sicgen",
                      "Same Sky": "#/$defs/_Same_Sky",
                      "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -2330,6 +2349,7 @@
                      "Spectra-Physics": "#/$defs/_Spectra_Physics",
                      "Spinnaker": "#/$defs/_Spinnaker",
                      "Stanford University": "#/$defs/_Stanford_University",
+                     "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                      "TE Connectivity": "#/$defs/_Te_Connectivity",
                      "Tamron": "#/$defs/_Tamron",
                      "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -2379,6 +2399,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Allied"
+                  },
+                  {
+                     "$ref": "#/$defs/_Antibodies_Inc"
                   },
                   {
                      "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -2636,6 +2659,9 @@
                      "$ref": "#/$defs/_Raspberry_Pi"
                   },
                   {
+                     "$ref": "#/$defs/_Rockland_Immunochemicals"
+                  },
+                  {
                      "$ref": "#/$defs/_Sicgen"
                   },
                   {
@@ -2667,6 +2693,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Stanford_University"
+                  },
+                  {
+                     "$ref": "#/$defs/_Synaptic_Systems"
                   },
                   {
                      "$ref": "#/$defs/_Te_Connectivity"
@@ -3050,25 +3079,16 @@
                "title": "Object Type",
                "type": "string"
             },
+            "name": {
+               "title": "Assembly name",
+               "type": "string"
+            },
             "relative_position": {
                "items": {
                   "$ref": "#/$defs/AnatomicalRelative"
                },
                "title": "Relative position",
                "type": "array"
-            },
-            "coordinate_system": {
-               "anyOf": [
-                  {
-                     "$ref": "#/$defs/CoordinateSystem"
-                  },
-                  {
-                     "type": "null"
-                  }
-               ],
-               "default": null,
-               "deprecated": true,
-               "title": "Device coordinate system"
             },
             "local_coordinate_system": {
                "anyOf": [
@@ -3120,10 +3140,6 @@
                "description": "Position and orientation of the device in the instrument global coordinate system",
                "title": "Local to global transform"
             },
-            "name": {
-               "title": "Camera assembly name",
-               "type": "string"
-            },
             "target": {
                "$ref": "#/$defs/CameraTarget",
                "title": "Camera target"
@@ -3148,8 +3164,8 @@
             }
          },
          "required": [
-            "relative_position",
             "name",
+            "relative_position",
             "target",
             "camera",
             "lens"
@@ -3245,6 +3261,7 @@
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                            "Allied": "#/$defs/_Allied",
+                           "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                            "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                            "Arduino": "#/$defs/_Arduino",
                            "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -3330,6 +3347,7 @@
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
                            "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                           "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                            "SICGEN": "#/$defs/_Sicgen",
                            "Same Sky": "#/$defs/_Same_Sky",
                            "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -3341,6 +3359,7 @@
                            "Spectra-Physics": "#/$defs/_Spectra_Physics",
                            "Spinnaker": "#/$defs/_Spinnaker",
                            "Stanford University": "#/$defs/_Stanford_University",
+                           "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                            "TE Connectivity": "#/$defs/_Te_Connectivity",
                            "Tamron": "#/$defs/_Tamron",
                            "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -3390,6 +3409,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Allied"
+                        },
+                        {
+                           "$ref": "#/$defs/_Antibodies_Inc"
                         },
                         {
                            "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -3647,6 +3669,9 @@
                            "$ref": "#/$defs/_Raspberry_Pi"
                         },
                         {
+                           "$ref": "#/$defs/_Rockland_Immunochemicals"
+                        },
+                        {
                            "$ref": "#/$defs/_Sicgen"
                         },
                         {
@@ -3678,6 +3703,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Stanford_University"
+                        },
+                        {
+                           "$ref": "#/$defs/_Synaptic_Systems"
                         },
                         {
                            "$ref": "#/$defs/_Te_Connectivity"
@@ -3989,19 +4017,6 @@
                "default": null,
                "title": "DAQ port"
             },
-            "channel_index": {
-               "anyOf": [
-                  {
-                     "type": "integer"
-                  },
-                  {
-                     "type": "null"
-                  }
-               ],
-               "default": null,
-               "deprecated": true,
-               "title": "DAQ channel index"
-            },
             "sample_rate": {
                "anyOf": [
                   {
@@ -4087,6 +4102,7 @@
                      "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                      "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                      "Allied": "#/$defs/_Allied",
+                     "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                      "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                      "Arduino": "#/$defs/_Arduino",
                      "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -4172,6 +4188,7 @@
                      "Prizmatix": "#/$defs/_Prizmatix",
                      "Quantifi": "#/$defs/_Quantifi",
                      "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                     "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                      "SICGEN": "#/$defs/_Sicgen",
                      "Same Sky": "#/$defs/_Same_Sky",
                      "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -4183,6 +4200,7 @@
                      "Spectra-Physics": "#/$defs/_Spectra_Physics",
                      "Spinnaker": "#/$defs/_Spinnaker",
                      "Stanford University": "#/$defs/_Stanford_University",
+                     "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                      "TE Connectivity": "#/$defs/_Te_Connectivity",
                      "Tamron": "#/$defs/_Tamron",
                      "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -4232,6 +4250,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Allied"
+                  },
+                  {
+                     "$ref": "#/$defs/_Antibodies_Inc"
                   },
                   {
                      "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -4489,6 +4510,9 @@
                      "$ref": "#/$defs/_Raspberry_Pi"
                   },
                   {
+                     "$ref": "#/$defs/_Rockland_Immunochemicals"
+                  },
+                  {
                      "$ref": "#/$defs/_Sicgen"
                   },
                   {
@@ -4520,6 +4544,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Stanford_University"
+                  },
+                  {
+                     "$ref": "#/$defs/_Synaptic_Systems"
                   },
                   {
                      "$ref": "#/$defs/_Te_Connectivity"
@@ -4725,6 +4752,7 @@
                      "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                      "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                      "Allied": "#/$defs/_Allied",
+                     "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                      "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                      "Arduino": "#/$defs/_Arduino",
                      "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -4810,6 +4838,7 @@
                      "Prizmatix": "#/$defs/_Prizmatix",
                      "Quantifi": "#/$defs/_Quantifi",
                      "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                     "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                      "SICGEN": "#/$defs/_Sicgen",
                      "Same Sky": "#/$defs/_Same_Sky",
                      "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -4821,6 +4850,7 @@
                      "Spectra-Physics": "#/$defs/_Spectra_Physics",
                      "Spinnaker": "#/$defs/_Spinnaker",
                      "Stanford University": "#/$defs/_Stanford_University",
+                     "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                      "TE Connectivity": "#/$defs/_Te_Connectivity",
                      "Tamron": "#/$defs/_Tamron",
                      "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -4870,6 +4900,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Allied"
+                  },
+                  {
+                     "$ref": "#/$defs/_Antibodies_Inc"
                   },
                   {
                      "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -5127,6 +5160,9 @@
                      "$ref": "#/$defs/_Raspberry_Pi"
                   },
                   {
+                     "$ref": "#/$defs/_Rockland_Immunochemicals"
+                  },
+                  {
                      "$ref": "#/$defs/_Sicgen"
                   },
                   {
@@ -5158,6 +5194,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Stanford_University"
+                  },
+                  {
+                     "$ref": "#/$defs/_Synaptic_Systems"
                   },
                   {
                      "$ref": "#/$defs/_Te_Connectivity"
@@ -5583,6 +5622,7 @@
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                            "Allied": "#/$defs/_Allied",
+                           "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                            "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                            "Arduino": "#/$defs/_Arduino",
                            "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -5668,6 +5708,7 @@
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
                            "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                           "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                            "SICGEN": "#/$defs/_Sicgen",
                            "Same Sky": "#/$defs/_Same_Sky",
                            "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -5679,6 +5720,7 @@
                            "Spectra-Physics": "#/$defs/_Spectra_Physics",
                            "Spinnaker": "#/$defs/_Spinnaker",
                            "Stanford University": "#/$defs/_Stanford_University",
+                           "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                            "TE Connectivity": "#/$defs/_Te_Connectivity",
                            "Tamron": "#/$defs/_Tamron",
                            "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -5728,6 +5770,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Allied"
+                        },
+                        {
+                           "$ref": "#/$defs/_Antibodies_Inc"
                         },
                         {
                            "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -5985,6 +6030,9 @@
                            "$ref": "#/$defs/_Raspberry_Pi"
                         },
                         {
+                           "$ref": "#/$defs/_Rockland_Immunochemicals"
+                        },
+                        {
                            "$ref": "#/$defs/_Sicgen"
                         },
                         {
@@ -6016,6 +6064,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Stanford_University"
+                        },
+                        {
+                           "$ref": "#/$defs/_Synaptic_Systems"
                         },
                         {
                            "$ref": "#/$defs/_Te_Connectivity"
@@ -6176,6 +6227,7 @@
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                            "Allied": "#/$defs/_Allied",
+                           "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                            "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                            "Arduino": "#/$defs/_Arduino",
                            "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -6261,6 +6313,7 @@
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
                            "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                           "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                            "SICGEN": "#/$defs/_Sicgen",
                            "Same Sky": "#/$defs/_Same_Sky",
                            "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -6272,6 +6325,7 @@
                            "Spectra-Physics": "#/$defs/_Spectra_Physics",
                            "Spinnaker": "#/$defs/_Spinnaker",
                            "Stanford University": "#/$defs/_Stanford_University",
+                           "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                            "TE Connectivity": "#/$defs/_Te_Connectivity",
                            "Tamron": "#/$defs/_Tamron",
                            "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -6321,6 +6375,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Allied"
+                        },
+                        {
+                           "$ref": "#/$defs/_Antibodies_Inc"
                         },
                         {
                            "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -6578,6 +6635,9 @@
                            "$ref": "#/$defs/_Raspberry_Pi"
                         },
                         {
+                           "$ref": "#/$defs/_Rockland_Immunochemicals"
+                        },
+                        {
                            "$ref": "#/$defs/_Sicgen"
                         },
                         {
@@ -6609,6 +6669,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Stanford_University"
+                        },
+                        {
+                           "$ref": "#/$defs/_Synaptic_Systems"
                         },
                         {
                            "$ref": "#/$defs/_Te_Connectivity"
@@ -6835,6 +6898,7 @@
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                            "Allied": "#/$defs/_Allied",
+                           "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                            "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                            "Arduino": "#/$defs/_Arduino",
                            "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -6920,6 +6984,7 @@
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
                            "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                           "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                            "SICGEN": "#/$defs/_Sicgen",
                            "Same Sky": "#/$defs/_Same_Sky",
                            "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -6931,6 +6996,7 @@
                            "Spectra-Physics": "#/$defs/_Spectra_Physics",
                            "Spinnaker": "#/$defs/_Spinnaker",
                            "Stanford University": "#/$defs/_Stanford_University",
+                           "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                            "TE Connectivity": "#/$defs/_Te_Connectivity",
                            "Tamron": "#/$defs/_Tamron",
                            "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -6980,6 +7046,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Allied"
+                        },
+                        {
+                           "$ref": "#/$defs/_Antibodies_Inc"
                         },
                         {
                            "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -7237,6 +7306,9 @@
                            "$ref": "#/$defs/_Raspberry_Pi"
                         },
                         {
+                           "$ref": "#/$defs/_Rockland_Immunochemicals"
+                        },
+                        {
                            "$ref": "#/$defs/_Sicgen"
                         },
                         {
@@ -7268,6 +7340,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Stanford_University"
+                        },
+                        {
+                           "$ref": "#/$defs/_Synaptic_Systems"
                         },
                         {
                            "$ref": "#/$defs/_Te_Connectivity"
@@ -7499,6 +7574,7 @@
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                            "Allied": "#/$defs/_Allied",
+                           "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                            "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                            "Arduino": "#/$defs/_Arduino",
                            "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -7584,6 +7660,7 @@
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
                            "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                           "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                            "SICGEN": "#/$defs/_Sicgen",
                            "Same Sky": "#/$defs/_Same_Sky",
                            "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -7595,6 +7672,7 @@
                            "Spectra-Physics": "#/$defs/_Spectra_Physics",
                            "Spinnaker": "#/$defs/_Spinnaker",
                            "Stanford University": "#/$defs/_Stanford_University",
+                           "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                            "TE Connectivity": "#/$defs/_Te_Connectivity",
                            "Tamron": "#/$defs/_Tamron",
                            "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -7644,6 +7722,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Allied"
+                        },
+                        {
+                           "$ref": "#/$defs/_Antibodies_Inc"
                         },
                         {
                            "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -7901,6 +7982,9 @@
                            "$ref": "#/$defs/_Raspberry_Pi"
                         },
                         {
+                           "$ref": "#/$defs/_Rockland_Immunochemicals"
+                        },
+                        {
                            "$ref": "#/$defs/_Sicgen"
                         },
                         {
@@ -7932,6 +8016,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Stanford_University"
+                        },
+                        {
+                           "$ref": "#/$defs/_Synaptic_Systems"
                         },
                         {
                            "$ref": "#/$defs/_Te_Connectivity"
@@ -8035,40 +8122,22 @@
                "default": null,
                "title": "Notes"
             },
-            "size": {
-               "$ref": "#/$defs/Scale",
-               "deprecated": true,
-               "title": "Size"
-            },
-            "size_unit": {
-               "$ref": "#/$defs/SizeUnit",
-               "deprecated": true,
-               "title": "Size unit"
-            },
             "shape": {
-               "anyOf": [
+               "discriminator": {
+                  "mapping": {
+                     "Circle": "#/$defs/Circle",
+                     "Rectangle": "#/$defs/Rectangle"
+                  },
+                  "propertyName": "object_type"
+               },
+               "oneOf": [
                   {
-                     "discriminator": {
-                        "mapping": {
-                           "Circle": "#/$defs/Circle",
-                           "Rectangle": "#/$defs/Rectangle"
-                        },
-                        "propertyName": "object_type"
-                     },
-                     "oneOf": [
-                        {
-                           "$ref": "#/$defs/Rectangle"
-                        },
-                        {
-                           "$ref": "#/$defs/Circle"
-                        }
-                     ]
+                     "$ref": "#/$defs/Rectangle"
                   },
                   {
-                     "type": "null"
+                     "$ref": "#/$defs/Circle"
                   }
                ],
-               "default": null,
                "title": "Shape of the enclosure"
             },
             "internal_material": {
@@ -8102,8 +8171,7 @@
          },
          "required": [
             "name",
-            "size",
-            "size_unit",
+            "shape",
             "external_material",
             "grounded",
             "laser_interlock",
@@ -8123,7 +8191,7 @@
                "type": "string"
             },
             "name": {
-               "title": "Ephys assembly name",
+               "title": "Assembly name",
                "type": "string"
             },
             "manipulator": {
@@ -8185,6 +8253,7 @@
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                            "Allied": "#/$defs/_Allied",
+                           "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                            "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                            "Arduino": "#/$defs/_Arduino",
                            "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -8270,6 +8339,7 @@
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
                            "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                           "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                            "SICGEN": "#/$defs/_Sicgen",
                            "Same Sky": "#/$defs/_Same_Sky",
                            "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -8281,6 +8351,7 @@
                            "Spectra-Physics": "#/$defs/_Spectra_Physics",
                            "Spinnaker": "#/$defs/_Spinnaker",
                            "Stanford University": "#/$defs/_Stanford_University",
+                           "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                            "TE Connectivity": "#/$defs/_Te_Connectivity",
                            "Tamron": "#/$defs/_Tamron",
                            "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -8330,6 +8401,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Allied"
+                        },
+                        {
+                           "$ref": "#/$defs/_Antibodies_Inc"
                         },
                         {
                            "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -8587,6 +8661,9 @@
                            "$ref": "#/$defs/_Raspberry_Pi"
                         },
                         {
+                           "$ref": "#/$defs/_Rockland_Immunochemicals"
+                        },
+                        {
                            "$ref": "#/$defs/_Sicgen"
                         },
                         {
@@ -8618,6 +8695,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Stanford_University"
+                        },
+                        {
+                           "$ref": "#/$defs/_Synaptic_Systems"
                         },
                         {
                            "$ref": "#/$defs/_Te_Connectivity"
@@ -8765,7 +8845,7 @@
                "type": "string"
             },
             "name": {
-               "title": "Fiber assembly name",
+               "title": "Assembly name",
                "type": "string"
             },
             "manipulator": {
@@ -8827,6 +8907,7 @@
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                            "Allied": "#/$defs/_Allied",
+                           "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                            "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                            "Arduino": "#/$defs/_Arduino",
                            "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -8912,6 +8993,7 @@
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
                            "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                           "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                            "SICGEN": "#/$defs/_Sicgen",
                            "Same Sky": "#/$defs/_Same_Sky",
                            "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -8923,6 +9005,7 @@
                            "Spectra-Physics": "#/$defs/_Spectra_Physics",
                            "Spinnaker": "#/$defs/_Spinnaker",
                            "Stanford University": "#/$defs/_Stanford_University",
+                           "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                            "TE Connectivity": "#/$defs/_Te_Connectivity",
                            "Tamron": "#/$defs/_Tamron",
                            "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -8972,6 +9055,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Allied"
+                        },
+                        {
+                           "$ref": "#/$defs/_Antibodies_Inc"
                         },
                         {
                            "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -9229,6 +9315,9 @@
                            "$ref": "#/$defs/_Raspberry_Pi"
                         },
                         {
+                           "$ref": "#/$defs/_Rockland_Immunochemicals"
+                        },
+                        {
                            "$ref": "#/$defs/_Sicgen"
                         },
                         {
@@ -9260,6 +9349,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Stanford_University"
+                        },
+                        {
+                           "$ref": "#/$defs/_Synaptic_Systems"
                         },
                         {
                            "$ref": "#/$defs/_Te_Connectivity"
@@ -9447,6 +9539,7 @@
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                            "Allied": "#/$defs/_Allied",
+                           "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                            "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                            "Arduino": "#/$defs/_Arduino",
                            "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -9532,6 +9625,7 @@
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
                            "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                           "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                            "SICGEN": "#/$defs/_Sicgen",
                            "Same Sky": "#/$defs/_Same_Sky",
                            "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -9543,6 +9637,7 @@
                            "Spectra-Physics": "#/$defs/_Spectra_Physics",
                            "Spinnaker": "#/$defs/_Spinnaker",
                            "Stanford University": "#/$defs/_Stanford_University",
+                           "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                            "TE Connectivity": "#/$defs/_Te_Connectivity",
                            "Tamron": "#/$defs/_Tamron",
                            "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -9592,6 +9687,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Allied"
+                        },
+                        {
+                           "$ref": "#/$defs/_Antibodies_Inc"
                         },
                         {
                            "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -9849,6 +9947,9 @@
                            "$ref": "#/$defs/_Raspberry_Pi"
                         },
                         {
+                           "$ref": "#/$defs/_Rockland_Immunochemicals"
+                        },
+                        {
                            "$ref": "#/$defs/_Sicgen"
                         },
                         {
@@ -9880,6 +9981,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Stanford_University"
+                        },
+                        {
+                           "$ref": "#/$defs/_Synaptic_Systems"
                         },
                         {
                            "$ref": "#/$defs/_Te_Connectivity"
@@ -10102,6 +10206,7 @@
                      "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                      "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                      "Allied": "#/$defs/_Allied",
+                     "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                      "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                      "Arduino": "#/$defs/_Arduino",
                      "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -10187,6 +10292,7 @@
                      "Prizmatix": "#/$defs/_Prizmatix",
                      "Quantifi": "#/$defs/_Quantifi",
                      "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                     "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                      "SICGEN": "#/$defs/_Sicgen",
                      "Same Sky": "#/$defs/_Same_Sky",
                      "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -10198,6 +10304,7 @@
                      "Spectra-Physics": "#/$defs/_Spectra_Physics",
                      "Spinnaker": "#/$defs/_Spinnaker",
                      "Stanford University": "#/$defs/_Stanford_University",
+                     "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                      "TE Connectivity": "#/$defs/_Te_Connectivity",
                      "Tamron": "#/$defs/_Tamron",
                      "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -10247,6 +10354,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Allied"
+                  },
+                  {
+                     "$ref": "#/$defs/_Antibodies_Inc"
                   },
                   {
                      "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -10504,6 +10614,9 @@
                      "$ref": "#/$defs/_Raspberry_Pi"
                   },
                   {
+                     "$ref": "#/$defs/_Rockland_Immunochemicals"
+                  },
+                  {
                      "$ref": "#/$defs/_Sicgen"
                   },
                   {
@@ -10535,6 +10648,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Stanford_University"
+                  },
+                  {
+                     "$ref": "#/$defs/_Synaptic_Systems"
                   },
                   {
                      "$ref": "#/$defs/_Te_Connectivity"
@@ -10781,6 +10897,7 @@
                      "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                      "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                      "Allied": "#/$defs/_Allied",
+                     "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                      "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                      "Arduino": "#/$defs/_Arduino",
                      "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -10866,6 +10983,7 @@
                      "Prizmatix": "#/$defs/_Prizmatix",
                      "Quantifi": "#/$defs/_Quantifi",
                      "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                     "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                      "SICGEN": "#/$defs/_Sicgen",
                      "Same Sky": "#/$defs/_Same_Sky",
                      "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -10877,6 +10995,7 @@
                      "Spectra-Physics": "#/$defs/_Spectra_Physics",
                      "Spinnaker": "#/$defs/_Spinnaker",
                      "Stanford University": "#/$defs/_Stanford_University",
+                     "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                      "TE Connectivity": "#/$defs/_Te_Connectivity",
                      "Tamron": "#/$defs/_Tamron",
                      "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -10926,6 +11045,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Allied"
+                  },
+                  {
+                     "$ref": "#/$defs/_Antibodies_Inc"
                   },
                   {
                      "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -11183,6 +11305,9 @@
                      "$ref": "#/$defs/_Raspberry_Pi"
                   },
                   {
+                     "$ref": "#/$defs/_Rockland_Immunochemicals"
+                  },
+                  {
                      "$ref": "#/$defs/_Sicgen"
                   },
                   {
@@ -11214,6 +11339,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Stanford_University"
+                  },
+                  {
+                     "$ref": "#/$defs/_Synaptic_Systems"
                   },
                   {
                      "$ref": "#/$defs/_Te_Connectivity"
@@ -11354,7 +11482,7 @@
                      "AnalogInput": "#/$defs/_Analoginput",
                      "Archimedes": "#/$defs/_Archimedes",
                      "AudioSwitch": "#/$defs/_Audioswitch",
-                     "Behavior": "#/$defs/aind_data_schema_models__harp_types___Behavior",
+                     "Behavior": "#/$defs/biodata_models__harp_types___Behavior",
                      "CameraController": "#/$defs/_Cameracontroller",
                      "CameraControllerGen2": "#/$defs/_Cameracontrollergen2",
                      "ClockSynchronizer": "#/$defs/_Clocksynchronizer",
@@ -11410,7 +11538,7 @@
                      "$ref": "#/$defs/_Audioswitch"
                   },
                   {
-                     "$ref": "#/$defs/aind_data_schema_models__harp_types___Behavior"
+                     "$ref": "#/$defs/biodata_models__harp_types___Behavior"
                   },
                   {
                      "$ref": "#/$defs/_Cameracontroller"
@@ -11651,6 +11779,7 @@
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                            "Allied": "#/$defs/_Allied",
+                           "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                            "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                            "Arduino": "#/$defs/_Arduino",
                            "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -11736,6 +11865,7 @@
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
                            "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                           "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                            "SICGEN": "#/$defs/_Sicgen",
                            "Same Sky": "#/$defs/_Same_Sky",
                            "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -11747,6 +11877,7 @@
                            "Spectra-Physics": "#/$defs/_Spectra_Physics",
                            "Spinnaker": "#/$defs/_Spinnaker",
                            "Stanford University": "#/$defs/_Stanford_University",
+                           "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                            "TE Connectivity": "#/$defs/_Te_Connectivity",
                            "Tamron": "#/$defs/_Tamron",
                            "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -11796,6 +11927,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Allied"
+                        },
+                        {
+                           "$ref": "#/$defs/_Antibodies_Inc"
                         },
                         {
                            "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -12053,6 +12187,9 @@
                            "$ref": "#/$defs/_Raspberry_Pi"
                         },
                         {
+                           "$ref": "#/$defs/_Rockland_Immunochemicals"
+                        },
+                        {
                            "$ref": "#/$defs/_Sicgen"
                         },
                         {
@@ -12084,6 +12221,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Stanford_University"
+                        },
+                        {
+                           "$ref": "#/$defs/_Synaptic_Systems"
                         },
                         {
                            "$ref": "#/$defs/_Te_Connectivity"
@@ -12285,6 +12425,7 @@
                      "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                      "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                      "Allied": "#/$defs/_Allied",
+                     "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                      "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                      "Arduino": "#/$defs/_Arduino",
                      "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -12370,6 +12511,7 @@
                      "Prizmatix": "#/$defs/_Prizmatix",
                      "Quantifi": "#/$defs/_Quantifi",
                      "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                     "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                      "SICGEN": "#/$defs/_Sicgen",
                      "Same Sky": "#/$defs/_Same_Sky",
                      "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -12381,6 +12523,7 @@
                      "Spectra-Physics": "#/$defs/_Spectra_Physics",
                      "Spinnaker": "#/$defs/_Spinnaker",
                      "Stanford University": "#/$defs/_Stanford_University",
+                     "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                      "TE Connectivity": "#/$defs/_Te_Connectivity",
                      "Tamron": "#/$defs/_Tamron",
                      "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -12430,6 +12573,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Allied"
+                  },
+                  {
+                     "$ref": "#/$defs/_Antibodies_Inc"
                   },
                   {
                      "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -12687,6 +12833,9 @@
                      "$ref": "#/$defs/_Raspberry_Pi"
                   },
                   {
+                     "$ref": "#/$defs/_Rockland_Immunochemicals"
+                  },
+                  {
                      "$ref": "#/$defs/_Sicgen"
                   },
                   {
@@ -12718,6 +12867,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Stanford_University"
+                  },
+                  {
+                     "$ref": "#/$defs/_Synaptic_Systems"
                   },
                   {
                      "$ref": "#/$defs/_Te_Connectivity"
@@ -12879,7 +13031,7 @@
                "type": "string"
             },
             "name": {
-               "title": "Laser assembly name",
+               "title": "Assembly name",
                "type": "string"
             },
             "manipulator": {
@@ -12949,6 +13101,7 @@
                      "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                      "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                      "Allied": "#/$defs/_Allied",
+                     "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                      "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                      "Arduino": "#/$defs/_Arduino",
                      "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -13034,6 +13187,7 @@
                      "Prizmatix": "#/$defs/_Prizmatix",
                      "Quantifi": "#/$defs/_Quantifi",
                      "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                     "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                      "SICGEN": "#/$defs/_Sicgen",
                      "Same Sky": "#/$defs/_Same_Sky",
                      "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -13045,6 +13199,7 @@
                      "Spectra-Physics": "#/$defs/_Spectra_Physics",
                      "Spinnaker": "#/$defs/_Spinnaker",
                      "Stanford University": "#/$defs/_Stanford_University",
+                     "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                      "TE Connectivity": "#/$defs/_Te_Connectivity",
                      "Tamron": "#/$defs/_Tamron",
                      "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -13094,6 +13249,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Allied"
+                  },
+                  {
+                     "$ref": "#/$defs/_Antibodies_Inc"
                   },
                   {
                      "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -13351,6 +13509,9 @@
                      "$ref": "#/$defs/_Raspberry_Pi"
                   },
                   {
+                     "$ref": "#/$defs/_Rockland_Immunochemicals"
+                  },
+                  {
                      "$ref": "#/$defs/_Sicgen"
                   },
                   {
@@ -13382,6 +13543,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Stanford_University"
+                  },
+                  {
+                     "$ref": "#/$defs/_Synaptic_Systems"
                   },
                   {
                      "$ref": "#/$defs/_Te_Connectivity"
@@ -13537,6 +13701,7 @@
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                            "Allied": "#/$defs/_Allied",
+                           "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                            "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                            "Arduino": "#/$defs/_Arduino",
                            "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -13622,6 +13787,7 @@
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
                            "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                           "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                            "SICGEN": "#/$defs/_Sicgen",
                            "Same Sky": "#/$defs/_Same_Sky",
                            "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -13633,6 +13799,7 @@
                            "Spectra-Physics": "#/$defs/_Spectra_Physics",
                            "Spinnaker": "#/$defs/_Spinnaker",
                            "Stanford University": "#/$defs/_Stanford_University",
+                           "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                            "TE Connectivity": "#/$defs/_Te_Connectivity",
                            "Tamron": "#/$defs/_Tamron",
                            "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -13682,6 +13849,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Allied"
+                        },
+                        {
+                           "$ref": "#/$defs/_Antibodies_Inc"
                         },
                         {
                            "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -13939,6 +14109,9 @@
                            "$ref": "#/$defs/_Raspberry_Pi"
                         },
                         {
+                           "$ref": "#/$defs/_Rockland_Immunochemicals"
+                        },
+                        {
                            "$ref": "#/$defs/_Sicgen"
                         },
                         {
@@ -13970,6 +14143,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Stanford_University"
+                        },
+                        {
+                           "$ref": "#/$defs/_Synaptic_Systems"
                         },
                         {
                            "$ref": "#/$defs/_Te_Connectivity"
@@ -14144,7 +14320,7 @@
                "type": "string"
             },
             "name": {
-               "title": "Lick spout assembly name",
+               "title": "Assembly name",
                "type": "string"
             },
             "lick_spouts": {
@@ -14212,6 +14388,7 @@
                      "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                      "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                      "Allied": "#/$defs/_Allied",
+                     "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                      "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                      "Arduino": "#/$defs/_Arduino",
                      "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -14297,6 +14474,7 @@
                      "Prizmatix": "#/$defs/_Prizmatix",
                      "Quantifi": "#/$defs/_Quantifi",
                      "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                     "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                      "SICGEN": "#/$defs/_Sicgen",
                      "Same Sky": "#/$defs/_Same_Sky",
                      "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -14308,6 +14486,7 @@
                      "Spectra-Physics": "#/$defs/_Spectra_Physics",
                      "Spinnaker": "#/$defs/_Spinnaker",
                      "Stanford University": "#/$defs/_Stanford_University",
+                     "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                      "TE Connectivity": "#/$defs/_Te_Connectivity",
                      "Tamron": "#/$defs/_Tamron",
                      "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -14357,6 +14536,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Allied"
+                  },
+                  {
+                     "$ref": "#/$defs/_Antibodies_Inc"
                   },
                   {
                      "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -14614,6 +14796,9 @@
                      "$ref": "#/$defs/_Raspberry_Pi"
                   },
                   {
+                     "$ref": "#/$defs/_Rockland_Immunochemicals"
+                  },
+                  {
                      "$ref": "#/$defs/_Sicgen"
                   },
                   {
@@ -14645,6 +14830,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Stanford_University"
+                  },
+                  {
+                     "$ref": "#/$defs/_Synaptic_Systems"
                   },
                   {
                      "$ref": "#/$defs/_Te_Connectivity"
@@ -14832,6 +15020,7 @@
                      "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                      "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                      "Allied": "#/$defs/_Allied",
+                     "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                      "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                      "Arduino": "#/$defs/_Arduino",
                      "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -14917,6 +15106,7 @@
                      "Prizmatix": "#/$defs/_Prizmatix",
                      "Quantifi": "#/$defs/_Quantifi",
                      "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                     "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                      "SICGEN": "#/$defs/_Sicgen",
                      "Same Sky": "#/$defs/_Same_Sky",
                      "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -14928,6 +15118,7 @@
                      "Spectra-Physics": "#/$defs/_Spectra_Physics",
                      "Spinnaker": "#/$defs/_Spinnaker",
                      "Stanford University": "#/$defs/_Stanford_University",
+                     "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                      "TE Connectivity": "#/$defs/_Te_Connectivity",
                      "Tamron": "#/$defs/_Tamron",
                      "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -14977,6 +15168,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Allied"
+                  },
+                  {
+                     "$ref": "#/$defs/_Antibodies_Inc"
                   },
                   {
                      "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -15234,6 +15428,9 @@
                      "$ref": "#/$defs/_Raspberry_Pi"
                   },
                   {
+                     "$ref": "#/$defs/_Rockland_Immunochemicals"
+                  },
+                  {
                      "$ref": "#/$defs/_Sicgen"
                   },
                   {
@@ -15265,6 +15462,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Stanford_University"
+                  },
+                  {
+                     "$ref": "#/$defs/_Synaptic_Systems"
                   },
                   {
                      "$ref": "#/$defs/_Te_Connectivity"
@@ -15436,6 +15636,7 @@
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                            "Allied": "#/$defs/_Allied",
+                           "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                            "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                            "Arduino": "#/$defs/_Arduino",
                            "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -15521,6 +15722,7 @@
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
                            "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                           "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                            "SICGEN": "#/$defs/_Sicgen",
                            "Same Sky": "#/$defs/_Same_Sky",
                            "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -15532,6 +15734,7 @@
                            "Spectra-Physics": "#/$defs/_Spectra_Physics",
                            "Spinnaker": "#/$defs/_Spinnaker",
                            "Stanford University": "#/$defs/_Stanford_University",
+                           "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                            "TE Connectivity": "#/$defs/_Te_Connectivity",
                            "Tamron": "#/$defs/_Tamron",
                            "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -15581,6 +15784,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Allied"
+                        },
+                        {
+                           "$ref": "#/$defs/_Antibodies_Inc"
                         },
                         {
                            "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -15838,6 +16044,9 @@
                            "$ref": "#/$defs/_Raspberry_Pi"
                         },
                         {
+                           "$ref": "#/$defs/_Rockland_Immunochemicals"
+                        },
+                        {
                            "$ref": "#/$defs/_Sicgen"
                         },
                         {
@@ -15869,6 +16078,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Stanford_University"
+                        },
+                        {
+                           "$ref": "#/$defs/_Synaptic_Systems"
                         },
                         {
                            "$ref": "#/$defs/_Te_Connectivity"
@@ -15996,19 +16208,6 @@
                "title": "Relative position",
                "type": "array"
             },
-            "coordinate_system": {
-               "anyOf": [
-                  {
-                     "$ref": "#/$defs/CoordinateSystem"
-                  },
-                  {
-                     "type": "null"
-                  }
-               ],
-               "default": null,
-               "deprecated": true,
-               "title": "Device coordinate system"
-            },
             "local_coordinate_system": {
                "anyOf": [
                   {
@@ -16087,6 +16286,7 @@
                      "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                      "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                      "Allied": "#/$defs/_Allied",
+                     "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                      "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                      "Arduino": "#/$defs/_Arduino",
                      "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -16172,6 +16372,7 @@
                      "Prizmatix": "#/$defs/_Prizmatix",
                      "Quantifi": "#/$defs/_Quantifi",
                      "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                     "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                      "SICGEN": "#/$defs/_Sicgen",
                      "Same Sky": "#/$defs/_Same_Sky",
                      "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -16183,6 +16384,7 @@
                      "Spectra-Physics": "#/$defs/_Spectra_Physics",
                      "Spinnaker": "#/$defs/_Spinnaker",
                      "Stanford University": "#/$defs/_Stanford_University",
+                     "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                      "TE Connectivity": "#/$defs/_Te_Connectivity",
                      "Tamron": "#/$defs/_Tamron",
                      "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -16232,6 +16434,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Allied"
+                  },
+                  {
+                     "$ref": "#/$defs/_Antibodies_Inc"
                   },
                   {
                      "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -16489,6 +16694,9 @@
                      "$ref": "#/$defs/_Raspberry_Pi"
                   },
                   {
+                     "$ref": "#/$defs/_Rockland_Immunochemicals"
+                  },
+                  {
                      "$ref": "#/$defs/_Sicgen"
                   },
                   {
@@ -16520,6 +16728,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Stanford_University"
+                  },
+                  {
+                     "$ref": "#/$defs/_Synaptic_Systems"
                   },
                   {
                      "$ref": "#/$defs/_Te_Connectivity"
@@ -16758,6 +16969,7 @@
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                            "Allied": "#/$defs/_Allied",
+                           "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                            "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                            "Arduino": "#/$defs/_Arduino",
                            "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -16843,6 +17055,7 @@
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
                            "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                           "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                            "SICGEN": "#/$defs/_Sicgen",
                            "Same Sky": "#/$defs/_Same_Sky",
                            "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -16854,6 +17067,7 @@
                            "Spectra-Physics": "#/$defs/_Spectra_Physics",
                            "Spinnaker": "#/$defs/_Spinnaker",
                            "Stanford University": "#/$defs/_Stanford_University",
+                           "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                            "TE Connectivity": "#/$defs/_Te_Connectivity",
                            "Tamron": "#/$defs/_Tamron",
                            "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -16903,6 +17117,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Allied"
+                        },
+                        {
+                           "$ref": "#/$defs/_Antibodies_Inc"
                         },
                         {
                            "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -17160,6 +17377,9 @@
                            "$ref": "#/$defs/_Raspberry_Pi"
                         },
                         {
+                           "$ref": "#/$defs/_Rockland_Immunochemicals"
+                        },
+                        {
                            "$ref": "#/$defs/_Sicgen"
                         },
                         {
@@ -17191,6 +17411,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Stanford_University"
+                        },
+                        {
+                           "$ref": "#/$defs/_Synaptic_Systems"
                         },
                         {
                            "$ref": "#/$defs/_Te_Connectivity"
@@ -17397,6 +17620,7 @@
                      "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                      "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                      "Allied": "#/$defs/_Allied",
+                     "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                      "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                      "Arduino": "#/$defs/_Arduino",
                      "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -17482,6 +17706,7 @@
                      "Prizmatix": "#/$defs/_Prizmatix",
                      "Quantifi": "#/$defs/_Quantifi",
                      "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                     "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                      "SICGEN": "#/$defs/_Sicgen",
                      "Same Sky": "#/$defs/_Same_Sky",
                      "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -17493,6 +17718,7 @@
                      "Spectra-Physics": "#/$defs/_Spectra_Physics",
                      "Spinnaker": "#/$defs/_Spinnaker",
                      "Stanford University": "#/$defs/_Stanford_University",
+                     "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                      "TE Connectivity": "#/$defs/_Te_Connectivity",
                      "Tamron": "#/$defs/_Tamron",
                      "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -17542,6 +17768,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Allied"
+                  },
+                  {
+                     "$ref": "#/$defs/_Antibodies_Inc"
                   },
                   {
                      "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -17799,6 +18028,9 @@
                      "$ref": "#/$defs/_Raspberry_Pi"
                   },
                   {
+                     "$ref": "#/$defs/_Rockland_Immunochemicals"
+                  },
+                  {
                      "$ref": "#/$defs/_Sicgen"
                   },
                   {
@@ -17830,6 +18062,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Stanford_University"
+                  },
+                  {
+                     "$ref": "#/$defs/_Synaptic_Systems"
                   },
                   {
                      "$ref": "#/$defs/_Te_Connectivity"
@@ -18033,6 +18268,7 @@
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                            "Allied": "#/$defs/_Allied",
+                           "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                            "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                            "Arduino": "#/$defs/_Arduino",
                            "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -18118,6 +18354,7 @@
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
                            "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                           "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                            "SICGEN": "#/$defs/_Sicgen",
                            "Same Sky": "#/$defs/_Same_Sky",
                            "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -18129,6 +18366,7 @@
                            "Spectra-Physics": "#/$defs/_Spectra_Physics",
                            "Spinnaker": "#/$defs/_Spinnaker",
                            "Stanford University": "#/$defs/_Stanford_University",
+                           "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                            "TE Connectivity": "#/$defs/_Te_Connectivity",
                            "Tamron": "#/$defs/_Tamron",
                            "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -18178,6 +18416,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Allied"
+                        },
+                        {
+                           "$ref": "#/$defs/_Antibodies_Inc"
                         },
                         {
                            "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -18435,6 +18676,9 @@
                            "$ref": "#/$defs/_Raspberry_Pi"
                         },
                         {
+                           "$ref": "#/$defs/_Rockland_Immunochemicals"
+                        },
+                        {
                            "$ref": "#/$defs/_Sicgen"
                         },
                         {
@@ -18466,6 +18710,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Stanford_University"
+                        },
+                        {
+                           "$ref": "#/$defs/_Synaptic_Systems"
                         },
                         {
                            "$ref": "#/$defs/_Te_Connectivity"
@@ -18664,6 +18911,7 @@
                      "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                      "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                      "Allied": "#/$defs/_Allied",
+                     "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                      "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                      "Arduino": "#/$defs/_Arduino",
                      "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -18749,6 +18997,7 @@
                      "Prizmatix": "#/$defs/_Prizmatix",
                      "Quantifi": "#/$defs/_Quantifi",
                      "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                     "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                      "SICGEN": "#/$defs/_Sicgen",
                      "Same Sky": "#/$defs/_Same_Sky",
                      "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -18760,6 +19009,7 @@
                      "Spectra-Physics": "#/$defs/_Spectra_Physics",
                      "Spinnaker": "#/$defs/_Spinnaker",
                      "Stanford University": "#/$defs/_Stanford_University",
+                     "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                      "TE Connectivity": "#/$defs/_Te_Connectivity",
                      "Tamron": "#/$defs/_Tamron",
                      "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -18809,6 +19059,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Allied"
+                  },
+                  {
+                     "$ref": "#/$defs/_Antibodies_Inc"
                   },
                   {
                      "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -19066,6 +19319,9 @@
                      "$ref": "#/$defs/_Raspberry_Pi"
                   },
                   {
+                     "$ref": "#/$defs/_Rockland_Immunochemicals"
+                  },
+                  {
                      "$ref": "#/$defs/_Sicgen"
                   },
                   {
@@ -19097,6 +19353,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Stanford_University"
+                  },
+                  {
+                     "$ref": "#/$defs/_Synaptic_Systems"
                   },
                   {
                      "$ref": "#/$defs/_Te_Connectivity"
@@ -19240,7 +19499,7 @@
                      "AnalogInput": "#/$defs/_Analoginput",
                      "Archimedes": "#/$defs/_Archimedes",
                      "AudioSwitch": "#/$defs/_Audioswitch",
-                     "Behavior": "#/$defs/aind_data_schema_models__harp_types___Behavior",
+                     "Behavior": "#/$defs/biodata_models__harp_types___Behavior",
                      "CameraController": "#/$defs/_Cameracontroller",
                      "CameraControllerGen2": "#/$defs/_Cameracontrollergen2",
                      "ClockSynchronizer": "#/$defs/_Clocksynchronizer",
@@ -19296,7 +19555,7 @@
                      "$ref": "#/$defs/_Audioswitch"
                   },
                   {
-                     "$ref": "#/$defs/aind_data_schema_models__harp_types___Behavior"
+                     "$ref": "#/$defs/biodata_models__harp_types___Behavior"
                   },
                   {
                      "$ref": "#/$defs/_Cameracontroller"
@@ -19552,6 +19811,7 @@
                      "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                      "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                      "Allied": "#/$defs/_Allied",
+                     "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                      "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                      "Arduino": "#/$defs/_Arduino",
                      "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -19637,6 +19897,7 @@
                      "Prizmatix": "#/$defs/_Prizmatix",
                      "Quantifi": "#/$defs/_Quantifi",
                      "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                     "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                      "SICGEN": "#/$defs/_Sicgen",
                      "Same Sky": "#/$defs/_Same_Sky",
                      "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -19648,6 +19909,7 @@
                      "Spectra-Physics": "#/$defs/_Spectra_Physics",
                      "Spinnaker": "#/$defs/_Spinnaker",
                      "Stanford University": "#/$defs/_Stanford_University",
+                     "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                      "TE Connectivity": "#/$defs/_Te_Connectivity",
                      "Tamron": "#/$defs/_Tamron",
                      "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -19697,6 +19959,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Allied"
+                  },
+                  {
+                     "$ref": "#/$defs/_Antibodies_Inc"
                   },
                   {
                      "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -19954,6 +20219,9 @@
                      "$ref": "#/$defs/_Raspberry_Pi"
                   },
                   {
+                     "$ref": "#/$defs/_Rockland_Immunochemicals"
+                  },
+                  {
                      "$ref": "#/$defs/_Sicgen"
                   },
                   {
@@ -19985,6 +20253,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Stanford_University"
+                  },
+                  {
+                     "$ref": "#/$defs/_Synaptic_Systems"
                   },
                   {
                      "$ref": "#/$defs/_Te_Connectivity"
@@ -20171,7 +20442,7 @@
                "type": "string"
             },
             "name": {
-               "title": "Patch clamp Assembly Name",
+               "title": "Assembly name",
                "type": "string"
             },
             "manipulator": {
@@ -20230,6 +20501,7 @@
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                            "Allied": "#/$defs/_Allied",
+                           "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                            "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                            "Arduino": "#/$defs/_Arduino",
                            "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -20315,6 +20587,7 @@
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
                            "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                           "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                            "SICGEN": "#/$defs/_Sicgen",
                            "Same Sky": "#/$defs/_Same_Sky",
                            "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -20326,6 +20599,7 @@
                            "Spectra-Physics": "#/$defs/_Spectra_Physics",
                            "Spinnaker": "#/$defs/_Spinnaker",
                            "Stanford University": "#/$defs/_Stanford_University",
+                           "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                            "TE Connectivity": "#/$defs/_Te_Connectivity",
                            "Tamron": "#/$defs/_Tamron",
                            "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -20375,6 +20649,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Allied"
+                        },
+                        {
+                           "$ref": "#/$defs/_Antibodies_Inc"
                         },
                         {
                            "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -20632,6 +20909,9 @@
                            "$ref": "#/$defs/_Raspberry_Pi"
                         },
                         {
+                           "$ref": "#/$defs/_Rockland_Immunochemicals"
+                        },
+                        {
                            "$ref": "#/$defs/_Sicgen"
                         },
                         {
@@ -20663,6 +20943,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Stanford_University"
+                        },
+                        {
+                           "$ref": "#/$defs/_Synaptic_Systems"
                         },
                         {
                            "$ref": "#/$defs/_Te_Connectivity"
@@ -20888,6 +21171,7 @@
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                            "Allied": "#/$defs/_Allied",
+                           "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                            "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                            "Arduino": "#/$defs/_Arduino",
                            "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -20973,6 +21257,7 @@
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
                            "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                           "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                            "SICGEN": "#/$defs/_Sicgen",
                            "Same Sky": "#/$defs/_Same_Sky",
                            "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -20984,6 +21269,7 @@
                            "Spectra-Physics": "#/$defs/_Spectra_Physics",
                            "Spinnaker": "#/$defs/_Spinnaker",
                            "Stanford University": "#/$defs/_Stanford_University",
+                           "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                            "TE Connectivity": "#/$defs/_Te_Connectivity",
                            "Tamron": "#/$defs/_Tamron",
                            "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -21033,6 +21319,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Allied"
+                        },
+                        {
+                           "$ref": "#/$defs/_Antibodies_Inc"
                         },
                         {
                            "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -21290,6 +21579,9 @@
                            "$ref": "#/$defs/_Raspberry_Pi"
                         },
                         {
+                           "$ref": "#/$defs/_Rockland_Immunochemicals"
+                        },
+                        {
                            "$ref": "#/$defs/_Sicgen"
                         },
                         {
@@ -21321,6 +21613,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Stanford_University"
+                        },
+                        {
+                           "$ref": "#/$defs/_Synaptic_Systems"
                         },
                         {
                            "$ref": "#/$defs/_Te_Connectivity"
@@ -21603,6 +21898,7 @@
          "enum": [
             "Michigan uLED Probe (Version 1)",
             "MPI Photonic Probe (Version 1)",
+            "MPI Photonic Probe (Version 2)",
             "Neuropixels Opto (Demonstrator)",
             "Neuropixels UHD (Fixed)",
             "Neuropixels UHD (Switchable)",
@@ -21838,6 +22134,7 @@
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                            "Allied": "#/$defs/_Allied",
+                           "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                            "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                            "Arduino": "#/$defs/_Arduino",
                            "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -21923,6 +22220,7 @@
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
                            "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                           "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                            "SICGEN": "#/$defs/_Sicgen",
                            "Same Sky": "#/$defs/_Same_Sky",
                            "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -21934,6 +22232,7 @@
                            "Spectra-Physics": "#/$defs/_Spectra_Physics",
                            "Spinnaker": "#/$defs/_Spinnaker",
                            "Stanford University": "#/$defs/_Stanford_University",
+                           "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                            "TE Connectivity": "#/$defs/_Te_Connectivity",
                            "Tamron": "#/$defs/_Tamron",
                            "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -21983,6 +22282,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Allied"
+                        },
+                        {
+                           "$ref": "#/$defs/_Antibodies_Inc"
                         },
                         {
                            "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -22240,6 +22542,9 @@
                            "$ref": "#/$defs/_Raspberry_Pi"
                         },
                         {
+                           "$ref": "#/$defs/_Rockland_Immunochemicals"
+                        },
+                        {
                            "$ref": "#/$defs/_Sicgen"
                         },
                         {
@@ -22271,6 +22576,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Stanford_University"
+                        },
+                        {
+                           "$ref": "#/$defs/_Synaptic_Systems"
                         },
                         {
                            "$ref": "#/$defs/_Te_Connectivity"
@@ -22431,6 +22739,7 @@
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                            "Allied": "#/$defs/_Allied",
+                           "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                            "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                            "Arduino": "#/$defs/_Arduino",
                            "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -22516,6 +22825,7 @@
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
                            "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                           "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                            "SICGEN": "#/$defs/_Sicgen",
                            "Same Sky": "#/$defs/_Same_Sky",
                            "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -22527,6 +22837,7 @@
                            "Spectra-Physics": "#/$defs/_Spectra_Physics",
                            "Spinnaker": "#/$defs/_Spinnaker",
                            "Stanford University": "#/$defs/_Stanford_University",
+                           "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                            "TE Connectivity": "#/$defs/_Te_Connectivity",
                            "Tamron": "#/$defs/_Tamron",
                            "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -22576,6 +22887,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Allied"
+                        },
+                        {
+                           "$ref": "#/$defs/_Antibodies_Inc"
                         },
                         {
                            "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -22833,6 +23147,9 @@
                            "$ref": "#/$defs/_Raspberry_Pi"
                         },
                         {
+                           "$ref": "#/$defs/_Rockland_Immunochemicals"
+                        },
+                        {
                            "$ref": "#/$defs/_Sicgen"
                         },
                         {
@@ -22864,6 +23181,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Stanford_University"
+                        },
+                        {
+                           "$ref": "#/$defs/_Synaptic_Systems"
                         },
                         {
                            "$ref": "#/$defs/_Te_Connectivity"
@@ -23087,19 +23407,6 @@
                "title": "Relative position",
                "type": "array"
             },
-            "coordinate_system": {
-               "anyOf": [
-                  {
-                     "$ref": "#/$defs/CoordinateSystem"
-                  },
-                  {
-                     "type": "null"
-                  }
-               ],
-               "default": null,
-               "deprecated": true,
-               "title": "Device coordinate system"
-            },
             "local_coordinate_system": {
                "anyOf": [
                   {
@@ -23178,6 +23485,7 @@
                      "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                      "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                      "Allied": "#/$defs/_Allied",
+                     "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                      "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                      "Arduino": "#/$defs/_Arduino",
                      "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -23263,6 +23571,7 @@
                      "Prizmatix": "#/$defs/_Prizmatix",
                      "Quantifi": "#/$defs/_Quantifi",
                      "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                     "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                      "SICGEN": "#/$defs/_Sicgen",
                      "Same Sky": "#/$defs/_Same_Sky",
                      "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -23274,6 +23583,7 @@
                      "Spectra-Physics": "#/$defs/_Spectra_Physics",
                      "Spinnaker": "#/$defs/_Spinnaker",
                      "Stanford University": "#/$defs/_Stanford_University",
+                     "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                      "TE Connectivity": "#/$defs/_Te_Connectivity",
                      "Tamron": "#/$defs/_Tamron",
                      "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -23323,6 +23633,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Allied"
+                  },
+                  {
+                     "$ref": "#/$defs/_Antibodies_Inc"
                   },
                   {
                      "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -23580,6 +23893,9 @@
                      "$ref": "#/$defs/_Raspberry_Pi"
                   },
                   {
+                     "$ref": "#/$defs/_Rockland_Immunochemicals"
+                  },
+                  {
                      "$ref": "#/$defs/_Sicgen"
                   },
                   {
@@ -23611,6 +23927,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Stanford_University"
+                  },
+                  {
+                     "$ref": "#/$defs/_Synaptic_Systems"
                   },
                   {
                      "$ref": "#/$defs/_Te_Connectivity"
@@ -23835,6 +24154,7 @@
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                            "Allied": "#/$defs/_Allied",
+                           "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                            "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                            "Arduino": "#/$defs/_Arduino",
                            "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -23920,6 +24240,7 @@
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
                            "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                           "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                            "SICGEN": "#/$defs/_Sicgen",
                            "Same Sky": "#/$defs/_Same_Sky",
                            "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -23931,6 +24252,7 @@
                            "Spectra-Physics": "#/$defs/_Spectra_Physics",
                            "Spinnaker": "#/$defs/_Spinnaker",
                            "Stanford University": "#/$defs/_Stanford_University",
+                           "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                            "TE Connectivity": "#/$defs/_Te_Connectivity",
                            "Tamron": "#/$defs/_Tamron",
                            "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -23980,6 +24302,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Allied"
+                        },
+                        {
+                           "$ref": "#/$defs/_Antibodies_Inc"
                         },
                         {
                            "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -24237,6 +24562,9 @@
                            "$ref": "#/$defs/_Raspberry_Pi"
                         },
                         {
+                           "$ref": "#/$defs/_Rockland_Immunochemicals"
+                        },
+                        {
                            "$ref": "#/$defs/_Sicgen"
                         },
                         {
@@ -24268,6 +24596,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Stanford_University"
+                        },
+                        {
+                           "$ref": "#/$defs/_Synaptic_Systems"
                         },
                         {
                            "$ref": "#/$defs/_Te_Connectivity"
@@ -24459,6 +24790,7 @@
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                            "Allied": "#/$defs/_Allied",
+                           "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                            "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                            "Arduino": "#/$defs/_Arduino",
                            "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -24544,6 +24876,7 @@
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
                            "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                           "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                            "SICGEN": "#/$defs/_Sicgen",
                            "Same Sky": "#/$defs/_Same_Sky",
                            "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -24555,6 +24888,7 @@
                            "Spectra-Physics": "#/$defs/_Spectra_Physics",
                            "Spinnaker": "#/$defs/_Spinnaker",
                            "Stanford University": "#/$defs/_Stanford_University",
+                           "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                            "TE Connectivity": "#/$defs/_Te_Connectivity",
                            "Tamron": "#/$defs/_Tamron",
                            "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -24604,6 +24938,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Allied"
+                        },
+                        {
+                           "$ref": "#/$defs/_Antibodies_Inc"
                         },
                         {
                            "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -24861,6 +25198,9 @@
                            "$ref": "#/$defs/_Raspberry_Pi"
                         },
                         {
+                           "$ref": "#/$defs/_Rockland_Immunochemicals"
+                        },
+                        {
                            "$ref": "#/$defs/_Sicgen"
                         },
                         {
@@ -24892,6 +25232,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Stanford_University"
+                        },
+                        {
+                           "$ref": "#/$defs/_Synaptic_Systems"
                         },
                         {
                            "$ref": "#/$defs/_Te_Connectivity"
@@ -25213,6 +25556,7 @@
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                            "Allied": "#/$defs/_Allied",
+                           "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                            "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                            "Arduino": "#/$defs/_Arduino",
                            "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -25298,6 +25642,7 @@
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
                            "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                           "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                            "SICGEN": "#/$defs/_Sicgen",
                            "Same Sky": "#/$defs/_Same_Sky",
                            "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -25309,6 +25654,7 @@
                            "Spectra-Physics": "#/$defs/_Spectra_Physics",
                            "Spinnaker": "#/$defs/_Spinnaker",
                            "Stanford University": "#/$defs/_Stanford_University",
+                           "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                            "TE Connectivity": "#/$defs/_Te_Connectivity",
                            "Tamron": "#/$defs/_Tamron",
                            "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -25358,6 +25704,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Allied"
+                        },
+                        {
+                           "$ref": "#/$defs/_Antibodies_Inc"
                         },
                         {
                            "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -25615,6 +25964,9 @@
                            "$ref": "#/$defs/_Raspberry_Pi"
                         },
                         {
+                           "$ref": "#/$defs/_Rockland_Immunochemicals"
+                        },
+                        {
                            "$ref": "#/$defs/_Sicgen"
                         },
                         {
@@ -25646,6 +25998,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Stanford_University"
+                        },
+                        {
+                           "$ref": "#/$defs/_Synaptic_Systems"
                         },
                         {
                            "$ref": "#/$defs/_Te_Connectivity"
@@ -26200,6 +26555,48 @@
             }
          },
          "title": "_Analoginput",
+         "type": "object"
+      },
+      "_Antibodies_Inc": {
+         "description": "Model Antibodies Inc",
+         "properties": {
+            "name": {
+               "const": "Antibodies Inc",
+               "default": "Antibodies Inc",
+               "title": "Name",
+               "type": "string"
+            },
+            "abbreviation": {
+               "const": null,
+               "default": null,
+               "title": "Abbreviation",
+               "type": "null"
+            },
+            "registry": {
+               "anyOf": [
+                  {
+                     "$ref": "#/$defs/Registry"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": null
+            },
+            "registry_identifier": {
+               "anyOf": [
+                  {
+                     "type": "string"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": null,
+               "title": "Registry Identifier"
+            }
+         },
+         "title": "_Antibodies_Inc",
          "type": "object"
       },
       "_Applied_Scientific_Instrumentation": {
@@ -30673,6 +31070,48 @@
          "title": "_Rgbarray",
          "type": "object"
       },
+      "_Rockland_Immunochemicals": {
+         "description": "Model Rockland Immunochemicals",
+         "properties": {
+            "name": {
+               "const": "Rockland Immunochemicals",
+               "default": "Rockland Immunochemicals",
+               "title": "Name",
+               "type": "string"
+            },
+            "abbreviation": {
+               "const": "ROCKLAND",
+               "default": "ROCKLAND",
+               "title": "Abbreviation",
+               "type": "string"
+            },
+            "registry": {
+               "anyOf": [
+                  {
+                     "$ref": "#/$defs/Registry"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "Research Organization Registry (ROR)"
+            },
+            "registry_identifier": {
+               "anyOf": [
+                  {
+                     "type": "string"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "02z2r2t61",
+               "title": "Registry Identifier"
+            }
+         },
+         "title": "_Rockland_Immunochemicals",
+         "type": "object"
+      },
       "_Same_Sky": {
          "description": "Model Same Sky",
          "properties": {
@@ -31289,6 +31728,48 @@
             }
          },
          "title": "_Stpt",
+         "type": "object"
+      },
+      "_Synaptic_Systems": {
+         "description": "Model Synaptic Systems",
+         "properties": {
+            "name": {
+               "const": "Synaptic Systems",
+               "default": "Synaptic Systems",
+               "title": "Name",
+               "type": "string"
+            },
+            "abbreviation": {
+               "const": null,
+               "default": null,
+               "title": "Abbreviation",
+               "type": "null"
+            },
+            "registry": {
+               "anyOf": [
+                  {
+                     "$ref": "#/$defs/Registry"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": null
+            },
+            "registry_identifier": {
+               "anyOf": [
+                  {
+                     "type": "string"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": null,
+               "title": "Registry Identifier"
+            }
+         },
+         "title": "_Synaptic_Systems",
          "type": "object"
       },
       "_Synchronizer": {
@@ -32256,7 +32737,7 @@
          "title": "_World_Precision_Intstruments",
          "type": "object"
       },
-      "aind_data_schema_models__harp_types___Behavior": {
+      "biodata_models__harp_types___Behavior": {
          "description": "Model Behavior",
          "properties": {
             "whoami": {
@@ -32275,7 +32756,7 @@
          "title": "_Behavior",
          "type": "object"
       },
-      "aind_data_schema_models__modalities___Behavior": {
+      "biodata_models__modalities___Behavior": {
          "additionalProperties": false,
          "description": "Model behavior",
          "properties": {
@@ -32306,14 +32787,14 @@
          "type": "string"
       },
       "describedBy": {
-         "const": "https://raw.githubusercontent.com/AllenNeuralDynamics/aind-data-schema/main/src/aind_data_schema/core/instrument.py",
-         "default": "https://raw.githubusercontent.com/AllenNeuralDynamics/aind-data-schema/main/src/aind_data_schema/core/instrument.py",
+         "const": "https://raw.githubusercontent.com/AllenNeuralDynamics/biodata-schema/main/src/biodata_schema/core/instrument.py",
+         "default": "https://raw.githubusercontent.com/AllenNeuralDynamics/biodata-schema/main/src/biodata_schema/core/instrument.py",
          "title": "Describedby",
          "type": "string"
       },
       "schema_version": {
-         "const": "2.2.7",
-         "default": "2.2.7",
+         "const": "3.0.2",
+         "default": "3.0.2",
          "title": "Schema Version",
          "type": "string"
       },
@@ -32354,7 +32835,7 @@
                   "MRI": "#/$defs/_Mri",
                   "SPIM": "#/$defs/_Spim",
                   "STPT": "#/$defs/_Stpt",
-                  "behavior": "#/$defs/aind_data_schema_models__modalities___Behavior",
+                  "behavior": "#/$defs/biodata_models__modalities___Behavior",
                   "behavior-videos": "#/$defs/_Behavior_Videos",
                   "brightfield": "#/$defs/_Brightfield",
                   "confocal": "#/$defs/_Confocal",
@@ -32375,7 +32856,7 @@
                   "$ref": "#/$defs/_Barseq"
                },
                {
-                  "$ref": "#/$defs/aind_data_schema_models__modalities___Behavior"
+                  "$ref": "#/$defs/biodata_models__modalities___Behavior"
                },
                {
                   "$ref": "#/$defs/_Behavior_Videos"
@@ -32472,20 +32953,6 @@
          "default": null,
          "description": "List of calibration measurements takend during instrument setup and maintenance",
          "title": "Calibrations"
-      },
-      "coordinate_system": {
-         "anyOf": [
-            {
-               "$ref": "#/$defs/CoordinateSystem"
-            },
-            {
-               "type": "null"
-            }
-         ],
-         "default": null,
-         "deprecated": true,
-         "description": "Origin and axis definitions for determining the position of the instrument's components",
-         "title": "Coordinate system"
       },
       "global_coordinate_system": {
          "$ref": "#/$defs/CoordinateSystem",

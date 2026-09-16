@@ -3,7 +3,7 @@
 import pytest
 from pydantic import ValidationError
 
-from aind_data_schema.components.measurements import CalibrationFit, FitType
+from biodata_schema.components.measurements import CalibrationFit, FitType
 
 
 class TestCalibrationFit:

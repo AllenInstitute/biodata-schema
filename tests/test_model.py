@@ -3,7 +3,7 @@
 import pydantic
 import pytest
 
-from aind_data_schema.core.model import Model
+from biodata_schema.core.model import Model
 from examples.model import m
 
 

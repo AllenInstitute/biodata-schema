@@ -4,21 +4,28 @@ from typing import List
 from zoneinfo import ZoneInfo
 
 import pandas as pd
-from aind_data_schema_models.brain_atlas import CCFv3
-from aind_data_schema_models.data_name_patterns import DataLevel
-from aind_data_schema_models.modalities import Modality
-from aind_data_schema_models.organizations import Organization
-from aind_data_schema_models.species import Strain
-from aind_data_schema_models.units import VolumeUnit
+from biodata_models.brain_atlas import CCFv3
+from biodata_models.coordinates import AxisName, Direction, Origin
+from biodata_models.data_name_patterns import DataLevel
+from biodata_models.modalities import Modality
+from biodata_models.organizations import Organization
+from biodata_models.species import Strain
+from biodata_models.units import SizeUnit, VolumeUnit
 
-from aind_data_schema.components.coordinates import CoordinateSystemLibrary, Rotation, Translation
-from aind_data_schema.components.identifiers import Person
-from aind_data_schema.components.injection_procedures import InjectionDynamics, InjectionProfile, ViralMaterial
-from aind_data_schema.components.subject_procedures import BrainInjection, Perfusion
-from aind_data_schema.components.subjects import BreedingInfo, HomeCageEnrichment, Housing, MouseSubject, Sex, Species
-from aind_data_schema.core.data_description import DataDescription, Funding
-from aind_data_schema.core.procedures import Procedures, Surgery
-from aind_data_schema.core.subject import Subject
+from biodata_schema.components.coordinates import (
+    Axis,
+    CoordinateSystem,
+    ReferenceCoordinateSystem,
+    Rotation,
+    Translation,
+)
+from biodata_schema.components.identifiers import Person
+from biodata_schema.components.injection_procedures import InjectionDynamics, InjectionProfile, ViralMaterial
+from biodata_schema.components.subject_procedures import BrainInjection, Perfusion
+from biodata_schema.components.subjects import BreedingInfo, HomeCageEnrichment, Housing, MouseSubject, Sex, Species
+from biodata_schema.core.data_description import DataDescription, Funding
+from biodata_schema.core.procedures import Procedures, Surgery
+from biodata_schema.core.subject import Subject
 
 sessions_df = pd.read_excel("example_workflow.xlsx", sheet_name="sessions")
 mice_df = pd.read_excel("example_workflow.xlsx", sheet_name="mice")
@@ -35,6 +42,18 @@ subject_sex_lookup = {
 
 # everything is covered by the same IACUC protocol
 ethics_review_id = "2109"
+
+# bregma origin with axes pointing anterior, right, and inferior
+BREGMA_ARI = CoordinateSystem(
+    name="BREGMA_ARI",
+    origin=Origin.BREGMA,
+    axis_unit=SizeUnit.MM,
+    axes=[
+        Axis(name=AxisName.AP, direction=Direction.PA),
+        Axis(name=AxisName.ML, direction=Direction.LR),
+        Axis(name=AxisName.SI, direction=Direction.SI),
+    ],
+)
 
 
 def generate_data_description(subject_id: str, creation_time: datetime) -> DataDescription:
@@ -76,7 +95,6 @@ def generate_subject(
                 maternal_genotype=maternal_genotype,
                 paternal_id=paternal_id,
                 paternal_genotype=paternal_genotype,
-                breeding_group="unknown",  # not in spreadsheet
             ),
             housing=Housing(
                 home_cage_enrichment=[HomeCageEnrichment.RUNNING_WHEEL],  # all subjects had a running wheel
@@ -106,20 +124,25 @@ def generate_procedures(
     # Create the first surgery (brain injection)
 
     # we stored the injection coordinates as a comma-delimited string: AP, ML, Depth (from surface), Rotation angle
-    # Note that the depth coordinate is inverted, it should be positive downward
     # We don't know which axis was rotated around, so we'll assume this is sagittal angle (around the AP axis)
+    # The depth is a local translation down the needle, applied after the rotation. It is inverted because the
+    # spreadsheet stores depth below the surface as a negative number, while the SI axis is positive downward.
     coord = [
         Translation(
-            translation=[float(coords[0]), float(coords[1]), 0, -float(coords[2])],
+            translation=[float(coords[0]), float(coords[1]), 0],
         ),
         Rotation(
             angles=[float(coords[3]), 0, 0],
+        ),
+        Translation(
+            translation=[0, 0, -float(coords[2])],
+            reference_coordinate_system=ReferenceCoordinateSystem.LOCAL,
         ),
     ]
 
     brain_injection = BrainInjection(
         protocol_id=protocol,
-        coordinate_system_name=CoordinateSystemLibrary.BREGMA_ARID.name,
+        coordinate_system_name=BREGMA_ARI.name,
         injection_materials=[
             ViralMaterial(
                 name=virus_name,
@@ -141,7 +164,7 @@ def generate_procedures(
         start_date=injection_date,
         protocol_id=protocol,
         ethics_review_id=ethics_review_id,
-        experimenters=[experimenter],
+        experimenters=[experimenter.name],
         procedures=[
             brain_injection,
         ],
@@ -150,7 +173,7 @@ def generate_procedures(
     # Create the second surgery (perfusion)
     perfusion_surgery = Surgery(
         start_date=perfusion_date,
-        experimenters=[experimenter],
+        experimenters=[experimenter.name],
         ethics_review_id=ethics_review_id,
         protocol_id=protocol,
         procedures=[Perfusion(protocol_id=protocol, output_specimen_ids=["1"])],
@@ -159,7 +182,7 @@ def generate_procedures(
     # Return the full Procedures object
     return Procedures(
         subject_id=subject_id,
-        coordinate_system=CoordinateSystemLibrary.BREGMA_ARID,
+        global_coordinate_system=BREGMA_ARI,
         subject_procedures=[
             brain_injection_surgery,
             perfusion_surgery,

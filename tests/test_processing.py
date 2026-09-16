@@ -4,11 +4,11 @@ from datetime import datetime
 
 import pydantic
 import pytest
-from aind_data_schema_models.system_architecture import CPUArchitecture, OperatingSystem
-from aind_data_schema_models.units import MemoryUnit
+from biodata_models.system_architecture import CPUArchitecture, OperatingSystem
+from biodata_models.units import MemoryUnit
 
-from aind_data_schema.components.identifiers import Code, DataAsset
-from aind_data_schema.core.processing import (
+from biodata_schema.components.identifiers import Code, DataAsset
+from biodata_schema.core.processing import (
     DataProcess,
     Processing,
     ProcessName,
@@ -305,6 +305,7 @@ class TestProcessing:
                     stage=ProcessStage.PROCESSING,
                     code=Code(
                         url="www.example.com/ephys_compression",
+                        version="0.0.1",
                     ),
                 ),
                 DataProcess(
@@ -313,7 +314,7 @@ class TestProcessing:
                     process_type=ProcessName.OTHER,
                     experimenters=["AIND Scientific Computing"],
                     stage=ProcessStage.PROCESSING,
-                    code=Code(url=""),
+                    code=Code(url="", version="0.0.1"),
                     notes="Data was copied.",
                 ),
             ]

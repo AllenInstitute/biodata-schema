@@ -5,16 +5,16 @@ from datetime import date
 from unittest.mock import patch
 
 import pytest
-from aind_data_schema_models.coordinates import AnatomicalRelative
-from aind_data_schema_models.harp_types import HarpDeviceType
-from aind_data_schema_models.modalities import Modality
-from aind_data_schema_models.organizations import Organization
-from aind_data_schema_models.units import FrequencyUnit, PowerUnit
+from biodata_models.coordinates import AnatomicalRelative
+from biodata_models.harp_types import HarpDeviceType
+from biodata_models.modalities import Modality
+from biodata_models.organizations import Organization
+from biodata_models.units import FrequencyUnit, PowerUnit
 from pydantic import ValidationError
 
-from aind_data_schema.components.connections import Connection
-from aind_data_schema.components.coordinates import CoordinateSystemLibrary
-from aind_data_schema.components.devices import (
+from biodata_schema.components.connections import Connection
+from biodata_schema.components.coordinates import CoordinateSystem
+from biodata_schema.components.devices import (
     Camera,
     CameraAssembly,
     CameraTarget,
@@ -42,13 +42,15 @@ from aind_data_schema.components.devices import (
     OlfactometerChannelType,
     ScanningStage,
 )
-from aind_data_schema.components.measurements import Calibration
-from aind_data_schema.core.instrument import (
+from biodata_schema.components.identifiers import Software
+from biodata_schema.components.measurements import Calibration
+from biodata_schema.core.instrument import (
     DEVICES_REQUIRED,
     Instrument,
 )
 from examples.ephys_instrument import inst as ephys_instrument
 from examples.slap2_instrument import dmds
+from tests.coordinate_systems import BREGMA_ARI
 
 dmd = dmds[0]
 
@@ -350,7 +352,7 @@ class TestInstrument:
                 instrument_id="123_EPHYS1-OPTO_20220101",
                 modification_date=date(2020, 10, 10),
                 modalities=[Modality.ECEPHYS, Modality.FIB],
-                coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+                global_coordinate_system=BREGMA_ARI,
                 components=[
                     *daqs,
                     camera_no_target,
@@ -386,7 +388,7 @@ class TestInstrument:
             instrument_id="123_EPHYS1-OPTO_20220101",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.ECEPHYS, Modality.FIB],
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
             components=[
                 *daqs,
                 camera_no_target,
@@ -427,7 +429,7 @@ class TestInstrument:
                 instrument_id="123_EPHYS1-OPTO_20220101",
                 modification_date=date(2020, 10, 10),
                 modalities=[Modality.ECEPHYS, Modality.FIB],
-                coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+                global_coordinate_system=BREGMA_ARI,
                 components=[
                     *daqs,
                     *cameras,
@@ -467,7 +469,7 @@ class TestInstrument:
                 instrument_id="123_EPHYS1-OPTO_20220101",
                 modification_date=date(2020, 10, 10),
                 modalities=[Modality.ECEPHYS, Modality.FIB],
-                coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+                global_coordinate_system=BREGMA_ARI,
                 components=[
                     *daqs,
                     *cameras,
@@ -511,7 +513,7 @@ class TestInstrument:
                 Instrument(
                     modalities=[Modality.from_abbreviation(modality_abbreviation)],
                     instrument_id="123_EPHYS1-OPTO_20220101",
-                    coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+                    global_coordinate_system=BREGMA_ARI,
                     modification_date=date(2020, 10, 10),
                     components=[],
                     calibrations=[],
@@ -526,7 +528,7 @@ class TestInstrument:
                 modalities=[Modality.from_abbreviation(modality_abbreviation)],
                 instrument_id="123_EPHYS1-OPTO_20220101",
                 modification_date=date(2020, 10, 10),
-                coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+                global_coordinate_system=BREGMA_ARI,
                 components=[
                     *daqs,
                     *cameras,
@@ -538,7 +540,6 @@ class TestInstrument:
                     *patch_cords,
                     *stimulus_devices,
                     *objectives,
-                    laser,
                     dmd,
                     scan_stage,
                     microscope,
@@ -554,7 +555,7 @@ class TestInstrument:
         instrument_instance_modality = Instrument.model_construct(
             instrument_id="123_EPHYS1-OPTO_20220101",
             modalities={Modality.ECEPHYS},  # Example with a valid Modality instance
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
         )
         instrument_json = instrument_instance_modality.model_dump_json()
         instrument_data = json.loads(instrument_json)
@@ -584,7 +585,7 @@ class TestInstrument:
 
         # Create a matching CameraAssembly
         camera_assembly = CameraAssembly(
-            name="Assembly A",
+            name="Assembly B",
             camera=camera,
             target=CameraTarget.BRAIN,
             relative_position=[AnatomicalRelative.SUPERIOR],
@@ -595,14 +596,13 @@ class TestInstrument:
             instrument_id="123_EPHYS1-OPTO_20220101",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.ECEPHYS, Modality.FIB],
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,  # order is AP, ML, SI
+            global_coordinate_system=BREGMA_ARI,  # order is AP, ML, SI
             components=[
                 *daqs,
                 *cameras,
                 *stick_microscopes,
                 *light_sources,
                 *lms,
-                laser,
                 *ems,
                 *detectors,
                 *patch_cords,
@@ -702,18 +702,18 @@ class TestInstrument:
             instrument_id="test_inst",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.ECEPHYS],
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
             components=[Computer(name="Computer1")],
         )
         inst2 = Instrument(
             instrument_id="test_inst",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.ECEPHYS],
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
             components=[Computer(name="Computer1")],
         )
 
-        with patch("aind_data_schema.core.instrument.logger") as mock_logger:
+        with patch("biodata_schema.core.instrument.logger") as mock_logger:
             combined = inst1 + inst2
             mock_logger.error.assert_called_once()
             error_call_args = mock_logger.error.call_args[0][0]
@@ -737,18 +737,18 @@ class TestInstrument:
             instrument_id="test_inst",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.ECEPHYS],
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
             components=[harp_clock_gen],
         )
         inst2 = Instrument(
             instrument_id="test_inst",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.ECEPHYS],
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
             components=[harp_clock_gen.model_copy(deep=True)],
         )
 
-        with patch("aind_data_schema.core.instrument.logger") as mock_logger:
+        with patch("biodata_schema.core.instrument.logger") as mock_logger:
             combined = inst1 + inst2
             mock_logger.info.assert_called_once()
             info_call_args = mock_logger.info.call_args[0][0]
@@ -777,7 +777,7 @@ class TestInstrument:
             instrument_id="test_inst",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.BEHAVIOR],
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
             components=[
                 harp_clock_gen,
                 LickSpoutAssembly(
@@ -797,7 +797,7 @@ class TestInstrument:
             instrument_id="test_inst",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.BEHAVIOR],
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
             components=[
                 harp_non_clock_gen,
                 LickSpoutAssembly(
@@ -814,7 +814,7 @@ class TestInstrument:
             ],
         )
 
-        with patch("aind_data_schema.core.instrument.logger") as mock_logger:
+        with patch("biodata_schema.core.instrument.logger") as mock_logger:
             combined = inst1 + inst2
             mock_logger.error.assert_called_once()
             error_call_args = mock_logger.error.call_args[0][0]
@@ -824,7 +824,7 @@ class TestInstrument:
         assert len(combined.components) == 3
 
     def test_validate_unique_component_names(self):
-        """Test that duplicate component names log a warning"""
+        """Test that duplicate component names raise an error"""
         duplicate_component = ephys_instrument.components[0].model_copy(deep=True)
         inst_with_dup = Instrument.model_construct(
             instrument_id=ephys_instrument.instrument_id,
@@ -836,11 +836,9 @@ class TestInstrument:
             calibrations=ephys_instrument.calibrations,
         )
 
-        with patch("aind_data_schema.core.instrument.logger") as mock_logger:
+        with pytest.raises(ValueError) as context:
             inst_with_dup.validate_unique_component_names()
-            mock_logger.warning.assert_called_once()
-            warning_msg = mock_logger.warning.call_args[0][0]
-            assert duplicate_component.name in warning_msg
+        assert duplicate_component.name in str(context.value)
 
         inst_no_dup = Instrument.model_construct(
             instrument_id=ephys_instrument.instrument_id,
@@ -852,9 +850,107 @@ class TestInstrument:
             calibrations=ephys_instrument.calibrations,
         )
 
-        with patch("aind_data_schema.core.instrument.logger") as mock_logger:
-            inst_no_dup.validate_unique_component_names()
-            mock_logger.warning.assert_not_called()
+        assert inst_no_dup.validate_unique_component_names() is inst_no_dup
+
+    @pytest.mark.parametrize("endpoint", ["source_device", "target_device"])
+    def test_connections_reject_software_names(self, endpoint):
+        """Software is not a device endpoint even when it is attached to a camera."""
+        camera = Camera(
+            name="Camera",
+            detector_type=DetectorType.CAMERA,
+            manufacturer=Organization.AIND,
+            data_interface="USB",
+            recording_software=Software(name="Bonsai", version="2.5"),
+        )
+        values = dict(
+            instrument_id="rig",
+            modification_date=date(2026, 1, 1),
+            modalities=[],
+            global_coordinate_system=BREGMA_ARI,
+            components=[camera],
+        )
+        instrument = Instrument(**values)
+        assert instrument.get_component_names() == ["Camera", "rig"]
+        endpoints = dict(source_device="Camera", target_device="rig")
+        assert Instrument(**values, connections=[Connection(**endpoints)])
+        endpoints[endpoint] = "Bonsai"
+        with pytest.raises(ValidationError, match="Bonsai.*not part of the instrument"):
+            Instrument(**values, connections=[Connection(**endpoints)])
+
+    def test_shared_software_name_allowed(self):
+        """The same Software recorded on several devices is not a name collision"""
+        shared_software = Software(name="Bonsai", version="2.5")
+
+        def _camera(name):
+            """Build a camera assembly recording with the shared software"""
+            return CameraAssembly(
+                name=name,
+                target=CameraTarget.BRAIN,
+                relative_position=[AnatomicalRelative.SUPERIOR],
+                camera=Camera(
+                    name=f"{name} Detector",
+                    detector_type=DetectorType.CAMERA,
+                    manufacturer=Organization.OTHER,
+                    data_interface="USB",
+                    frame_rate=144,
+                    frame_rate_unit=FrequencyUnit.HZ,
+                    sensor_width=1,
+                    sensor_height=1,
+                    chroma="Color",
+                    notes="Manufacturer unknown",
+                    recording_software=shared_software,
+                ),
+                lens=Lens(name=f"{name} Lens", manufacturer=Organization.OTHER, notes="Manufacturer unknown"),
+            )
+
+        inst = Instrument.model_construct(
+            instrument_id=ephys_instrument.instrument_id,
+            modification_date=ephys_instrument.modification_date,
+            modalities=ephys_instrument.modalities,
+            global_coordinate_system=ephys_instrument.global_coordinate_system,
+            components=[_camera("Camera One"), _camera("Camera Two")],
+            connections=[],
+            calibrations=[],
+        )
+        assert inst.validate_unique_component_names() is inst
+
+    def test_coordinate_system_names_ignored(self):
+        """Names on coordinate systems are not component collisions"""
+        inst = Instrument.model_construct(
+            instrument_id=ephys_instrument.instrument_id,
+            modification_date=ephys_instrument.modification_date,
+            modalities=ephys_instrument.modalities,
+            global_coordinate_system=ephys_instrument.global_coordinate_system,
+            components=[
+                CameraAssembly.model_construct(
+                    name="Camera assembly one",
+                    local_coordinate_system=CoordinateSystem.model_construct(name="Shared coordinate system"),
+                ),
+                CameraAssembly.model_construct(
+                    name="Camera assembly two",
+                    local_coordinate_system=CoordinateSystem.model_construct(name="Shared coordinate system"),
+                ),
+            ],
+            connections=[],
+            calibrations=[],
+        )
+
+        assert inst.validate_unique_component_names() is inst
+
+    def test_distinct_objects_sharing_a_name_rejected(self):
+        """Two different devices with the same name are still a collision"""
+        inst = Instrument.model_construct(
+            instrument_id=ephys_instrument.instrument_id,
+            modification_date=ephys_instrument.modification_date,
+            modalities=ephys_instrument.modalities,
+            global_coordinate_system=ephys_instrument.global_coordinate_system,
+            components=[Disc(name="Shared", radius=1), Disc(name="Shared", radius=2)],
+            connections=[],
+            calibrations=[],
+        )
+        with pytest.raises(ValueError) as context:
+            inst.validate_unique_component_names()
+        assert "Shared" in str(context.value)
 
 
 class TestConnection:
@@ -899,14 +995,13 @@ class TestConnection:
             instrument_id="123_EPHYS1-OPTO_20220101",
             modification_date=date(2020, 10, 10),
             modalities=unsorted_modalities,
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
             components=[
                 *daqs,
                 *cameras,
                 *stick_microscopes,
                 *light_sources,
                 *lms,
-                laser,
                 *ems,
                 *detectors,
                 *patch_cords,

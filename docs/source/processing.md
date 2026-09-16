@@ -1,6 +1,6 @@
 # Processing
 
-[Link to code](https://github.com/AllenNeuralDynamics/biodata-schema/blob/dev/src/aind_data_schema/core/processing.py)
+[Link to code](https://github.com/AllenNeuralDynamics/biodata-schema/blob/dev/src/biodata_schema/core/processing.py)
 
 The `processing.json` file captures the data processing and analysis steps that have been carried out – mostly for derived data assets. This tracks what code was used for each step, when it was run, what the input and outputs where, what parameters were set. This includes things like spike sorting, image alignment, cell segmentation. It also includes manual annotation, quality control, and data analysis.
 
@@ -35,8 +35,8 @@ Description of a single processing step
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `process_type` | [ProcessName](aind_data_schema_models/process_names.md#processname) | Process type  |
-| `name` | `str` | Name (('Unique name of the processing step.', ' If not provided, the type will be used as the name.')) |
+| `process_type` | [ProcessName](biodata_models/process_names.md#processname) | Process type  |
+| `name` | `str` | Name (Unique name of the processing step. If not provided, the type will be used as the name.) |
 | `stage` | [ProcessStage](processing.md#processstage) | Processing stage  |
 | `code` | [Code](components/identifiers.md#code) | Code (Code used for processing) |
 | `experimenters` | `List[str]` | Experimenters (People responsible for processing) |
@@ -81,9 +81,9 @@ Description of resources used by a process
 | `cpu_cores` | `Optional[int]` | CPU cores  |
 | `gpu` | `Optional[str]` | GPU name  |
 | `system_memory` | `Optional[float]` | System memory  |
-| `system_memory_unit` | Optional[[MemoryUnit](aind_data_schema_models/units.md#memoryunit)] | System memory unit  |
+| `system_memory_unit` | Optional[[MemoryUnit](biodata_models/units.md#memoryunit)] | System memory unit  |
 | `ram` | `Optional[float]` | System RAM  |
-| `ram_unit` | Optional[[MemoryUnit](aind_data_schema_models/units.md#memoryunit)] | Ram unit  |
+| `ram_unit` | Optional[[MemoryUnit](biodata_models/units.md#memoryunit)] | Ram unit  |
 | `cpu_usage` | Optional[List[[ResourceTimestamped](processing.md#resourcetimestamped)]] | CPU usage  |
 | `gpu_usage` | Optional[List[[ResourceTimestamped](processing.md#resourcetimestamped)]] | GPU usage  |
 | `ram_usage` | Optional[List[[ResourceTimestamped](processing.md#resourcetimestamped)]] | RAM usage  |

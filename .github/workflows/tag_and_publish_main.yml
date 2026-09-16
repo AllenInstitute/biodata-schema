@@ -25,7 +25,7 @@ jobs:
     - name: Push git tag
       run: git push origin "v${{ env.tag }}"
     - name: Install uv
-      uses: astral-sh/setup-uv@v9
+      uses: astral-sh/setup-uv@v10.0.1
       with:
         python-version: '3.10'
     - name: Install dependencies
@@ -54,7 +54,7 @@ jobs:
       - name: Pull latest changes
         run: git pull origin main
       - name: Install uv
-        uses: astral-sh/setup-uv@v9
+        uses: astral-sh/setup-uv@v10.0.1
         with:
           python-version: '3.10'
       - name: Configure aws credentials
@@ -66,5 +66,5 @@ jobs:
       - name: Create and upload schemas
         run: |
           uv sync --locked
-          uv run python -m aind_data_schema.utils.json_writer --output $TEMP_DIR --attach-version
+          uv run python -m biodata_schema.utils.json_writer --output $TEMP_DIR --attach-version
           uvx --from awscli aws s3 sync $TEMP_DIR s3://${AWS_DATA_SCHEMA_BUCKET}/$S3_PREFIX

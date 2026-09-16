@@ -2,7 +2,7 @@
 
 import pytest
 
-from aind_data_schema.utils.compatibility_check import InstrumentAcquisitionCompatibility
+from biodata_schema.utils.compatibility_check import InstrumentAcquisitionCompatibility
 from examples.ephys_acquisition import acquisition as ephys_acquisition
 from examples.ephys_instrument import inst as ephys_instrument
 from examples.exaspim_acquisition import acq as exaspim_acquisition

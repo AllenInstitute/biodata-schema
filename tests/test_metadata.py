@@ -7,26 +7,25 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-from aind_data_schema_models.data_name_patterns import DataLevel
-from aind_data_schema_models.modalities import Modality
-from aind_data_schema_models.organizations import Organization
-from aind_data_schema_models.species import Strain
+from biodata_models.data_name_patterns import DataLevel
+from biodata_models.modalities import Modality
+from biodata_models.organizations import Organization
+from biodata_models.species import Strain
 from pydantic import ValidationError
 
-from aind_data_schema.components.connections import Connection
-from aind_data_schema.components.coordinates import CoordinateSystemLibrary
-from aind_data_schema.components.devices import EphysAssembly, EphysProbe, Laser, Manipulator
-from aind_data_schema.components.identifiers import Code, Database, Person
-from aind_data_schema.components.subject_procedures import TrainingProtocol
-from aind_data_schema.components.subjects import BreedingInfo, CalibrationObject, Housing, MouseSubject, Sex, Species
-from aind_data_schema.components.surgery_procedures import BrainInjection
-from aind_data_schema.core.acquisition import Acquisition, AcquisitionSubjectDetails, DataStream, StimulusEpoch
-from aind_data_schema.core.data_description import DataDescription, Funding
-from aind_data_schema.core.instrument import Instrument
-from aind_data_schema.core.metadata import Metadata, create_metadata_json
-from aind_data_schema.core.procedures import Procedures, Surgery
-from aind_data_schema.core.processing import DataProcess, Processing, ProcessName, ProcessStage
-from aind_data_schema.core.subject import Subject
+from biodata_schema.components.connections import Connection
+from biodata_schema.components.devices import EphysAssembly, EphysProbe, Laser, Manipulator
+from biodata_schema.components.identifiers import Code, Database, Person
+from biodata_schema.components.subject_procedures import TrainingProtocol
+from biodata_schema.components.subjects import BreedingInfo, CalibrationObject, Housing, MouseSubject, Sex, Species
+from biodata_schema.components.surgery_procedures import BrainInjection
+from biodata_schema.core.acquisition import Acquisition, AcquisitionSubjectDetails, DataStream, StimulusEpoch
+from biodata_schema.core.data_description import DataDescription, Funding
+from biodata_schema.core.instrument import Instrument
+from biodata_schema.core.metadata import Metadata, create_metadata_json
+from biodata_schema.core.procedures import Procedures, Surgery
+from biodata_schema.core.processing import DataProcess, Processing, ProcessName, ProcessStage
+from biodata_schema.core.subject import Subject
 from examples.aibs_smartspim_instrument import inst as spim_inst
 from examples.barseq_acquisition import acquisition as barseq_acquisition
 from examples.data_description import d as data_description
@@ -35,6 +34,7 @@ from examples.model import m as model_example
 from examples.processing import p as processing_example
 from examples.quality_control import q as quality_control_example
 from examples.subject import s as subject
+from tests.coordinate_systems import BREGMA_ARI
 
 ephys_assembly = EphysAssembly(
     probes=[EphysProbe(probe_model="Neuropixels 1.0", name="Probe A")],
@@ -73,7 +73,6 @@ class TestMetadata:
                 date_of_birth=datetime(2022, 11, 22, 8, 43, 00, tzinfo=timezone.utc).date(),
                 source=Organization.AI,
                 breeding_info=BreedingInfo(
-                    breeding_group="Emx1-IRES-Cre(ND)",
                     maternal_id="546543",
                     maternal_genotype="Emx1-IRES-Cre/wt; Camk2a-tTa/Camk2a-tTA",
                     paternal_id="232323",
@@ -194,7 +193,7 @@ class TestMetadata:
             instrument_id="123_EPHYS1_20220101",
             modalities=modalities,
             components=[ephys_assembly],
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
         )
         with pytest.raises(ValidationError) as context:
             Metadata(
@@ -742,7 +741,6 @@ class TestMetadata:
                 source=Organization.AI,
                 genotype="wt",
                 breeding_info=BreedingInfo(
-                    breeding_group="Test",
                     maternal_id="123",
                     maternal_genotype="wt",
                     paternal_id="456",
@@ -773,7 +771,6 @@ class TestMetadata:
                 source=Organization.AI,
                 genotype="wt",
                 breeding_info=BreedingInfo(
-                    breeding_group="Test",
                     maternal_id="123",
                     maternal_genotype="wt",
                     paternal_id="456",
@@ -868,7 +865,7 @@ class TestMetadata:
         assert "start_date_time" in str(context.value)
 
     def test_validate_calibration_object_tags(self):
-        """Tests that calibration tag warning is issued when subject is CalibrationObject but tag is missing"""
+        """Tests that CalibrationObject subjects use the calibration subject ID"""
 
         # Create a subject with CalibrationObject
         calibration_subject = Subject(
@@ -878,24 +875,21 @@ class TestMetadata:
             ),
         )
 
-        # Use the existing data_description from class setup (which doesn't have 'calibration' tag)
-        dd = data_description.model_copy()
-        dd.tags = None  # Ensure no tags are set
-
-        # This should trigger a warning since subject is CalibrationObject but no 'calibration' tag
-        with pytest.warns(UserWarning) as w:
-            metadata = Metadata(
+        with pytest.raises(ValueError, match="CalibrationObject subject_id must be 'calibration'"):
+            Metadata(
                 name="Test Metadata",
                 location="Test Location",
                 subject=calibration_subject,
-                data_description=dd,
+                data_description=data_description,
             )
 
-        warning_messages = [str(warning.message) for warning in w]
-        assert (
-            "Subject is a CalibrationObject but 'calibration' tag is missing from data_description.tags. "
-            "Adding 'calibration' tag automatically."
-        ) in warning_messages
+        calibration_subject.subject_id = "calibration"
+        metadata = Metadata(
+            name="Test Metadata",
+            location="Test Location",
+            subject=calibration_subject,
+            data_description=data_description,
+        )
         assert metadata is not None
 
     def test_validate_subject_details_if_not_specimen(self):
@@ -954,7 +948,7 @@ class TestWriteStandardFiles:
     """Tests for Metadata.write_standard_files"""
 
     @patch.object(Path, "open", autospec=True)
-    @patch("aind_data_schema.utils.validators.recursive_check_paths")
+    @patch("biodata_schema.utils.validators.recursive_check_paths")
     def test_writes_each_present_core_file(self, mock_rcp, mock_open_fn):
         """write_standard_files calls write_standard_file for each non-None core field"""
         m = Metadata.model_construct(
@@ -975,7 +969,7 @@ class TestWriteStandardFiles:
         assert 4 == mock_open_fn.call_count
 
     @patch.object(Path, "open", autospec=True)
-    @patch("aind_data_schema.utils.validators.recursive_check_paths")
+    @patch("biodata_schema.utils.validators.recursive_check_paths")
     def test_skips_none_fields(self, mock_rcp, mock_open_fn):
         """Fields that are None produce no file writes"""
         m = Metadata.model_construct(
@@ -990,7 +984,7 @@ class TestWriteStandardFiles:
         assert "processing.json" in opened_files
 
     @patch.object(Path, "open", autospec=True)
-    @patch("aind_data_schema.utils.validators.recursive_check_paths")
+    @patch("biodata_schema.utils.validators.recursive_check_paths")
     def test_output_directory_forwarded(self, mock_rcp, mock_open_fn):
         """output_directory is forwarded to each write_standard_file call"""
         m = Metadata.model_construct(

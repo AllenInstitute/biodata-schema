@@ -3,11 +3,11 @@
 import argparse
 import datetime
 
-from aind_data_schema_models.system_architecture import ModelArchitecture
+from biodata_models.system_architecture import ModelArchitecture
 
-from aind_data_schema.components.identifiers import Code, DataAsset, Software
-from aind_data_schema.core.model import Model, ModelEvaluation, ModelTraining, PerformanceMetric
-from aind_data_schema.core.processing import ProcessStage
+from biodata_schema.components.identifiers import Code, DataAsset, Software
+from biodata_schema.core.model import Model, ModelEvaluation, ModelTraining, PerformanceMetric
+from biodata_schema.core.processing import ProcessStage
 
 now = datetime.datetime.now()
 
@@ -29,6 +29,7 @@ m = Model(
     example_run_code=Code(
         url="url for model code repo",
         run_script="./predict.py",
+        version="0.0.1",
     ),
     training=[
         ModelTraining(
@@ -45,6 +46,7 @@ m = Model(
                     "batch_size": 32,
                     "augmentation": True,
                 },
+                version="0.0.1",
             ),
             output_path="./trained_model.h5",
             start_date_time=now,
@@ -71,6 +73,7 @@ m = Model(
                 ],
                 url="url for model code repo",
                 run_script="./eval.py",
+                version="0.0.1",
             ),
             start_date_time=now,
             end_date_time=now,

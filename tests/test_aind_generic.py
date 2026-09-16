@@ -2,7 +2,7 @@
 
 from pydantic import Field
 
-from aind_data_schema.base import DataModel, GenericModel
+from biodata_schema.base import DataModel, GenericModel
 
 
 class GenericContainer(DataModel):

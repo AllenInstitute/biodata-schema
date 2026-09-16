@@ -1,6 +1,6 @@
 # Instrument
 
-[Link to code](https://github.com/AllenNeuralDynamics/biodata-schema/blob/dev/src/aind_data_schema/core/instrument.py)
+[Link to code](https://github.com/AllenNeuralDynamics/biodata-schema/blob/dev/src/biodata_schema/core/instrument.py)
 
 The `instrument.json` collects the components, mostly hardware devices, used to collect data. In general, the instrument schema describes the static state of the data acquisition hardware across sessions. The [Acquisition](acquisition.md) is used to describe the configuration of components for a specific session.
 
@@ -26,22 +26,22 @@ If you need to specify additional information about a device we will need to add
 
 ### Missing organizations
 
-You can find the full list of [Organizations](aind_data_schema_models/organizations.md) in the `aind-data-schema-models` repository. Some device types are restricted to a subset of this full list to simplify the `metadata-entry` app. Please open an [issue](https://github.com/AllenNeuralDynamics/biodata-schema/issues) if you need a manufacturer that isn't available in either the main list or one of the subsets.
+You can find the full list of [Organizations](biodata_models/organizations.md) in the `biodata-models` repository. Some device types are restricted to a subset of this full list to simplify the `metadata-entry` app. Please open an [issue](https://github.com/AllenNeuralDynamics/biodata-schema/issues) if you need a manufacturer that isn't available in either the main list or one of the subsets.
 
 ## Position
 
-### RelativePosition
+### Relative position
 
-For all devices where a position is expected you are *required* to provide the relative position. This is a `List[AnatomicalRelative]`, for example you can specify that a computer monitor is `[Anterior]`. Relative positions should be used for devices that might have small position adjustments made from day-to-day and where the exact position is not important.
+For all devices where a position is expected you are *required* to provide the `relative_position` field. This is a `List[AnatomicalRelative]`, for example you can specify that a computer monitor is `[Anterior]`. Relative positions should be used for devices that might have small position adjustments made from day-to-day and where the exact position is not important.
 
 ### Exact position
 
-For devices where you know the exact position you need to describe the `CoordinateSystem` and and `transform` of the device. The transform describes the `device_to_instrument` transformation, i.e. given a point in the device's coordinate system (0,0,0) how do you need to translate (and rotate/scale) that point to place it in the instrument's coordinate system. Please refer to the [coordinate systems](coordinate_systems.md) page for additional details.
+For devices where you know the exact position you need to describe the `local_coordinate_system` and `transform` of the device. The transform describes the `device_to_instrument` transformation, i.e. given a point in the device's coordinate system (0,0,0) how do you need to translate (and rotate/scale) that point to place it in the instrument's coordinate system. Please refer to the [coordinate systems](coordinate_systems.md) page for additional details.
 
 ## Examples
 
 - [Ephys instrument](https://github.com/AllenNeuralDynamics/biodata-schema/blob/dev/examples/ephys_instrument.py)
-- [AIBS Smartspim instrument](https://github.com/AllenNeuralDynamics/biodata-schema/blob/dev/examples/aibs_smartspim.py)
+- [AIBS Smartspim instrument](https://github.com/AllenNeuralDynamics/biodata-schema/blob/dev/examples/aibs_smartspim_instrument.py)
 - [AIND Smartspim instrument](https://github.com/AllenNeuralDynamics/biodata-schema/blob/dev/examples/aind_smartspim_instrument.py)
 - [Exaspim instrument](https://github.com/AllenNeuralDynamics/biodata-schema/blob/dev/examples/exaspim_instrument.py)
 - [FIP / Ophys instrument](https://github.com/AllenNeuralDynamics/biodata-schema/blob/dev/examples/fip_ophys_instrument.py)
@@ -58,9 +58,8 @@ Description of an instrument
 | `location` | `Optional[str]` | Location (Location of the instrument) |
 | `instrument_id` | `str` | Instrument ID (Unique instrument identifier) |
 | `modification_date` | `datetime.date` | Date of modification (Date of the last change to the instrument, hardware addition/removal, calibration, etc.) |
-| `modalities` | List[[Modality](aind_data_schema_models/modalities.md#modality)] | Modalities (List of all possible modalities that the instrument is capable of acquiring) |
+| `modalities` | List[[Modality](biodata_models/modalities.md#modality)] | Modalities (List of all possible modalities that the instrument is capable of acquiring) |
 | `calibrations` | Optional[List[[Calibration](components/measurements.md#calibration) or [VolumeCalibration](components/measurements.md#volumecalibration) or [PowerCalibration](components/measurements.md#powercalibration)]] | Calibrations (List of calibration measurements takend during instrument setup and maintenance) |
-| <del>`coordinate_system`</del> | Optional[[CoordinateSystem](components/coordinates.md#coordinatesystem)] | **[DEPRECATED]** Deprecated: use global_coordinate_system instead. Coordinate system (Origin and axis definitions for determining the position of the instrument's components) |
 | `global_coordinate_system` | [CoordinateSystem](components/coordinates.md#coordinatesystem) | Global coordinate system (Origin and axis definitions for determining the position of the instrument's components) |
 | `temperature_control` | `Optional[bool]` | Temperature control (Does the instrument maintain a constant temperature?) |
 | `notes` | `Optional[str]` | Notes  |

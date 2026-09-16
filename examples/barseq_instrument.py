@@ -3,12 +3,13 @@
 import argparse
 from datetime import date
 
-from aind_data_schema_models.modalities import Modality
-from aind_data_schema_models.organizations import Organization
-from aind_data_schema_models.units import SizeUnit
+from biodata_models.coordinates import AxisName, Direction, Origin
+from biodata_models.modalities import Modality
+from biodata_models.organizations import Organization
+from biodata_models.units import SizeUnit
 
-from aind_data_schema.components.coordinates import CoordinateSystemLibrary
-from aind_data_schema.components.devices import (
+from biodata_schema.components.coordinates import Axis, CoordinateSystem
+from biodata_schema.components.devices import (
     BinMode,
     Camera,
     CameraChroma,
@@ -21,7 +22,18 @@ from aind_data_schema.components.devices import (
     Microscope,
     Objective,
 )
-from aind_data_schema.core.instrument import Instrument
+from biodata_schema.core.instrument import Instrument
+
+IMAGE_XYZ = CoordinateSystem(
+    name="IMAGE_XYZ",
+    origin=Origin.ORIGIN,
+    axis_unit=SizeUnit.PX,
+    axes=[
+        Axis(name=AxisName.X, direction=Direction.POS),
+        Axis(name=AxisName.Y, direction=Direction.POS),
+        Axis(name=AxisName.Z, direction=Direction.POS),
+    ],
+)
 
 objectives = [
     Objective(
@@ -216,7 +228,7 @@ instrument = Instrument(
     location="243",
     instrument_id="Dogwood",
     modification_date=date(2024, 7, 9),
-    coordinate_system=CoordinateSystemLibrary.IMAGE_XYZ,
+    global_coordinate_system=IMAGE_XYZ,
     modalities=[Modality.BARSEQ],
     notes=(
         "BarSEQ imaging system with Nikon Ti2-E inverted microscope, X-Light V3 spinning disk confocal, "

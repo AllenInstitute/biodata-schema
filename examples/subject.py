@@ -3,11 +3,11 @@
 import argparse
 from datetime import datetime, timezone
 
-from aind_data_schema_models.organizations import Organization
-from aind_data_schema_models.species import Species, Strain
+from biodata_models.organizations import Organization
+from biodata_models.species import Species, Strain
 
-from aind_data_schema.components.subjects import BreedingInfo, Housing, MouseSubject, Sex
-from aind_data_schema.core.subject import Subject
+from biodata_schema.components.subjects import BreedingInfo, Housing, MouseSubject, Sex
+from biodata_schema.core.subject import Subject
 
 # If a timezone isn't specified, the timezone of the computer running this
 # script will be used as default
@@ -22,7 +22,6 @@ s = Subject(
         date_of_birth=t.date(),
         source=Organization.AI,
         breeding_info=BreedingInfo(
-            breeding_group="Emx1-IRES-Cre(ND)",
             maternal_id="546543",
             maternal_genotype="Emx1-IRES-Cre/wt; Camk2a-tTa/Camk2a-tTA",
             paternal_id="232323",

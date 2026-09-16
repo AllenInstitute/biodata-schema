@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 from unittest.mock import MagicMock, call, mock_open, patch
 
-from aind_data_schema.utils.json_writer import SchemaWriter
+from biodata_schema.utils.json_writer import SchemaWriter
 
 
 class TestSchemaWriter:

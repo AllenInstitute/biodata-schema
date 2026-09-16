@@ -3,19 +3,15 @@
 import argparse
 from datetime import date
 
-from aind_data_schema_models.coordinates import AnatomicalRelative
-from aind_data_schema_models.devices import CameraTarget
-from aind_data_schema_models.modalities import Modality
-from aind_data_schema_models.organizations import Organization
-from aind_data_schema_models.units import FrequencyUnit, SizeUnit
+from biodata_models.coordinates import AnatomicalRelative, AxisName, Direction, Origin
+from biodata_models.devices import CameraTarget
+from biodata_models.modalities import Modality
+from biodata_models.organizations import Organization
+from biodata_models.units import FrequencyUnit, SizeUnit
 
-from aind_data_schema.components.connections import Connection
-from aind_data_schema.components.coordinates import (
-    Affine,
-    CoordinateSystemLibrary,
-    Translation,
-)
-from aind_data_schema.components.devices import (
+from biodata_schema.components.connections import Connection
+from biodata_schema.components.coordinates import Affine, Axis, CoordinateSystem, Translation
+from biodata_schema.components.devices import (
     BinMode,
     Camera,
     CameraAssembly,
@@ -34,14 +30,25 @@ from aind_data_schema.components.devices import (
     Objective,
     PockelsCell,
 )
-from aind_data_schema.components.identifiers import Software
-from aind_data_schema.core.instrument import Instrument
+from biodata_schema.components.identifiers import Software
+from biodata_schema.core.instrument import Instrument
+
+BREGMA_ARI = CoordinateSystem(
+    name="BREGMA_ARI",
+    origin=Origin.BREGMA,
+    axis_unit=SizeUnit.MM,
+    axes=[
+        Axis(name=AxisName.AP, direction=Direction.PA),
+        Axis(name=AxisName.ML, direction=Direction.LR),
+        Axis(name=AxisName.SI, direction=Direction.SI),
+    ],
+)
 
 instrument = Instrument(
     location="429",
     instrument_id="mesoscope",
     modification_date=date(2024, 10, 16),
-    coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+    global_coordinate_system=BREGMA_ARI,
     modalities=[Modality.POPHYS],
     notes=None,
     temperature_control=None,
@@ -78,7 +85,7 @@ instrument = Instrument(
             relative_position=[AnatomicalRelative.ANTERIOR],
             contrast=None,
             brightness=None,
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            local_coordinate_system=BREGMA_ARI,
             transform=[
                 Affine(
                     affine_transform=[
@@ -86,16 +93,19 @@ instrument = Instrument(
                             -0.80914,
                             -0.58761,
                             0,
+                            0,
                         ],
                         [
                             -0.12391,
                             0.17063,
                             0.97751,
+                            0,
                         ],
                         [
                             -0.5744,
                             0.79095,
                             -0.21087,
+                            0,
                         ],
                     ],
                 ),
@@ -113,7 +123,7 @@ instrument = Instrument(
             target=CameraTarget.BODY,
             relative_position=[AnatomicalRelative.SUPERIOR],
             camera=Camera(
-                name="Behavior Camera",
+                name="Behavior Camera Detector",
                 serial_number=None,
                 manufacturer=Organization.ALLIED,
                 model="Mako G-32B",
@@ -168,7 +178,7 @@ instrument = Instrument(
             target=CameraTarget.EYE,
             relative_position=[AnatomicalRelative.LEFT],
             camera=Camera(
-                name="Eye Camera",
+                name="Eye Camera Detector",
                 serial_number=None,
                 manufacturer=Organization.ALLIED,
                 model="Mako G-32B",
@@ -223,7 +233,7 @@ instrument = Instrument(
             target=CameraTarget.FACE,
             relative_position=[AnatomicalRelative.ANTERIOR],
             camera=Camera(
-                name="Face Camera",
+                name="Face Camera Detector",
                 serial_number=None,
                 manufacturer=Organization.ALLIED,
                 model="Mako G-32B",

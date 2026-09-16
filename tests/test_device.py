@@ -1,16 +1,15 @@
 """test Device models"""
 
 import pytest
-from aind_data_schema_models.coordinates import AnatomicalRelative
-from aind_data_schema_models.devices import DaqChannelType
-from aind_data_schema_models.harp_types import HarpDeviceType
-from aind_data_schema_models.organizations import Organization
-from aind_data_schema_models.units import UnitlessUnit
+from biodata_models.coordinates import AnatomicalRelative
+from biodata_models.harp_types import HarpDeviceType
+from biodata_models.organizations import Organization
+from biodata_models.units import UnitlessUnit
+from pydantic import ValidationError
 
-from aind_data_schema.components.coordinates import CoordinateSystemLibrary, Translation
-from aind_data_schema.components.devices import (
+from biodata_schema.components.coordinates import Translation
+from biodata_schema.components.devices import (
     AdditionalImagingDevice,
-    DAQChannel,
     DataInterface,
     Detector,
     DetectorType,
@@ -24,6 +23,7 @@ from aind_data_schema.components.devices import (
     Monitor,
     Objective,
 )
+from tests.coordinate_systems import BREGMA_ARI
 
 
 class TestDevice:
@@ -97,17 +97,17 @@ class TestDevice:
                     translation=[1, 1, 1],
                 )
             ],
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            local_coordinate_system=BREGMA_ARI,
         )
         assert valid_positioned.transform is not None
-        assert valid_positioned.coordinate_system is not None
+        assert valid_positioned.local_coordinate_system is not None
 
         # Test with both transform and coordinate_system unset
         valid_positioned_unset = DevicePosition(
             relative_position=[AnatomicalRelative.SUPERIOR],
         )
         assert valid_positioned_unset.transform is None
-        assert valid_positioned_unset.coordinate_system is None
+        assert valid_positioned_unset.local_coordinate_system is None
 
         # Test with transform set but coordinate_system unset
         with pytest.raises(ValueError) as e1:
@@ -128,7 +128,7 @@ class TestDevice:
         with pytest.raises(ValueError) as e2:
             DevicePosition(
                 relative_position=[AnatomicalRelative.SUPERIOR],
-                coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+                local_coordinate_system=BREGMA_ARI,
             )
         assert (
             "DevicePosition.transform and DevicePosition.local_coordinate_system must "
@@ -194,64 +194,45 @@ class TestFilter:
 class TestDAQChannel:
     """tests DAQChannel schemas"""
 
-    def test_deprecated_channel_index(self):
-        """Test that using channel_index raises a deprecation warning"""
-
-        with pytest.warns(DeprecationWarning) as warning:
-            DAQChannel(channel_name="test_channel", channel_type=DaqChannelType.DI, channel_index=1)
-
-        assert len(warning) == 1
-        assert "DAQChannel.channel_index is deprecated" in str(warning[0].message)
-        assert "Use DAQChannel.port instead" in str(warning[0].message)
-
 
 class TestMonitor:
     """tests Monitor schemas"""
 
-    def test_add_units_if_needed_validator(self):
-        """tests the Monitor validator for adding units if needed"""
-
-        monitor_with_contrast_no_unit = Monitor(
+    @pytest.mark.parametrize("setting", ["contrast", "brightness"])
+    def test_zero_setting_requires_units(self, setting):
+        """Zero is a supplied monitor setting, not a missing value."""
+        values = dict(
             name="test_monitor",
             manufacturer=Organization.ASUS,
             refresh_rate=60,
             width=1920,
             height=1080,
             viewing_distance=15.0,
-            relative_position=[AnatomicalRelative.SUPERIOR],
-            contrast=50,
+            relative_position=[],
         )
-        assert monitor_with_contrast_no_unit.contrast == 50
-        assert monitor_with_contrast_no_unit.contrast_unit == UnitlessUnit.PERCENT
+        assert getattr(Monitor(**values), setting) is None
+        values[setting] = 0
+        with pytest.raises(ValidationError, match=f"Unit {setting}_unit is required"):
+            Monitor(**values)
+        values[f"{setting}_unit"] = UnitlessUnit.PERCENT
+        assert getattr(Monitor(**values), setting) == 0
 
-        monitor_with_brightness_no_unit = Monitor(
-            name="test_monitor",
-            manufacturer=Organization.ASUS,
-            refresh_rate=60,
-            width=1920,
-            height=1080,
-            viewing_distance=15.0,
-            relative_position=[AnatomicalRelative.SUPERIOR],
-            brightness=75,
-        )
-        assert monitor_with_brightness_no_unit.brightness == 75
-        assert monitor_with_brightness_no_unit.brightness_unit == UnitlessUnit.PERCENT
+    def test_contrast_brightness_units_not_inferred(self):
+        """Units for contrast and brightness are no longer filled in automatically"""
 
-        monitor_with_both_no_units = Monitor(
-            name="test_monitor",
-            manufacturer=Organization.ASUS,
-            refresh_rate=60,
-            width=1920,
-            height=1080,
-            viewing_distance=15.0,
-            relative_position=[AnatomicalRelative.SUPERIOR],
-            contrast=50,
-            brightness=75,
-        )
-        assert monitor_with_both_no_units.contrast == 50
-        assert monitor_with_both_no_units.contrast_unit == UnitlessUnit.PERCENT
-        assert monitor_with_both_no_units.brightness == 75
-        assert monitor_with_both_no_units.brightness_unit == UnitlessUnit.PERCENT
+        with pytest.raises(ValidationError) as context:
+            Monitor(
+                name="test_monitor",
+                manufacturer=Organization.ASUS,
+                refresh_rate=60,
+                width=1920,
+                height=1080,
+                viewing_distance=15.0,
+                relative_position=[AnatomicalRelative.SUPERIOR],
+                contrast=50,
+                brightness=75,
+            )
+        assert "Unit contrast_unit is required when contrast is set" in str(context.value)
 
         monitor_with_explicit_units = Monitor(
             name="test_monitor",
@@ -266,21 +247,5 @@ class TestMonitor:
             brightness=75,
             brightness_unit=UnitlessUnit.PERCENT,
         )
-        assert monitor_with_explicit_units.contrast == 50
         assert monitor_with_explicit_units.contrast_unit == UnitlessUnit.PERCENT
-        assert monitor_with_explicit_units.brightness == 75
         assert monitor_with_explicit_units.brightness_unit == UnitlessUnit.PERCENT
-
-        monitor_without_contrast_brightness = Monitor(
-            name="test_monitor",
-            manufacturer=Organization.ASUS,
-            refresh_rate=60,
-            width=1920,
-            height=1080,
-            viewing_distance=15.0,
-            relative_position=[AnatomicalRelative.SUPERIOR],
-        )
-        assert monitor_without_contrast_brightness.contrast is None
-        assert monitor_without_contrast_brightness.contrast_unit is None
-        assert monitor_without_contrast_brightness.brightness is None
-        assert monitor_without_contrast_brightness.brightness_unit is None

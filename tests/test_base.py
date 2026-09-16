@@ -8,10 +8,10 @@ from typing import Literal, Optional
 from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
-from aind_data_schema_models.brain_atlas import BrainStructureModel
+from biodata_models.brain_atlas import BrainStructureModel
 from pydantic import Field, SkipValidation, ValidationError, create_model
 
-from aind_data_schema.base import (
+from biodata_schema.base import (
     MAX_FILE_SIZE,
     AwareDatetimeWithDefault,
     DataCoreModel,
@@ -19,7 +19,7 @@ from aind_data_schema.base import (
     GenericModel,
     is_dict_corrupt,
 )
-from aind_data_schema.core.subject import Subject
+from biodata_schema.core.subject import Subject
 
 
 class TestBase:
@@ -32,7 +32,7 @@ class TestBase:
 
         assert s.describedBy == (
             "https://raw.githubusercontent.com/AllenNeuralDynamics/"
-            "biodata-schema/main/src/aind_data_schema/core/subject.py"
+            "biodata-schema/main/src/biodata_schema/core/subject.py"
         )
 
     @patch("pathlib.Path.open", new_callable=mock_open)
@@ -100,6 +100,19 @@ class TestBase:
 
         test3 = MultiModel(value_multi_unit="unit")
         assert test3 is not None
+
+    def test_zero_multi_value_requires_unit(self):
+        """A zero-valued member of a measurement group still needs units."""
+
+        class Measurement(DataModel):
+            """Measurement with shared units."""
+
+            value_start: Optional[float] = None
+            value_unit: Optional[str] = None
+
+        with pytest.raises(ValidationError, match="Unit value_unit is required"):
+            Measurement(value_start=0)
+        assert Measurement(value_start=0, value_unit="mm").value_start == 0
 
     def test_is_dict_corrupt(self):
         """Tests is_dict_corrupt method"""
@@ -201,7 +214,7 @@ class TestBase:
             TestCoreModel(**v2_from_v1.model_dump())
 
     @patch("pathlib.Path.open", new_callable=mock_open)
-    @patch("aind_data_schema.base.logger")
+    @patch("biodata_schema.base.logger")
     def test_write_standard_file_size_warning(self, mock_logger: MagicMock, mock_open: MagicMock):
         """Tests that a warning is logged if the file size exceeds MAX_FILE_SIZE"""
 
@@ -288,7 +301,7 @@ class TestDataCoreModel:
         assert ChildModel.default_filename() == "test_model.json"
 
     @patch("pathlib.Path.open", new_callable=mock_open)
-    @patch("aind_data_schema.utils.validators.recursive_check_paths")
+    @patch("biodata_schema.utils.validators.recursive_check_paths")
     def test_write_standard_file(self, mock_recursive_check_paths: MagicMock, mock_open: MagicMock):
         """Tests write_standard_file method"""
 
@@ -306,8 +319,8 @@ class TestDataCoreModel:
         mock_open.assert_called_once_with("w")
 
     @patch("pathlib.Path.open", new_callable=mock_open)
-    @patch("aind_data_schema.base.logger")
-    @patch("aind_data_schema.utils.validators.recursive_check_paths")
+    @patch("biodata_schema.base.logger")
+    @patch("biodata_schema.utils.validators.recursive_check_paths")
     def test_write_standard_file_size_warning(
         self, mock_recursive_check_paths: MagicMock, mock_logger: MagicMock, mock_open: MagicMock
     ):
@@ -329,7 +342,7 @@ class TestDataCoreModel:
         )
 
     @patch("pathlib.Path.open", new_callable=mock_open)
-    @patch("aind_data_schema.utils.validators.recursive_check_paths")
+    @patch("biodata_schema.utils.validators.recursive_check_paths")
     def test_write_standard_file_string_output_directory(
         self, mock_recursive_check_paths: MagicMock, mock_open: MagicMock
     ):
@@ -346,7 +359,7 @@ class TestDataCoreModel:
         mock_open.assert_called_once_with("w")
 
     @patch("pathlib.Path.open", new_callable=mock_open)
-    @patch("aind_data_schema.utils.validators.recursive_check_paths")
+    @patch("biodata_schema.utils.validators.recursive_check_paths")
     def test_write_standard_file_no_output_directory(self, mock_recursive_check_paths: MagicMock, mock_open: MagicMock):
         """Tests write_standard_file with no output_directory (defaults to cwd)"""
 

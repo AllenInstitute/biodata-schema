@@ -4,10 +4,10 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from aind_data_schema.components.devices import Device
-from aind_data_schema.core.acquisition import Acquisition, StimulusEpoch
-from aind_data_schema.core.instrument import Instrument
-from aind_data_schema.utils.compatibility_check import InstrumentAcquisitionCompatibility
+from biodata_schema.components.devices import Device
+from biodata_schema.core.acquisition import Acquisition, StimulusEpoch
+from biodata_schema.core.instrument import Instrument
+from biodata_schema.utils.compatibility_check import InstrumentAcquisitionCompatibility
 from examples.exaspim_acquisition import acq
 from examples.exaspim_instrument import inst
 

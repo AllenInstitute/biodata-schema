@@ -329,10 +329,7 @@
             },
             "name": {
                "default": "",
-               "description": [
-                  "Unique name of the processing step.",
-                  " If not provided, the type will be used as the name."
-               ],
+               "description": "Unique name of the processing step. If not provided, the type will be used as the name.",
                "title": "Name",
                "type": "string"
             },
@@ -772,14 +769,14 @@
          "type": "string"
       },
       "describedBy": {
-         "const": "https://raw.githubusercontent.com/AllenNeuralDynamics/aind-data-schema/main/src/aind_data_schema/core/processing.py",
-         "default": "https://raw.githubusercontent.com/AllenNeuralDynamics/aind-data-schema/main/src/aind_data_schema/core/processing.py",
+         "const": "https://raw.githubusercontent.com/AllenNeuralDynamics/biodata-schema/main/src/biodata_schema/core/processing.py",
+         "default": "https://raw.githubusercontent.com/AllenNeuralDynamics/biodata-schema/main/src/biodata_schema/core/processing.py",
          "title": "Describedby",
          "type": "string"
       },
       "schema_version": {
-         "const": "2.3.1",
-         "default": "2.3.1",
+         "const": "3.0.0",
+         "default": "3.0.0",
          "title": "Schema Version",
          "type": "string"
       },

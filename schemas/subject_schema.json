@@ -10,19 +10,6 @@
                "title": "Object Type",
                "type": "string"
             },
-            "breeding_group": {
-               "anyOf": [
-                  {
-                     "type": "string"
-                  },
-                  {
-                     "type": "null"
-                  }
-               ],
-               "default": null,
-               "deprecated": true,
-               "title": "Breeding Group"
-            },
             "maternal_id": {
                "title": "Maternal specimen ID",
                "type": "string"
@@ -132,6 +119,7 @@
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                            "Allied": "#/$defs/_Allied",
+                           "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                            "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                            "Arduino": "#/$defs/_Arduino",
                            "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -217,6 +205,7 @@
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
                            "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                           "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                            "SICGEN": "#/$defs/_Sicgen",
                            "Same Sky": "#/$defs/_Same_Sky",
                            "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -228,6 +217,7 @@
                            "Spectra-Physics": "#/$defs/_Spectra_Physics",
                            "Spinnaker": "#/$defs/_Spinnaker",
                            "Stanford University": "#/$defs/_Stanford_University",
+                           "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                            "TE Connectivity": "#/$defs/_Te_Connectivity",
                            "Tamron": "#/$defs/_Tamron",
                            "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -242,7 +232,7 @@
                            "Tymphany": "#/$defs/_Tymphany",
                            "University of California, San Diego": "#/$defs/_University_Of_California_San_Diego",
                            "University of Pennsylvania": "#/$defs/_University_Of_Pennsylvania",
-                           "Unknown": "#/$defs/aind_data_schema_models__organizations___Unknown",
+                           "Unknown": "#/$defs/biodata_models__organizations___Unknown",
                            "Vieworks": "#/$defs/_Vieworks",
                            "Vortran": "#/$defs/_Vortran",
                            "World Precision Intstruments": "#/$defs/_World_Precision_Intstruments",
@@ -277,6 +267,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Allied"
+                        },
+                        {
+                           "$ref": "#/$defs/_Antibodies_Inc"
                         },
                         {
                            "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -534,6 +527,9 @@
                            "$ref": "#/$defs/_Raspberry_Pi"
                         },
                         {
+                           "$ref": "#/$defs/_Rockland_Immunochemicals"
+                        },
+                        {
                            "$ref": "#/$defs/_Sicgen"
                         },
                         {
@@ -565,6 +561,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Stanford_University"
+                        },
+                        {
+                           "$ref": "#/$defs/_Synaptic_Systems"
                         },
                         {
                            "$ref": "#/$defs/_Te_Connectivity"
@@ -609,7 +608,7 @@
                            "$ref": "#/$defs/_University_Of_Pennsylvania"
                         },
                         {
-                           "$ref": "#/$defs/aind_data_schema_models__organizations___Unknown"
+                           "$ref": "#/$defs/biodata_models__organizations___Unknown"
                         },
                         {
                            "$ref": "#/$defs/_Vieworks"
@@ -765,13 +764,79 @@
                "type": "string"
             },
             "species": {
-               "$ref": "#/$defs/SpeciesModel",
                "default": {
                   "name": "Homo sapiens",
                   "common_name": "Human",
                   "registry": "National Center for Biotechnology Information (NCBI)",
                   "registry_identifier": "NCBI:txid9606"
                },
+               "discriminator": {
+                  "mapping": {
+                     "Callithrix jacchus": "#/$defs/_Callithrix_Jacchus",
+                     "Carpa hircus": "#/$defs/_Carpa_Hircus",
+                     "Cavia porcellus": "#/$defs/_Cavia_Porcellus",
+                     "Equus asinus": "#/$defs/_Equus_Asinus",
+                     "Gallus gallus": "#/$defs/_Gallus_Gallus",
+                     "Homo sapiens": "#/$defs/_Homo_Sapiens",
+                     "Lama glama": "#/$defs/_Lama_Glama",
+                     "Macaca fascicularis": "#/$defs/_Macaca_Fascicularis",
+                     "Macaca mulatta": "#/$defs/_Macaca_Mulatta",
+                     "Macaca nemestrina": "#/$defs/_Macaca_Nemestrina",
+                     "Mus musculus": "#/$defs/_Mus_Musculus",
+                     "Oryctolagus cuniculus": "#/$defs/_Oryctolagus_Cuniculus",
+                     "Rattus norvegicus": "#/$defs/_Rattus_Norvegicus",
+                     "Saimiri sciureus": "#/$defs/_Saimiri_Sciureus",
+                     "Vicuna pacos": "#/$defs/_Vicuna_Pacos"
+                  },
+                  "propertyName": "name"
+               },
+               "oneOf": [
+                  {
+                     "$ref": "#/$defs/_Callithrix_Jacchus"
+                  },
+                  {
+                     "$ref": "#/$defs/_Carpa_Hircus"
+                  },
+                  {
+                     "$ref": "#/$defs/_Cavia_Porcellus"
+                  },
+                  {
+                     "$ref": "#/$defs/_Equus_Asinus"
+                  },
+                  {
+                     "$ref": "#/$defs/_Gallus_Gallus"
+                  },
+                  {
+                     "$ref": "#/$defs/_Homo_Sapiens"
+                  },
+                  {
+                     "$ref": "#/$defs/_Lama_Glama"
+                  },
+                  {
+                     "$ref": "#/$defs/_Macaca_Fascicularis"
+                  },
+                  {
+                     "$ref": "#/$defs/_Macaca_Mulatta"
+                  },
+                  {
+                     "$ref": "#/$defs/_Macaca_Nemestrina"
+                  },
+                  {
+                     "$ref": "#/$defs/_Mus_Musculus"
+                  },
+                  {
+                     "$ref": "#/$defs/_Oryctolagus_Cuniculus"
+                  },
+                  {
+                     "$ref": "#/$defs/_Rattus_Norvegicus"
+                  },
+                  {
+                     "$ref": "#/$defs/_Saimiri_Sciureus"
+                  },
+                  {
+                     "$ref": "#/$defs/_Vicuna_Pacos"
+                  }
+               ],
                "title": "Species"
             },
             "sex": {
@@ -794,6 +859,7 @@
                      "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                      "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                      "Allied": "#/$defs/_Allied",
+                     "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                      "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                      "Arduino": "#/$defs/_Arduino",
                      "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -879,6 +945,7 @@
                      "Prizmatix": "#/$defs/_Prizmatix",
                      "Quantifi": "#/$defs/_Quantifi",
                      "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                     "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                      "SICGEN": "#/$defs/_Sicgen",
                      "Same Sky": "#/$defs/_Same_Sky",
                      "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -890,6 +957,7 @@
                      "Spectra-Physics": "#/$defs/_Spectra_Physics",
                      "Spinnaker": "#/$defs/_Spinnaker",
                      "Stanford University": "#/$defs/_Stanford_University",
+                     "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                      "TE Connectivity": "#/$defs/_Te_Connectivity",
                      "Tamron": "#/$defs/_Tamron",
                      "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -904,7 +972,7 @@
                      "Tymphany": "#/$defs/_Tymphany",
                      "University of California, San Diego": "#/$defs/_University_Of_California_San_Diego",
                      "University of Pennsylvania": "#/$defs/_University_Of_Pennsylvania",
-                     "Unknown": "#/$defs/aind_data_schema_models__organizations___Unknown",
+                     "Unknown": "#/$defs/biodata_models__organizations___Unknown",
                      "Vieworks": "#/$defs/_Vieworks",
                      "Vortran": "#/$defs/_Vortran",
                      "World Precision Intstruments": "#/$defs/_World_Precision_Intstruments",
@@ -939,6 +1007,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Allied"
+                  },
+                  {
+                     "$ref": "#/$defs/_Antibodies_Inc"
                   },
                   {
                      "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -1196,6 +1267,9 @@
                      "$ref": "#/$defs/_Raspberry_Pi"
                   },
                   {
+                     "$ref": "#/$defs/_Rockland_Immunochemicals"
+                  },
+                  {
                      "$ref": "#/$defs/_Sicgen"
                   },
                   {
@@ -1227,6 +1301,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Stanford_University"
+                  },
+                  {
+                     "$ref": "#/$defs/_Synaptic_Systems"
                   },
                   {
                      "$ref": "#/$defs/_Te_Connectivity"
@@ -1271,7 +1348,7 @@
                      "$ref": "#/$defs/_University_Of_Pennsylvania"
                   },
                   {
-                     "$ref": "#/$defs/aind_data_schema_models__organizations___Unknown"
+                     "$ref": "#/$defs/biodata_models__organizations___Unknown"
                   },
                   {
                      "$ref": "#/$defs/_Vieworks"
@@ -1360,19 +1437,19 @@
                   "mapping": {
                      "BALB/c": "#/$defs/_Balb_C",
                      "C57BL/6J": "#/$defs/_C57Bl_6J",
-                     "Unknown": "#/$defs/aind_data_schema_models__species___Unknown"
+                     "Unknown": "#/$defs/biodata_models__species___Unknown"
                   },
                   "propertyName": "name"
                },
                "oneOf": [
                   {
-                     "$ref": "#/$defs/_C57Bl_6J"
+                     "$ref": "#/$defs/biodata_models__species___Unknown"
                   },
                   {
                      "$ref": "#/$defs/_Balb_C"
                   },
                   {
-                     "$ref": "#/$defs/aind_data_schema_models__species___Unknown"
+                     "$ref": "#/$defs/_C57Bl_6J"
                   }
                ],
                "title": "Strain"
@@ -1387,10 +1464,13 @@
                      "Gallus gallus": "#/$defs/_Gallus_Gallus",
                      "Homo sapiens": "#/$defs/_Homo_Sapiens",
                      "Lama glama": "#/$defs/_Lama_Glama",
+                     "Macaca fascicularis": "#/$defs/_Macaca_Fascicularis",
                      "Macaca mulatta": "#/$defs/_Macaca_Mulatta",
+                     "Macaca nemestrina": "#/$defs/_Macaca_Nemestrina",
                      "Mus musculus": "#/$defs/_Mus_Musculus",
                      "Oryctolagus cuniculus": "#/$defs/_Oryctolagus_Cuniculus",
                      "Rattus norvegicus": "#/$defs/_Rattus_Norvegicus",
+                     "Saimiri sciureus": "#/$defs/_Saimiri_Sciureus",
                      "Vicuna pacos": "#/$defs/_Vicuna_Pacos"
                   },
                   "propertyName": "name"
@@ -1418,7 +1498,13 @@
                      "$ref": "#/$defs/_Lama_Glama"
                   },
                   {
+                     "$ref": "#/$defs/_Macaca_Fascicularis"
+                  },
+                  {
                      "$ref": "#/$defs/_Macaca_Mulatta"
+                  },
+                  {
+                     "$ref": "#/$defs/_Macaca_Nemestrina"
                   },
                   {
                      "$ref": "#/$defs/_Mus_Musculus"
@@ -1428,6 +1514,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Rattus_Norvegicus"
+                  },
+                  {
+                     "$ref": "#/$defs/_Saimiri_Sciureus"
                   },
                   {
                      "$ref": "#/$defs/_Vicuna_Pacos"
@@ -1494,6 +1583,7 @@
                      "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                      "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                      "Allied": "#/$defs/_Allied",
+                     "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                      "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                      "Arduino": "#/$defs/_Arduino",
                      "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -1579,6 +1669,7 @@
                      "Prizmatix": "#/$defs/_Prizmatix",
                      "Quantifi": "#/$defs/_Quantifi",
                      "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                     "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                      "SICGEN": "#/$defs/_Sicgen",
                      "Same Sky": "#/$defs/_Same_Sky",
                      "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -1590,6 +1681,7 @@
                      "Spectra-Physics": "#/$defs/_Spectra_Physics",
                      "Spinnaker": "#/$defs/_Spinnaker",
                      "Stanford University": "#/$defs/_Stanford_University",
+                     "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                      "TE Connectivity": "#/$defs/_Te_Connectivity",
                      "Tamron": "#/$defs/_Tamron",
                      "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -1604,7 +1696,7 @@
                      "Tymphany": "#/$defs/_Tymphany",
                      "University of California, San Diego": "#/$defs/_University_Of_California_San_Diego",
                      "University of Pennsylvania": "#/$defs/_University_Of_Pennsylvania",
-                     "Unknown": "#/$defs/aind_data_schema_models__organizations___Unknown",
+                     "Unknown": "#/$defs/biodata_models__organizations___Unknown",
                      "Vieworks": "#/$defs/_Vieworks",
                      "Vortran": "#/$defs/_Vortran",
                      "World Precision Intstruments": "#/$defs/_World_Precision_Intstruments",
@@ -1639,6 +1731,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Allied"
+                  },
+                  {
+                     "$ref": "#/$defs/_Antibodies_Inc"
                   },
                   {
                      "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -1896,6 +1991,9 @@
                      "$ref": "#/$defs/_Raspberry_Pi"
                   },
                   {
+                     "$ref": "#/$defs/_Rockland_Immunochemicals"
+                  },
+                  {
                      "$ref": "#/$defs/_Sicgen"
                   },
                   {
@@ -1927,6 +2025,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Stanford_University"
+                  },
+                  {
+                     "$ref": "#/$defs/_Synaptic_Systems"
                   },
                   {
                      "$ref": "#/$defs/_Te_Connectivity"
@@ -1971,7 +2072,7 @@
                      "$ref": "#/$defs/_University_Of_Pennsylvania"
                   },
                   {
-                     "$ref": "#/$defs/aind_data_schema_models__organizations___Unknown"
+                     "$ref": "#/$defs/biodata_models__organizations___Unknown"
                   },
                   {
                      "$ref": "#/$defs/_Vieworks"
@@ -2046,10 +2147,13 @@
                      "Gallus gallus": "#/$defs/_Gallus_Gallus",
                      "Homo sapiens": "#/$defs/_Homo_Sapiens",
                      "Lama glama": "#/$defs/_Lama_Glama",
+                     "Macaca fascicularis": "#/$defs/_Macaca_Fascicularis",
                      "Macaca mulatta": "#/$defs/_Macaca_Mulatta",
+                     "Macaca nemestrina": "#/$defs/_Macaca_Nemestrina",
                      "Mus musculus": "#/$defs/_Mus_Musculus",
                      "Oryctolagus cuniculus": "#/$defs/_Oryctolagus_Cuniculus",
                      "Rattus norvegicus": "#/$defs/_Rattus_Norvegicus",
+                     "Saimiri sciureus": "#/$defs/_Saimiri_Sciureus",
                      "Vicuna pacos": "#/$defs/_Vicuna_Pacos"
                   },
                   "propertyName": "name"
@@ -2077,7 +2181,13 @@
                      "$ref": "#/$defs/_Lama_Glama"
                   },
                   {
+                     "$ref": "#/$defs/_Macaca_Fascicularis"
+                  },
+                  {
                      "$ref": "#/$defs/_Macaca_Mulatta"
+                  },
+                  {
+                     "$ref": "#/$defs/_Macaca_Nemestrina"
                   },
                   {
                      "$ref": "#/$defs/_Mus_Musculus"
@@ -2087,6 +2197,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Rattus_Norvegicus"
+                  },
+                  {
+                     "$ref": "#/$defs/_Saimiri_Sciureus"
                   },
                   {
                      "$ref": "#/$defs/_Vicuna_Pacos"
@@ -2131,6 +2244,7 @@
                      "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                      "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
                      "Allied": "#/$defs/_Allied",
+                     "Antibodies Inc": "#/$defs/_Antibodies_Inc",
                      "Applied Scientific Instrumentation": "#/$defs/_Applied_Scientific_Instrumentation",
                      "Arduino": "#/$defs/_Arduino",
                      "Arecont Vision Costar": "#/$defs/_Arecont_Vision_Costar",
@@ -2216,6 +2330,7 @@
                      "Prizmatix": "#/$defs/_Prizmatix",
                      "Quantifi": "#/$defs/_Quantifi",
                      "Raspberry Pi": "#/$defs/_Raspberry_Pi",
+                     "Rockland Immunochemicals": "#/$defs/_Rockland_Immunochemicals",
                      "SICGEN": "#/$defs/_Sicgen",
                      "Same Sky": "#/$defs/_Same_Sky",
                      "Schneider-Kreuznach": "#/$defs/_Schneider_Kreuznach",
@@ -2227,6 +2342,7 @@
                      "Spectra-Physics": "#/$defs/_Spectra_Physics",
                      "Spinnaker": "#/$defs/_Spinnaker",
                      "Stanford University": "#/$defs/_Stanford_University",
+                     "Synaptic Systems": "#/$defs/_Synaptic_Systems",
                      "TE Connectivity": "#/$defs/_Te_Connectivity",
                      "Tamron": "#/$defs/_Tamron",
                      "Technical Manufacturing Corporation": "#/$defs/_Technical_Manufacturing_Corporation",
@@ -2241,7 +2357,7 @@
                      "Tymphany": "#/$defs/_Tymphany",
                      "University of California, San Diego": "#/$defs/_University_Of_California_San_Diego",
                      "University of Pennsylvania": "#/$defs/_University_Of_Pennsylvania",
-                     "Unknown": "#/$defs/aind_data_schema_models__organizations___Unknown",
+                     "Unknown": "#/$defs/biodata_models__organizations___Unknown",
                      "Vieworks": "#/$defs/_Vieworks",
                      "Vortran": "#/$defs/_Vortran",
                      "World Precision Intstruments": "#/$defs/_World_Precision_Intstruments",
@@ -2276,6 +2392,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Allied"
+                  },
+                  {
+                     "$ref": "#/$defs/_Antibodies_Inc"
                   },
                   {
                      "$ref": "#/$defs/_Applied_Scientific_Instrumentation"
@@ -2533,6 +2652,9 @@
                      "$ref": "#/$defs/_Raspberry_Pi"
                   },
                   {
+                     "$ref": "#/$defs/_Rockland_Immunochemicals"
+                  },
+                  {
                      "$ref": "#/$defs/_Sicgen"
                   },
                   {
@@ -2564,6 +2686,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Stanford_University"
+                  },
+                  {
+                     "$ref": "#/$defs/_Synaptic_Systems"
                   },
                   {
                      "$ref": "#/$defs/_Te_Connectivity"
@@ -2608,7 +2733,7 @@
                      "$ref": "#/$defs/_University_Of_Pennsylvania"
                   },
                   {
-                     "$ref": "#/$defs/aind_data_schema_models__organizations___Unknown"
+                     "$ref": "#/$defs/biodata_models__organizations___Unknown"
                   },
                   {
                      "$ref": "#/$defs/_Vieworks"
@@ -2719,34 +2844,6 @@
          ],
          "title": "Sex",
          "type": "string"
-      },
-      "SpeciesModel": {
-         "description": "Base model for species",
-         "properties": {
-            "name": {
-               "title": "Name",
-               "type": "string"
-            },
-            "common_name": {
-               "title": "Common Name",
-               "type": "string"
-            },
-            "registry": {
-               "$ref": "#/$defs/Registry"
-            },
-            "registry_identifier": {
-               "title": "Registry Identifier",
-               "type": "string"
-            }
-         },
-         "required": [
-            "name",
-            "common_name",
-            "registry",
-            "registry_identifier"
-         ],
-         "title": "SpeciesModel",
-         "type": "object"
       },
       "WellnessReport": {
          "additionalProperties": false,
@@ -3151,6 +3248,48 @@
             }
          },
          "title": "_Ams_Osram",
+         "type": "object"
+      },
+      "_Antibodies_Inc": {
+         "description": "Model Antibodies Inc",
+         "properties": {
+            "name": {
+               "const": "Antibodies Inc",
+               "default": "Antibodies Inc",
+               "title": "Name",
+               "type": "string"
+            },
+            "abbreviation": {
+               "const": null,
+               "default": null,
+               "title": "Abbreviation",
+               "type": "null"
+            },
+            "registry": {
+               "anyOf": [
+                  {
+                     "$ref": "#/$defs/Registry"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": null
+            },
+            "registry_identifier": {
+               "anyOf": [
+                  {
+                     "type": "string"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": null,
+               "title": "Registry Identifier"
+            }
+         },
+         "title": "_Antibodies_Inc",
          "type": "object"
       },
       "_Applied_Scientific_Instrumentation": {
@@ -5715,6 +5854,35 @@
          "title": "_Lumencor",
          "type": "object"
       },
+      "_Macaca_Fascicularis": {
+         "description": "Model Macaca fascicularis",
+         "properties": {
+            "name": {
+               "const": "Macaca fascicularis",
+               "default": "Macaca fascicularis",
+               "title": "Name",
+               "type": "string"
+            },
+            "common_name": {
+               "const": "Crab-eating macaque",
+               "default": "Crab-eating macaque",
+               "title": "Common Name",
+               "type": "string"
+            },
+            "registry": {
+               "$ref": "#/$defs/Registry",
+               "default": "National Center for Biotechnology Information (NCBI)"
+            },
+            "registry_identifier": {
+               "const": "NCBI:txid9541",
+               "default": "NCBI:txid9541",
+               "title": "Registry Identifier",
+               "type": "string"
+            }
+         },
+         "title": "_Macaca_Fascicularis",
+         "type": "object"
+      },
       "_Macaca_Mulatta": {
          "description": "Model Macaca mulatta",
          "properties": {
@@ -5742,6 +5910,35 @@
             }
          },
          "title": "_Macaca_Mulatta",
+         "type": "object"
+      },
+      "_Macaca_Nemestrina": {
+         "description": "Model Macaca nemestrina",
+         "properties": {
+            "name": {
+               "const": "Macaca nemestrina",
+               "default": "Macaca nemestrina",
+               "title": "Name",
+               "type": "string"
+            },
+            "common_name": {
+               "const": "Pig-tailed macaque",
+               "default": "Pig-tailed macaque",
+               "title": "Common Name",
+               "type": "string"
+            },
+            "registry": {
+               "$ref": "#/$defs/Registry",
+               "default": "National Center for Biotechnology Information (NCBI)"
+            },
+            "registry_identifier": {
+               "const": "NCBI:txid9545",
+               "default": "NCBI:txid9545",
+               "title": "Registry Identifier",
+               "type": "string"
+            }
+         },
+         "title": "_Macaca_Nemestrina",
          "type": "object"
       },
       "_Massachusetts_Institute_Of_Technology": {
@@ -7175,6 +7372,77 @@
          "title": "_Rattus_Norvegicus",
          "type": "object"
       },
+      "_Rockland_Immunochemicals": {
+         "description": "Model Rockland Immunochemicals",
+         "properties": {
+            "name": {
+               "const": "Rockland Immunochemicals",
+               "default": "Rockland Immunochemicals",
+               "title": "Name",
+               "type": "string"
+            },
+            "abbreviation": {
+               "const": "ROCKLAND",
+               "default": "ROCKLAND",
+               "title": "Abbreviation",
+               "type": "string"
+            },
+            "registry": {
+               "anyOf": [
+                  {
+                     "$ref": "#/$defs/Registry"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "Research Organization Registry (ROR)"
+            },
+            "registry_identifier": {
+               "anyOf": [
+                  {
+                     "type": "string"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "02z2r2t61",
+               "title": "Registry Identifier"
+            }
+         },
+         "title": "_Rockland_Immunochemicals",
+         "type": "object"
+      },
+      "_Saimiri_Sciureus": {
+         "description": "Model Saimiri sciureus",
+         "properties": {
+            "name": {
+               "const": "Saimiri sciureus",
+               "default": "Saimiri sciureus",
+               "title": "Name",
+               "type": "string"
+            },
+            "common_name": {
+               "const": "Common squirrel monkey",
+               "default": "Common squirrel monkey",
+               "title": "Common Name",
+               "type": "string"
+            },
+            "registry": {
+               "$ref": "#/$defs/Registry",
+               "default": "National Center for Biotechnology Information (NCBI)"
+            },
+            "registry_identifier": {
+               "const": "NCBI:txid9521",
+               "default": "NCBI:txid9521",
+               "title": "Registry Identifier",
+               "type": "string"
+            }
+         },
+         "title": "_Saimiri_Sciureus",
+         "type": "object"
+      },
       "_Same_Sky": {
          "description": "Model Same Sky",
          "properties": {
@@ -7635,6 +7903,48 @@
             }
          },
          "title": "_Stanford_University",
+         "type": "object"
+      },
+      "_Synaptic_Systems": {
+         "description": "Model Synaptic Systems",
+         "properties": {
+            "name": {
+               "const": "Synaptic Systems",
+               "default": "Synaptic Systems",
+               "title": "Name",
+               "type": "string"
+            },
+            "abbreviation": {
+               "const": null,
+               "default": null,
+               "title": "Abbreviation",
+               "type": "null"
+            },
+            "registry": {
+               "anyOf": [
+                  {
+                     "$ref": "#/$defs/Registry"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": null
+            },
+            "registry_identifier": {
+               "anyOf": [
+                  {
+                     "type": "string"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": null,
+               "title": "Registry Identifier"
+            }
+         },
+         "title": "_Synaptic_Systems",
          "type": "object"
       },
       "_Tamron": {
@@ -8380,7 +8690,7 @@
          "title": "_World_Precision_Intstruments",
          "type": "object"
       },
-      "aind_data_schema_models__organizations___Unknown": {
+      "biodata_models__organizations___Unknown": {
          "description": "Model Unknown",
          "properties": {
             "name": {
@@ -8422,7 +8732,7 @@
          "title": "_Unknown",
          "type": "object"
       },
-      "aind_data_schema_models__species___Unknown": {
+      "biodata_models__species___Unknown": {
          "description": "Model Unknown",
          "properties": {
             "name": {
@@ -8475,14 +8785,14 @@
          "type": "string"
       },
       "describedBy": {
-         "const": "https://raw.githubusercontent.com/AllenNeuralDynamics/aind-data-schema/main/src/aind_data_schema/core/subject.py",
-         "default": "https://raw.githubusercontent.com/AllenNeuralDynamics/aind-data-schema/main/src/aind_data_schema/core/subject.py",
+         "const": "https://raw.githubusercontent.com/AllenNeuralDynamics/biodata-schema/main/src/biodata_schema/core/subject.py",
+         "default": "https://raw.githubusercontent.com/AllenNeuralDynamics/biodata-schema/main/src/biodata_schema/core/subject.py",
          "title": "Describedby",
          "type": "string"
       },
       "schema_version": {
-         "const": "2.3.2",
-         "default": "2.3.2",
+         "const": "3.0.2",
+         "default": "3.0.2",
          "title": "Schema Version",
          "type": "string"
       },

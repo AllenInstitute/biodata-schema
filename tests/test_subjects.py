@@ -3,12 +3,12 @@
 from datetime import datetime
 
 import pytest
-from aind_data_schema_models.organizations import Organization
-from aind_data_schema_models.pid_names import PIDName
-from aind_data_schema_models.registries import Registry
-from aind_data_schema_models.species import Species, Strain
+from biodata_models.organizations import Organization
+from biodata_models.pid_names import PIDName
+from biodata_models.registries import Registry
+from biodata_models.species import Species, Strain
 
-from aind_data_schema.components.subjects import (
+from biodata_schema.components.subjects import (
     BreedingInfo,
     CalibrationObject,
     Housing,
@@ -93,6 +93,18 @@ class TestHumanSubject:
         assert subject.sex == Sex.FEMALE
         assert subject.year_of_birth == 1990
         assert subject.source == Organization.AI
+
+    def test_validate_species_is_human_from_dict(self):
+        """Test the species validator with a serialized human species"""
+
+        subject = HumanSubject(
+            sex=Sex.FEMALE,
+            species=Species.HUMAN.model_dump(),
+            year_of_birth=1990,
+            source=Organization.AI,
+        )
+
+        assert subject.species == Species.HUMAN
 
 
 class TestNonHumanPrimateSubject:
@@ -207,25 +219,8 @@ class TestCalibrationObject:
 class TestBreedingInfo:
     """Test the breeding info model"""
 
-    def test_breeding_info_deprecated_field_warning(self):
-        """Test that breeding_group field triggers deprecation warning and is cleared"""
-
-        with pytest.warns(DeprecationWarning) as warning:
-            breeding_info = BreedingInfo(
-                breeding_group="test_group",  # This should trigger warning and be cleared
-                maternal_id="M001",
-                maternal_genotype="wt/wt",
-                paternal_id="P001",
-                paternal_genotype="wt/wt",
-            )
-
-        assert len(warning) == 1
-        assert "breeding_group" in str(warning[0].message)
-
-        assert breeding_info.breeding_group is None
-
-    def test_breeding_info_without_deprecated_field(self):
-        """Test creating BreedingInfo without the deprecated breeding_group field"""
+    def test_breeding_info(self):
+        """Test creating BreedingInfo"""
 
         breeding_info = BreedingInfo(
             maternal_id="M001", maternal_genotype="wt/wt", paternal_id="P001", paternal_genotype="wt/wt"
@@ -235,4 +230,3 @@ class TestBreedingInfo:
         assert breeding_info.maternal_genotype == "wt/wt"
         assert breeding_info.paternal_id == "P001"
         assert breeding_info.paternal_genotype == "wt/wt"
-        assert breeding_info.breeding_group is None

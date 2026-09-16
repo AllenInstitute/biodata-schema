@@ -39,9 +39,9 @@ Documentation is automatically built when you open a PR into the biodata-schema 
 To generate the source files for the documentation and model class links, run:
 
 ```bash
-uv run python src/aind_data_schema/utils/docs/model_generator.py
-uv run python src/aind_data_schema/utils/docs/registries_generator.py
-uv run python src/aind_data_schema/utils/docs/doc_generator.py
+uv run python src/biodata_schema/utils/docs/model_generator.py
+uv run python src/biodata_schema/utils/docs/registries_generator.py
+uv run python src/biodata_schema/utils/docs/doc_generator.py
 ```
 
 The front page embeds an interactive React Flow diagram of the `Metadata` schema (`diagram-app/`). Build its JS/CSS bundle once before building the docs (it's git-ignored and only needs rebuilding when `diagram-app/` changes):
@@ -73,7 +73,7 @@ Testing is required to open a PR in this repository to ensure robustness and rel
   - Please test your changes using pytest and coverage:
 
     ```bash
-    uv run pytest --cov=aind_data_schema --cov=tests --cov-report=term-missing
+    uv run pytest --cov=biodata_schema --cov=tests --cov-report=term-missing
     ```
 
     To open the coverage report in a browser, you can run
@@ -110,7 +110,7 @@ Use `uv run ruff format .` to apply Ruff's formatting.
 **NOTE**: Please note that these linters are automatically run in github actions when a PR is opened. These linters must pass for a PR to merge. 
 
 ### Units
-Unit types (i.e. anything from [aind_data_schema_models.units](https://github.com/AllenNeuralDynamics/aind-data-schema-models/blob/main/src/aind_data_schema_models/units.py)) should always be paired with a variable in one of two patterns.
+Unit types (i.e. anything from [biodata_models.units](https://github.com/AllenNeuralDynamics/biodata-models/blob/main/src/biodata_models/units.py)) should always be paired with a variable in one of two patterns.
 
 When you have a single `variable` with a unit, you should add the `_unit` suffix on the name of the unit:
 
@@ -157,7 +157,7 @@ When you are ready to open a pull request, please link any relevant issues and r
 ## Release
 
 - From dev, create a branch called release-vX.Y.Z
-- Manually increment the version number in the aind_data_schema/__init__.py file to match
+- Manually increment the version number in the biodata_schema/__init__.py file to match
 - Manually increment the major/minor/patch versions of the core files as needed
 - Push the branch and open a PR into main
 - After this push, any last minute changes to the release-vX.Y.Z will have to done to via a PR
