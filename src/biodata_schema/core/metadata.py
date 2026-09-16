@@ -5,7 +5,7 @@ import json
 import logging
 import warnings
 from pathlib import Path
-from typing import Dict, List, Literal, Optional, Union, get_args
+from typing import Annotated, Dict, List, Literal, Optional, Union, get_args
 
 from biodata_models.modalities import Modality
 from pydantic import (
@@ -19,7 +19,7 @@ from pydantic import (
     model_validator,
 )
 
-from biodata_schema.base import DataCoreModel
+from biodata_schema.base import DataCoreModel, DraftRequirement
 from biodata_schema.components.identifiers import DatabaseIdentifiers
 from biodata_schema.components.subject_procedures import TrainingProtocol
 from biodata_schema.components.subjects import CalibrationObject
@@ -80,7 +80,7 @@ class Metadata(DataCoreModel):
         description="Name of the data asset.",
         title="Data Asset Name",
     )
-    location: str = Field(
+    location: Annotated[str, DraftRequirement] = Field(
         ...,
         title="Location",
         description="Current location of the data asset.",

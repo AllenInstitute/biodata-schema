@@ -30,6 +30,10 @@ logger = logging.getLogger(__name__)
 MAX_FILE_SIZE = 500 * 1024  # 500KB
 
 
+class DraftRequirement:
+    """Marker for fields required by the draft metadata schema."""
+
+
 def _coerce_naive_datetime(v: Any, handler: ValidatorFunctionWrapHandler) -> AwareDatetime:
     """Validator to wrap around AwareDatetime to set a default timezone as user's locale"""
     try:

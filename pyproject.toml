@@ -25,6 +25,7 @@ dev = [
     'argparse',
     'codespell',
     'dictdiffer',
+    'jsonschema>=4.23,<5',
     'pydantic>=2.7, !=2.9.0, !=2.9.1',
     'pytest>=8.3',
     'pytest-cov>=6',
