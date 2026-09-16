@@ -102,6 +102,18 @@ class TestRecurseHelper:
         )
         _recurse_helper(data, coordinate_system_name=self.coordinate_system_name, axis_count=2)
 
+    def test_recurse_helper_skips_callable_attributes(self):
+        """Test _recurse_helper skips methods while traversing an object."""
+
+        class ObjectWithCallable:
+            """Object containing a callable and a transform."""
+
+            def __init__(self):
+                self.callback = lambda: None
+                self.translation = Translation(translation=[0.5, 1])
+
+        _recurse_helper(ObjectWithCallable(), coordinate_system_name=self.coordinate_system_name, axis_count=2)
+
 
 class TestRecursiveSystemCheckHelper:
     """Test for _system_check_helper function"""
@@ -242,6 +254,16 @@ class TestRecursiveCoordSystemCheck:
             recursive_coord_system_check(data, None, axis_count=0)
 
         assert "CoordinateSystem is required" in str(context.value)
+
+    def test_recursive_coord_system_check_direct_transform_requires_coordinate_system(self):
+        """Test direct transforms require a coordinate system."""
+        data = Translation(
+            translation=[0.5, 1],
+            reference_coordinate_system=ReferenceCoordinateSystem.LOCAL,
+        )
+
+        with pytest.raises(ValueError, match="CoordinateSystem is required"):
+            recursive_coord_system_check(data, None, axis_count=None)
 
     def test_recursive_coord_system_check_object_without_transforms(self):
         """Test recursive_coord_system_check with object without transforms (should not require coordinate system)"""
