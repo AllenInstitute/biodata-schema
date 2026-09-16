@@ -1,4 +1,4 @@
-/** Mirrors the JSON produced by aind_data_schema.utils.schema_tree.generate_schema_diagram_data */
+/** Mirrors the JSON produced by biodata_schema.utils.schema_tree.generate_schema_diagram_data */
 
 export interface FieldLink {
   /** Model key to drill into in-app, or null if this type isn't a local model (e.g. an enum). */

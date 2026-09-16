@@ -1,19 +1,20 @@
 """test Instrument"""
 
 import json
-import unittest
 from datetime import date
 from unittest.mock import patch
 
-from aind_data_schema_models.coordinates import AnatomicalRelative
-from aind_data_schema_models.modalities import Modality
-from aind_data_schema_models.organizations import Organization
-from aind_data_schema_models.units import FrequencyUnit, PowerUnit
-from aind_data_schema_models.harp_types import HarpDeviceType
+import pytest
+from biodata_models.coordinates import AnatomicalRelative
+from biodata_models.harp_types import HarpDeviceType
+from biodata_models.modalities import Modality
+from biodata_models.organizations import Organization
+from biodata_models.units import FrequencyUnit, PowerUnit
 from pydantic import ValidationError
 
-from aind_data_schema.components.coordinates import CoordinateSystemLibrary
-from aind_data_schema.components.devices import (
+from biodata_schema.components.connections import Connection
+from biodata_schema.components.coordinates import CoordinateSystem
+from biodata_schema.components.devices import (
     Camera,
     CameraAssembly,
     CameraTarget,
@@ -41,14 +42,15 @@ from aind_data_schema.components.devices import (
     OlfactometerChannelType,
     ScanningStage,
 )
-from aind_data_schema.components.connections import Connection
-from aind_data_schema.components.measurements import Calibration
-from aind_data_schema.core.instrument import (
+from biodata_schema.components.identifiers import Software
+from biodata_schema.components.measurements import Calibration
+from biodata_schema.core.instrument import (
     DEVICES_REQUIRED,
     Instrument,
 )
 from examples.ephys_instrument import inst as ephys_instrument
 from examples.slap2_instrument import dmds
+from tests.coordinate_systems import BREGMA_ARI
 
 dmd = dmds[0]
 
@@ -327,17 +329,17 @@ calibration = Calibration(
 )
 
 
-class InstrumentTests(unittest.TestCase):
+class TestInstrument:
     """test instrument schemas"""
 
     def test_constructors(self):
         """always returns true"""
 
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             Instrument()
 
-        self.assertIsNotNone(ephys_instrument)
-        self.assertIn(ephys_instrument.instrument_id, ephys_instrument.get_component_names())
+        assert ephys_instrument is not None
+        assert ephys_instrument.instrument_id in ephys_instrument.get_component_names()
 
     def test_other_camera_target(self):
         """Test that the camera_target being set to Other throws a validation error without notes"""
@@ -345,12 +347,12 @@ class InstrumentTests(unittest.TestCase):
         camera_no_target = cameras[0].model_copy()
         camera_no_target.target = CameraTarget.OTHER
 
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             Instrument(
                 instrument_id="123_EPHYS1-OPTO_20220101",
                 modification_date=date(2020, 10, 10),
                 modalities=[Modality.ECEPHYS, Modality.FIB],
-                coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+                global_coordinate_system=BREGMA_ARI,
                 components=[
                     *daqs,
                     camera_no_target,
@@ -386,7 +388,7 @@ class InstrumentTests(unittest.TestCase):
             instrument_id="123_EPHYS1-OPTO_20220101",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.ECEPHYS, Modality.FIB],
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
             components=[
                 *daqs,
                 camera_no_target,
@@ -418,16 +420,16 @@ class InstrumentTests(unittest.TestCase):
             ],
             notes="Camera target is Other",
         )
-        self.assertIsNotNone(inst)
+        assert inst is not None
 
     def test_missing_connections(self):
         """Validation error when connections are missing"""
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             Instrument(
                 instrument_id="123_EPHYS1-OPTO_20220101",
                 modification_date=date(2020, 10, 10),
                 modalities=[Modality.ECEPHYS, Modality.FIB],
-                coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+                global_coordinate_system=BREGMA_ARI,
                 components=[
                     *daqs,
                     *cameras,
@@ -460,14 +462,14 @@ class InstrumentTests(unittest.TestCase):
                 ],
             )
 
-        self.assertIn("Device name validation error: 'Not a real device'", str(context.exception))
+        assert "Device name validation error: 'Not a real device'" in str(context.value)
 
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             Instrument(
                 instrument_id="123_EPHYS1-OPTO_20220101",
                 modification_date=date(2020, 10, 10),
                 modalities=[Modality.ECEPHYS, Modality.FIB],
-                coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+                global_coordinate_system=BREGMA_ARI,
                 components=[
                     *daqs,
                     *cameras,
@@ -500,18 +502,18 @@ class InstrumentTests(unittest.TestCase):
                 ],
             )
 
-        self.assertIn("Device name validation error: 'Not a real device'", str(context.exception))
+        assert "Device name validation error: 'Not a real device'" in str(context.value)
 
     def test_validator_modality_device_missing(self):
         """Test that the modality -> device validator throws validation errors when devices are missing"""
 
         # Mapping is a dictionary of Modality -> List[Device groups]
         for modality_abbreviation, _ in DEVICES_REQUIRED.items():
-            with self.assertRaises(ValidationError):
+            with pytest.raises(ValidationError):
                 Instrument(
                     modalities=[Modality.from_abbreviation(modality_abbreviation)],
                     instrument_id="123_EPHYS1-OPTO_20220101",
-                    coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+                    global_coordinate_system=BREGMA_ARI,
                     modification_date=date(2020, 10, 10),
                     components=[],
                     calibrations=[],
@@ -522,12 +524,11 @@ class InstrumentTests(unittest.TestCase):
 
         # Mapping is a dictionary of Modality -> List[Device groups]
         for modality_abbreviation, _ in DEVICES_REQUIRED.items():
-
             inst = Instrument(
                 modalities=[Modality.from_abbreviation(modality_abbreviation)],
                 instrument_id="123_EPHYS1-OPTO_20220101",
                 modification_date=date(2020, 10, 10),
-                coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+                global_coordinate_system=BREGMA_ARI,
                 components=[
                     *daqs,
                     *cameras,
@@ -539,14 +540,13 @@ class InstrumentTests(unittest.TestCase):
                     *patch_cords,
                     *stimulus_devices,
                     *objectives,
-                    laser,
                     dmd,
                     scan_stage,
                     microscope,
                 ],
                 calibrations=[],
             )
-            self.assertIsNotNone(inst)
+            assert inst is not None
 
     def test_serialize_modalities(self):
         """Tests that modalities serializer can handle different types"""
@@ -555,17 +555,17 @@ class InstrumentTests(unittest.TestCase):
         instrument_instance_modality = Instrument.model_construct(
             instrument_id="123_EPHYS1-OPTO_20220101",
             modalities={Modality.ECEPHYS},  # Example with a valid Modality instance
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
         )
         instrument_json = instrument_instance_modality.model_dump_json()
         instrument_data = json.loads(instrument_json)
-        self.assertEqual(instrument_data["modalities"], expected_modalities)
+        assert instrument_data["modalities"] == expected_modalities
 
         # Case 2: Modality is a dictionary when Instrument is constructed from JSON
         instrument_dict_modality = Instrument.model_construct(**instrument_data)
         instrument_dict_json = instrument_dict_modality.model_dump_json()
         instrument_dict_data = json.loads(instrument_dict_json)
-        self.assertEqual(instrument_dict_data["modalities"], expected_modalities)
+        assert instrument_dict_data["modalities"] == expected_modalities
 
     def test_coordinate_validator(self):
         """Test the coordinate_validator function"""
@@ -585,7 +585,7 @@ class InstrumentTests(unittest.TestCase):
 
         # Create a matching CameraAssembly
         camera_assembly = CameraAssembly(
-            name="Assembly A",
+            name="Assembly B",
             camera=camera,
             target=CameraTarget.BRAIN,
             relative_position=[AnatomicalRelative.SUPERIOR],
@@ -596,14 +596,13 @@ class InstrumentTests(unittest.TestCase):
             instrument_id="123_EPHYS1-OPTO_20220101",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.ECEPHYS, Modality.FIB],
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,  # order is AP, ML, SI
+            global_coordinate_system=BREGMA_ARI,  # order is AP, ML, SI
             components=[
                 *daqs,
                 *cameras,
                 *stick_microscopes,
                 *light_sources,
                 *lms,
-                laser,
                 *ems,
                 *detectors,
                 *patch_cords,
@@ -621,7 +620,7 @@ class InstrumentTests(unittest.TestCase):
                 )
             ],
         )
-        self.assertIsNotNone(inst)
+        assert inst is not None
 
     def test_instrument_addition(self):
         """Test the __add__ method of Instrument"""
@@ -634,32 +633,32 @@ class InstrumentTests(unittest.TestCase):
         combined = inst1 + inst2
 
         # Verify the combined instrument has the expected properties
-        self.assertEqual(combined.instrument_id, inst1.instrument_id)
-        self.assertEqual(combined.location, inst1.location)
-        self.assertEqual(combined.global_coordinate_system, inst1.global_coordinate_system)
-        self.assertEqual(combined.temperature_control, inst1.temperature_control)
+        assert combined.instrument_id == inst1.instrument_id
+        assert combined.location == inst1.location
+        assert combined.global_coordinate_system == inst1.global_coordinate_system
+        assert combined.temperature_control == inst1.temperature_control
 
         # Check that modalities are combined and sorted (should be the same since we're adding identical instruments)
-        self.assertEqual(len(combined.modalities), len(set(inst1.modalities + inst2.modalities)))
+        assert len(combined.modalities) == len(set(inst1.modalities + inst2.modalities))
 
         # Check that components are deduplicated (same names from both instruments result in keeping only one)
-        self.assertEqual(len(combined.components), len(inst1.components))
+        assert len(combined.components) == len(inst1.components)
 
         # Check that connections are combined
-        self.assertEqual(len(combined.connections), len(inst1.connections) + len(inst2.connections))
+        assert len(combined.connections) == len(inst1.connections) + len(inst2.connections)
 
         # Check that calibrations are combined (if they exist)
         expected_calibrations_len = len(inst1.calibrations or []) + len(inst2.calibrations or [])
         actual_calibrations_len = len(combined.calibrations or [])
-        self.assertEqual(actual_calibrations_len, expected_calibrations_len)
+        assert actual_calibrations_len == expected_calibrations_len
 
         # Test incompatible schema versions
         inst1_orig_schema_v = inst1.schema_version
         inst1.schema_version = "0.1.0"
 
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             inst1 + inst2
-        self.assertIn("Cannot combine Instrument objects with different schema versions", str(context.exception))
+        assert "Cannot combine Instrument objects with different schema versions" in str(context.value)
 
         # Restore schema version for next tests
         inst1.schema_version = inst1_orig_schema_v
@@ -667,34 +666,34 @@ class InstrumentTests(unittest.TestCase):
         # Test that instrument_id differences are merged in alphabetical order
         inst2.instrument_id = "different-instrument-id"
         inst3 = inst1 + inst2
-        self.assertEqual(inst3.instrument_id, "EPHYS1_different-instrument-id")
+        assert inst3.instrument_id == "EPHYS1_different-instrument-id"
 
         # Test incompatible locations
         inst2.instrument_id = inst1.instrument_id  # Reset to same
         inst2.location = "Different Location"
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             inst1 + inst2
-        self.assertIn("Cannot combine Instrument objects that differ in key fields", str(context.exception))
+        assert "Cannot combine Instrument objects that differ in key fields" in str(context.value)
 
         # Test notes combination
         inst2.location = inst1.location  # Reset to same
         inst1.notes = "First note"
         inst2.notes = "Second note"
         combined = inst1 + inst2
-        self.assertIn("First note", combined.notes)
-        self.assertIn("Second note", combined.notes)
-        self.assertIn("\n", combined.notes)  # Should be joined with newline
+        assert "First note" in combined.notes
+        assert "Second note" in combined.notes
+        assert "\n" in combined.notes  # Should be joined with newline
 
         # Test notes combination with None values
         inst1.notes = "Only note"
         inst2.notes = None
         combined = inst1 + inst2
-        self.assertEqual(combined.notes, "Only note")
+        assert combined.notes == "Only note"
 
         inst1.notes = None
         inst2.notes = "Only note"
         combined = inst1 + inst2
-        self.assertEqual(combined.notes, "Only note")
+        assert combined.notes == "Only note"
 
     def test_duplicate_non_harp_device_components(self):
         """Test that duplicate non-HarpDevice components log an error when combining instruments"""
@@ -703,25 +702,25 @@ class InstrumentTests(unittest.TestCase):
             instrument_id="test_inst",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.ECEPHYS],
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
             components=[Computer(name="Computer1")],
         )
         inst2 = Instrument(
             instrument_id="test_inst",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.ECEPHYS],
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
             components=[Computer(name="Computer1")],
         )
 
-        with patch("aind_data_schema.core.instrument.logger") as mock_logger:
+        with patch("biodata_schema.core.instrument.logger") as mock_logger:
             combined = inst1 + inst2
             mock_logger.error.assert_called_once()
             error_call_args = mock_logger.error.call_args[0][0]
-            self.assertIn("Computer1", error_call_args)
-            self.assertIn("duplicated", error_call_args)
+            assert "Computer1" in error_call_args
+            assert "duplicated" in error_call_args
 
-        self.assertEqual(len(combined.components), 1)
+        assert len(combined.components) == 1
 
     def test_duplicate_harp_clock_generator_devices(self):
         """Test that duplicate HarpDevice clock generators are allowed when combining instruments"""
@@ -738,24 +737,24 @@ class InstrumentTests(unittest.TestCase):
             instrument_id="test_inst",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.ECEPHYS],
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
             components=[harp_clock_gen],
         )
         inst2 = Instrument(
             instrument_id="test_inst",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.ECEPHYS],
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
             components=[harp_clock_gen.model_copy(deep=True)],
         )
 
-        with patch("aind_data_schema.core.instrument.logger") as mock_logger:
+        with patch("biodata_schema.core.instrument.logger") as mock_logger:
             combined = inst1 + inst2
             mock_logger.info.assert_called_once()
             info_call_args = mock_logger.info.call_args[0][0]
-            self.assertIn("Harp Clock Generator", info_call_args)
+            assert "Harp Clock Generator" in info_call_args
 
-        self.assertEqual(len(combined.components), 1)
+        assert len(combined.components) == 1
 
     def test_duplicate_non_harp_device_with_clock_generator_attribute(self):
         """Test that duplicate non-HarpDevice components with is_clock_generator log error"""
@@ -778,7 +777,7 @@ class InstrumentTests(unittest.TestCase):
             instrument_id="test_inst",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.BEHAVIOR],
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
             components=[
                 harp_clock_gen,
                 LickSpoutAssembly(
@@ -798,7 +797,7 @@ class InstrumentTests(unittest.TestCase):
             instrument_id="test_inst",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.BEHAVIOR],
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
             components=[
                 harp_non_clock_gen,
                 LickSpoutAssembly(
@@ -815,17 +814,17 @@ class InstrumentTests(unittest.TestCase):
             ],
         )
 
-        with patch("aind_data_schema.core.instrument.logger") as mock_logger:
+        with patch("biodata_schema.core.instrument.logger") as mock_logger:
             combined = inst1 + inst2
             mock_logger.error.assert_called_once()
             error_call_args = mock_logger.error.call_args[0][0]
-            self.assertIn("CustomClockGenerator", error_call_args)
-            self.assertIn("duplicated", error_call_args)
+            assert "CustomClockGenerator" in error_call_args
+            assert "duplicated" in error_call_args
 
-        self.assertEqual(len(combined.components), 3)
+        assert len(combined.components) == 3
 
     def test_validate_unique_component_names(self):
-        """Test that duplicate component names log a warning"""
+        """Test that duplicate component names raise an error"""
         duplicate_component = ephys_instrument.components[0].model_copy(deep=True)
         inst_with_dup = Instrument.model_construct(
             instrument_id=ephys_instrument.instrument_id,
@@ -837,11 +836,9 @@ class InstrumentTests(unittest.TestCase):
             calibrations=ephys_instrument.calibrations,
         )
 
-        with patch("aind_data_schema.core.instrument.logger") as mock_logger:
+        with pytest.raises(ValueError) as context:
             inst_with_dup.validate_unique_component_names()
-            mock_logger.warning.assert_called_once()
-            warning_msg = mock_logger.warning.call_args[0][0]
-            self.assertIn(duplicate_component.name, warning_msg)
+        assert duplicate_component.name in str(context.value)
 
         inst_no_dup = Instrument.model_construct(
             instrument_id=ephys_instrument.instrument_id,
@@ -853,12 +850,110 @@ class InstrumentTests(unittest.TestCase):
             calibrations=ephys_instrument.calibrations,
         )
 
-        with patch("aind_data_schema.core.instrument.logger") as mock_logger:
-            inst_no_dup.validate_unique_component_names()
-            mock_logger.warning.assert_not_called()
+        assert inst_no_dup.validate_unique_component_names() is inst_no_dup
+
+    @pytest.mark.parametrize("endpoint", ["source_device", "target_device"])
+    def test_connections_reject_software_names(self, endpoint):
+        """Software is not a device endpoint even when it is attached to a camera."""
+        camera = Camera(
+            name="Camera",
+            detector_type=DetectorType.CAMERA,
+            manufacturer=Organization.AIND,
+            data_interface="USB",
+            recording_software=Software(name="Bonsai", version="2.5"),
+        )
+        values = dict(
+            instrument_id="rig",
+            modification_date=date(2026, 1, 1),
+            modalities=[],
+            global_coordinate_system=BREGMA_ARI,
+            components=[camera],
+        )
+        instrument = Instrument(**values)
+        assert instrument.get_component_names() == ["Camera", "rig"]
+        endpoints = dict(source_device="Camera", target_device="rig")
+        assert Instrument(**values, connections=[Connection(**endpoints)])
+        endpoints[endpoint] = "Bonsai"
+        with pytest.raises(ValidationError, match="Bonsai.*not part of the instrument"):
+            Instrument(**values, connections=[Connection(**endpoints)])
+
+    def test_shared_software_name_allowed(self):
+        """The same Software recorded on several devices is not a name collision"""
+        shared_software = Software(name="Bonsai", version="2.5")
+
+        def _camera(name):
+            """Build a camera assembly recording with the shared software"""
+            return CameraAssembly(
+                name=name,
+                target=CameraTarget.BRAIN,
+                relative_position=[AnatomicalRelative.SUPERIOR],
+                camera=Camera(
+                    name=f"{name} Detector",
+                    detector_type=DetectorType.CAMERA,
+                    manufacturer=Organization.OTHER,
+                    data_interface="USB",
+                    frame_rate=144,
+                    frame_rate_unit=FrequencyUnit.HZ,
+                    sensor_width=1,
+                    sensor_height=1,
+                    chroma="Color",
+                    notes="Manufacturer unknown",
+                    recording_software=shared_software,
+                ),
+                lens=Lens(name=f"{name} Lens", manufacturer=Organization.OTHER, notes="Manufacturer unknown"),
+            )
+
+        inst = Instrument.model_construct(
+            instrument_id=ephys_instrument.instrument_id,
+            modification_date=ephys_instrument.modification_date,
+            modalities=ephys_instrument.modalities,
+            global_coordinate_system=ephys_instrument.global_coordinate_system,
+            components=[_camera("Camera One"), _camera("Camera Two")],
+            connections=[],
+            calibrations=[],
+        )
+        assert inst.validate_unique_component_names() is inst
+
+    def test_coordinate_system_names_ignored(self):
+        """Names on coordinate systems are not component collisions"""
+        inst = Instrument.model_construct(
+            instrument_id=ephys_instrument.instrument_id,
+            modification_date=ephys_instrument.modification_date,
+            modalities=ephys_instrument.modalities,
+            global_coordinate_system=ephys_instrument.global_coordinate_system,
+            components=[
+                CameraAssembly.model_construct(
+                    name="Camera assembly one",
+                    local_coordinate_system=CoordinateSystem.model_construct(name="Shared coordinate system"),
+                ),
+                CameraAssembly.model_construct(
+                    name="Camera assembly two",
+                    local_coordinate_system=CoordinateSystem.model_construct(name="Shared coordinate system"),
+                ),
+            ],
+            connections=[],
+            calibrations=[],
+        )
+
+        assert inst.validate_unique_component_names() is inst
+
+    def test_distinct_objects_sharing_a_name_rejected(self):
+        """Two different devices with the same name are still a collision"""
+        inst = Instrument.model_construct(
+            instrument_id=ephys_instrument.instrument_id,
+            modification_date=ephys_instrument.modification_date,
+            modalities=ephys_instrument.modalities,
+            global_coordinate_system=ephys_instrument.global_coordinate_system,
+            components=[Disc(name="Shared", radius=1), Disc(name="Shared", radius=2)],
+            connections=[],
+            calibrations=[],
+        )
+        with pytest.raises(ValueError) as context:
+            inst.validate_unique_component_names()
+        assert "Shared" in str(context.value)
 
 
-class ConnectionTest(unittest.TestCase):
+class TestConnection:
     """Test the Connection schema"""
 
     def test_connection(self):
@@ -869,14 +964,14 @@ class ConnectionTest(unittest.TestCase):
             source_port="123",
             target_device="Laser A",
         )
-        self.assertIsNotNone(connection)
+        assert connection is not None
 
         # Test that a simple connection with valid structure is created successfully
         simple_connection = Connection(
             source_device="Camera A",
             target_device="Invalid Target",
         )
-        self.assertIsNotNone(simple_connection)
+        assert simple_connection is not None
 
     def test_validate_modalities_sorting(self):
         """Test that validate_modalities sorts modalities by their name"""
@@ -900,14 +995,13 @@ class ConnectionTest(unittest.TestCase):
             instrument_id="123_EPHYS1-OPTO_20220101",
             modification_date=date(2020, 10, 10),
             modalities=unsorted_modalities,
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
             components=[
                 *daqs,
                 *cameras,
                 *stick_microscopes,
                 *light_sources,
                 *lms,
-                laser,
                 *ems,
                 *detectors,
                 *patch_cords,
@@ -924,8 +1018,4 @@ class ConnectionTest(unittest.TestCase):
 
         inst_modality_abbr = [modality.abbreviation for modality in inst.modalities]
         # Validate that the modalities are sorted
-        self.assertEqual(inst_modality_abbr, expected_sorted_modalities)
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert inst_modality_abbr == expected_sorted_modalities

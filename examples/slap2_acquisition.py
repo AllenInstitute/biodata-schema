@@ -2,38 +2,38 @@
 
 import argparse
 from datetime import datetime, timezone
-from aind_data_schema_models.modalities import Modality
-from aind_data_schema_models.slap2_acquisition_type import Slap2AcquisitionType
-from aind_data_schema_models.units import PowerUnit, SizeUnit, FrequencyUnit, TimeUnit
 
-from aind_data_schema.components.identifiers import Code
+from biodata_models.brain_atlas import CCFv3
+from biodata_models.coordinates import AxisName, Direction
+from biodata_models.modalities import Modality
+from biodata_models.slap2_acquisition_type import Slap2AcquisitionType
+from biodata_models.stimulus_modality import StimulusModality
+from biodata_models.units import FrequencyUnit, PowerUnit, SizeUnit, TimeUnit
 
-from aind_data_schema.components.coordinates import (
-    Translation,
-    Scale,
-    CoordinateSystem,
-    Axis,
-    Origin,
+from biodata_schema.components.configs import (
+    Channel,
+    DetectorConfig,
+    DeviceConfig,
+    ImagingConfig,
+    LaserConfig,
+    NeuronStructure,
+    PlanarImage,
+    Slap2Plane,
+    TriggerType,
 )
-from aind_data_schema_models.coordinates import AxisName, Direction
-from aind_data_schema.core.acquisition import (
+from biodata_schema.components.coordinates import (
+    Axis,
+    CoordinateSystem,
+    Origin,
+    Scale,
+    Translation,
+)
+from biodata_schema.components.identifiers import Code
+from biodata_schema.core.acquisition import (
     Acquisition,
     DataStream,
     StimulusEpoch,
 )
-from aind_data_schema.components.configs import (
-    Channel,
-    DetectorConfig,
-    LaserConfig,
-    TriggerType,
-    ImagingConfig,
-    Slap2Plane,
-    PlanarImage,
-    DeviceConfig,
-    NeuronStructure,
-)
-from aind_data_schema_models.brain_atlas import CCFv3
-from aind_data_schema_models.stimulus_modality import StimulusModality
 
 coordinate_system = CoordinateSystem(
     name="Arbitrary Origin ARI",
@@ -114,7 +114,7 @@ stage_offset_from_origin = None
 
 image_to_acquisition_transform = [
     Scale(
-        scale=[0.25, 0.25],
+        scale=[0.25, 0.25, 1],
     ),
 ]
 if stage_offset_from_origin is not None:
@@ -289,7 +289,7 @@ a = Acquisition(
     instrument_id="SLAP2_1_VCO_1",
     acquisition_type=project_name + ": " + acquisition_type,
     notes="center back of cranial window is coordinate system origin",
-    coordinate_system=coordinate_system,
+    global_coordinate_system=coordinate_system,
     calibrations=[],
     maintenance=[],
     data_streams=[
@@ -332,8 +332,8 @@ a = Acquisition(
                         )
                         for path_idx in range(num_paths)
                         for plane in (
-                            slap2_plane_rois_raster[f"Path {path_idx+1}"]
-                            + slap2_plane_rois_integration[f"Path {path_idx+1}"]
+                            slap2_plane_rois_raster[f"Path {path_idx + 1}"]
+                            + slap2_plane_rois_integration[f"Path {path_idx + 1}"]
                         )
                         for channel_color in active_channels
                     ],

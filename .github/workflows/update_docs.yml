@@ -14,27 +14,25 @@ jobs:
       - uses: actions/checkout@v3
         with:
           token: ${{ secrets.SERVICE_TOKEN }}
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v3
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.0.1
         with:
           python-version: '3.10'
       - name: Install dependencies
-        run: |
-          python -m pip install -e .[dev] --no-cache-dir
+        run: uv sync --locked --group dev
       - name: Bump schema versions
         run: |
-          python -m aind_data_schema.utils.schema_version_bump
+          uv run python -m biodata_schema.utils.schema_version_bump
           echo "Finished schema version bump"
       - name: Update schemas
         run: |
           rm -rf $OUTPUT_DIR
-          python -m pip install -e .
-          python -m aind_data_schema.utils.json_writer --output $OUTPUT_DIR
+          uv run python -m biodata_schema.utils.json_writer --output $OUTPUT_DIR
       - name: Create example schemas
         run: |
           cd examples
           for script in ./*.py; do
-              python "$script"
+              uv run python "$script"
           done
       - name: Commit changes
         uses: EndBug/add-and-commit@v9
@@ -54,13 +52,12 @@ jobs:
           ref: ${{ github.ref }}
       - name: Pull latest changes
         run: git pull origin ${{ github.ref_name }}
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v2
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.0.1
         with:
           python-version: '3.10'
       - name: Install dependencies
-        run: |
-          python -m pip install -e .[dev] -e .[docs] --no-cache-dir
+        run: uv sync --locked --group dev --group docs
       - name: Commit changes
         uses: EndBug/add-and-commit@v9
         with:

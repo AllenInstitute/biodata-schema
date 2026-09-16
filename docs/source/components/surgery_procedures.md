@@ -10,7 +10,7 @@ Description of an anaesthetic
 |-------|------|-------------|
 | `anaesthetic_type` | `str` | Type  |
 | `duration` | `float` | Duration  |
-| `duration_unit` | [TimeUnit](../aind_data_schema_models/units.md#timeunit) | Duration unit  |
+| `duration_unit` | [TimeUnit](../biodata_models/units.md#timeunit) | Duration unit  |
 | `level` | `Optional[float]` | Level (percent)  |
 
 
@@ -22,9 +22,9 @@ Description of an injection procedure into a brain
 |-------|------|-------------|
 | `coordinate_system_name` | `str` | Coordinate system name  |
 | `coordinates` | List[List[[Translation](coordinates.md#translation) or [Rotation](coordinates.md#rotation) or [Scale](coordinates.md#scale) or [Affine](coordinates.md#affine)]] | Injection coordinate, depth, and rotation  |
-| `targeted_structure` | Optional[[BrainAtlas](../aind_data_schema_models/brain_atlas.md#ccfv3)] | Injection targeted brain structure  |
+| `targeted_structure` | Optional[[BrainAtlas](../biodata_models/brain_atlas.md#ccfv3)] | Injection targeted brain structure  |
 | `injection_materials` | List[[ViralMaterial](injection_procedures.md#viralmaterial) or [NonViralMaterial](injection_procedures.md#nonviralmaterial)] | Injection material  |
-| `relative_position` | Optional[List[[AnatomicalRelative](../aind_data_schema_models/coordinates.md#anatomicalrelative)]] | Relative position  |
+| `relative_position` | Optional[List[[AnatomicalRelative](../biodata_models/coordinates.md#anatomicalrelative)]] | Relative position  |
 | `dynamics` | List[[InjectionDynamics](injection_procedures.md#injectiondynamics)] | Injection dynamics (List of injection events, one per location/depth) |
 | `protocol_id` | `Optional[str]` | Protocol ID (DOI for protocols.io) |
 
@@ -35,7 +35,7 @@ Description of a catheter implant procedure
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `where_performed` | [Organization](../aind_data_schema_models/organizations.md#organization) | Where performed  |
+| `where_performed` | [Organization](../biodata_models/organizations.md#organization) | Where performed  |
 | `implanted_device` | [Catheter](devices.md#catheter) | Implanted device  |
 | `device_config` | [CatheterConfig](configs.md#catheterconfig) | Device configuration  |
 
@@ -48,9 +48,9 @@ Description of craniotomy procedure
 |-------|------|-------------|
 | `craniotomy_type` | [CraniotomyType](#craniotomytype) | Craniotomy type  |
 | `coordinate_system_name` | `Optional[str]` | Coordinate system name  |
-| `position` | [Translation](coordinates.md#translation) or List[[AnatomicalRelative](../aind_data_schema_models/coordinates.md#anatomicalrelative)] or NoneType | Craniotomy position  |
+| `position` | [Translation](coordinates.md#translation) or List[[AnatomicalRelative](../biodata_models/coordinates.md#anatomicalrelative)] or NoneType | Craniotomy position  |
 | `size` | `Optional[float]` | Craniotomy size (Diameter or side length) |
-| `size_unit` | Optional[[SizeUnit](../aind_data_schema_models/units.md#sizeunit)] | Craniotomy size unit  |
+| `size_unit` | Optional[[SizeUnit](../biodata_models/units.md#sizeunit)] | Craniotomy size unit  |
 | `protective_material` | Optional[[ProtectiveMaterial](#protectivematerial)] | Protective material  |
 | `implant_part_number` | `Optional[str]` | Implant part number  |
 | `dura_removed` | `Optional[bool]` | Dura removed  |
@@ -78,8 +78,7 @@ Description of a generic device implant procedure
 |-------|------|-------------|
 | `implanted_device` | [Device](devices.md#device) | Implanted device  |
 | `protocol_id` | `Optional[str]` | Protocol ID (DOI for protocols.io) |
-| `relative_position` | List[[AnatomicalRelative](../aind_data_schema_models/coordinates.md#anatomicalrelative)] | Relative position  |
-| <del>`coordinate_system`</del> | Optional[[CoordinateSystem](coordinates.md#coordinatesystem)] | **[DEPRECATED]** Deprecated: use local_coordinate_system instead. Device coordinate system  |
+| `relative_position` | List[[AnatomicalRelative](../biodata_models/coordinates.md#anatomicalrelative)] | Relative position  |
 | `local_coordinate_system` | Optional[[CoordinateSystem](coordinates.md#coordinatesystem)] | Device local coordinate system  |
 | `transform` | Optional[List[[Translation](coordinates.md#translation) or [Rotation](coordinates.md#rotation) or [Scale](coordinates.md#scale) or [Affine](coordinates.md#affine)]] | Local to global transform (Position and orientation of the device in the instrument global coordinate system) |
 
@@ -101,11 +100,11 @@ Ground wire implant procedure
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `ground_electrode_location` | [MouseAnatomyModel](../aind_data_schema_models/external.md#mouseanatomymodel) | Location of ground electrode  |
+| `ground_electrode_location` | [MouseAnatomyModel](../biodata_models/external.md#mouseanatomymodel) | Location of ground electrode  |
 | `ground_wire_hole` | `Optional[int]` | Ground wire hole (For SHIELD implants, the hole number for the ground wire) |
 | `ground_wire_material` | Optional[[GroundWireMaterial](#groundwirematerial)] | Ground wire material  |
 | `ground_wire_diameter` | `Optional[float]` | Ground wire diameter  |
-| `ground_wire_diameter_unit` | Optional[[SizeUnit](../aind_data_schema_models/units.md#sizeunit)] | Ground wire diameter unit  |
+| `ground_wire_diameter_unit` | Optional[[SizeUnit](../biodata_models/units.md#sizeunit)] | Ground wire diameter unit  |
 
 
 ### GroundWireMaterial
@@ -197,7 +196,7 @@ Description of a single sample collection
 | `sample_type` | [SampleType](#sampletype) | Sample type  |
 | `time` | `datetime (timezone-aware)` | Collection time  |
 | `collection_volume` | `float` | Collection volume  |
-| `collection_volume_unit` | [VolumeUnit](../aind_data_schema_models/units.md#volumeunit) | Collection volume unit  |
+| `collection_volume_unit` | [VolumeUnit](../biodata_models/units.md#volumeunit) | Collection volume unit  |
 | `collection_method` | `Optional[str]` | Collection method for terminal collection  |
 
 

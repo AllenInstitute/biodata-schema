@@ -14,20 +14,20 @@ The rig consists of:
 import argparse
 from datetime import date
 
-from aind_data_schema_models.coordinates import AnatomicalRelative
-from aind_data_schema_models.devices import (
+from biodata_models.coordinates import AnatomicalRelative, AxisName, Direction, Origin
+from biodata_models.devices import (
     CameraChroma,
     CameraTarget,
     DataInterface,
     DetectorType,
     FilterType,
 )
-from aind_data_schema_models.modalities import Modality
-from aind_data_schema_models.organizations import Organization
-from aind_data_schema_models.units import SizeUnit
+from biodata_models.modalities import Modality
+from biodata_models.organizations import Organization
+from biodata_models.units import SizeUnit
 
-from aind_data_schema.components.coordinates import CoordinateSystemLibrary
-from aind_data_schema.components.devices import (
+from biodata_schema.components.coordinates import Axis, CoordinateSystem
+from biodata_schema.components.devices import (
     Camera,
     CameraAssembly,
     Computer,
@@ -39,7 +39,18 @@ from aind_data_schema.components.devices import (
     Monitor,
     MotorizedStage,
 )
-from aind_data_schema.core.instrument import Instrument
+from biodata_schema.core.instrument import Instrument
+
+BREGMA_ARI = CoordinateSystem(
+    name="BREGMA_ARI",
+    origin=Origin.BREGMA,
+    axis_unit=SizeUnit.MM,
+    axes=[
+        Axis(name=AxisName.AP, direction=Direction.PA),
+        Axis(name=AxisName.ML, direction=Direction.LR),
+        Axis(name=AxisName.SI, direction=Direction.SI),
+    ],
+)
 
 acquisition_computer = Computer(
     name="Acquisition Computer",
@@ -214,7 +225,7 @@ inst = Instrument(
     instrument_id="ISIV.1",
     modification_date=date(2026, 5, 15),
     modalities=[Modality.ISI],
-    coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+    global_coordinate_system=BREGMA_ARI,
     temperature_control=True,
     notes="",
     components=[

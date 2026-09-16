@@ -2,31 +2,31 @@
 
 import argparse
 from datetime import datetime
-from zoneinfo import ZoneInfo
 from decimal import Decimal
+from zoneinfo import ZoneInfo
 
-from aind_data_schema_models.modalities import Modality
-from aind_data_schema_models.units import TimeUnit, SizeUnit, PowerUnit, VolumeUnit, FrequencyUnit
+from biodata_models.modalities import Modality
+from biodata_models.stimulus_modality import StimulusModality
+from biodata_models.units import FrequencyUnit, PowerUnit, SizeUnit, TimeUnit, VolumeUnit
 
-from aind_data_schema.core.acquisition import (
-    Acquisition,
-    DataStream,
-    StimulusEpoch,
-    AcquisitionSubjectDetails,
-    PerformanceMetrics,
-)
-from aind_data_schema.components.connections import Connection
-from aind_data_schema.components.configs import (
+from biodata_schema.components.configs import (
     Channel,
     DetectorConfig,
-    PatchCordConfig,
-    LightEmittingDiodeConfig,
-    TriggerType,
-    SpeakerConfig,
     DeviceConfig,
+    LightEmittingDiodeConfig,
+    PatchCordConfig,
+    SpeakerConfig,
+    TriggerType,
 )
-from aind_data_schema.components.identifiers import Code
-from aind_data_schema_models.stimulus_modality import StimulusModality
+from biodata_schema.components.connections import Connection
+from biodata_schema.components.identifiers import Code
+from biodata_schema.core.acquisition import (
+    Acquisition,
+    AcquisitionSubjectDetails,
+    DataStream,
+    PerformanceMetrics,
+    StimulusEpoch,
+)
 
 # The session date from the JSON file is 2024-01-15 with timezone -08:00
 t_start = datetime(2024, 1, 15, 15, 56, 28, tzinfo=ZoneInfo("America/Los_Angeles"))
@@ -323,6 +323,7 @@ stimulus_epoch = StimulusEpoch(
             "frequency": [5, 8, 13],
             "frequency_unit": FrequencyUnit.KHZ,
         },
+        version="0.0.1",
     ),
     performance_metrics=PerformanceMetrics(
         reward_consumed_during_epoch=Decimal("414"),

@@ -1,13 +1,13 @@
 # Contributor Guidelines
 
-Contributions to `aind-data-schema` must follow certain rules to ensure stability and organization. This document will go through best practices for contributing to this project
+Contributions to `biodata-schema` must follow certain rules to ensure stability and organization. This document will go through best practices for contributing to this project
 
 ## Issues and Feature Requests
 
-Feature requests and bug reports are all welcome as [issues](https://github.com/AllenNeuralDynamics/aind-data-schema/issues). Create a ticket using the provided [templates](https://github.com/AllenNeuralDynamics/aind-metadata-mapper/issues/new/choose) to ensure we have enough information to work with.
+Feature requests and bug reports are all welcome as [issues](https://github.com/AllenNeuralDynamics/biodata-schema/issues). Create a ticket using the provided [templates](https://github.com/AllenNeuralDynamics/aind-metadata-mapper/issues/new/choose) to ensure we have enough information to work with.
 Our team will review, assign, and address the ticket. If the ticket is urgent, you may tag a dedicated engineer in the issue but please refrain from assigning it.
 
-If you have a broader suggestion or a question about how things work, start a new [Discussion](https://github.com/AllenNeuralDynamics/aind-data-schema/discussions)!
+If you have a broader suggestion or a question about how things work, start a new [Discussion](https://github.com/AllenNeuralDynamics/biodata-schema/discussions)!
 
 ## Installation and Development
 
@@ -15,40 +15,33 @@ To develop the software, *clone* the repository and create a new branch for your
 Please do not fork this repository unless you are an external developer.
 
 ```bash
-git clone git@github.com:AllenNeuralDynamics/aind-data-schema.git
-cd aind-data-schema
+git clone git@github.com:AllenNeuralDynamics/biodata-schema.git
+cd biodata-schema
 git checkout -b my-new-feature-branch
 ```
 
-It's recommended you work in an isolated virtual environment.
+Install the development environment with [uv](https://docs.astral.sh/uv/):
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate  # (unix)
-```
-
-Then run the following command in the checked out directory.
-
-```bash
-pip install -e .[dev]
+uv sync --dev
 ```
 
 ### Upgrades
 
-Starting with the v2.0 release all changes must be accompanied by an [upgrader](https://github.com/AllenNeuralDynamics/aind-metadata-upgrader/) that converts valid metadata from the latest version tag of `aind-data-schema` to valid metadata in the version tag where your changes are introduced. Breaking changes are exempt from this requirement.
+Starting with the v2.0 release all changes must be accompanied by an [upgrader](https://github.com/AllenNeuralDynamics/aind-metadata-upgrader/) that converts valid metadata from the latest version tag of `biodata-schema` to valid metadata in the version tag where your changes are introduced. Breaking changes are exempt from this requirement.
 
 ### Documentation
 
-Documentation is automatically built when you open a PR into the aind-data-schema repository. For **core files, please make sure that you modify the base file**, these are used to construct the source files: i.e. `docs/base/core/acquisition.md` will over-write any changes made to `docs/source/acquisition.md`. 
+Documentation is automatically built when you open a PR into the biodata-schema repository. For **core files, please make sure that you modify the base file**, these are used to construct the source files: i.e. `docs/base/core/acquisition.md` will over-write any changes made to `docs/source/acquisition.md`.
 
 #### Manually build documentation
 
 To generate the source files for the documentation and model class links, run:
 
-```python
-python src/aind_data_schema/utils/docs/model_generator.py
-python src/aind_data_schema/utils/docs/registries_generator.py
-python src/aind_data_schema/utils/docs/doc_generator.py
+```bash
+uv run python src/biodata_schema/utils/docs/model_generator.py
+uv run python src/biodata_schema/utils/docs/registries_generator.py
+uv run python src/biodata_schema/utils/docs/doc_generator.py
 ```
 
 The front page embeds an interactive React Flow diagram of the `Metadata` schema (`diagram-app/`). Build its JS/CSS bundle once before building the docs (it's git-ignored and only needs rebuilding when `diagram-app/` changes):
@@ -61,7 +54,7 @@ npm --prefix diagram-app run build
 Then to create the documentation html files, run:
 
 ```bash
-sphinx-build -b html docs/source/ docs/build/html
+uv run sphinx-build -b html docs/source/ docs/build/html
 ```
 
 This also (re)generates `docs/source/_static/schema-diagram/schema_diagram.json`, the data the diagram reads at runtime, from the current schema classes.
@@ -77,69 +70,47 @@ Testing is required to open a PR in this repository to ensure robustness and rel
   - For every method in a module, there should be a corresponding unit test.
   - For complicated functions, keep unit test functions small and interpretable.
 - **Test Coverage:** Aim for comprehensive test coverage to validate all critical paths and edge cases within the module. To open a PR, you will need at least 80% coverage. 
-  - Please test your changes using the **coverage** library, which will run the tests and log a coverage report:
+  - Please test your changes using pytest and coverage:
 
     ```bash
-    coverage run -m unittest discover && coverage report
+    uv run pytest --cov=biodata_schema --cov=tests --cov-report=term-missing
     ```
 
     To open the coverage report in a browser, you can run
 
     ```bash
-    coverage html
+    uv run coverage html
     ```
     and find the report in the htmlcov/index.html.
 
-To run a single unit test file you can use
+To run a single test file you can use
 
 ```bash
-coverage run -m unittest tests/your_test.py
+uv run pytest tests/your_test.py
+```
+
+Tests that require external services are marked `online` and can be run explicitly with:
+
+```bash
+uv run pytest --run-online
 ```
 
 ### Linters
 
-There are several libraries used to run linters and check documentation. We've included these in the development package. You can run them as described [here](https://github.com/AllenNeuralDynamics/aind-metadata-mapper/blob/main/README.md#linters-and-testing).
+Run the test suite and Ruff checks with:
 
-- To run tests locally, navigate to AIND-DATA-SCHEMA directory in terminal and run (this will not run any on-line only tests):
+```bash
+uv run pytest
+uv run ruff check .
+uv run ruff format --check .
+uv run codespell src examples tests
+```
 
-  ```
-  python -m unittest
-  ```
-- To test any of the following modules, conda/pip install the relevant package (interrogate, flake8, black, isort), navigate to relevant directory, and run any of the following commands in place of [command]:
-
-  ```
-  [command] -v . 
-  ```
-
-- Use **interrogate** to check that modules, methods, etc. have been documented thoroughly:
-
-  ```
-  interrogate .
-  ```
-  For more information you can run
-  ```interrogate --verbose .```
-
-- Use **flake8** to check that code is up to standards (no unused imports, etc.):
-
-  ```
-  flake8 .
-  ```
-
-- Use **black** to automatically format the code into PEP standards:
-
-  ```
-  black .
-  ```
-
-- Use **isort** to automatically sort import statements:
-  
-  ```
-  isort .
-  ```
+Use `uv run ruff format .` to apply Ruff's formatting.
 **NOTE**: Please note that these linters are automatically run in github actions when a PR is opened. These linters must pass for a PR to merge. 
 
 ### Units
-Unit types (i.e. anything from [aind_data_schema_models.units](https://github.com/AllenNeuralDynamics/aind-data-schema-models/blob/main/src/aind_data_schema_models/units.py)) should always be paired with a variable in one of two patterns.
+Unit types (i.e. anything from [biodata_models.units](https://github.com/AllenNeuralDynamics/biodata-models/blob/main/src/biodata_models/units.py)) should always be paired with a variable in one of two patterns.
 
 When you have a single `variable` with a unit, you should add the `_unit` suffix on the name of the unit:
 
@@ -186,7 +157,7 @@ When you are ready to open a pull request, please link any relevant issues and r
 ## Release
 
 - From dev, create a branch called release-vX.Y.Z
-- Manually increment the version number in the aind_data_schema/__init__.py file to match
+- Manually increment the version number in the biodata_schema/__init__.py file to match
 - Manually increment the major/minor/patch versions of the core files as needed
 - Push the branch and open a PR into main
 - After this push, any last minute changes to the release-vX.Y.Z will have to done to via a PR

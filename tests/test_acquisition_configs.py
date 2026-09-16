@@ -1,14 +1,13 @@
 """Tests for the configs module"""
 
-import unittest
 from decimal import Decimal
 
-from aind_data_schema_models.brain_atlas import CCFv3
-from aind_data_schema_models.units import AngleUnit, FrequencyUnit, SizeUnit, TimeUnit, VolumeUnit
+import pytest
+from biodata_models.brain_atlas import CCFv3
+from biodata_models.units import AngleUnit, FrequencyUnit, SizeUnit, TimeUnit, VolumeUnit
 from pydantic import ValidationError
 
-from aind_data_schema.components.configs import (
-    AirPuffConfig,
+from biodata_schema.components.configs import (
     Channel,
     DetectorConfig,
     ImageSPIM,
@@ -25,10 +24,11 @@ from aind_data_schema.components.configs import (
     SubjectPosition,
     Valence,
 )
-from aind_data_schema.components.coordinates import Affine, CoordinateSystemLibrary, Translation
+from biodata_schema.components.coordinates import Affine, Translation
+from tests.coordinate_systems import SPIM_IJK
 
 
-class TestMRIScan(unittest.TestCase):
+class TestMRIScan:
     """Tests for the MRIScan class"""
 
     def test_validate_non_setup_success(self):
@@ -58,7 +58,7 @@ class TestMRIScan(unittest.TestCase):
             ),
             resolution_unit=SizeUnit.MM,
         )
-        self.assertIsNotNone(scan)
+        assert scan is not None
 
     def test_validate_non_setup_failure(self):
         """Test validate_non_setup method with invalid primary scan data"""
@@ -73,13 +73,13 @@ class TestMRIScan(unittest.TestCase):
             "subject_position": SubjectPosition.PRONE,
             "additional_scan_parameters": {},
         }
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             MRIScan(**invalid_data)
 
     def test_validate_primary_missing_fields(self):
         """Test that missing fields raise ValidationError"""
 
-        with self.assertRaises(ValidationError) as context:
+        with pytest.raises(ValidationError) as context:
             MRIScan(
                 device_name="MRI Scanner",
                 index=1,
@@ -95,10 +95,10 @@ class TestMRIScan(unittest.TestCase):
                 resolution_unit=SizeUnit.MM,
             )
 
-        self.assertIn("Primary scan must have affine_transform and resolution fields", str(context.exception))
+        assert "Primary scan must have affine_transform and resolution fields" in str(context.value)
 
 
-class TestLickSpoutConfig(unittest.TestCase):
+class TestLickSpoutConfig:
     """Tests for the LickSpoutConfig class"""
 
     def test_validate_other_success(self):
@@ -111,11 +111,11 @@ class TestLickSpoutConfig(unittest.TestCase):
             volume_unit=VolumeUnit.ML,
             relative_position=[],
         )
-        self.assertIsNotNone(lick_spout)
+        assert lick_spout is not None
 
     def test_validate_other_failure(self):
         """Test validate_other method with invalid data"""
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             LickSpoutConfig(
                 device_name="Spout1",
                 solution=Liquid.OTHER,
@@ -124,16 +124,16 @@ class TestLickSpoutConfig(unittest.TestCase):
                 volume_unit=VolumeUnit.ML,
                 relative_position=[],
             )
-        self.assertIn(
-            "Notes cannot be empty if LickSpoutConfig.solution is Other." "Describe the solution in the notes field.",
-            str(context.exception),
+        assert (
+            "Notes cannot be empty if LickSpoutConfig.solution is Other."
+            "Describe the solution in the notes field." in str(context.value)
         )
 
 
-class TestImagingConfig(unittest.TestCase):
+class TestImagingConfig:
     """Tests for the ImagingConfig class"""
 
-    def setUp(self):
+    def setup_method(self):
         """Set up common test data"""
         self.channel1 = Channel(
             channel_name="Channel1",
@@ -163,7 +163,7 @@ class TestImagingConfig(unittest.TestCase):
                 )
             ],
         )
-        self.coordinate_system = CoordinateSystemLibrary.SPIM_IJK
+        self.coordinate_system = SPIM_IJK
         self.sampling_strategy = SamplingStrategy(
             frame_rate=30.0,
             frame_rate_unit=FrequencyUnit.HZ,
@@ -197,13 +197,13 @@ class TestImagingConfig(unittest.TestCase):
                 ),
             ],
             sampling_strategy=self.sampling_strategy,
-            coordinate_system=self.coordinate_system,
+            local_coordinate_system=self.coordinate_system,
         )
-        self.assertIsNotNone(imaging_config)
+        assert imaging_config is not None
 
     def test_check_image_channels_failure(self):
         """Test check_image_channels validator with invalid data"""
-        with self.assertRaises(ValidationError) as context:
+        with pytest.raises(ValidationError) as context:
             ImagingConfig(
                 device_name="ImagingDevice",
                 channels=[self.channel1],
@@ -230,12 +230,9 @@ class TestImagingConfig(unittest.TestCase):
                     )
                 ],
                 sampling_strategy=self.sampling_strategy,
-                coordinate_system=self.coordinate_system,
+                local_coordinate_system=self.coordinate_system,
             )
-        self.assertIn(
-            "Channel InvalidChannel must be defined in the ImagingConfig.channels list",
-            str(context.exception),
-        )
+        assert "Channel InvalidChannel must be defined in the ImagingConfig.channels list" in str(context.value)
 
     def test_require_cs_images_success(self):
         """Test require_cs_images validator with valid data"""
@@ -253,13 +250,13 @@ class TestImagingConfig(unittest.TestCase):
                     imaging_angle_unit=AngleUnit.DEG,
                 ),
             ],
-            coordinate_system=self.coordinate_system,
+            local_coordinate_system=self.coordinate_system,
         )
-        self.assertIsNotNone(imaging_config)
+        assert imaging_config is not None
 
     def test_require_cs_images_failure(self):
         """Test require_cs_images validator with missing coordinate system"""
-        with self.assertRaises(ValidationError) as context:
+        with pytest.raises(ValidationError) as context:
             ImagingConfig(
                 device_name="ImagingDevice",
                 channels=[self.channel1],
@@ -274,31 +271,13 @@ class TestImagingConfig(unittest.TestCase):
                         imaging_angle_unit=AngleUnit.DEG,
                     ),
                 ],
-                coordinate_system=None,
+                local_coordinate_system=None,
             )
-        self.assertIn(
-            "ImagingConfig.local_coordinate_system is required when ImagingConfig.images are ImageSPIM objects",
-            str(context.exception),
+        assert (
+            "ImagingConfig.local_coordinate_system is required when ImagingConfig.images are ImageSPIM objects"
+            in str(context.value)
         )
 
 
-class TestAirPuffConfig(unittest.TestCase):
+class TestAirPuffConfig:
     """Tests for the AirPuffConfig class"""
-
-    def test_migrate_deprecated_coordinate_system(self):
-        """Test that deprecated coordinate_system is copied to local_coordinate_system"""
-        import warnings
-
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            config = AirPuffConfig(
-                device_name="AirPuff1",
-                relative_position=[],
-                coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
-            )
-        self.assertEqual(config.local_coordinate_system, CoordinateSystemLibrary.BREGMA_ARI)
-        self.assertTrue(any(issubclass(warning.category, DeprecationWarning) for warning in w))
-
-
-if __name__ == "__main__":
-    unittest.main()

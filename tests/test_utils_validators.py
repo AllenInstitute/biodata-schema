@@ -1,19 +1,32 @@
 """Tests for compatibility check utilities"""
 
-import unittest
-from datetime import date, datetime, timezone, timedelta
+from datetime import date, datetime, timedelta, timezone
 from enum import Enum
 from pathlib import Path
 from typing import Annotated
 from unittest.mock import MagicMock, patch
 
+import pytest
+from biodata_models.units import SizeUnit, VolumeUnit
 from pydantic import BaseModel
 from pydantic_extra_types.timezone_name import TimeZoneName
 
-from aind_data_schema.base import AwareDatetimeWithDefault, DataModel
-from aind_data_schema.components.coordinates import Rotation, Scale, Translation
-from aind_data_schema.components.wrappers import AssetPath
-from aind_data_schema.utils.validators import (
+from biodata_schema.base import AwareDatetimeWithDefault, DataModel
+from biodata_schema.components.configs import DeviceConfig, ManipulatorConfig
+from biodata_schema.components.coordinates import (
+    Affine,
+    AtlasCoordinate,
+    AtlasLibrary,
+    ReferenceCoordinateSystem,
+    Rotation,
+    Scale,
+    Translation,
+)
+from biodata_schema.components.injection_procedures import InjectionDynamics, InjectionProfile, ViralMaterial
+from biodata_schema.components.specimen_procedures import PlanarSection
+from biodata_schema.components.surgery_procedures import BrainInjection
+from biodata_schema.components.wrappers import AssetPath
+from biodata_schema.utils.validators import (
     TimeValidation,
     _convert_to_comparable,
     _recurse_helper,
@@ -28,22 +41,23 @@ from aind_data_schema.utils.validators import (
     subject_specimen_id_compatibility,
     validate_creation_time_after_midnight,
 )
+from tests.coordinate_systems import BREGMA_ARI
 
 
-class TestCompatibilityCheck(unittest.TestCase):
+class TestCompatibilityCheck:
     """Tests compatibility checks"""
 
     def test_subj_spec_valid(self):
         """Test subject_id specimen_id valid"""
         subject_id = "123456"
         specimen_id = "123456-valid"
-        self.assertTrue(subject_specimen_id_compatibility(subject_id, specimen_id))
+        assert subject_specimen_id_compatibility(subject_id, specimen_id)
 
     def test_subj_spec_invalid(self):
         """Test invalid subject_id specimen_id"""
         subject_id = "123456"
         specimen_id = "invalid"
-        self.assertFalse(subject_specimen_id_compatibility(subject_id, specimen_id))
+        assert not subject_specimen_id_compatibility(subject_id, specimen_id)
 
 
 class TranslationWrapper(DataModel):
@@ -53,10 +67,10 @@ class TranslationWrapper(DataModel):
     translation: Translation
 
 
-class TestRecurseHelper(unittest.TestCase):
+class TestRecurseHelper:
     """Tests for _recurse_helper function"""
 
-    def setUp(self):
+    def setup_method(self):
         """Set up test data"""
         self.coordinate_system_name = "BREGMA_ARI"
 
@@ -88,11 +102,23 @@ class TestRecurseHelper(unittest.TestCase):
         )
         _recurse_helper(data, coordinate_system_name=self.coordinate_system_name, axis_count=2)
 
+    def test_recurse_helper_skips_callable_attributes(self):
+        """Test _recurse_helper skips methods while traversing an object."""
 
-class TestRecursiveSystemCheckHelper(unittest.TestCase):
+        class ObjectWithCallable:
+            """Object containing a callable and a transform."""
+
+            def __init__(self):
+                self.callback = lambda: None
+                self.translation = Translation(translation=[0.5, 1])
+
+        _recurse_helper(ObjectWithCallable(), coordinate_system_name=self.coordinate_system_name, axis_count=2)
+
+
+class TestRecursiveSystemCheckHelper:
     """Test for _system_check_helper function"""
 
-    def setUp(self):
+    def setup_method(self):
         """Set up test data"""
         self.coordinate_system_name = "BREGMA_ARI"
         self.translation_wrapper = TranslationWrapper(
@@ -106,27 +132,27 @@ class TestRecursiveSystemCheckHelper(unittest.TestCase):
 
     def test_system_check_helper_missing_system_name(self):
         """Test _system_check_helper with missing coordinate_system_name"""
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             _system_check_helper(self.translation_wrapper, None, axis_count=2)
 
     def test_system_check_helper_missing_axis_count(self):
         """Test _system_check_helper with missing axis_count"""
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             _system_check_helper(self.translation_wrapper, self.coordinate_system_name, axis_count=None)
 
     def test_system_check_helper_wrong_system_name(self):
         """Test _system_check_helper with wrong coordinate_system_name"""
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             _system_check_helper(self.translation_wrapper, "WRONG_SYSTEM", axis_count=2)
-        self.assertIn("WRONG_SYSTEM", str(context.exception))
-        self.assertIn(self.coordinate_system_name, str(context.exception))
+        assert "WRONG_SYSTEM" in str(context.value)
+        assert self.coordinate_system_name in str(context.value)
 
     def test_system_check_helper_wrong_axis_count(self):
         """Test _system_check_helper with wrong axis_count"""
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             _system_check_helper(self.translation_wrapper, self.coordinate_system_name, axis_count=3)
-        self.assertIn("3", str(context.exception))
-        self.assertIn("2", str(context.exception))
+        assert "3" in str(context.value)
+        assert "2" in str(context.value)
 
     def test_system_check_helper_multiple_axis_types(self):
         """Test _system_check_helper with multiple axis types"""
@@ -150,10 +176,10 @@ class TestRecursiveSystemCheckHelper(unittest.TestCase):
         # No exception means test passed
 
 
-class TestRecursiveCoordSystemCheck(unittest.TestCase):
+class TestRecursiveCoordSystemCheck:
     """Tests for recursive_coord_system_check function"""
 
-    def setUp(self):
+    def setup_method(self):
         """Set up test data"""
         self.coordinate_system_name = "BREGMA_ARI"
 
@@ -175,10 +201,10 @@ class TestRecursiveCoordSystemCheck(unittest.TestCase):
                 translation=[0.5, 1],
             ),
         )
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             recursive_coord_system_check(data, self.coordinate_system_name, axis_count=2)
 
-        self.assertIn("System name mismatch", str(context.exception))
+        assert "System name mismatch" in str(context.value)
 
     def test_recursive_coord_system_check_with_empty_data(self):
         """Test recursive_coord_system_check with empty data"""
@@ -211,10 +237,10 @@ class TestRecursiveCoordSystemCheck(unittest.TestCase):
                 translation=[0.5, 1, 2],
             ),
         )
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             recursive_coord_system_check(data, self.coordinate_system_name, axis_count=2)
 
-        self.assertIn("Axis count mismatch", str(context.exception))
+        assert "Axis count mismatch" in str(context.value)
 
     def test_recursive_coord_system_check_with_missing_coordinate_system(self):
         """Test recursive_coord_system_check with missing coordinate system for object WITH transforms"""
@@ -224,10 +250,20 @@ class TestRecursiveCoordSystemCheck(unittest.TestCase):
             coordinate_system_name=self.coordinate_system_name, translation=Translation(translation=[0.5, 1])
         )
 
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             recursive_coord_system_check(data, None, axis_count=0)
 
-        self.assertIn("CoordinateSystem is required", str(context.exception))
+        assert "CoordinateSystem is required" in str(context.value)
+
+    def test_recursive_coord_system_check_direct_transform_requires_coordinate_system(self):
+        """Test direct transforms require a coordinate system."""
+        data = Translation(
+            translation=[0.5, 1],
+            reference_coordinate_system=ReferenceCoordinateSystem.LOCAL,
+        )
+
+        with pytest.raises(ValueError, match="CoordinateSystem is required"):
+            recursive_coord_system_check(data, None, axis_count=None)
 
     def test_recursive_coord_system_check_object_without_transforms(self):
         """Test recursive_coord_system_check with object without transforms (should not require coordinate system)"""
@@ -277,12 +313,111 @@ class TestRecursiveCoordSystemCheck(unittest.TestCase):
                 coordinate_system_name=self.coordinate_system_name, translation=Translation(translation=[0.5, 1])
             ),
             without_transform=ObjectWithoutTransforms(
-                coordinate_system_name="any_name", some_field="test"  # This can be anything since no transforms
+                coordinate_system_name="any_name",
+                some_field="test",  # This can be anything since no transforms
             ),
         )
 
         # Should pass validation - only the object with transforms is checked
         recursive_coord_system_check(container, self.coordinate_system_name, axis_count=2)
+
+
+@pytest.mark.parametrize("system_name", ["ARI", "", "NONEXISTENT"])
+def test_section_requires_exact_system_name(system_name):
+    """A substring of the coordinate system name is not a valid reference."""
+    section = PlanarSection(
+        output_specimen_id="123456_001",
+        coordinate_system_name=system_name,
+        start_coordinate=Translation(translation=[0, 0, 0]),
+        thickness=0.1,
+        thickness_unit=SizeUnit.MM,
+    )
+    with pytest.raises(ValueError, match="System name mismatch"):
+        recursive_coord_system_check(section, "BREGMA_ARI", 3)
+
+
+@pytest.mark.parametrize("field_name", ["start_coordinate", "end_coordinate"])
+def test_section_checks_coordinate_dimensions(field_name):
+    """Both endpoints use the containing coordinate system's dimensions."""
+    values = dict(
+        output_specimen_id="123456_001",
+        coordinate_system_name="BREGMA_ARI",
+        start_coordinate=Translation(translation=[0, 0, 0]),
+        end_coordinate=Translation(translation=[0, 0, 1]),
+    )
+    values[field_name] = Translation(translation=[0, 0])
+    with pytest.raises(ValueError, match="Axis count mismatch"):
+        recursive_coord_system_check(PlanarSection(**values), "BREGMA_ARI", 3)
+
+
+@pytest.mark.parametrize(
+    "system_name, axis_count, coordinate, error",
+    [
+        (None, None, [0, 0, 0], "CoordinateSystem is required"),
+        ("OTHER", 3, [0, 0, 0], "System name mismatch"),
+        ("BREGMA_ARI", 3, [0, 0], "Axis count mismatch"),
+    ],
+)
+def test_injection_checks_nested_transform_lists(system_name, axis_count, coordinate, error):
+    """Nested injection coordinates must not bypass frame validation."""
+    injection = BrainInjection(
+        coordinate_system_name="BREGMA_ARI",
+        coordinates=[[Translation(translation=coordinate)]],
+        injection_materials=[ViralMaterial(name="example")],
+        dynamics=[InjectionDynamics(profile=InjectionProfile.BOLUS, volume=1, volume_unit=VolumeUnit.UL)],
+    )
+    with pytest.raises(ValueError, match=error):
+        recursive_coord_system_check(injection, system_name, axis_count)
+
+
+@pytest.mark.parametrize(
+    "transform",
+    [
+        Translation(translation=[0, 0]),
+        Rotation(angles=[0, 0]),
+        Scale(scale=[1, 1]),
+        Affine(affine_transform=[[1, 0, 0]]),
+    ],
+)
+def test_device_transform_dimensions(transform):
+    """Device transform lists are validated without a coordinate_system_name field."""
+
+    class Config(DeviceConfig):
+        """Device config with a transform list."""
+
+        transform: list[Translation | Rotation | Scale | Affine]
+
+    with pytest.raises(ValueError, match="Axis count mismatch"):
+        recursive_coord_system_check(Config(device_name="probe", transform=[transform]), "BREGMA_ARI", 3)
+
+
+def test_measured_coordinate_dictionary():
+    """Measured coordinates inside mappings retain their containing frame."""
+    with pytest.raises(ValueError, match="Axis count mismatch"):
+        recursive_coord_system_check({"lambda": Translation(translation=[-4.1, 0])}, "BREGMA_ARI", 3)
+
+
+def test_local_and_atlas_coordinate_frames():
+    """Local positions and atlas coordinates use their own frames."""
+    manipulator = ManipulatorConfig(
+        device_name="manipulator",
+        local_coordinate_system=BREGMA_ARI,
+        local_axis_positions=Translation(translation=[0, 0, 0]),
+    )
+    recursive_coord_system_check(manipulator, None, None)
+    recursive_coord_system_check(
+        AtlasCoordinate(translation=[0, 0, 0], coordinate_system=AtlasLibrary.CCFv3_10um), None, None
+    )
+    recursive_coord_system_check(
+        Translation(translation=[0, 0, 1], reference_coordinate_system=ReferenceCoordinateSystem.LOCAL),
+        "planar",
+        2,
+        local_coordinate_system=BREGMA_ARI,
+    )
+    with pytest.raises(ValueError, match="Axis count mismatch"):
+        recursive_coord_system_check(
+            Translation(translation=[0, 0, 1]), "planar", 2, local_coordinate_system=BREGMA_ARI
+        )
 
 
 class MockEnum(Enum):
@@ -329,14 +464,14 @@ class ModelWithNonDataModelChild(DataModel):
     non_data_child: NonDataModel
 
 
-class TestRecursiveGetAllNames(unittest.TestCase):
+class TestRecursiveGetAllNames:
     """Tests for recursive_get_all_names function"""
 
     def test_single_level(self):
         """Test single level model"""
         model = NestedModel(name="test_name", value=42)
         result = recursive_get_all_names(model)
-        self.assertEqual(result, ["test_name"])
+        assert result == ["test_name"]
 
     def test_nested_model(self):
         """Test nested model"""
@@ -348,7 +483,7 @@ class TestRecursiveGetAllNames(unittest.TestCase):
             enum_field=MockEnum.VALUE1,
         )
         result = recursive_get_all_names(model)
-        self.assertEqual(result, ["complex_name", "nested_name"])
+        assert result == ["complex_name", "nested_name"]
 
     def test_nested_list(self):
         """Test model with nested list"""
@@ -362,13 +497,13 @@ class TestRecursiveGetAllNames(unittest.TestCase):
             enum_field=MockEnum.VALUE1,
         )
         result = recursive_get_all_names(model)
-        self.assertEqual(result, ["complex_name", "nested_name0", "nested_name1", "nested_name2"])
+        assert result == ["complex_name", "nested_name0", "nested_name1", "nested_name2"]
 
     def test_empty_model(self):
         """Test empty model"""
         model = None
         result = recursive_get_all_names(model)
-        self.assertEqual(result, [])
+        assert result == []
 
     def test_enum_field(self):
         """Test model with enum field"""
@@ -380,7 +515,7 @@ class TestRecursiveGetAllNames(unittest.TestCase):
             enum_field=MockEnum.VALUE1,
         )
         result = recursive_get_all_names(model)
-        self.assertEqual(result, ["complex_name", "nested_name"])
+        assert result == ["complex_name", "nested_name"]
 
     def test_multi_level(self):
         """Test multi-level nesting"""
@@ -393,21 +528,21 @@ class TestRecursiveGetAllNames(unittest.TestCase):
         )
         parent_model = ComplexParentModel(name="parent_name", child=model)
         result = recursive_get_all_names(parent_model)
-        self.assertEqual(result, ["parent_name", "complex_name", "nested_name"])
+        assert result == ["parent_name", "complex_name", "nested_name"]
 
     def test_non_data_model_child_ignored(self):
         """Test that names from non-DataModel objects (without object_type) are not extracted"""
         non_data_child = NonDataModel(name="should_be_ignored", value=42)
         model = ModelWithNonDataModelChild(name="parent_name", non_data_child=non_data_child)
         result = recursive_get_all_names(model)
-        self.assertEqual(result, ["parent_name"])
+        assert result == ["parent_name"]
 
 
-class TestRecursiveCheckPaths(unittest.TestCase):
+class TestRecursiveCheckPaths:
     """Tests for recursive_check_paths function"""
 
     @patch("pathlib.Path.exists")
-    @patch("aind_data_schema.utils.validators.logger")
+    @patch("biodata_schema.utils.validators.logger")
     def test_path_exists(self, mock_warning: MagicMock, mock_exists: MagicMock):
         """Test when the path exists"""
         mock_exists.return_value = True
@@ -418,7 +553,7 @@ class TestRecursiveCheckPaths(unittest.TestCase):
         mock_warning.warning.assert_not_called()
 
     @patch("pathlib.Path.exists")
-    @patch("aind_data_schema.utils.validators.logger")
+    @patch("biodata_schema.utils.validators.logger")
     def test_path_does_not_exist(self, mock_warning: MagicMock, mock_exists: MagicMock):
         """Test when the path does not exist"""
         mock_exists.return_value = False
@@ -430,7 +565,7 @@ class TestRecursiveCheckPaths(unittest.TestCase):
         )
 
     @patch("pathlib.Path.exists")
-    @patch("aind_data_schema.utils.validators.logger")
+    @patch("biodata_schema.utils.validators.logger")
     def test_nested_paths_in_list(self, mock_warning: MagicMock, mock_exists: MagicMock):
         """Test nested paths in a list"""
         mock_exists.side_effect = [True, False]
@@ -442,7 +577,7 @@ class TestRecursiveCheckPaths(unittest.TestCase):
         )
 
     @patch("pathlib.Path.exists")
-    @patch("aind_data_schema.utils.validators.logger")
+    @patch("biodata_schema.utils.validators.logger")
     def test_nested_paths_in_dict(self, mock_warning: MagicMock, mock_exists: MagicMock):
         """Test nested paths in a dictionary"""
         mock_exists.side_effect = [False, True]
@@ -454,7 +589,7 @@ class TestRecursiveCheckPaths(unittest.TestCase):
         )
 
     @patch("pathlib.Path.exists")
-    @patch("aind_data_schema.utils.validators.logger")
+    @patch("biodata_schema.utils.validators.logger")
     def test_nested_paths_in_object(self, mock_warning: MagicMock, mock_exists: MagicMock):
         """Test nested paths in a custom object"""
 
@@ -475,7 +610,7 @@ class TestRecursiveCheckPaths(unittest.TestCase):
         )
 
     @patch("pathlib.Path.exists")
-    @patch("aind_data_schema.utils.validators.logger")
+    @patch("biodata_schema.utils.validators.logger")
     def test_no_paths(self, mock_warning: MagicMock, mock_exists: MagicMock):
         """Test when no paths are present"""
         data = {"key": "value", "list": [1, 2, 3]}
@@ -484,20 +619,19 @@ class TestRecursiveCheckPaths(unittest.TestCase):
 
     @patch("pathlib.Path.is_absolute")
     @patch("pathlib.Path.exists")
-    @patch("aind_data_schema.utils.validators.logger")
-    def test_absolute_path_warning(self, mock_warning: MagicMock, mock_is_absolute: MagicMock, mock_exists: MagicMock):
+    @patch("biodata_schema.utils.validators.logger")
+    def test_absolute_path_raises(self, mock_warning: MagicMock, mock_is_absolute: MagicMock, mock_exists: MagicMock):
         """Test when the path is absolute"""
         mock_is_absolute.return_value = True
         mock_exists.return_value = True
         test_path = AssetPath("/absolute/path/to/file.txt")
-        recursive_check_paths(test_path, None)
-        mock_warning.warning.assert_called_with(
-            "AssetPath /absolute/path/to/file.txt is absolute, ensure file paths are relative to the metadata directory"
-        )
+        with pytest.raises(ValueError) as context:
+            recursive_check_paths(test_path, None)
+        assert "is absolute" in str(context.value)
 
     @patch("pathlib.Path.is_absolute", return_value=False)
     @patch("pathlib.Path.exists", returns_value=True)
-    @patch("aind_data_schema.utils.validators.logger")
+    @patch("biodata_schema.utils.validators.logger")
     def test_relative_path_no_warning(
         self, mock_warning: MagicMock, mock_is_absolute: MagicMock, mock_exists: MagicMock
     ):
@@ -510,26 +644,26 @@ class TestRecursiveCheckPaths(unittest.TestCase):
         """Test return enum"""
         data = MockEnum.VALUE1
         recursive_check_paths(data, None)
-        self.assertTrue(True)
+        assert True
         # No exception raised, because enum is valid
 
 
-class TestImplantedDevice(BaseModel):
+class ImplantedDevice(BaseModel):
     """Test class with implanted_device_name"""
 
     implanted_device_name: str
 
 
-class TestImplantedDeviceNames(BaseModel):
+class ImplantedDeviceNames(BaseModel):
     """Test class with implanted_device_names"""
 
     implanted_device_names: list[str]
 
 
-class TestTimeValidation(unittest.TestCase):
+class TestTimeValidation:
     """Tests for time validation functions"""
 
-    def setUp(self):
+    def setup_method(self):
         """Set up test data"""
         self.start_time = datetime(2023, 1, 1, 10, 0, 0, tzinfo=timezone.utc)
         self.end_time = datetime(2023, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
@@ -543,22 +677,22 @@ class TestTimeValidation(unittest.TestCase):
     def test_validate_time_constraint_between_invalid_before(self):
         """Test _validate_time_constraint with invalid BETWEEN constraint (before start)"""
         invalid_time = datetime(2023, 1, 1, 9, 0, 0, tzinfo=timezone.utc)
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             _validate_time_constraint(
                 invalid_time, TimeValidation.BETWEEN, self.start_time, self.end_time, "test_field"
             )
-        self.assertIn("must be between", str(context.exception))
-        self.assertIn("test_field", str(context.exception))
+        assert "must be between" in str(context.value)
+        assert "test_field" in str(context.value)
 
     def test_validate_time_constraint_between_invalid_after(self):
         """Test _validate_time_constraint with invalid BETWEEN constraint (after end)"""
         invalid_time = datetime(2023, 1, 1, 13, 0, 0, tzinfo=timezone.utc)
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             _validate_time_constraint(
                 invalid_time, TimeValidation.BETWEEN, self.start_time, self.end_time, "test_field"
             )
-        self.assertIn("must be between", str(context.exception))
-        self.assertIn("test_field", str(context.exception))
+        assert "must be between" in str(context.value)
+        assert "test_field" in str(context.value)
 
     def test_validate_time_constraint_after_valid(self):
         """Test _validate_time_constraint with valid AFTER constraint"""
@@ -569,10 +703,10 @@ class TestTimeValidation(unittest.TestCase):
     def test_validate_time_constraint_after_invalid(self):
         """Test _validate_time_constraint with invalid AFTER constraint"""
         invalid_time = datetime(2023, 1, 1, 9, 0, 0, tzinfo=timezone.utc)
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             _validate_time_constraint(invalid_time, TimeValidation.AFTER, self.start_time, self.end_time, "test_field")
-        self.assertIn("must be after", str(context.exception))
-        self.assertIn("test_field", str(context.exception))
+        assert "must be after" in str(context.value)
+        assert "test_field" in str(context.value)
 
     def test_validate_time_constraint_before_valid(self):
         """Test _validate_time_constraint with valid BEFORE constraint"""
@@ -583,10 +717,10 @@ class TestTimeValidation(unittest.TestCase):
     def test_validate_time_constraint_before_invalid(self):
         """Test _validate_time_constraint with invalid BEFORE constraint"""
         invalid_time = datetime(2023, 1, 1, 13, 0, 0, tzinfo=timezone.utc)
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             _validate_time_constraint(invalid_time, TimeValidation.BEFORE, self.start_time, self.end_time, "test_field")
-        self.assertIn("must be before", str(context.exception))
-        self.assertIn("test_field", str(context.exception))
+        assert "must be before" in str(context.value)
+        assert "test_field" in str(context.value)
 
     def test_time_validation_recurse_helper_with_list(self):
         """Test _time_validation_recurse_helper with a list"""
@@ -651,9 +785,9 @@ class TestTimeValidation(unittest.TestCase):
             stream_end_time=datetime(2023, 1, 1, 11, 30, 0, tzinfo=timezone.utc),
         )
 
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             recursive_time_validation_check(data, self.start_time, self.end_time)
-        self.assertIn("must be between", str(context.exception))
+        assert "must be between" in str(context.value)
 
     def test_recursive_time_validation_check_with_none_data(self):
         """Test recursive_time_validation_check with None data"""
@@ -673,10 +807,10 @@ class TestTimeValidation(unittest.TestCase):
         recursive_time_validation_check(data, self.start_time, self.end_time)
 
 
-class TestValidateCreationTimeAfterMidnight(unittest.TestCase):
+class TestValidateCreationTimeAfterMidnight:
     """Tests for validate_creation_time_after_midnight function"""
 
-    def setUp(self):
+    def setup_method(self):
         """Set up test data"""
         self.reference_time = datetime(2023, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
 
@@ -701,9 +835,9 @@ class TestValidateCreationTimeAfterMidnight(unittest.TestCase):
     def test_invalid_creation_time_before_midnight(self):
         """Test invalid creation time before midnight of reference day"""
         creation_time = datetime(2022, 12, 31, 23, 59, 59, tzinfo=timezone.utc)
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             validate_creation_time_after_midnight(creation_time, self.reference_time)
-        self.assertIn("must be on or after midnight", str(context.exception))
+        assert "must be on or after midnight" in str(context.value)
 
     def test_timezone_naive_creation_time(self):
         """Test timezone-naive creation time gets reference timezone"""
@@ -714,9 +848,9 @@ class TestValidateCreationTimeAfterMidnight(unittest.TestCase):
     def test_timezone_naive_creation_time_invalid(self):
         """Test timezone-naive creation time that's invalid"""
         creation_time = datetime(2022, 12, 31, 10, 0, 0)  # No timezone, day before
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             validate_creation_time_after_midnight(creation_time, self.reference_time)
-        self.assertIn("must be on or after midnight", str(context.exception))
+        assert "must be on or after midnight" in str(context.value)
 
     def test_none_creation_time(self):
         """Test None creation time"""
@@ -752,12 +886,12 @@ class TestValidateCreationTimeAfterMidnight(unittest.TestCase):
         from datetime import date
 
         creation_date = date(2022, 12, 31)  # Day before reference
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             validate_creation_time_after_midnight(creation_date, self.reference_time)
-        self.assertIn("must be on or after midnight", str(context.exception))
+        assert "must be on or after midnight" in str(context.value)
 
 
-class TestConvertToComparable(unittest.TestCase):
+class TestConvertToComparable:
     """Tests for _convert_to_comparable function"""
 
     def test_convert_date_to_datetime(self):
@@ -768,7 +902,7 @@ class TestConvertToComparable(unittest.TestCase):
         result = _convert_to_comparable(test_date, reference_time)
 
         expected = datetime(2023, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
-        self.assertEqual(result, expected)
+        assert result == expected
 
     def test_return_datetime_unchanged(self):
         """Test that datetime objects are returned unchanged"""
@@ -777,10 +911,10 @@ class TestConvertToComparable(unittest.TestCase):
 
         result = _convert_to_comparable(test_datetime, reference_time)
 
-        self.assertEqual(result, test_datetime)
+        assert result == test_datetime
 
 
-class TestExtractTimezoneFromDatetime(unittest.TestCase):
+class TestExtractTimezoneFromDatetime:
     """Tests for extract_timezone_from_datetime function"""
 
     def test_zoneinfo_timezone_returns_timezone_name(self):
@@ -789,43 +923,39 @@ class TestExtractTimezoneFromDatetime(unittest.TestCase):
 
         dt = datetime(2023, 1, 1, 12, 0, 0, tzinfo=ZoneInfo("America/Los_Angeles"))
         result = extract_timezone_from_datetime(dt)
-        self.assertIsInstance(result, TimeZoneName)
-        self.assertEqual(result, "America/Los_Angeles")
+        assert isinstance(result, TimeZoneName)
+        assert result == "America/Los_Angeles"
 
     def test_utc_fixed_offset_returns_int(self):
         """Test that timezone.utc (fixed offset of 0) returns integer 0"""
         dt = datetime(2023, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
         result = extract_timezone_from_datetime(dt)
-        self.assertIsInstance(result, int)
-        self.assertEqual(result, 0)
+        assert isinstance(result, int)
+        assert result == 0
 
     def test_negative_fixed_offset_returns_int(self):
         """Test that a negative fixed-offset timezone returns the offset in hours"""
         dt = datetime(2023, 1, 1, 7, 0, 0, tzinfo=timezone(timedelta(hours=-7)))
         result = extract_timezone_from_datetime(dt)
-        self.assertIsInstance(result, int)
-        self.assertEqual(result, -7)
+        assert isinstance(result, int)
+        assert result == -7
 
     def test_positive_fixed_offset_returns_int(self):
         """Test that a positive fixed-offset timezone returns the offset in hours"""
         dt = datetime(2023, 1, 1, 17, 30, 0, tzinfo=timezone(timedelta(hours=5, minutes=30)))
         result = extract_timezone_from_datetime(dt)
-        self.assertIsInstance(result, int)
-        self.assertEqual(result, 5)
+        assert isinstance(result, int)
+        assert result == 5
 
     def test_local_timezone_from_astimezone_returns_int_or_timezone_name(self):
         """Test that a datetime from astimezone() returns either int or TimeZoneName"""
         dt = datetime(2023, 1, 1, 12, 0, 0).astimezone()
         result = extract_timezone_from_datetime(dt)
-        self.assertIsInstance(result, (int, TimeZoneName))
+        assert isinstance(result, (int, TimeZoneName))
 
     def test_naive_datetime_raises_error(self):
         """Test that naive datetime raises ValueError"""
         dt = datetime(2023, 1, 1, 12, 0, 0)
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             extract_timezone_from_datetime(dt)
-        self.assertIn("must be timezone-aware", str(context.exception))
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert "must be timezone-aware" in str(context.value)

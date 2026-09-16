@@ -1,23 +1,23 @@
 """Tests schema_version_bump module"""
 
-import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, call, patch
 
+import pytest
 from semver import Version
 
-from aind_data_schema.core.acquisition import Acquisition
-from aind_data_schema.core.instrument import Instrument
-from aind_data_schema.core.subject import Subject
-from aind_data_schema.utils.json_writer import SchemaWriter
-from aind_data_schema.utils.schema_version_bump import SchemaVersionHandler
+from biodata_schema.core.acquisition import Acquisition
+from biodata_schema.core.instrument import Instrument
+from biodata_schema.core.subject import Subject
+from biodata_schema.utils.json_writer import SchemaWriter
+from biodata_schema.utils.schema_version_bump import SchemaVersionHandler
 
 
-class SchemaVersionTests(unittest.TestCase):
+class TestSchemaVersion:
     """Tests the methods in the SchemaVersionHandler class."""
 
     @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         """Load json files before running tests."""
         mock_open_return_values = []
         for core_model in SchemaWriter.get_schemas():
@@ -37,10 +37,10 @@ class SchemaVersionTests(unittest.TestCase):
 
         handler = SchemaVersionHandler(json_schemas_location=Path("."))
         models_that_changed = handler._get_list_of_models_that_changed()
-        self.assertTrue(Acquisition in models_that_changed)
-        self.assertTrue(Subject in models_that_changed)
+        assert Acquisition in models_that_changed
+        assert Subject in models_that_changed
 
-    @patch("aind_data_schema.utils.schema_version_bump.SchemaVersionHandler._get_schema_json")
+    @patch("biodata_schema.utils.schema_version_bump.SchemaVersionHandler._get_schema_json")
     def test_get_list_of_incremented_versions(self, mock_get_schema: MagicMock):
         """Tests get_list_of_incremented_versions method"""
 
@@ -61,7 +61,7 @@ class SchemaVersionTests(unittest.TestCase):
 
         model_map = handler._get_incremented_versions_map([Subject, Acquisition])
         expected_model_map = {Subject: new_subject_version, Acquisition: new_acquisition_version}
-        self.assertEqual(expected_model_map, model_map)
+        assert expected_model_map == model_map
 
     @patch("builtins.open")
     def test_write_new_file(self, mock_open: MagicMock):
@@ -88,7 +88,7 @@ class SchemaVersionTests(unittest.TestCase):
         model.default_filename.return_value = "test_model.json"
 
         schema_json = handler._get_schema_json(model)
-        self.assertEqual(schema_json, {"properties": {"schema_version": {"default": "1.0.0"}}})
+        assert schema_json == {"properties": {"schema_version": {"default": "1.0.0"}}}
 
         mock_open.assert_called_once_with(Path("./test_model_schema.json"), "r")
         mock_json_load.assert_called_once()
@@ -103,20 +103,20 @@ class SchemaVersionTests(unittest.TestCase):
         model = MagicMock()
         model.default_filename.return_value = "test_model.json"
 
-        with self.assertRaises(FileNotFoundError):
+        with pytest.raises(FileNotFoundError):
             handler._get_schema_json(model)
 
-    @patch("aind_data_schema.utils.schema_version_bump.SchemaVersionHandler._get_schema_json")
+    @patch("biodata_schema.utils.schema_version_bump.SchemaVersionHandler._get_schema_json")
     def test_get_incremented_versions_map_exception(self, mock_get_schema: MagicMock):
         """Test that missing schema_version field raises an error"""
         handler = SchemaVersionHandler(json_schemas_location=Path("."))
 
         mock_get_schema.return_value = {}
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             handler._get_incremented_versions_map([Subject])
 
-    @patch("aind_data_schema.utils.schema_version_bump.SchemaVersionHandler._get_schema_json")
+    @patch("biodata_schema.utils.schema_version_bump.SchemaVersionHandler._get_schema_json")
     def test_get_incremented_versions_map_skip(self, mock_get_schema: MagicMock):
         """Test that missing schema_version field raises an error"""
         handler = SchemaVersionHandler(json_schemas_location=Path("."))
@@ -124,9 +124,9 @@ class SchemaVersionTests(unittest.TestCase):
         mock_get_schema.return_value = {"properties": {"schema_version": {"default": "0.0.0"}}}
 
         empty_map = handler._get_incremented_versions_map([Subject])
-        self.assertEqual(empty_map, {})
+        assert empty_map == {}
 
-    @patch("aind_data_schema.utils.schema_version_bump.SchemaVersionHandler._write_new_file")
+    @patch("biodata_schema.utils.schema_version_bump.SchemaVersionHandler._write_new_file")
     def test_update_files(self, mock_write: MagicMock):
         """Tests the update_files method"""
         handler = SchemaVersionHandler(json_schemas_location=Path("."))
@@ -152,14 +152,14 @@ class SchemaVersionTests(unittest.TestCase):
 
         mock_write_args0 = mock_write.mock_calls[0].args
         mock_write_args1 = mock_write.mock_calls[1].args
-        self.assertTrue(expected_line_change0 in str(mock_write_args0[0]))
-        self.assertTrue("subject.py" in str(mock_write_args0[1]))
-        self.assertTrue(expected_line_change1 in str(mock_write_args1[0]))
-        self.assertTrue("acquisition.py" in str(mock_write_args1[1]))
+        assert expected_line_change0 in str(mock_write_args0[0])
+        assert "subject.py" in str(mock_write_args0[1])
+        assert expected_line_change1 in str(mock_write_args1[0])
+        assert "acquisition.py" in str(mock_write_args1[1])
 
-    @patch("aind_data_schema.utils.schema_version_bump.SchemaVersionHandler._get_schema_json")
-    @patch("aind_data_schema.utils.schema_version_bump.SchemaVersionHandler._get_list_of_models_that_changed")
-    @patch("aind_data_schema.utils.schema_version_bump.SchemaVersionHandler._update_files")
+    @patch("biodata_schema.utils.schema_version_bump.SchemaVersionHandler._get_schema_json")
+    @patch("biodata_schema.utils.schema_version_bump.SchemaVersionHandler._get_list_of_models_that_changed")
+    @patch("biodata_schema.utils.schema_version_bump.SchemaVersionHandler._update_files")
     def test_run_job(
         self, mock_update_files: MagicMock, mock_get_list_of_models: MagicMock, mock_get_schema: MagicMock
     ):
@@ -184,7 +184,3 @@ class SchemaVersionTests(unittest.TestCase):
         handler = SchemaVersionHandler(json_schemas_location=Path("."))
         handler.run_job()
         mock_update_files.assert_called_once_with({Subject: new_subject_version, Acquisition: new_acquisition_version})
-
-
-if __name__ == "__main__":
-    unittest.main()

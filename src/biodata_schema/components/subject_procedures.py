@@ -1,0 +1,154 @@
+"""Subject procedures module for AIND data schema"""
+
+from datetime import date
+from typing import Dict, List, Optional
+
+from biodata_models.coordinates import Origin
+from biodata_models.units import MassUnit, UnitlessUnit, VolumeUnit
+from pydantic import Field
+
+from biodata_schema.base import DataModel, DiscriminatedList
+from biodata_schema.components.coordinates import CoordinateSystem, Translation
+from biodata_schema.components.identifiers import Code, ProtocolMixin
+from biodata_schema.components.injection_procedures import Injection
+from biodata_schema.components.surgery_procedures import (
+    Anaesthetic,
+    BrainInjection,
+    CatheterImplant,
+    Craniotomy,
+    DeviceImplant,
+    GenericSurgeryProcedure,
+    Headframe,
+    MyomatrixInsertion,
+    Perfusion,
+    ProbeImplant,
+    SampleCollection,
+)
+
+
+class GenericSubjectProcedure(ProtocolMixin, DataModel):
+    """Description of a non-surgical procedure performed on a subject"""
+
+    start_date: date = Field(..., title="Start date")
+    experimenters: Optional[List[str]] = Field(
+        default=None,
+        title="experimenter(s)",
+    )
+    ethics_review_id: str = Field(..., title="Ethics review ID")
+    description: str = Field(..., title="Description")
+    notes: Optional[str] = Field(default=None, title="Notes")
+
+
+class NonSurgicalInjection(DataModel):
+    """Injection procedure performed outside of surgery,
+    which may include one or more injections at different locations/depths
+    """
+
+    start_date: date = Field(..., title="Start date")
+    ethics_review_id: str = Field(..., title="Ethics review ID")
+    protocol_id: Optional[str] = Field(default=None, title="Protocol ID", description="DOI for protocols.io")
+    injections: List[Injection] = Field(..., title="Injections", min_length=1)
+    notes: Optional[str] = Field(default=None, title="Notes")
+
+
+class TrainingProtocol(DataModel):
+    """Description of an animal training protocol"""
+
+    training_name: str = Field(..., title="Training protocol name")
+    protocol_id: Optional[str] = Field(default=None, title="Training protocol ID")
+    start_date: date = Field(..., title="Training protocol start date")
+    end_date: Optional[date] = Field(default=None, title="Training protocol end date")
+    curriculum_code: Optional[Code] = Field(
+        default=None,
+        title="Curriculum code",
+        description="Code describing the directed graph used for the training curriculum",
+    )
+    notes: Optional[str] = Field(default=None, title="Notes")
+
+
+class WaterRestriction(DataModel):
+    """Description of a water restriction procedure"""
+
+    ethics_review_id: str = Field(..., title="Ethics review ID")
+    target_fraction_weight: int = Field(..., title="Target fraction weight (%)")
+    target_fraction_weight_unit: UnitlessUnit = Field(default=UnitlessUnit.PERCENT, title="Target fraction weight unit")
+    minimum_water_per_day: float = Field(..., title="Minimum water per day (mL)")
+    minimum_water_per_day_unit: VolumeUnit = Field(default=VolumeUnit.ML, title="Minimum water per day unit")
+    baseline_weight: float = Field(
+        ...,
+        title="Baseline weight (g)",
+        description="Weight at start of water restriction",
+    )
+    weight_unit: MassUnit = Field(default=MassUnit.G, title="Weight unit")
+    start_date: date = Field(..., title="Water restriction start date")
+    end_date: Optional[date] = Field(default=None, title="Water restriction end date")
+
+
+class FoodRestriction(DataModel):
+    """Description of a food restriction procedure"""
+
+    ethics_review_id: str = Field(..., title="Ethics review ID")
+    target_fraction_weight: int = Field(..., title="Target fraction weight (%)")
+    target_fraction_weight_unit: UnitlessUnit = Field(default=UnitlessUnit.PERCENT, title="Target fraction weight unit")
+    minimum_food_per_day: float = Field(..., title="Minimum food per day")
+    minimum_food_per_day_unit: MassUnit = Field(..., title="Minimum food per day unit")
+    baseline_weight: float = Field(
+        ...,
+        title="Baseline weight (g)",
+        description="Weight at start of food restriction",
+    )
+    weight_unit: MassUnit = Field(default=MassUnit.G, title="Weight unit")
+    start_date: date = Field(..., title="Food restriction start date")
+    end_date: Optional[date] = Field(default=None, title="Food restriction end date")
+
+
+class Surgery(ProtocolMixin, DataModel):
+    """Description of subject procedures performed at one time"""
+
+    start_date: date = Field(..., title="Start date")
+    experimenters: Optional[List[str]] = Field(
+        default=None,
+        title="experimenter(s)",
+    )
+    ethics_review_id: Optional[str] = Field(default=None, title="Ethics review ID")
+    animal_weight_prior: Optional[float] = Field(
+        default=None, title="Animal weight (g)", description="Animal weight before procedure"
+    )
+    animal_weight_post: Optional[float] = Field(
+        default=None, title="Animal weight (g)", description="Animal weight after procedure"
+    )
+    weight_unit: MassUnit = Field(default=MassUnit.G, title="Weight unit")
+    anaesthesia: Optional[Anaesthetic] = Field(default=None, title="Anaesthesia")
+    workstation_id: Optional[str] = Field(default=None, title="Workstation ID")
+
+    # Coordinate system
+    global_coordinate_system: Optional[CoordinateSystem] = Field(
+        default=None,
+        title="Surgery global coordinate system",
+        description=(
+            "Only required when the Surgery.global_coordinate_system "
+            "is different from the Procedures.global_coordinate_system"
+        ),
+    )
+
+    # Measured coordinates
+    measured_coordinates: Optional[Dict[Origin, Translation]] = Field(
+        default=None,
+        title="Measured coordinates",
+        description="Coordinates measured during the procedure, for example Bregma and Lambda",
+    )
+
+    procedures: DiscriminatedList[
+        CatheterImplant
+        | Craniotomy
+        | DeviceImplant
+        | ProbeImplant
+        | Headframe
+        | BrainInjection
+        | Injection
+        | MyomatrixInsertion
+        | GenericSurgeryProcedure
+        | Perfusion
+        | SampleCollection
+    ] = Field(title="Procedures", min_length=1)
+    notes: Optional[str] = Field(default=None, title="Notes")

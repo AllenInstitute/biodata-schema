@@ -1,12 +1,12 @@
 """test quality metrics"""
 
-import unittest
 from datetime import datetime
 
-from aind_data_schema_models.modalities import Modality
+import pytest
+from biodata_models.modalities import Modality
 from pydantic import ValidationError
 
-from aind_data_schema.core.quality_control import (
+from biodata_schema.core.quality_control import (
     QCMetric,
     QCStatus,
     QualityControl,
@@ -15,59 +15,41 @@ from aind_data_schema.core.quality_control import (
     _get_filtered_statuses,
     _get_status_by_date,
 )
-
 from examples.quality_control import q as quality_control
 
 
-class QualityControlTests(unittest.TestCase):
+class TestQualityControl:
     """test quality metrics schema"""
 
     def test_constructors(self):
         """testing constructors"""
 
-        self.assertRaises(ValidationError, QualityControl)
+        with pytest.raises(ValidationError):
+            QualityControl()
 
         assert quality_control is not None
-
-    def test_tags_list_to_dict_conversion(self):
-        """test that old list[str] tags get converted to dict[str, str]"""
-
-        metric_dict = {
-            "name": "Test metric",
-            "modality": {"name": "Extracellular electrophysiology", "abbreviation": "ecephys"},
-            "stage": "Processing",
-            "value": 42,
-            "status_history": [{"evaluator": "Test", "timestamp": "2020-10-10", "status": "Pass"}],
-            "tags": ["tag1", "tag2", "tag3"],
-        }
-
-        with self.assertWarns(DeprecationWarning):
-            metric = QCMetric.model_validate(metric_dict)
-
-        self.assertIsInstance(metric.tags, dict)
-        self.assertEqual(metric.tags, {"tag_1": "tag1", "tag_2": "tag2", "tag_3": "tag3"})
 
     def test_tags_property(self):
         """test that QualityControl.tags returns all unique tag values"""
         tags = quality_control.tags
-        self.assertIsInstance(tags, list)
-        self.assertIn("Probe A", tags)
-        self.assertIn("Probe B", tags)
-        self.assertIn("Probe C", tags)
-        self.assertIn("Video 1", tags)
-        self.assertIn("Video 2", tags)
-        self.assertEqual(len(tags), 5)
+        assert isinstance(tags, list)
+        assert "Probe A" in tags
+        assert "Probe B" in tags
+        assert "Probe C" in tags
+        assert "Video 1" in tags
+        assert "Video 2" in tags
+        assert len(tags) == 5
 
     def test_tag_pairs_property(self):
         """test that QualityControl.tag_pairs returns all unique key:value pairs"""
         tag_pairs = quality_control.tag_pairs
-        self.assertIsInstance(tag_pairs, list)
-        self.assertIn("probe:Probe A", tag_pairs)
-        self.assertIn("probe:Probe B", tag_pairs)
-        self.assertIn("probe:Probe C", tag_pairs)
-        self.assertIn("video:Video 1", tag_pairs)
-        self.assertIn("video:Video 2", tag_pairs)
-        self.assertEqual(len(tag_pairs), 5)
+        assert isinstance(tag_pairs, list)
+        assert "probe:Probe A" in tag_pairs
+        assert "probe:Probe B" in tag_pairs
+        assert "probe:Probe C" in tag_pairs
+        assert "video:Video 1" in tag_pairs
+        assert "video:Video 2" in tag_pairs
+        assert len(tag_pairs) == 5
 
     def test_overall_status(self):
         """test that overall status goes to pass/pending/fail correctly"""
@@ -97,12 +79,12 @@ class QualityControlTests(unittest.TestCase):
             ),
         ]
 
-        self.assertEqual(test_metrics[0].status.status, Status.PASS)
+        assert test_metrics[0].status.status == Status.PASS
 
         q = QualityControl(metrics=test_metrics + test_metrics, default_grouping=["group"])  # duplicate the metrics
 
         # check that overall status gets auto-set if it has never been set before
-        self.assertEqual(q.evaluate_status(), Status.PASS)
+        assert q.evaluate_status() == Status.PASS
 
         # Add a pending metric
         q.metrics.append(
@@ -122,7 +104,7 @@ class QualityControlTests(unittest.TestCase):
             )
         )
 
-        self.assertEqual(q.evaluate_status(), Status.PENDING)
+        assert q.evaluate_status() == Status.PENDING
 
         # Add a failing metric
         q.metrics.append(
@@ -140,7 +122,7 @@ class QualityControlTests(unittest.TestCase):
             )
         )
 
-        self.assertEqual(q.evaluate_status(), Status.FAIL)
+        assert q.evaluate_status() == Status.FAIL
 
     def test_evaluation_status(self):
         """test that evaluation status goes to pass/pending/fail correctly"""
@@ -170,7 +152,7 @@ class QualityControlTests(unittest.TestCase):
         ]
 
         qc = QualityControl(metrics=metrics, default_grouping=["group"])
-        self.assertEqual(qc.evaluate_status(tag="Drift map"), Status.PASS)
+        assert qc.evaluate_status(tag="Drift map") == Status.PASS
 
         # Add a pending metric, evaluation should now evaluate to pending
         qc.metrics.append(
@@ -190,7 +172,7 @@ class QualityControlTests(unittest.TestCase):
             )
         )
 
-        self.assertEqual(qc.evaluate_status(tag="Drift map"), Status.PENDING)
+        assert qc.evaluate_status(tag="Drift map") == Status.PENDING
 
         # Add a failing metric, evaluation should now evaluate to fail
         qc.metrics.append(
@@ -208,7 +190,7 @@ class QualityControlTests(unittest.TestCase):
             )
         )
 
-        self.assertEqual(qc.evaluate_status(tag="group:Drift map"), Status.FAIL)
+        assert qc.evaluate_status(tag="group:Drift map") == Status.FAIL
 
     def test_allowed_failed_metrics(self):
         """Test that if you set the flag to allow failures that tags pass"""
@@ -246,17 +228,17 @@ class QualityControlTests(unittest.TestCase):
             default_grouping=["group"],
         )
 
-        self.assertEqual(qc.evaluate_status(tag="group:Drift map"), Status.PENDING)
+        assert qc.evaluate_status(tag="group:Drift map") == Status.PENDING
 
         # Replace the pending evaluation with a fail, evaluation should not evaluate to pass
         qc.metrics[1].status_history[0].status = Status.FAIL
 
-        self.assertEqual(qc.evaluate_status(tag="group:Drift map"), Status.FAIL)
+        assert qc.evaluate_status(tag="group:Drift map") == Status.FAIL
 
         # Now add the tag to allow_tag_failures
         qc.allow_tag_failures = ["group:Drift map"]
 
-        self.assertEqual(qc.evaluate_status(tag="group:Drift map"), Status.PASS)
+        assert qc.evaluate_status(tag="group:Drift map") == Status.PASS
 
     def test_metric_history_order(self):
         """Test that the order of the metric status history list is preserved when dumping"""
@@ -292,14 +274,14 @@ class QualityControlTests(unittest.TestCase):
         roundtrip_t1 = roundtrip_t1.replace(tzinfo=None)
         roundtrip_t2 = roundtrip_t2.replace(tzinfo=None)
 
-        self.assertEqual(roundtrip_t0, t0)
-        self.assertEqual(roundtrip_t1, t1)
-        self.assertEqual(roundtrip_t2, t2)
+        assert roundtrip_t0 == t0
+        assert roundtrip_t1 == t1
+        assert roundtrip_t2 == t2
 
     def test_metric_status(self):
         """Ensure that at least one status object exists for metric_status_history"""
 
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             QCMetric(
                 name="Multiple values example",
                 modality=Modality.ECEPHYS,
@@ -309,7 +291,7 @@ class QualityControlTests(unittest.TestCase):
             )
 
         expected_exception = "List should have at least 1 item after validation, not 0"
-        self.assertTrue(expected_exception in repr(context.exception))
+        assert expected_exception in repr(context.value)
 
     def test_multi_acquisition(self):
         """Ensure that the multi-asset QC validator checks for evaluated_assets"""
@@ -327,11 +309,11 @@ class QualityControlTests(unittest.TestCase):
             tags={"type": "Test"},
         )
 
-        self.assertTrue(metric.stage != Stage.MULTI_ASSET)
-        self.assertIsNone(metric.evaluated_assets)
+        assert metric.stage != Stage.MULTI_ASSET
+        assert metric.evaluated_assets is None
 
         # Check that single-asset QC with evaluated_assets throws a validation error
-        with self.assertRaises(ValidationError) as context:
+        with pytest.raises(ValidationError) as context:
             QCMetric(
                 name="Dict with evaluated assets list",
                 modality=Modality.ECEPHYS,
@@ -344,10 +326,10 @@ class QualityControlTests(unittest.TestCase):
                 tags={"type": "Test"},
             )
 
-        self.assertTrue("is a single-asset metric and should not have evaluated_assets" in repr(context.exception))
+        assert "is a single-asset metric and should not have evaluated_assets" in repr(context.value)
 
         # Check that multi-asset with empty evaluated_assets raises a validation error
-        with self.assertRaises(ValidationError) as context:
+        with pytest.raises(ValidationError) as context:
             QCMetric(
                 name="Missing evaluated assets",
                 modality=Modality.ECEPHYS,
@@ -360,10 +342,10 @@ class QualityControlTests(unittest.TestCase):
                 tags={"type": "Test"},
             )
 
-        self.assertTrue("is a multi-asset metric and must have evaluated_assets" in repr(context.exception))
+        assert "is a multi-asset metric and must have evaluated_assets" in repr(context.value)
 
         # Check that multi-asset with missing evaluated_assets raises a validation error
-        with self.assertRaises(ValidationError) as context:
+        with pytest.raises(ValidationError) as context:
             QCMetric(
                 name="Multiple values example",
                 modality=Modality.ECEPHYS,
@@ -375,7 +357,7 @@ class QualityControlTests(unittest.TestCase):
                 tags={"type": "Test"},
             )
 
-        self.assertTrue("is a multi-asset metric and must have evaluated_assets" in repr(context.exception))
+        assert "is a multi-asset metric and must have evaluated_assets" in repr(context.value)
 
     def test_status_filters(self):
         """Test that QualityControl.status(modality, stage) filters correctly"""
@@ -453,30 +435,27 @@ class QualityControlTests(unittest.TestCase):
         q = QualityControl(metrics=test_metrics, default_grouping=[("group", "type")])
 
         # Check that the status field was built correctly
-        self.assertEqual(
-            q.status,
-            {
-                # Stages
-                "Processing": Status.PASS,
-                "Raw data": Status.FAIL,
-                # Modalities
-                "behavior": Status.FAIL,
-                "behavior-videos": Status.PENDING,
-                "ecephys": Status.PASS,
-                # Tags (now in key:value format)
-                "group:test_group": Status.PASS,
-                "group:test_group2": Status.FAIL,
-                "type:tag1": Status.PENDING,
-            },
-        )
+        assert q.status == {
+            # Stages
+            "Processing": Status.PASS,
+            "Raw data": Status.FAIL,
+            # Modalities
+            "behavior": Status.FAIL,
+            "behavior-videos": Status.PENDING,
+            "ecephys": Status.PASS,
+            # Tags (now in key:value format)
+            "group:test_group": Status.PASS,
+            "group:test_group2": Status.FAIL,
+            "type:tag1": Status.PENDING,
+        }
 
-        self.assertEqual(q.evaluate_status(), Status.FAIL)
-        self.assertEqual(q.evaluate_status(modality=Modality.BEHAVIOR), Status.FAIL)
-        self.assertEqual(q.evaluate_status(modality=Modality.ECEPHYS), Status.PASS)
-        self.assertEqual(q.evaluate_status(modality=[Modality.ECEPHYS, Modality.BEHAVIOR]), Status.FAIL)
-        self.assertEqual(q.evaluate_status(stage=Stage.RAW), Status.FAIL)
-        self.assertEqual(q.evaluate_status(stage=Stage.PROCESSING), Status.PASS)
-        self.assertEqual(q.evaluate_status(tag="type:tag1"), Status.PENDING)
+        assert q.evaluate_status() == Status.FAIL
+        assert q.evaluate_status(modality=Modality.BEHAVIOR) == Status.FAIL
+        assert q.evaluate_status(modality=Modality.ECEPHYS) == Status.PASS
+        assert q.evaluate_status(modality=[Modality.ECEPHYS, Modality.BEHAVIOR]) == Status.FAIL
+        assert q.evaluate_status(stage=Stage.RAW) == Status.FAIL
+        assert q.evaluate_status(stage=Stage.PROCESSING) == Status.PASS
+        assert q.evaluate_status(tag="type:tag1") == Status.PENDING
 
     def test_status_date(self):
         """QualityControl.status(date=) should return the correct status for the given date"""
@@ -502,9 +481,9 @@ class QualityControlTests(unittest.TestCase):
         # This test would need to be updated once date filtering is implemented
         qc = QualityControl(metrics=[metric], default_grouping=["group"])
 
-        self.assertEqual(qc.evaluate_status(date=t3), Status.PASS)
-        self.assertEqual(qc.evaluate_status(date=t2), Status.PENDING)
-        self.assertEqual(qc.evaluate_status(date=t1), Status.FAIL)
+        assert qc.evaluate_status(date=t3) == Status.PASS
+        assert qc.evaluate_status(date=t2) == Status.PENDING
+        assert qc.evaluate_status(date=t1) == Status.FAIL
 
     def test_get_status_by_date_helper(self):
         """Test the _get_status_by_date helper function with various scenarios"""
@@ -532,28 +511,28 @@ class QualityControlTests(unittest.TestCase):
 
         # Date before any status - should return earliest status
         early_date = datetime.fromisoformat("1999-01-01T00:00:00+00:00")
-        self.assertEqual(_get_status_by_date(metric, early_date), Status.FAIL)
+        assert _get_status_by_date(metric, early_date) == Status.FAIL
 
         # Date exactly at first status
-        self.assertEqual(_get_status_by_date(metric, t1), Status.FAIL)
+        assert _get_status_by_date(metric, t1) == Status.FAIL
 
         # Date between first and second status
         between_t1_t2 = datetime.fromisoformat("2020-01-15T00:00:00+00:00")
-        self.assertEqual(_get_status_by_date(metric, between_t1_t2), Status.FAIL)
+        assert _get_status_by_date(metric, between_t1_t2) == Status.FAIL
 
         # Date exactly at second status
-        self.assertEqual(_get_status_by_date(metric, t2), Status.PENDING)
+        assert _get_status_by_date(metric, t2) == Status.PENDING
 
         # Date between second and third status
         between_t2_t3 = datetime.fromisoformat("2020-02-15T00:00:00+00:00")
-        self.assertEqual(_get_status_by_date(metric, between_t2_t3), Status.PENDING)
+        assert _get_status_by_date(metric, between_t2_t3) == Status.PENDING
 
         # Date exactly at third status
-        self.assertEqual(_get_status_by_date(metric, t3), Status.PASS)
+        assert _get_status_by_date(metric, t3) == Status.PASS
 
         # Date after all statuses - should return most recent status
         future_date = datetime.fromisoformat("2025-01-01T00:00:00+00:00")
-        self.assertEqual(_get_status_by_date(metric, future_date), Status.PASS)
+        assert _get_status_by_date(metric, future_date) == Status.PASS
 
         # Test with single status entry
         single_status_metric = QCMetric(
@@ -568,11 +547,11 @@ class QualityControlTests(unittest.TestCase):
         )
 
         # Date before single status - should return that status
-        self.assertEqual(_get_status_by_date(single_status_metric, t1), Status.PASS)
+        assert _get_status_by_date(single_status_metric, t1) == Status.PASS
         # Date at single status
-        self.assertEqual(_get_status_by_date(single_status_metric, t2), Status.PASS)
+        assert _get_status_by_date(single_status_metric, t2) == Status.PASS
         # Date after single status
-        self.assertEqual(_get_status_by_date(single_status_metric, t3), Status.PASS)
+        assert _get_status_by_date(single_status_metric, t3) == Status.PASS
 
     def test_get_filtered_statuses_helper(self):
         """Test the _get_filtered_statuses helper function with various filters"""
@@ -627,15 +606,15 @@ class QualityControlTests(unittest.TestCase):
             modality_filter=[Modality.ECEPHYS],
         )
         # Should include ECEPHYS metrics from quality_control example + our test metric
-        self.assertGreater(len(ecephys_statuses), 0)
+        assert len(ecephys_statuses) > 0
 
         behavior_statuses = _get_filtered_statuses(
             metrics=all_metrics,
             date=test_date,
             modality_filter=[Modality.BEHAVIOR],
         )
-        self.assertEqual(len(behavior_statuses), 1)  # Our test BEHAVIOR metric
-        self.assertEqual(behavior_statuses[0], Status.PASS)
+        assert len(behavior_statuses) == 1  # Our test BEHAVIOR metric
+        assert behavior_statuses[0] == Status.PASS
 
         # Test filtering by stage
         raw_statuses = _get_filtered_statuses(
@@ -643,15 +622,15 @@ class QualityControlTests(unittest.TestCase):
             date=test_date,
             stage_filter=[Stage.RAW],
         )
-        self.assertGreater(len(raw_statuses), 0)
+        assert len(raw_statuses) > 0
 
         analysis_statuses = _get_filtered_statuses(
             metrics=all_metrics,
             date=test_date,
             stage_filter=[Stage.ANALYSIS],
         )
-        self.assertEqual(len(analysis_statuses), 1)  # Our test OPHYS metric
-        self.assertEqual(analysis_statuses[0], Status.FAIL)
+        assert len(analysis_statuses) == 1  # Our test OPHYS metric
+        assert analysis_statuses[0] == Status.FAIL
 
         # Test filtering by tag
         shared_tag_statuses = _get_filtered_statuses(
@@ -659,9 +638,9 @@ class QualityControlTests(unittest.TestCase):
             date=test_date,
             tag_filter=["group:shared_tag"],
         )
-        self.assertEqual(len(shared_tag_statuses), 2)  # Our BEHAVIOR and OPHYS test metrics
-        self.assertIn(Status.PASS, shared_tag_statuses)
-        self.assertIn(Status.FAIL, shared_tag_statuses)
+        assert len(shared_tag_statuses) == 2  # Our BEHAVIOR and OPHYS test metrics
+        assert Status.PASS in shared_tag_statuses
+        assert Status.FAIL in shared_tag_statuses
 
         # Test filtering by multiple criteria
         ecephys_raw_statuses = _get_filtered_statuses(
@@ -670,7 +649,7 @@ class QualityControlTests(unittest.TestCase):
             modality_filter=[Modality.ECEPHYS],
             stage_filter=[Stage.RAW],
         )
-        self.assertGreater(len(ecephys_raw_statuses), 0)
+        assert len(ecephys_raw_statuses) > 0
 
         # Test date-based status retrieval
         earlier_date = datetime.fromisoformat("2020-03-01T00:00:00+00:00")
@@ -679,8 +658,8 @@ class QualityControlTests(unittest.TestCase):
             date=earlier_date,
             tag_filter=["test:time_test"],
         )
-        self.assertEqual(len(time_test_statuses), 1)
-        self.assertEqual(time_test_statuses[0], Status.FAIL)  # Should get the earlier FAIL status
+        assert len(time_test_statuses) == 1
+        assert time_test_statuses[0] == Status.FAIL  # Should get the earlier FAIL status
 
         # Test allow_tag_failures
         ophys_fail_statuses = _get_filtered_statuses(
@@ -689,8 +668,8 @@ class QualityControlTests(unittest.TestCase):
             tag_filter=["type:ophys_tag"],
             allow_tag_failures=["type:ophys_tag"],
         )
-        self.assertEqual(len(ophys_fail_statuses), 1)
-        self.assertEqual(ophys_fail_statuses[0], Status.PASS)  # FAIL converted to PASS
+        assert len(ophys_fail_statuses) == 1
+        assert ophys_fail_statuses[0] == Status.PASS  # FAIL converted to PASS
 
         # Test with no matching filters
         no_match_statuses = _get_filtered_statuses(
@@ -698,14 +677,14 @@ class QualityControlTests(unittest.TestCase):
             date=test_date,
             tag_filter=["nonexistent_tag"],
         )
-        self.assertEqual(len(no_match_statuses), 0)
+        assert len(no_match_statuses) == 0
 
         # Test with empty metrics list
         empty_statuses = _get_filtered_statuses(
             metrics=[],
             date=test_date,
         )
-        self.assertEqual(len(empty_statuses), 0)
+        assert len(empty_statuses) == 0
 
         # Test multiple modalities and stages
         multi_modality_statuses = _get_filtered_statuses(
@@ -713,14 +692,14 @@ class QualityControlTests(unittest.TestCase):
             date=test_date,
             modality_filter=[Modality.BEHAVIOR, Modality.POPHYS],
         )
-        self.assertEqual(len(multi_modality_statuses), 2)  # Our BEHAVIOR and OPHYS test metrics
+        assert len(multi_modality_statuses) == 2  # Our BEHAVIOR and OPHYS test metrics
 
         multi_stage_statuses = _get_filtered_statuses(
             metrics=all_metrics,
             date=test_date,
             stage_filter=[Stage.PROCESSING, Stage.ANALYSIS],
         )
-        self.assertEqual(len(multi_stage_statuses), 2)  # Our BEHAVIOR and OPHYS test metrics
+        assert len(multi_stage_statuses) == 2  # Our BEHAVIOR and OPHYS test metrics
 
     def test_helper_functions_integration(self):
         """Test that helper functions work correctly when used by QualityControl.evaluate_status"""
@@ -779,43 +758,16 @@ class QualityControlTests(unittest.TestCase):
         early_date = datetime.fromisoformat("2020-02-01T00:00:00+00:00")
         # At early date: metric 1 is FAIL, metric 2 is PASS -> overall FAIL
         early_status = qc.evaluate_status(date=early_date, tag="group:time_sensitive")
-        self.assertEqual(early_status, Status.FAIL)
+        assert early_status == Status.FAIL
 
         # At test date: metric 1 is PASS, metric 2 is PASS -> overall PASS
         test_status = qc.evaluate_status(date=test_date, tag="group:time_sensitive")
-        self.assertEqual(test_status, Status.PASS)
+        assert test_status == Status.PASS
 
         # At late date: metric 1 is PASS, metric 2 is FAIL -> overall FAIL
         late_date = datetime.fromisoformat("2020-08-01T00:00:00+00:00")
         late_status = qc.evaluate_status(date=late_date, tag="group:time_sensitive")
-        self.assertEqual(late_status, Status.FAIL)
-
-    def test_backwards_compatibility_default_grouping(self):
-        """Test that fix_default_grouping_list validator handles old v2.2.X format correctly"""
-
-        # Test old v2.2.X format: list of strings for default_grouping + list-based tags
-        old_format_dict = {
-            "metrics": [
-                {
-                    "object_type": "QC metric",
-                    "name": "Old format metric",
-                    "modality": {"name": "Extracellular electrophysiology", "abbreviation": "ecephys"},
-                    "stage": "Processing",
-                    "value": 42,
-                    "status_history": [{"evaluator": "Test", "timestamp": "2020-10-10", "status": "Pass"}],
-                    "tags": ["old_tag1", "old_tag2"],
-                }
-            ],
-            "default_grouping": ["group1", "group2"],
-        }
-
-        with self.assertWarns(DeprecationWarning):
-            qc_old = QualityControl.model_validate(old_format_dict)
-
-        # Should convert to [("modality",), ("tag_1",)] for backwards compatibility
-        self.assertEqual(qc_old.default_grouping, [("modality",), ("tag_1",)])
-        # Tags should be converted to dict
-        self.assertEqual(qc_old.metrics[0].tags, {"tag_1": "old_tag1", "tag_2": "old_tag2"})
+        assert late_status == Status.FAIL
 
     def test_new_format_default_grouping_all_strings(self):
         """Test that new format with all strings in default_grouping is NOT converted"""
@@ -839,9 +791,9 @@ class QualityControlTests(unittest.TestCase):
         qc_new = QualityControl.model_validate(new_format_dict)
 
         # Should NOT convert - keep as-is
-        self.assertEqual(qc_new.default_grouping, ["group", "probe"])
+        assert qc_new.default_grouping == ["group", "probe"]
         # Tags should remain as dict
-        self.assertEqual(qc_new.metrics[0].tags, {"group": "test_group", "probe": "probeA"})
+        assert qc_new.metrics[0].tags == {"group": "test_group", "probe": "probeA"}
 
     def test_new_format_default_grouping_mixed(self):
         """Test that new format with mixed strings and tuples in default_grouping is NOT converted"""
@@ -865,9 +817,9 @@ class QualityControlTests(unittest.TestCase):
         qc_new = QualityControl.model_validate(new_format_dict)
 
         # Should NOT convert - keep as-is
-        self.assertEqual(qc_new.default_grouping, ["group", ("probe", "shank")])
+        assert qc_new.default_grouping == ["group", ("probe", "shank")]
         # Tags should remain as dict
-        self.assertEqual(qc_new.metrics[0].tags, {"group": "test_group", "probe": "probeA", "shank": "shank1"})
+        assert qc_new.metrics[0].tags == {"group": "test_group", "probe": "probeA", "shank": "shank1"}
 
     def test_empty_metrics_does_not_convert_default_grouping(self):
         """Test that fix_default_grouping_list does not alter default_grouping when metrics is empty"""
@@ -879,8 +831,4 @@ class QualityControlTests(unittest.TestCase):
 
         qc = QualityControl.model_validate(empty_metrics_dict)
 
-        self.assertEqual(qc.default_grouping, ["group1", "group2"])
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert qc.default_grouping == ["group1", "group2"]

@@ -17,15 +17,15 @@ Definition an atlas
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `name` | [AtlasName](../aind_data_schema_models/atlas.md#atlasname) | Atlas name  |
+| `name` | [AtlasName](../biodata_models/atlas.md#atlasname) | Atlas name  |
 | `version` | `str` | Atlas version  |
 | `size` | `List[float]` | Size  |
-| `size_unit` | [SizeUnit](../aind_data_schema_models/units.md#sizeunit) | Size unit  |
+| `size_unit` | [SizeUnit](../biodata_models/units.md#sizeunit) | Size unit  |
 | `resolution` | `List[float]` | Resolution  |
-| `resolution_unit` | [SizeUnit](../aind_data_schema_models/units.md#sizeunit) | Resolution unit  |
-| `origin` | [MouseAnatomyModel](../aind_data_schema_models/external.md#mouseanatomymodel) | Origin (Defines the position of (0,0,0) in the coordinate system) |
+| `resolution_unit` | [SizeUnit](../biodata_models/units.md#sizeunit) | Resolution unit  |
+| `origin` | [MouseAnatomyModel](../biodata_models/external.md#mouseanatomymodel) | Origin (Defines the position of (0,0,0) in the coordinate system) |
 | `axes` | List[[Axis](#axis)] | Axis names (Axis names and directions) |
-| `axis_unit` | [SizeUnit](../aind_data_schema_models/units.md#sizeunit) | Size unit  |
+| `axis_unit` | [SizeUnit](../biodata_models/units.md#sizeunit) | Size unit  |
 | `handedness` | Optional[[Handedness](#handedness)] | Handedness (Whether the coordinate system is right-handed or left-handed) |
 
 
@@ -46,8 +46,8 @@ Linked direction and axis
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `name` | [AxisName](../aind_data_schema_models/coordinates.md#axisname) | Axis name (Note: axis names do not influence order or orientation) |
-| `direction` | [Direction](../aind_data_schema_models/coordinates.md#direction) | Direction (Direction of positive values along the axis) |
+| `name` | [AxisName](../biodata_models/coordinates.md#axisname) | Axis name (Note: axis names do not influence order or orientation) |
+| `direction` | [Direction](../biodata_models/coordinates.md#direction) | Direction (Direction of positive values along the axis) |
 
 
 ### CoordinateSystem
@@ -57,9 +57,9 @@ Definition of a coordinate system
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `name` | `str` | Name (Convention is to use <Origin>_<POS_X_DIR><POS_Y_DIR><POS_Z_DIR> etc) |
-| `origin` | [MouseAnatomyModel](../aind_data_schema_models/external.md#mouseanatomymodel) | Origin (Defines the position of (0,0,0) in the coordinate system) |
+| `origin` | [MouseAnatomyModel](../biodata_models/external.md#mouseanatomymodel) | Origin (Defines the position of (0,0,0) in the coordinate system) |
 | `axes` | List[[Axis](#axis)] | Axis names (Axis names and directions) |
-| `axis_unit` | [SizeUnit](../aind_data_schema_models/units.md#sizeunit) | Size unit  |
+| `axis_unit` | [SizeUnit](../biodata_models/units.md#sizeunit) | Size unit  |
 | `handedness` | Optional[[Handedness](#handedness)] | Handedness (Whether the coordinate system is right-handed or left-handed) |
 
 
@@ -101,7 +101,7 @@ Rotations should be applied as Euler angles in the specified axis order.
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `angles` | `List[float]` | Angles (Right-hand rule, positive angles rotate CCW) |
-| `angles_unit` | [AngleUnit](../aind_data_schema_models/units.md#angleunit) | Angle unit  |
+| `angles_unit` | [AngleUnit](../biodata_models/units.md#angleunit) | Angle unit  |
 | `axis_order` | `str` | Axis order (Order of rotation axes as a string (e.g. 'xyz', 'zyx'). Must match the length of angles.) |
 | `reference_coordinate_system` | [ReferenceCoordinateSystem](#referencecoordinatesystem) | Reference coordinate system (Whether to rotate around the global or local coordinate system axes) |
 | `rotation_direction` | [RotationDirection](#rotationdirection) | Rotation direction (Right-hand rule: positive angles rotate CCW when looking toward the origin from the positive axis) |

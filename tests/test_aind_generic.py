@@ -1,10 +1,8 @@
 """test round trip (de)serialization behavior of GenericModel models"""
 
-import unittest
-
 from pydantic import Field
 
-from aind_data_schema.base import DataModel, GenericModel
+from biodata_schema.base import DataModel, GenericModel
 
 
 class GenericContainer(DataModel):
@@ -27,7 +25,7 @@ class SubGenericContainer(GenericContainer):
     contains_model: Bar
 
 
-class GenericModelTests(unittest.TestCase):
+class TestGenericModel:
     """tests device schemas"""
 
     def test_sub_generic_container_round_trip(self):
@@ -38,7 +36,7 @@ class GenericModelTests(unittest.TestCase):
             contains_dict={"foodict": 1, "bardict": "bar"},
         )
         deserialized = SubGenericContainer.model_validate_json(sub_generic_container.model_dump_json())
-        self.assertEqual(sub_generic_container, deserialized)
+        assert sub_generic_container == deserialized
 
     def test_sub_generic_container_from_parent_round_trip(self):
         """tests a round trip (de)serialization of the SubGenericContainer from the parent"""
@@ -48,7 +46,7 @@ class GenericModelTests(unittest.TestCase):
         )
         deserialized_parent = GenericContainer.model_validate_json(sub_generic_container.model_dump_json())
         deserialized = SubGenericContainer.model_validate_json(deserialized_parent.model_dump_json())
-        self.assertEqual(sub_generic_container, deserialized)
+        assert sub_generic_container == deserialized
 
     def test_sub_container_from_container(self):
         """tests if a model created directly from GenericContainer can be deserialized from the SubGenericContainer"""
@@ -62,4 +60,4 @@ class GenericModelTests(unittest.TestCase):
             contains_dict={"foodict": 1, "bardict": "bar"},
         )
         deserialized = SubGenericContainer.model_validate_json(parent_container.model_dump_json())
-        self.assertEqual(sub_generic_container, deserialized)
+        assert sub_generic_container == deserialized

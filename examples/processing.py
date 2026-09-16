@@ -3,8 +3,11 @@
 import argparse
 from datetime import datetime, timezone
 
-from aind_data_schema.components.identifiers import Code, DataAsset
-from aind_data_schema.core.processing import (
+from biodata_models.system_architecture import CPUArchitecture, OperatingSystem
+from biodata_models.units import MemoryUnit
+
+from biodata_schema.components.identifiers import Code, DataAsset
+from biodata_schema.core.processing import (
     DataProcess,
     Processing,
     ProcessName,
@@ -12,8 +15,6 @@ from aind_data_schema.core.processing import (
     ResourceTimestamped,
     ResourceUsage,
 )
-from aind_data_schema_models.units import MemoryUnit
-from aind_data_schema_models.system_architecture import OperatingSystem, CPUArchitecture
 
 # If a timezone isn't specified, the timezone of the computer running this
 # script will be used as default
@@ -52,9 +53,11 @@ p = Processing.create_with_sequential_process_graph(
             name="Imaging processing pipeline",
             url="https://url/for/pipeline",
             version="0.1.1",
-            input_data=[DataAsset(
-                name="123456_2026-05-20_14-14-14",
-            )]
+            input_data=[
+                DataAsset(
+                    name="123456_2026-05-20_14-14-14",
+                )
+            ],
         ),
     ],
     data_processes=[

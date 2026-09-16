@@ -4,29 +4,41 @@ import argparse
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from aind_data_schema_models.modalities import Modality
-from aind_data_schema_models.units import FrequencyUnit
+from biodata_models.brain_atlas import CCFv3
+from biodata_models.coordinates import AxisName, Direction, Origin
+from biodata_models.modalities import Modality
+from biodata_models.stimulus_modality import StimulusModality
+from biodata_models.units import FrequencyUnit, SizeUnit
 
-from aind_data_schema.components.identifiers import Code
-from aind_data_schema.components.stimulus import PhotoStimulation, PhotoStimulationGroup
-from aind_data_schema.core.acquisition import (
-    Acquisition,
-    StimulusEpoch,
-    DataStream,
-    AcquisitionSubjectDetails,
-)
-from aind_data_schema.components.configs import (
+from biodata_schema.components.configs import (
     Channel,
     DetectorConfig,
-    LaserConfig,
-    Plane,
-    PlanarImage,
-    SamplingStrategy,
     ImagingConfig,
+    LaserConfig,
+    PlanarImage,
+    Plane,
+    SamplingStrategy,
 )
-from aind_data_schema.components.coordinates import Translation, Scale, CoordinateSystemLibrary
-from aind_data_schema_models.brain_atlas import CCFv3
-from aind_data_schema_models.stimulus_modality import StimulusModality
+from biodata_schema.components.coordinates import Axis, CoordinateSystem, Scale, Translation
+from biodata_schema.components.identifiers import Code
+from biodata_schema.components.stimulus import PhotoStimulation, PhotoStimulationGroup
+from biodata_schema.core.acquisition import (
+    Acquisition,
+    AcquisitionSubjectDetails,
+    DataStream,
+    StimulusEpoch,
+)
+
+BREGMA_ARI = CoordinateSystem(
+    name="BREGMA_ARI",
+    origin=Origin.BREGMA,
+    axis_unit=SizeUnit.MM,
+    axes=[
+        Axis(name=AxisName.AP, direction=Direction.PA),
+        Axis(name=AxisName.ML, direction=Direction.LR),
+        Axis(name=AxisName.SI, direction=Direction.SI),
+    ],
+)
 
 # If a timezone isn't specified, the timezone of the computer running this
 # script will be used as default
@@ -44,10 +56,10 @@ planar_image = PlanarImage(
     channel_name="Green channel",
     image_to_acquisition_transform=[
         Translation(
-            translation=[1500, 1500],
+            translation=[1500, 1500, 0],
         ),
         Scale(
-            scale=[1.5, 1.5],
+            scale=[1.5, 1.5, 1],
         ),
     ],
     planes=[
@@ -81,7 +93,7 @@ a = Acquisition(
     subject_details=AcquisitionSubjectDetails(
         mouse_platform_name="Mouse tube",
     ),
-    coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+    global_coordinate_system=BREGMA_ARI,
     data_streams=[
         DataStream(
             stream_start_time=t,
@@ -144,6 +156,7 @@ a = Acquisition(
                     ],
                     inter_trial_interval=10,
                 ),
+                version="0.0.1",
             ),
             stimulus_start_time=t,
             stimulus_end_time=t,

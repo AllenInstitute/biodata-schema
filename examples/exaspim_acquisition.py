@@ -1,30 +1,42 @@
 """example ExaSPIM acquisition"""
 
+import argparse
 from datetime import datetime
 from zoneinfo import ZoneInfo
-import argparse
 
-from aind_data_schema_models.organizations import Organization
-from aind_data_schema_models.pid_names import PIDName
-from aind_data_schema_models.registries import Registry
-from aind_data_schema_models.units import PowerUnit, SizeUnit
-from aind_data_schema_models.modalities import Modality
+from biodata_models.coordinates import AxisName, Direction, Origin
+from biodata_models.modalities import Modality
+from biodata_models.organizations import Organization
+from biodata_models.pid_names import PIDName
+from biodata_models.registries import Registry
+from biodata_models.units import PowerUnit, SizeUnit
 
-from aind_data_schema.components.configs import (
+from biodata_schema.components.configs import (
     Channel,
-    DeviceConfig,
-    LaserConfig,
-    ImageSPIM,
-    Immersion,
-    ImagingConfig,
     DetectorConfig,
+    DeviceConfig,
+    ImageSPIM,
+    ImagingConfig,
+    Immersion,
+    LaserConfig,
     SampleChamberConfig,
 )
-from aind_data_schema.components.coordinates import CoordinateSystemLibrary, Scale, Translation
-from aind_data_schema.components.reagent import Reagent
-from aind_data_schema.components.wrappers import AssetPath
-from aind_data_schema.core.acquisition import Acquisition, DataStream
-from aind_data_schema.components.measurements import Calibration, Maintenance
+from biodata_schema.components.coordinates import Axis, CoordinateSystem, Scale, Translation
+from biodata_schema.components.measurements import Calibration, Maintenance
+from biodata_schema.components.reagent import Reagent
+from biodata_schema.components.wrappers import AssetPath
+from biodata_schema.core.acquisition import Acquisition, DataStream
+
+SPIM_RPI = CoordinateSystem(
+    name="SPIM_RPI",
+    origin=Origin.ORIGIN,
+    axis_unit=SizeUnit.MM,
+    axes=[
+        Axis(name=AxisName.X, direction=Direction.LR),
+        Axis(name=AxisName.Y, direction=Direction.AP),
+        Axis(name=AxisName.Z, direction=Direction.SI),
+    ],
+)
 
 # If a timezone isn't specified, the timezone of the computer running this
 # script will be used as default
@@ -101,7 +113,7 @@ imaging_config = ImagingConfig(
         ),
     ],
     images=[image0, image1],
-    coordinate_system=CoordinateSystemLibrary.SPIM_RPI,
+    local_coordinate_system=SPIM_RPI,
 )
 
 chamber_config = SampleChamberConfig(

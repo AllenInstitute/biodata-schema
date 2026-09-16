@@ -1,11 +1,11 @@
 """Example quality control processing"""
 
-from datetime import datetime, timezone
 import argparse
+from datetime import datetime, timezone
 
-from aind_data_schema_models.modalities import Modality
+from biodata_models.modalities import Modality
 
-from aind_data_schema.core.quality_control import QualityControl, QCMetric, Stage, Status, QCStatus
+from biodata_schema.core.quality_control import QCMetric, QCStatus, QualityControl, Stage, Status
 
 t = datetime(2022, 11, 22, 0, 0, 0, tzinfo=timezone.utc)
 

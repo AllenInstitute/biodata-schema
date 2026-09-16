@@ -1,42 +1,40 @@
 """Tests metadata module"""
 
 import json
-import unittest
 import warnings
 from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import patch
 
-from aind_data_schema_models.modalities import Modality
-from aind_data_schema_models.organizations import Organization
-from aind_data_schema_models.species import Strain
+import pytest
+from biodata_models.data_name_patterns import DataLevel
+from biodata_models.modalities import Modality
+from biodata_models.organizations import Organization
+from biodata_models.species import Strain
 from pydantic import ValidationError
 
-from aind_data_schema.components.coordinates import CoordinateSystemLibrary
-from aind_data_schema.components.devices import EphysAssembly, EphysProbe, Laser, Manipulator
-from aind_data_schema.components.identifiers import Code, Database, Person
-from aind_data_schema.components.subjects import BreedingInfo, Housing, MouseSubject, Sex, Species, CalibrationObject
-from aind_data_schema.components.surgery_procedures import BrainInjection
-from aind_data_schema.core.acquisition import Acquisition, AcquisitionSubjectDetails, DataStream
-from aind_data_schema.core.data_description import DataDescription, Funding
-from aind_data_schema_models.data_name_patterns import DataLevel
-from aind_data_schema.components.connections import Connection
-from aind_data_schema.core.instrument import Instrument
-from aind_data_schema.core.metadata import Metadata, create_metadata_json
-from aind_data_schema.core.procedures import Procedures, Surgery
-from aind_data_schema.core.processing import DataProcess, Processing, ProcessName, ProcessStage
-from aind_data_schema.core.subject import Subject
+from biodata_schema.components.connections import Connection
+from biodata_schema.components.devices import EphysAssembly, EphysProbe, Laser, Manipulator
+from biodata_schema.components.identifiers import Code, Database, Person
+from biodata_schema.components.subject_procedures import TrainingProtocol
+from biodata_schema.components.subjects import BreedingInfo, CalibrationObject, Housing, MouseSubject, Sex, Species
+from biodata_schema.components.surgery_procedures import BrainInjection
+from biodata_schema.core.acquisition import Acquisition, AcquisitionSubjectDetails, DataStream, StimulusEpoch
+from biodata_schema.core.data_description import DataDescription, Funding
+from biodata_schema.core.instrument import Instrument
+from biodata_schema.core.metadata import Metadata, create_metadata_json
+from biodata_schema.core.procedures import Procedures, Surgery
+from biodata_schema.core.processing import DataProcess, Processing, ProcessName, ProcessStage
+from biodata_schema.core.subject import Subject
 from examples.aibs_smartspim_instrument import inst as spim_inst
-from examples.ephys_instrument import inst as ephys_inst
-from aind_data_schema.components.subject_procedures import TrainingProtocol
-from aind_data_schema.core.acquisition import StimulusEpoch
-
 from examples.barseq_acquisition import acquisition as barseq_acquisition
 from examples.data_description import d as data_description
+from examples.ephys_instrument import inst as ephys_inst
 from examples.model import m as model_example
 from examples.processing import p as processing_example
 from examples.quality_control import q as quality_control_example
 from examples.subject import s as subject
+from tests.coordinate_systems import BREGMA_ARI
 
 ephys_assembly = EphysAssembly(
     probes=[EphysProbe(probe_model="Neuropixels 1.0", name="Probe A")],
@@ -58,11 +56,11 @@ laser = Laser(
 t = datetime.fromisoformat("2024-09-13T14:00:00")
 
 
-class TestMetadata(unittest.TestCase):
+class TestMetadata:
     """Class to test Metadata model"""
 
     @classmethod
-    def setUpClass(cls) -> None:
+    def setup_class(cls) -> None:
         """Set up the test class."""
         cls.spim_instrument = spim_inst
 
@@ -75,7 +73,6 @@ class TestMetadata(unittest.TestCase):
                 date_of_birth=datetime(2022, 11, 22, 8, 43, 00, tzinfo=timezone.utc).date(),
                 source=Organization.AI,
                 breeding_info=BreedingInfo(
-                    breeding_group="Emx1-IRES-Cre(ND)",
                     maternal_id="546543",
                     maternal_genotype="Emx1-IRES-Cre/wt; Camk2a-tTa/Camk2a-tTA",
                     paternal_id="232323",
@@ -130,7 +127,7 @@ class TestMetadata(unittest.TestCase):
 
     def test_default_file_extension(self):
         """Tests that the default file extension used is as expected."""
-        self.assertEqual(".nd.json", Metadata._FILE_EXTENSION.default)
+        assert ".nd.json" == Metadata._FILE_EXTENSION.default
 
     def test_injection_material_validator_spim(self):
         """Tests that the injection validator works for SPIM"""
@@ -138,7 +135,7 @@ class TestMetadata(unittest.TestCase):
 
         # Tests missing injection materials
         surgery2 = Surgery.model_construct(procedures=[nano_inj])
-        with self.assertRaises(ValidationError) as context:
+        with pytest.raises(ValidationError) as context:
             Metadata(
                 name="655019_2023-04-03T181709",
                 location="bucket",
@@ -157,7 +154,7 @@ class TestMetadata(unittest.TestCase):
                 instrument=self.spim_instrument,
                 processing=Processing.model_construct(),
             )
-        self.assertIn("Injection is missing injection_materials.", str(context.exception))
+        assert "Injection is missing injection_materials." in str(context.value)
 
     def test_injection_material_validator_ephys(self):
         """Test that the injection validator works for ephys"""
@@ -166,7 +163,7 @@ class TestMetadata(unittest.TestCase):
         # Tests missing injection materials
         surgery2 = Surgery.model_construct(procedures=[nano_inj])
         modalities = [Modality.ECEPHYS]
-        with self.assertRaises(ValidationError) as context:
+        with pytest.raises(ValidationError) as context:
             Metadata(
                 name="655019_2023-04-03T181709",
                 location="bucket",
@@ -186,7 +183,7 @@ class TestMetadata(unittest.TestCase):
                     subject_details=AcquisitionSubjectDetails.model_construct(),
                 ),
             )
-        self.assertIn("Injection is missing injection_materials.", str(context.exception))
+        assert "Injection is missing injection_materials." in str(context.value)
 
     def test_validate_instrument_acquisition_compatibility(self):
         """Tests that instrument/acquisition compatibility validator works as expected"""
@@ -196,9 +193,9 @@ class TestMetadata(unittest.TestCase):
             instrument_id="123_EPHYS1_20220101",
             modalities=modalities,
             components=[ephys_assembly],
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
         )
-        with self.assertRaises(ValidationError) as context:
+        with pytest.raises(ValidationError) as context:
             Metadata(
                 name="655019_2023-04-03T181709",
                 location="bucket",
@@ -219,10 +216,9 @@ class TestMetadata(unittest.TestCase):
                     data_streams=[],
                 ),
             )
-        self.assertIn(
-            "Instrument ID in acquisition 123_EPHYS2_20230101 does not match the instrument's 123_EPHYS1_20220101.",
-            str(context.exception),
-        )
+        assert (
+            "Instrument ID in acquisition 123_EPHYS2_20230101 does not match the instrument's 123_EPHYS1_20220101."
+        ) in str(context.value)
 
     def test_validate_old_schema_version(self):
         """Tests that old schema versions are ignored during validation"""
@@ -239,7 +235,7 @@ class TestMetadata(unittest.TestCase):
 
         m2 = Metadata(**m_dict)
 
-        self.assertIsNotNone(m2)
+        assert m2 is not None
 
     def test_create_from_core_jsons(self):
         """Tests metadata json can be created with valid inputs"""
@@ -267,14 +263,14 @@ class TestMetadata(unittest.TestCase):
             core_jsons=core_jsons,
         )
         # check that metadata was created with expected values
-        self.assertEqual(self.sample_name, result["name"])
-        self.assertEqual(self.sample_location, result["location"])
-        self.assertEqual(self.subject_json, result["subject"])
-        self.assertEqual(self.procedures_json, result["procedures"])
-        self.assertEqual(self.processing_json, result["processing"])
-        self.assertIsNone(result["acquisition"])
+        assert self.sample_name == result["name"]
+        assert self.sample_location == result["location"]
+        assert self.subject_json == result["subject"]
+        assert self.procedures_json == result["procedures"]
+        assert self.processing_json == result["processing"]
+        assert result["acquisition"] is None
         # also check the other fields
-        self.assertDictEqual(expected_result, result)
+        assert expected_result == result
 
     def test_create_from_core_jsons_invalid(self):
         """Tests metadata json creation with invalid inputs"""
@@ -293,7 +289,7 @@ class TestMetadata(unittest.TestCase):
             location=self.sample_location,
             core_jsons=core_jsons,
         )
-        self.assertIsNotNone(metadata)
+        assert metadata is not None
 
     def test_create_from_core_jsons_optional_overwrite(self):
         """Tests metadata json creation with created and external links"""
@@ -308,14 +304,14 @@ class TestMetadata(unittest.TestCase):
             },
             other_identifiers=other_identifiers,
         )
-        self.assertEqual(self.sample_name, result["name"])
-        self.assertEqual(self.sample_location, result["location"])
-        self.assertEqual(other_identifiers, result["other_identifiers"])
+        assert self.sample_name == result["name"]
+        assert self.sample_location == result["location"]
+        assert other_identifiers == result["other_identifiers"]
 
     def test_validate_expected_files_by_modality(self):
         """Tests that warnings are issued when metadata is missing required files"""
         # Test case where required files are missing for 'subject'
-        with self.assertWarns(UserWarning) as w:
+        with pytest.warns(UserWarning) as w:
             Metadata(
                 name="655019_2023-04-03T181709",
                 location="bucket",
@@ -323,22 +319,21 @@ class TestMetadata(unittest.TestCase):
                 # Missing required files: data_description, procedures, instrument, acquisition
             )
 
-        warning_messages = [str(warning.message) for warning in w.warnings]
-        self.assertIn("Metadata missing required file: data_description", warning_messages)
-        self.assertIn("Metadata missing required file: procedures", warning_messages)
-        self.assertIn("Metadata missing required file: instrument", warning_messages)
-        self.assertIn("Metadata missing required file: acquisition", warning_messages)
+        warning_messages = [str(warning.message) for warning in w]
+        assert "Metadata missing required file: data_description" in warning_messages
+        assert "Metadata missing required file: procedures" in warning_messages
+        assert "Metadata missing required file: instrument" in warning_messages
+        assert "Metadata missing required file: acquisition" in warning_messages
 
         # Test case where ALL required file set keys are missing (subject, processing, model)
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             Metadata(
                 name="655019_2023-04-03T181709",
                 location="bucket",
                 # No subject, processing, or model - should trigger validation error
             )
-        self.assertIn(
-            "Metadata must contain at least one of the following files: subject, processing, model",
-            str(context.exception),
+        assert "Metadata must contain at least one of the following files: subject, processing, model" in str(
+            context.value
         )
 
     def test_external_data_stream_no_instrument_warning(self):
@@ -352,7 +347,7 @@ class TestMetadata(unittest.TestCase):
                 acquisition=barseq_acquisition,
             )
         instrument_warnings = [str(warning.message) for warning in w if "instrument" in str(warning.message)]
-        self.assertEqual([], instrument_warnings)
+        assert [] == instrument_warnings
 
     def test_validate_acquisition_connections(self):
         """Tests that acquisition connections are validated correctly."""
@@ -380,7 +375,7 @@ class TestMetadata(unittest.TestCase):
             instrument=instrument,
             acquisition=acquisition,
         )
-        self.assertIsNotNone(metadata)
+        assert metadata is not None
 
         # Case where connection devices are missing
         acquisition = Acquisition.model_construct(
@@ -396,7 +391,7 @@ class TestMetadata(unittest.TestCase):
             ],
             subject_details=AcquisitionSubjectDetails.model_construct(),
         )
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             Metadata(
                 name="Test Metadata",
                 location="Test Location",
@@ -404,10 +399,7 @@ class TestMetadata(unittest.TestCase):
                 instrument=instrument,
                 acquisition=acquisition,
             )
-        self.assertIn(
-            "Missing Device",
-            str(context.exception),
-        )
+        assert "Missing Device" in str(context.value)
 
         # Case where source device is missing
         acquisition_missing_source = Acquisition.model_construct(
@@ -423,7 +415,7 @@ class TestMetadata(unittest.TestCase):
             ],
             subject_details=AcquisitionSubjectDetails.model_construct(),
         )
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             Metadata(
                 name="Test Metadata",
                 location="Test Location",
@@ -431,10 +423,7 @@ class TestMetadata(unittest.TestCase):
                 instrument=instrument,
                 acquisition=acquisition_missing_source,
             )
-        self.assertIn(
-            "Missing Source",
-            str(context.exception),
-        )
+        assert "Missing Source" in str(context.value)
 
     def test_validate_acquisition_active_devices(self):
         """Tests that acquisition active devices are validated correctly."""
@@ -462,7 +451,7 @@ class TestMetadata(unittest.TestCase):
             instrument=instrument,
             acquisition=acquisition,
         )
-        self.assertIsNotNone(metadata)
+        assert metadata is not None
 
         # Case where active devices are missing from both instrument and procedures
         acquisition = Acquisition.model_construct(
@@ -475,7 +464,7 @@ class TestMetadata(unittest.TestCase):
             ],
             subject_details=AcquisitionSubjectDetails.model_construct(),
         )
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             Metadata(
                 name="Test Metadata",
                 location="Test Location",
@@ -483,11 +472,10 @@ class TestMetadata(unittest.TestCase):
                 instrument=instrument,
                 acquisition=acquisition,
             )
-        self.assertIn(
+        assert (
             "Active devices '{'Missing Device'}' were not found in either the Instrument.components or "
-            "in an individual procedure's implanted_device field.",
-            str(context.exception),
-        )
+            "in an individual procedure's implanted_device field."
+        ) in str(context.value)
 
     def test_validate_training_protocol_references(self):
         """Tests that training protocol references are validated correctly."""
@@ -511,7 +499,7 @@ class TestMetadata(unittest.TestCase):
             procedures=procedures,
             acquisition=acquisition,
         )
-        self.assertIsNotNone(metadata)
+        assert metadata is not None
 
         # Case where training protocol reference doesn't match
         stimulus_epoch_invalid = StimulusEpoch.model_construct(training_protocol_name="Missing Protocol")
@@ -523,7 +511,7 @@ class TestMetadata(unittest.TestCase):
             subject_details=AcquisitionSubjectDetails.model_construct(),
         )
 
-        with self.assertWarns(UserWarning) as w:
+        with pytest.warns(UserWarning) as w:
             metadata = Metadata(
                 name="Test Metadata",
                 location="Test Location",
@@ -532,19 +520,16 @@ class TestMetadata(unittest.TestCase):
                 acquisition=acquisition_invalid,
             )
 
-        warning_messages = [str(warning.message) for warning in w.warnings]
-        self.assertIn(
-            (
-                "Training protocol 'Missing Protocol' in StimulusEpoch not found in Procedures."
-                " Available protocols: ['Protocol A']"
-            ),
-            warning_messages,
-        )
-        self.assertIsNotNone(metadata)
+        warning_messages = [str(warning.message) for warning in w]
+        assert (
+            "Training protocol 'Missing Protocol' in StimulusEpoch not found in Procedures."
+            " Available protocols: ['Protocol A']"
+        ) in warning_messages
+        assert metadata is not None
 
         # Case where no training protocols exist in procedures
         procedures_empty = Procedures.model_construct(subject_procedures=[])
-        with self.assertWarns(UserWarning) as w:
+        with pytest.warns(UserWarning) as w:
             metadata = Metadata(
                 name="Test Metadata",
                 location="Test Location",
@@ -553,15 +538,11 @@ class TestMetadata(unittest.TestCase):
                 acquisition=acquisition_invalid,
             )
 
-        warning_messages = [str(warning.message) for warning in w.warnings]
-        self.assertIn(
-            (
-                "Training protocol 'Missing Protocol' in StimulusEpoch not found in Procedures. "
-                "Available protocols: []"
-            ),
-            warning_messages,
-        )
-        self.assertIsNotNone(metadata)
+        warning_messages = [str(warning.message) for warning in w]
+        assert (
+            "Training protocol 'Missing Protocol' in StimulusEpoch not found in Procedures. Available protocols: []"
+        ) in warning_messages
+        assert metadata is not None
 
         # Case where stimulus epoch has no training protocol name (should pass)
         stimulus_epoch_none = StimulusEpoch.model_construct(training_protocol_name=None)
@@ -580,7 +561,7 @@ class TestMetadata(unittest.TestCase):
             procedures=procedures,
             acquisition=acquisition_none,
         )
-        self.assertIsNotNone(metadata_none)
+        assert metadata_none is not None
 
         # Case where acquisition is None (should pass)
         metadata_no_acquisition = Metadata(
@@ -589,7 +570,7 @@ class TestMetadata(unittest.TestCase):
             subject=subject,
             procedures=procedures,
         )
-        self.assertIsNotNone(metadata_no_acquisition)
+        assert metadata_no_acquisition is not None
 
         # Case where procedures is None (should pass)
         metadata_no_procedures = Metadata(
@@ -598,7 +579,7 @@ class TestMetadata(unittest.TestCase):
             subject=subject,
             acquisition=acquisition,
         )
-        self.assertIsNotNone(metadata_no_procedures)
+        assert metadata_no_procedures is not None
 
     def test_validate_data_description_name_time_consistency(self):
         """Tests that data_description.name creation_time is on or after midnight
@@ -636,7 +617,7 @@ class TestMetadata(unittest.TestCase):
             data_description=data_description,
             acquisition=acquisition,
         )
-        self.assertIsNotNone(metadata_matching)
+        assert metadata_matching is not None
 
         # Test with creation time later on the same day - should pass
         later_same_day = datetime(2023, 4, 3, 23, 59, 59, tzinfo=timezone.utc)
@@ -658,7 +639,7 @@ class TestMetadata(unittest.TestCase):
             data_description=data_description_later,
             acquisition=acquisition,
         )
-        self.assertIsNotNone(metadata_later_same_day)
+        assert metadata_later_same_day is not None
 
         # Test with creation time on the next day - should pass
         next_day = datetime(2023, 4, 4, 0, 0, 1, tzinfo=timezone.utc)
@@ -680,7 +661,7 @@ class TestMetadata(unittest.TestCase):
             data_description=data_description_next_day,
             acquisition=acquisition,
         )
-        self.assertIsNotNone(metadata_next_day)
+        assert metadata_next_day is not None
 
         # Test with creation time before midnight of acquisition day - should fail
         before_midnight = datetime(2023, 4, 2, 23, 59, 59, tzinfo=timezone.utc)
@@ -706,14 +687,14 @@ class TestMetadata(unittest.TestCase):
                 acquisition=acquisition,
             )
             # Should have successfully created the metadata object
-            self.assertIsNotNone(metadata_with_warning)
+            assert metadata_with_warning is not None
             # Should have issued a warning
             print(warning_list)
             # Filter to only the time consistency warning
             time_warnings = [w for w in warning_list if "Creation time from data_description" in str(w.message)]
-            self.assertEqual(len(time_warnings), 1)
-            self.assertIn("Creation time from data_description", str(time_warnings[0].message))
-            self.assertIn("should be close to the acquisition end time", str(time_warnings[0].message))
+            assert len(time_warnings) == 1
+            assert "Creation time from data_description" in str(time_warnings[0].message)
+            assert "should be close to the acquisition end time" in str(time_warnings[0].message)
 
         # Test case where data_description is None (should pass)
         metadata_no_data_desc = Metadata(
@@ -722,7 +703,7 @@ class TestMetadata(unittest.TestCase):
             subject=subject,
             acquisition=acquisition,
         )
-        self.assertIsNotNone(metadata_no_data_desc)
+        assert metadata_no_data_desc is not None
 
         # Test case where acquisition is None (should pass)
         metadata_no_acquisition = Metadata(
@@ -731,7 +712,7 @@ class TestMetadata(unittest.TestCase):
             subject=subject,
             data_description=data_description,
         )
-        self.assertIsNotNone(metadata_no_acquisition)
+        assert metadata_no_acquisition is not None
 
     def test_validate_time_constraints_subject(self):
         """Tests that time constraints are validated for subject with date_of_birth"""
@@ -760,7 +741,6 @@ class TestMetadata(unittest.TestCase):
                 source=Organization.AI,
                 genotype="wt",
                 breeding_info=BreedingInfo(
-                    breeding_group="Test",
                     maternal_id="123",
                     maternal_genotype="wt",
                     paternal_id="456",
@@ -777,7 +757,7 @@ class TestMetadata(unittest.TestCase):
             subject=valid_subject,
             acquisition=acquisition,
         )
-        self.assertIsNotNone(metadata_valid_birth)
+        assert metadata_valid_birth is not None
 
         # Test case where subject's date_of_birth is after acquisition end (should fail)
         invalid_birth_date = datetime(2023, 4, 4, tzinfo=timezone.utc).date()  # After acquisition
@@ -791,7 +771,6 @@ class TestMetadata(unittest.TestCase):
                 source=Organization.AI,
                 genotype="wt",
                 breeding_info=BreedingInfo(
-                    breeding_group="Test",
                     maternal_id="123",
                     maternal_genotype="wt",
                     paternal_id="456",
@@ -802,15 +781,15 @@ class TestMetadata(unittest.TestCase):
         )
 
         # This should fail - birth date is after acquisition end
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             Metadata(
                 name="Test Metadata",
                 location="Test Location",
                 subject=invalid_subject,
                 acquisition=acquisition,
             )
-        self.assertIn("must be before", str(context.exception))
-        self.assertIn("date_of_birth", str(context.exception))
+        assert "must be before" in str(context.value)
+        assert "date_of_birth" in str(context.value)
 
     def test_validate_time_constraints_processing(self):
         """Tests that time constraints are validated for processing with start_date_time and end_date_time"""
@@ -853,7 +832,7 @@ class TestMetadata(unittest.TestCase):
             processing=valid_processing,
             acquisition=acquisition,
         )
-        self.assertIsNotNone(metadata_valid_processing)
+        assert metadata_valid_processing is not None
 
         # Test case where processing start time is before acquisition start (should fail)
         invalid_processing = Processing.create_with_sequential_process_graph(
@@ -875,18 +854,18 @@ class TestMetadata(unittest.TestCase):
         )
 
         # This should fail - processing start time is before acquisition start
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             Metadata(
                 name="Test Metadata",
                 location="Test Location",
                 processing=invalid_processing,
                 acquisition=acquisition,
             )
-        self.assertIn("must be after", str(context.exception))
-        self.assertIn("start_date_time", str(context.exception))
+        assert "must be after" in str(context.value)
+        assert "start_date_time" in str(context.value)
 
     def test_validate_calibration_object_tags(self):
-        """Tests that calibration tag warning is issued when subject is CalibrationObject but tag is missing"""
+        """Tests that CalibrationObject subjects use the calibration subject ID"""
 
         # Create a subject with CalibrationObject
         calibration_subject = Subject(
@@ -896,26 +875,22 @@ class TestMetadata(unittest.TestCase):
             ),
         )
 
-        # Use the existing data_description from class setup (which doesn't have 'calibration' tag)
-        dd = data_description.model_copy()
-        dd.tags = None  # Ensure no tags are set
-
-        # This should trigger a warning since subject is CalibrationObject but no 'calibration' tag
-        with self.assertWarns(UserWarning) as w:
-            metadata = Metadata(
+        with pytest.raises(ValueError, match="CalibrationObject subject_id must be 'calibration'"):
+            Metadata(
                 name="Test Metadata",
                 location="Test Location",
                 subject=calibration_subject,
-                data_description=dd,
+                data_description=data_description,
             )
 
-        warning_messages = [str(warning.message) for warning in w.warnings]
-        self.assertIn(
-            "Subject is a CalibrationObject but 'calibration' tag is missing from data_description.tags. "
-            "Adding 'calibration' tag automatically.",
-            warning_messages,
+        calibration_subject.subject_id = "calibration"
+        metadata = Metadata(
+            name="Test Metadata",
+            location="Test Location",
+            subject=calibration_subject,
+            data_description=data_description,
         )
-        self.assertIsNotNone(metadata)
+        assert metadata is not None
 
     def test_validate_subject_details_if_not_specimen(self):
         """Tests that subject details are required if acquisition.specimen_id is not provided"""
@@ -934,7 +909,7 @@ class TestMetadata(unittest.TestCase):
             subject=subject,
             acquisition=acquisition_with_specimen,
         )
-        self.assertIsNotNone(metadata_with_specimen)
+        assert metadata_with_specimen is not None
 
         # Case where specimen_id is not provided and subject_details is provided - should pass
         acquisition_with_details = Acquisition.model_construct(
@@ -950,7 +925,7 @@ class TestMetadata(unittest.TestCase):
             subject=subject,
             acquisition=acquisition_with_details,
         )
-        self.assertIsNotNone(metadata_with_details)
+        assert metadata_with_details is not None
 
         # Case where neither specimen_id nor subject_details is provided - should fail
         acquisition_missing_both = Acquisition.model_construct(
@@ -959,21 +934,21 @@ class TestMetadata(unittest.TestCase):
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             data_streams=[],
         )
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             Metadata(
                 name="Test Metadata",
                 location="Test Location",
                 subject=subject,
                 acquisition=acquisition_missing_both,
             )
-        self.assertIn("Acquisition.subject_details are required for in vivo experiments", str(context.exception))
+        assert "Acquisition.subject_details are required for in vivo experiments" in str(context.value)
 
 
-class TestWriteStandardFiles(unittest.TestCase):
+class TestWriteStandardFiles:
     """Tests for Metadata.write_standard_files"""
 
     @patch.object(Path, "open", autospec=True)
-    @patch("aind_data_schema.utils.validators.recursive_check_paths")
+    @patch("biodata_schema.utils.validators.recursive_check_paths")
     def test_writes_each_present_core_file(self, mock_rcp, mock_open_fn):
         """write_standard_files calls write_standard_file for each non-None core field"""
         m = Metadata.model_construct(
@@ -987,14 +962,14 @@ class TestWriteStandardFiles(unittest.TestCase):
         m.write_standard_files()
 
         opened_files = [call_args[0][0].name for call_args in mock_open_fn.call_args_list]
-        self.assertIn("subject.json", opened_files)
-        self.assertIn("data_description.json", opened_files)
-        self.assertIn("processing.json", opened_files)
-        self.assertIn("quality_control.json", opened_files)
-        self.assertEqual(4, mock_open_fn.call_count)
+        assert "subject.json" in opened_files
+        assert "data_description.json" in opened_files
+        assert "processing.json" in opened_files
+        assert "quality_control.json" in opened_files
+        assert 4 == mock_open_fn.call_count
 
     @patch.object(Path, "open", autospec=True)
-    @patch("aind_data_schema.utils.validators.recursive_check_paths")
+    @patch("biodata_schema.utils.validators.recursive_check_paths")
     def test_skips_none_fields(self, mock_rcp, mock_open_fn):
         """Fields that are None produce no file writes"""
         m = Metadata.model_construct(
@@ -1004,12 +979,12 @@ class TestWriteStandardFiles(unittest.TestCase):
         )
         m.write_standard_files()
 
-        self.assertEqual(1, mock_open_fn.call_count)
+        assert 1 == mock_open_fn.call_count
         opened_files = [call_args[0][0].name for call_args in mock_open_fn.call_args_list]
-        self.assertIn("processing.json", opened_files)
+        assert "processing.json" in opened_files
 
     @patch.object(Path, "open", autospec=True)
-    @patch("aind_data_schema.utils.validators.recursive_check_paths")
+    @patch("biodata_schema.utils.validators.recursive_check_paths")
     def test_output_directory_forwarded(self, mock_rcp, mock_open_fn):
         """output_directory is forwarded to each write_standard_file call"""
         m = Metadata.model_construct(
@@ -1021,9 +996,5 @@ class TestWriteStandardFiles(unittest.TestCase):
         m.write_standard_files(output_directory=Path("output_dir"))
 
         opened_files = [call_args[0][0] for call_args in mock_open_fn.call_args_list]
-        self.assertIn(Path("output_dir/subject.json"), opened_files)
-        self.assertIn(Path("output_dir/model.json"), opened_files)
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert Path("output_dir/subject.json") in opened_files
+        assert Path("output_dir/model.json") in opened_files

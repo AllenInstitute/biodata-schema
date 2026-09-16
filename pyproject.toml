@@ -3,7 +3,7 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "aind-data-schema"
+name = "biodata-schema"
 description = "A library that defines AIND data schema and validates JSON files."
 license = {text = "MIT"}
 requires-python = ">=3.10,<3.14"
@@ -14,93 +14,69 @@ readme = "README.md"
 dynamic = ["version"]
 
 dependencies = [
-    'aind-data-schema-models>=6.1.0,<7',
-    'pydantic>=2.7, <2.12',
+    'biodata-models>=1.0.1,<2',
+    'pydantic>=2.7, <3',
     'pydantic-extra-types',
     'tzdata',
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
-    'aind_data_schema[linters]',
-    'pydantic>=2.7, !=2.9.0, !=2.9.1',
-    'scipy',
-    'dictdiffer',
-    'semver',
     'argparse',
-]
-
-linters = [
     'codespell',
-    'black',
-    'coverage',
-    'flake8',
-    'interrogate',
-    'isort',
-    'aind-flake8-extensions>=0.6,<0.7'
+    'dictdiffer',
+    'pydantic>=2.7, !=2.9.0, !=2.9.1',
+    'pytest>=8.3',
+    'pytest-cov>=6',
+    'ruff>=0.11',
+    'semver',
 ]
 
 docs = [
-    'sphinx',
-    'sphinx-jinja',
-    'furo',
     'autodoc_pydantic',
+    'furo',
     'myst-parser',
     'openpyxl',
-]
-
-transforms = [
-    'scipy',
+    'sphinx',
+    'sphinx-jinja',
 ]
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.dynamic]
-version = {attr = "aind_data_schema.__version__"}
+version = {attr = "biodata_schema.__version__"}
 readme = {file = ["README.md"]}
-
-[tool.black]
-line-length = 120
-exclude = '''
-
-(
-  /(
-      \.eggs         # exclude a few common directories in the
-    | \.git          # root of the project
-    | \.hg
-    | \.mypy_cache
-    | \.tox
-    | \.venv
-    | _build
-    | build
-    | dist
-  )/
-  | .gitignore
-)
-'''
 
 [tool.coverage.run]
 omit = [
     "*__init__*",
-    "*/aind_data_schema/visualizations/*",
+    "*/biodata_schema/visualizations/*",
     "*/tests/test_diagram_builder.py",
-    "*/aind_data_schema/utils/schema_tree.py"
+    "*/biodata_schema/utils/schema_tree.py"
 ]
-source = ["aind_data_schema", "tests"]
+source = ["biodata_schema", "tests"]
 
 [tool.coverage.report]
 exclude_lines = ["if __name__ == .__main__.:", "pragma: no cover"]
 fail_under = 100
 
-[tool.isort]
-line_length = 120
-profile = "black"
-
-[tool.interrogate]
-exclude = ["setup.py", "docs", "build"]
-fail-under = 100
-
 [tool.codespell]
 skip = '.git,*.pdf,*.svg'
-ignore-words-list = 'nd,assertIn,DeviceC'
+ignore-words-list = 'nd,DeviceC'
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+strict_config = true
+strict_markers = true
+markers = ["online: tests requiring external services"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["C901", "E4", "E7", "E9", "F", "I"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10

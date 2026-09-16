@@ -8,13 +8,13 @@ Description of an inherently fluorescent marker. Note this class will change nam
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `stain_type` | [StainType](../aind_data_schema_models/reagent.md#staintype) |   |
+| `stain_type` | [StainType](../biodata_models/reagent.md#staintype) | Stain type  |
 | `excitation_wavelength` | `int` | Excitation wavelength (nm)  |
 | `emission_wavelength` | `int` | Emission wavelength (nm)  |
-| `wavelength_unit` | [SizeUnit](../aind_data_schema_models/units.md#sizeunit) | Excitation wavelength unit  |
+| `wavelength_unit` | [SizeUnit](../biodata_models/units.md#sizeunit) | Excitation wavelength unit  |
 | `name` | `str` | Name  |
-| `source` | [Organization](../aind_data_schema_models/organizations.md#organization) | Source  |
-| `rrid` | Optional[[PIDName](../aind_data_schema_models/pid_names.md#pidname)] | Research Resource ID  |
+| `source` | [Organization](../biodata_models/organizations.md#organization) | Source  |
+| `rrid` | Optional[[PIDName](../biodata_models/pid_names.md#pidname)] | Research Resource ID  |
 | `lot_number` | `Optional[str]` | Lot number  |
 | `expiration_date` | `Optional[datetime.date]` | Lot expiration date  |
 
@@ -27,12 +27,12 @@ Note this class will change names in v3.0
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `probe` | [GeneProbe](#geneprobe) or [ProteinProbe](#proteinprobe) or [SmallMoleculeProbe](#smallmoleculeprobe) | Target of the stain  |
-| `stain_type` | [StainType](../aind_data_schema_models/reagent.md#staintype) | Stain type  |
+| `stain_type` | [StainType](../biodata_models/reagent.md#staintype) | Stain type  |
 | `fluorophore` | [Fluorophore](#fluorophore) | Fluorophore used in the stain  |
 | `initiator_name` | `Optional[str]` | Initiator for HCR probes  |
 | `name` | `str` | Name  |
-| `source` | [Organization](../aind_data_schema_models/organizations.md#organization) | Source  |
-| `rrid` | Optional[[PIDName](../aind_data_schema_models/pid_names.md#pidname)] | Research Resource ID  |
+| `source` | [Organization](../biodata_models/organizations.md#organization) | Source  |
+| `rrid` | Optional[[PIDName](../biodata_models/pid_names.md#pidname)] | Research Resource ID  |
 | `lot_number` | `Optional[str]` | Lot number  |
 | `expiration_date` | `Optional[datetime.date]` | Lot expiration date  |
 
@@ -43,9 +43,9 @@ Flurophore used in HCR, Immunolabeling, etc
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `fluorophore_type` | [FluorophoreType](../aind_data_schema_models/reagent.md#fluorophoretype) | Fluorophore type  |
+| `fluorophore_type` | [FluorophoreType](../biodata_models/reagent.md#fluorophoretype) | Fluorophore type  |
 | `excitation_wavelength` | `int` | Excitation wavelength (nm)  |
-| `excitation_wavelength_unit` | [SizeUnit](../aind_data_schema_models/units.md#sizeunit) | Excitation wavelength unit  |
+| `excitation_wavelength_unit` | [SizeUnit](../biodata_models/units.md#sizeunit) | Excitation wavelength unit  |
 
 
 ### GeneProbe
@@ -54,7 +54,7 @@ Description of a set of oligonucleotide probes targeting a specific gene
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `gene` | [PIDName](../aind_data_schema_models/pid_names.md#pidname) | Gene name  |
+| `gene` | [PIDName](../biodata_models/pid_names.md#pidname) | Gene name  |
 | `probes` | Optional[List[[OligoProbe](#oligoprobe)]] | Probes  |
 
 
@@ -66,8 +66,8 @@ set of probes used in BarSEQ
 |-------|------|-------------|
 | `gene_probes` | List[[GeneProbe](#geneprobe)] | Gene probes  |
 | `name` | `str` | Name  |
-| `source` | [Organization](../aind_data_schema_models/organizations.md#organization) | Source  |
-| `rrid` | Optional[[PIDName](../aind_data_schema_models/pid_names.md#pidname)] | Research Resource ID  |
+| `source` | [Organization](../biodata_models/organizations.md#organization) | Source  |
+| `rrid` | Optional[[PIDName](../biodata_models/pid_names.md#pidname)] | Research Resource ID  |
 | `lot_number` | `Optional[str]` | Lot number  |
 | `expiration_date` | `Optional[datetime.date]` | Lot expiration date  |
 
@@ -90,8 +90,8 @@ Description of a probe used as a reagent
 |-------|------|-------------|
 | `target` | [GeneProbe](#geneprobe) or [ProteinProbe](#proteinprobe) or [SmallMoleculeProbe](#smallmoleculeprobe) | Target  |
 | `name` | `str` | Name  |
-| `source` | [Organization](../aind_data_schema_models/organizations.md#organization) | Source  |
-| `rrid` | Optional[[PIDName](../aind_data_schema_models/pid_names.md#pidname)] | Research Resource ID  |
+| `source` | [Organization](../biodata_models/organizations.md#organization) | Source  |
+| `rrid` | Optional[[PIDName](../biodata_models/pid_names.md#pidname)] | Research Resource ID  |
 | `lot_number` | `Optional[str]` | Lot number  |
 | `expiration_date` | `Optional[datetime.date]` | Lot expiration date  |
 
@@ -102,10 +102,10 @@ Description of a protein probe including antibodies
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `protein` | [PIDName](../aind_data_schema_models/pid_names.md#pidname) | Target protein name  |
-| `species` | Optional[[Species](../aind_data_schema_models/species.md#species)] | Species of the probe  |
+| `protein` | [PIDName](../biodata_models/pid_names.md#pidname) | Target protein name  |
+| `species` | Optional[[Species](../biodata_models/species.md#species)] | Species of the probe  |
 | `mass` | `float` | Mass of protein probe (ug)  |
-| `mass_unit` | [MassUnit](../aind_data_schema_models/units.md#massunit) | Mass unit  |
+| `mass_unit` | [MassUnit](../biodata_models/units.md#massunit) | Mass unit  |
 | `sequence` | `Optional[str]` | Amino acid sequence of the probe  |
 
 
@@ -116,8 +116,8 @@ Description of reagent used in procedure
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `name` | `str` | Name  |
-| `source` | [Organization](../aind_data_schema_models/organizations.md#organization) | Source  |
-| `rrid` | Optional[[PIDName](../aind_data_schema_models/pid_names.md#pidname)] | Research Resource ID  |
+| `source` | [Organization](../biodata_models/organizations.md#organization) | Source  |
+| `rrid` | Optional[[PIDName](../biodata_models/pid_names.md#pidname)] | Research Resource ID  |
 | `lot_number` | `Optional[str]` | Lot number  |
 | `expiration_date` | `Optional[datetime.date]` | Lot expiration date  |
 
@@ -128,9 +128,9 @@ Description of a small molecule probe
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `molecule` | [PIDName](../aind_data_schema_models/pid_names.md#pidname) | Target small molecule name  |
+| `molecule` | [PIDName](../biodata_models/pid_names.md#pidname) | Target small molecule name  |
 | `mass` | `float` | Mass of small molecule probe (ug)  |
-| `mass_unit` | [MassUnit](../aind_data_schema_models/units.md#massunit) | Mass unit  |
+| `mass_unit` | [MassUnit](../biodata_models/units.md#massunit) | Mass unit  |
 
 
 ### Solution

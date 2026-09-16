@@ -1,11 +1,9 @@
 """Test components.stimulus"""
 
-import unittest
-
-from aind_data_schema.components.stimulus import AuditoryStimulation
+from biodata_schema.components.stimulus import AuditoryStimulation
 
 
-class StimulusTests(unittest.TestCase):
+class TestStimulus:
     """tests components.stimulus"""
 
     def test_typo(self):
@@ -18,4 +16,4 @@ class StimulusTests(unittest.TestCase):
         a_dict = a.model_dump()
         a_dict["sitmulus_name"] = a_dict.pop("stimulus_name")
 
-        self.assertEqual(a.model_dump(), AuditoryStimulation(**a_dict).model_dump())
+        assert a.model_dump() == AuditoryStimulation(**a_dict).model_dump()

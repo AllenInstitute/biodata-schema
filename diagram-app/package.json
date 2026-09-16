@@ -1,9 +1,9 @@
 {
-  "name": "aind-data-schema-diagram-app",
+  "name": "biodata-schema-diagram-app",
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Interactive React Flow diagram of the aind-data-schema Metadata model, embedded in the Sphinx docs front page.",
+  "description": "Interactive React Flow diagram of the biodata-schema Metadata model, embedded in the Sphinx docs front page.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

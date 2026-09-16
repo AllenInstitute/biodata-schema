@@ -3,24 +3,35 @@
 import argparse
 import datetime
 
-from aind_data_schema_models.organizations import Organization
+from biodata_models.coordinates import AxisName, Direction, Origin
+from biodata_models.modalities import Modality
+from biodata_models.organizations import Organization
+from biodata_models.units import SizeUnit
 
-from aind_data_schema.components.devices import (
+from biodata_schema.components.connections import Connection
+from biodata_schema.components.coordinates import Axis, CoordinateSystem
+from biodata_schema.components.devices import (
     AdditionalImagingDevice,
     Detector,
+    Device,
     Filter,
     Laser,
+    Microscope,
     MotorizedStage,
     Objective,
     ScanningStage,
-    Device,
-    Microscope,
 )
-from aind_data_schema_models.modalities import Modality
-from aind_data_schema.components.connections import Connection
-from aind_data_schema.core.instrument import Instrument
-from aind_data_schema.components.coordinates import (
-    CoordinateSystemLibrary,
+from biodata_schema.core.instrument import Instrument
+
+SIPE_MONITOR_RTF = CoordinateSystem(
+    name="SIPE_MONITOR_RTF",
+    origin=Origin.FRONT_CENTER,
+    axis_unit=SizeUnit.MM,
+    axes=[
+        Axis(name=AxisName.X, direction=Direction.LR),
+        Axis(name=AxisName.Y, direction=Direction.DU),
+        Axis(name=AxisName.Z, direction=Direction.BF),
+    ],
 )
 
 objective = Objective(
@@ -211,7 +222,7 @@ inst = Instrument(
     location="440",
     instrument_id="SmartSPIM2",
     modification_date=datetime.date(2023, 10, 4),
-    coordinate_system=CoordinateSystemLibrary.SIPE_MONITOR_RTF,
+    global_coordinate_system=SIPE_MONITOR_RTF,
     modalities=[Modality.SPIM],
     temperature_control=False,
     components=[

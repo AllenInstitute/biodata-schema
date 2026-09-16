@@ -32,11 +32,11 @@ For assets created during analysis that aggregate across multiple acquisitions o
 ```python
 from datetime import datetime, timezone
 
-from aind_data_schema.core.metadata import Metadata
-from aind_data_schema.core.processing import DataProcess, Processing, ProcessName, ProcessStage
-from aind_data_schema.core.quality_control import QCMetric, QCStatus, QualityControl, Stage, Status
-from aind_data_schema.components.identifiers import Code
-from aind_data_schema_models.modalities import Modality
+from biodata_schema.core.metadata import Metadata
+from biodata_schema.core.processing import DataProcess, Processing, ProcessName, ProcessStage
+from biodata_schema.core.quality_control import QCMetric, QCStatus, QualityControl, Stage, Status
+from biodata_schema.components.identifiers import Code
+from biodata_models.modalities import Modality
 
 # Load and validate source metadata (e.g. from a JSON file)
 source = Metadata.model_validate_json(open("metadata.nd.json").read())
@@ -64,9 +64,7 @@ new_qc = QualityControl(
             modality=Modality.SPIM,
             stage=Stage.PROCESSING,
             value=42.5,
-            status_history=[
-                QCStatus(evaluator="Automated", status=Status.PASS, timestamp=datetime.now(timezone.utc))
-            ],
+            status_history=[QCStatus(evaluator="Automated", status=Status.PASS, timestamp=datetime.now(timezone.utc))],
             tags={"step": "fusing"},
         ),
     ],

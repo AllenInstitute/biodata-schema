@@ -1,6 +1,6 @@
 # Acquisition
 
-[Link to code](https://github.com/AllenNeuralDynamics/aind-data-schema/blob/dev/src/aind_data_schema/core/acquisition.py)
+[Link to code](https://github.com/AllenNeuralDynamics/biodata-schema/blob/dev/src/biodata_schema/core/acquisition.py)
 
 An acquisition is single episode of data collection that creates one data asset.
 
@@ -59,8 +59,8 @@ Example acquisition demonstrating **3**: one stimulus epoch, multiple data strea
 
 ## Examples
 
-- [Ephys acquisition](https://github.com/AllenNeuralDynamics/aind-data-schema/blob/dev/examples/ephys_acquisition.py)
-- [ExaSPIM acquisition](https://github.com/AllenNeuralDynamics/aind-data-schema/blob/dev/examples/exaspim_acquisition.py)
-- [Bergamo ophys acquisition](https://github.com/AllenNeuralDynamics/aind-data-schema/blob/dev/examples/bergamo_ophys_acquisition.py)
-- [Multi-plane ophys acquisition](https://github.com/AllenNeuralDynamics/aind-data-schema/blob/dev/examples/multiplane_ophys_acquisition.py)
-- [Ophys acquisition](https://github.com/AllenNeuralDynamics/aind-data-schema/blob/dev/examples/ophys_acquisition.py)
+- [Ephys acquisition](https://github.com/AllenNeuralDynamics/biodata-schema/blob/dev/examples/ephys_acquisition.py)
+- [ExaSPIM acquisition](https://github.com/AllenNeuralDynamics/biodata-schema/blob/dev/examples/exaspim_acquisition.py)
+- [Bergamo ophys acquisition](https://github.com/AllenNeuralDynamics/biodata-schema/blob/dev/examples/bergamo_ophys_acquisition.py)
+- [Multi-plane ophys acquisition](https://github.com/AllenNeuralDynamics/biodata-schema/blob/dev/examples/multiplane_ophys_acquisition.py)
+- [Ophys acquisition](https://github.com/AllenNeuralDynamics/biodata-schema/blob/dev/examples/ophys_acquisition.py)

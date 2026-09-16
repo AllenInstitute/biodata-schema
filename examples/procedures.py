@@ -3,13 +3,26 @@
 import argparse
 from datetime import datetime, timezone
 
-from aind_data_schema.components.injection_procedures import (
+from biodata_models.brain_atlas import CCFv3
+from biodata_models.coordinates import AxisName, Direction, Origin
+from biodata_models.units import SizeUnit, VolumeUnit
+
+from biodata_schema.components.configs import ProbeConfig
+from biodata_schema.components.coordinates import (
+    Axis,
+    CoordinateSystem,
+    ReferenceCoordinateSystem,
+    Rotation,
+    Translation,
+)
+from biodata_schema.components.devices import EphysProbe
+from biodata_schema.components.injection_procedures import (
     InjectionDynamics,
     InjectionProfile,
     TarsVirusIdentifiers,
     ViralMaterial,
 )
-from aind_data_schema.components.surgery_procedures import (
+from biodata_schema.components.surgery_procedures import (
     Anaesthetic,
     BrainInjection,
     Craniotomy,
@@ -17,19 +30,42 @@ from aind_data_schema.components.surgery_procedures import (
     Perfusion,
     ProbeImplant,
 )
-from aind_data_schema.core.procedures import (
+from biodata_schema.core.procedures import (
     Procedures,
     Surgery,
 )
-from aind_data_schema.components.devices import EphysProbe
-from aind_data_schema.components.configs import ProbeConfig
-from aind_data_schema_models.brain_atlas import CCFv3
-from aind_data_schema_models.units import VolumeUnit, SizeUnit
-from aind_data_schema.components.coordinates import (
-    Translation,
-    Rotation,
-    Origin,
-    CoordinateSystemLibrary,
+
+BREGMA_ARI = CoordinateSystem(
+    name="BREGMA_ARI",
+    origin=Origin.BREGMA,
+    axis_unit=SizeUnit.MM,
+    axes=[
+        Axis(name=AxisName.AP, direction=Direction.PA),
+        Axis(name=AxisName.ML, direction=Direction.LR),
+        Axis(name=AxisName.SI, direction=Direction.SI),
+    ],
+)
+
+BREGMA_RAS = CoordinateSystem(
+    name="BREGMA_RAS",
+    origin=Origin.BREGMA,
+    axis_unit=SizeUnit.MM,
+    axes=[
+        Axis(name=AxisName.ML, direction=Direction.LR),
+        Axis(name=AxisName.AP, direction=Direction.PA),
+        Axis(name=AxisName.SI, direction=Direction.IS),
+    ],
+)
+
+MPM_MANIP_RFB = CoordinateSystem(
+    name="MPM_MANIP_RFB",
+    origin=Origin.TIP,
+    axis_unit=SizeUnit.MM,
+    axes=[
+        Axis(name=AxisName.X, direction=Direction.LR),
+        Axis(name=AxisName.Y, direction=Direction.BF),
+        Axis(name=AxisName.Z, direction=Direction.UD),
+    ],
 )
 
 # If a timezone isn't specified, the timezone of the computer running this
@@ -37,8 +73,8 @@ from aind_data_schema.components.coordinates import (
 t = datetime(2022, 7, 12, 7, 00, 00, tzinfo=timezone.utc)
 t2 = datetime(2022, 9, 23, 10, 22, 00, tzinfo=timezone.utc)
 
-coordinate_system = CoordinateSystemLibrary.BREGMA_RASD
-coordinate_system.name = "LAMBDA_RASD"
+coordinate_system = BREGMA_RAS
+coordinate_system.name = "LAMBDA_RAS"
 coordinate_system.origin = Origin.LAMBDA
 
 probe = EphysProbe(
@@ -49,10 +85,15 @@ probe = EphysProbe(
 config = ProbeConfig(
     primary_targeted_structure=CCFv3.VTA,
     device_name="Probe A",
-    coordinate_system=CoordinateSystemLibrary.MPM_MANIP_RFB,
+    local_coordinate_system=MPM_MANIP_RFB,
     transform=[
         Translation(
-            translation=[-600, -3050, 0, 4200],
+            translation=[-600, -3050, 0],
+        ),
+        # insertion depth runs along the probe's own Z axis, which points down
+        Translation(
+            translation=[0, 0, 4200],
+            reference_coordinate_system=ReferenceCoordinateSystem.LOCAL,
         ),
     ],
 )
@@ -65,7 +106,7 @@ surgery1 = Surgery(
     animal_weight_prior=22.6,
     animal_weight_post=22.3,
     anaesthesia=Anaesthetic(anaesthetic_type="Isoflurane", duration=1, level=1.5),
-    coordinate_system=coordinate_system,
+    global_coordinate_system=coordinate_system,
     workstation_id="SWS 3",
     procedures=[
         ProbeImplant(
@@ -75,8 +116,8 @@ surgery1 = Surgery(
         Craniotomy(
             craniotomy_type=CraniotomyType.CIRCLE,
             protocol_id="1234",
-            coordinate_system_name="LAMBDA_RASD",
-            position=Translation(translation=[-2, 2, 0, 0]),
+            coordinate_system_name="LAMBDA_RAS",
+            position=Translation(translation=[-2, 2, 0]),
             size=1,
             size_unit=SizeUnit.MM,
         ),
@@ -96,9 +137,14 @@ surgery1 = Surgery(
             coordinate_system_name=coordinate_system.name,
             coordinates=[
                 [
-                    Translation(translation=[-0.85, -3.8, 0, 3.3]),
+                    Translation(translation=[-0.85, -3.8, 0]),
                     Rotation(
                         angles=[0, 10, 0],
+                    ),
+                    # depth runs down the rotated needle axis, negative because SI points superior
+                    Translation(
+                        translation=[0, 0, -3.3],
+                        reference_coordinate_system=ReferenceCoordinateSystem.LOCAL,
                     ),
                 ],
             ],
@@ -123,7 +169,7 @@ p = Procedures(
             experimenters=["Scientist Smith"],
             ethics_review_id="2109",
             protocol_id="doi",
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
             procedures=[
                 Perfusion(
                     protocol_id="doi_of_protocol",

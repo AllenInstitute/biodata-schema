@@ -9,12 +9,11 @@ Air puff device configuration
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `valence` | [Valence](#valence) | Valence  |
-| `relative_position` | List[[AnatomicalRelative](../aind_data_schema_models/coordinates.md#anatomicalrelative)] | Initial relative position  |
-| <del>`coordinate_system`</del> | Optional[[CoordinateSystem](coordinates.md#coordinatesystem)] | **[DEPRECATED]** Deprecated: use local_coordinate_system instead. Device coordinate system  |
+| `relative_position` | List[[AnatomicalRelative](../biodata_models/coordinates.md#anatomicalrelative)] | Initial relative position  |
 | `local_coordinate_system` | Optional[[CoordinateSystem](coordinates.md#coordinatesystem)] | Device local coordinate system  |
 | `transform` | Optional[List[[Translation](coordinates.md#translation) or [Rotation](coordinates.md#rotation) or [Scale](coordinates.md#scale) or [Affine](coordinates.md#affine)]] | Local to global transform (Entry coordinate, depth, and rotation in the Acquisition.global_coordinate_system) |
 | `pressure` | `Optional[float]` | Pressure  |
-| `pressure_unit` | Optional[[PressureUnit](../aind_data_schema_models/units.md#pressureunit)] | Pressure unit  |
+| `pressure_unit` | Optional[[PressureUnit](../biodata_models/units.md#pressureunit)] | Pressure unit  |
 | `duration` | `Optional[float]` | Duration  |
 | `device_name` | `str` | Device name (Must match a device defined in the instrument.json) |
 
@@ -25,7 +24,7 @@ Configuration of a catheter
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `targeted_structure` | [MouseAnatomyModel](../aind_data_schema_models/external.md#mouseanatomymodel) | Targeted blood vessel (Use options from MouseBloodVessels) |
+| `targeted_structure` | [MouseAnatomyModel](../biodata_models/external.md#mouseanatomymodel) | Targeted blood vessel (Use options from MouseBloodVessels) |
 | `device_name` | `str` | Device name (Must match a device defined in the instrument.json) |
 
 
@@ -44,7 +43,7 @@ Configuration of a channel
 | `excitation_filters` | Optional[List[[DeviceConfig](#deviceconfig)]] | Excitation filters  |
 | `emission_filters` | Optional[List[[DeviceConfig](#deviceconfig)]] | Emission filters  |
 | `emission_wavelength` | `Optional[int]` | Emission wavelength  |
-| `emission_wavelength_unit` | Optional[[SizeUnit](../aind_data_schema_models/units.md#sizeunit)] | Emission wavelength unit  |
+| `emission_wavelength_unit` | Optional[[SizeUnit](../biodata_models/units.md#sizeunit)] | Emission wavelength unit  |
 
 
 ### CoupledPlane
@@ -57,10 +56,10 @@ Configuration of a pair of coupled imaging plane
 | `coupled_plane_index` | `int` | Coupled plane index (Plane index of the coupled plane) |
 | `power_ratio` | `float` | Power ratio  |
 | `depth` | `float` | Depth  |
-| `depth_unit` | [SizeUnit](../aind_data_schema_models/units.md#sizeunit) | Depth unit  |
+| `depth_unit` | [SizeUnit](../biodata_models/units.md#sizeunit) | Depth unit  |
 | `power` | `float` | Power  |
-| `power_unit` | [PowerUnit](../aind_data_schema_models/units.md#powerunit) | Power unit  |
-| `targeted_structure` | [BrainAtlas](../aind_data_schema_models/brain_atlas.md#ccfv3) | Targeted structure  |
+| `power_unit` | [PowerUnit](../biodata_models/units.md#powerunit) | Power unit  |
+| `targeted_structure` | [BrainAtlas](../biodata_models/brain_atlas.md#ccfv3) | Targeted structure  |
 
 
 ### DetectorConfig
@@ -70,14 +69,14 @@ Configuration of detector settings
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `exposure_time` | `Optional[float]` | Exposure time  |
-| `exposure_time_unit` | [TimeUnit](../aind_data_schema_models/units.md#timeunit) | Exposure time unit  |
+| `exposure_time_unit` | [TimeUnit](../biodata_models/units.md#timeunit) | Exposure time unit  |
 | `trigger_type` | [TriggerType](#triggertype) | Trigger type  |
 | `compression` | Optional[[Code](identifiers.md#code)] | Compression (Compression algorithm used during acquisition) |
 | `crop_offset_x` | `Optional[int]` | Crop offset x (Overrides any value set in the Instrument metadata) |
 | `crop_offset_y` | `Optional[int]` | Crop offset y (Overrides any value set in the Instrument metadata) |
 | `crop_width` | `Optional[int]` | Crop width (Overrides any value set in the Instrument metadata) |
 | `crop_height` | `Optional[int]` | Crop height (Overrides any value set in the Instrument metadata) |
-| `crop_unit` | Optional[[SizeUnit](../aind_data_schema_models/units.md#sizeunit)] | Crop size unit  |
+| `crop_unit` | Optional[[SizeUnit](../biodata_models/units.md#sizeunit)] | Crop size unit  |
 | `device_name` | `str` | Device name (Must match a device defined in the instrument.json) |
 
 
@@ -121,7 +120,7 @@ Description of an N-D image
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `channel_name` | `str` | Channel name  |
-| `dimensions_unit` | [SizeUnit](../aind_data_schema_models/units.md#sizeunit) | Dimensions unit  |
+| `dimensions_unit` | [SizeUnit](../biodata_models/units.md#sizeunit) | Dimensions unit  |
 | `image_to_acquisition_transform` | List[[Translation](coordinates.md#translation) or [Rotation](coordinates.md#rotation) or [Scale](coordinates.md#scale) or [Affine](coordinates.md#affine)] | Image to acquisition transform (Position, rotation, and scale of the image. Note that depth should be in the planes.) |
 | `dimensions` | Optional[[Scale](coordinates.md#scale) or [Rectangle](geometry.md#rectangle)] | Dimensions  |
 
@@ -134,11 +133,11 @@ Description of an N-D image acquired with SPIM
 |-------|------|-------------|
 | `file_name` | `AssetPath` | File name  |
 | `imaging_angle` | `int` | Imaging angle (Angle of the detector relative to the image plane relative to perpendicular) |
-| `imaging_angle_unit` | [AngleUnit](../aind_data_schema_models/units.md#angleunit) | Imaging angle unit  |
+| `imaging_angle_unit` | [AngleUnit](../biodata_models/units.md#angleunit) | Imaging angle unit  |
 | `image_start_time` | `Optional[datetime (timezone-aware)]` | Image acquisition start time  |
 | `image_end_time` | `Optional[datetime (timezone-aware)]` | Image acquisition end time  |
 | `channel_name` | `str` | Channel name  |
-| `dimensions_unit` | [SizeUnit](../aind_data_schema_models/units.md#sizeunit) | Dimensions unit  |
+| `dimensions_unit` | [SizeUnit](../biodata_models/units.md#sizeunit) | Dimensions unit  |
 | `image_to_acquisition_transform` | List[[Translation](coordinates.md#translation) or [Rotation](coordinates.md#rotation) or [Scale](coordinates.md#scale) or [Affine](coordinates.md#affine)] | Image to acquisition transform (Position, rotation, and scale of the image. Note that depth should be in the planes.) |
 | `dimensions` | Optional[[Scale](coordinates.md#scale) or [Rectangle](geometry.md#rectangle)] | Dimensions  |
 
@@ -149,8 +148,7 @@ Configuration of an imaging instrument
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `channels` | `List[typing.Annotated[aind_data_schema.components.configs.Channel, FieldInfo(annotation=NoneType, required=True, discriminator='object_type')]]` |   |
-| <del>`coordinate_system`</del> | Optional[[CoordinateSystem](coordinates.md#coordinatesystem)] | **[DEPRECATED]** Deprecated: use local_coordinate_system instead. Coordinate system (Required for ImageSPIM objects and when the imaging coordinate system differs from the Acquisition.coordinate_system) |
+| `channels` | `List[typing.Annotated[biodata_schema.components.configs.Channel, FieldInfo(annotation=NoneType, required=True, discriminator='object_type')]]` |   |
 | `local_coordinate_system` | Optional[[CoordinateSystem](coordinates.md#coordinatesystem)] | Local coordinate system (Required for ImageSPIM objects and when the imaging coordinate system differs from the Acquisition.global_coordinate_system) |
 | `images` | List[[PlanarImage](#planarimage) or [PlanarImageStack](#planarimagestack) or [ImageSPIM](#imagespim)] | Images  |
 | `sampling_strategy` | Optional[[SamplingStrategy](#samplingstrategy)] | Sampling strategy  |
@@ -163,7 +161,7 @@ Configuration of immersion medium
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `medium` | [ImmersionMedium](../aind_data_schema_models/devices.md#immersionmedium) | Immersion medium  |
+| `medium` | [ImmersionMedium](../biodata_models/devices.md#immersionmedium) | Immersion medium  |
 | `refractive_index` | `float` | Index of refraction  |
 
 
@@ -175,7 +173,7 @@ Description of an interleaved image sampling strategy
 |-------|------|-------------|
 | `image_index_sequence` | `List[int]` | Interleaving sequence  |
 | `frame_rate` | `float` | Frame rate  |
-| `frame_rate_unit` | [FrequencyUnit](../aind_data_schema_models/units.md#frequencyunit) | Frame rate unit  |
+| `frame_rate_unit` | [FrequencyUnit](../biodata_models/units.md#frequencyunit) | Frame rate unit  |
 
 
 ### JoystickConfig
@@ -195,9 +193,9 @@ Configuration of laser settings in an acquisition
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `wavelength` | `int` | Wavelength (nm)  |
-| `wavelength_unit` | [SizeUnit](../aind_data_schema_models/units.md#sizeunit) | Wavelength unit  |
+| `wavelength_unit` | [SizeUnit](../biodata_models/units.md#sizeunit) | Wavelength unit  |
 | `power` | `Optional[float]` | Excitation power  |
-| `power_unit` | Optional[[PowerUnit](../aind_data_schema_models/units.md#powerunit)] | Excitation power unit  |
+| `power_unit` | Optional[[PowerUnit](../biodata_models/units.md#powerunit)] | Excitation power unit  |
 | `power_measured_at` | `Optional[str]` | Power measurement location (For example: objective, patch cable, etc) |
 | `device_name` | `str` | Device name (Must match a device defined in the instrument.json) |
 
@@ -211,9 +209,8 @@ Lick spout acquisition information
 | `solution` | [Liquid](#liquid) | Solution  |
 | `solution_valence` | [Valence](#valence) | Valence  |
 | `volume` | `float` | Volume  |
-| `volume_unit` | [VolumeUnit](../aind_data_schema_models/units.md#volumeunit) | Volume unit  |
-| `relative_position` | List[[AnatomicalRelative](../aind_data_schema_models/coordinates.md#anatomicalrelative)] | Initial relative position  |
-| <del>`coordinate_system`</del> | Optional[[CoordinateSystem](coordinates.md#coordinatesystem)] | **[DEPRECATED]** Deprecated: use local_coordinate_system instead. Device coordinate system  |
+| `volume_unit` | [VolumeUnit](../biodata_models/units.md#volumeunit) | Volume unit  |
+| `relative_position` | List[[AnatomicalRelative](../biodata_models/coordinates.md#anatomicalrelative)] | Initial relative position  |
 | `local_coordinate_system` | Optional[[CoordinateSystem](coordinates.md#coordinatesystem)] | Device local coordinate system  |
 | `transform` | Optional[List[[Translation](coordinates.md#translation) or [Rotation](coordinates.md#rotation) or [Scale](coordinates.md#scale) or [Affine](coordinates.md#affine)]] | Local to global transform (Entry coordinate, depth, and rotation in the Acquisition.global_coordinate_system) |
 | `notes` | `Optional[str]` | Notes  |
@@ -227,7 +224,7 @@ Configuration of LED settings
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `power` | `Optional[float]` | Excitation power  |
-| `power_unit` | Optional[[PowerUnit](../aind_data_schema_models/units.md#powerunit)] | Excitation power unit  |
+| `power_unit` | Optional[[PowerUnit](../biodata_models/units.md#powerunit)] | Excitation power unit  |
 | `power_measured_at` | `Optional[str]` | Power measurement location (For example: objective, patch cable, etc) |
 | `device_name` | `str` | Device name (Must match a device defined in the instrument.json) |
 
@@ -254,8 +251,7 @@ Configuration for a camera used in a New Scale modular insertion system
 | `detector_config` | [DetectorConfig](#detectorconfig) | Detector configuration  |
 | `module` | [MISModuleConfig](#mismoduleconfig) | Module  |
 | `device_name` | `str` | Device name (Must match a device defined in the instrument.json) |
-| `relative_position` | List[[AnatomicalRelative](../aind_data_schema_models/coordinates.md#anatomicalrelative)] | Relative position  |
-| <del>`coordinate_system`</del> | Optional[[CoordinateSystem](coordinates.md#coordinatesystem)] | **[DEPRECATED]** Deprecated: use local_coordinate_system instead. Device coordinate system  |
+| `relative_position` | List[[AnatomicalRelative](../biodata_models/coordinates.md#anatomicalrelative)] | Relative position  |
 | `local_coordinate_system` | Optional[[CoordinateSystem](coordinates.md#coordinatesystem)] | Device local coordinate system  |
 | `transform` | Optional[List[[Translation](coordinates.md#translation) or [Rotation](coordinates.md#rotation) or [Scale](coordinates.md#scale) or [Affine](coordinates.md#affine)]] | Local to global transform (Position and orientation of the device in the instrument global coordinate system) |
 
@@ -269,7 +265,7 @@ Modular insertion system module configuration
 | `arc_angle` | `float` | Arc Angle (deg)  |
 | `module_angle` | `float` | Module Angle (deg)  |
 | `rotation_angle` | `Optional[float]` | Rotation Angle (deg)  |
-| `angle_unit` | [AngleUnit](../aind_data_schema_models/units.md#angleunit) | Angle unit  |
+| `angle_unit` | [AngleUnit](../biodata_models/units.md#angleunit) | Angle unit  |
 | `notes` | `Optional[str]` | Notes  |
 
 
@@ -294,14 +290,14 @@ Configuration of a 3D scan
 | `pulse_sequence_type` | [PulseSequenceType](#pulsesequencetype) | Scan sequence (BIDS PulseSequenceType) |
 | `mr_acquisition_type` | [MRAcquisitionType](#mracquisitiontype) | MR acquisition type (BIDS MRAcquisitionType / DICOM Tag 0018,0023) |
 | `resolution` | Optional[[Scale](coordinates.md#scale)] | Voxel resolution  |
-| `resolution_unit` | Optional[[SizeUnit](../aind_data_schema_models/units.md#sizeunit)] | Voxel resolution unit  |
+| `resolution_unit` | Optional[[SizeUnit](../biodata_models/units.md#sizeunit)] | Voxel resolution unit  |
 | `additional_scan_parameters` | `Optional[dict]` | Parameters  |
 | `rare_factor` | `Optional[int]` | RARE factor  |
 | `echo_time` | `decimal.Decimal` | Echo time (s) (BIDS EchoTime / DICOM Tag 0018,0081) |
-| `echo_time_unit` | [TimeUnit](../aind_data_schema_models/units.md#timeunit) | Echo time unit  |
+| `echo_time_unit` | [TimeUnit](../biodata_models/units.md#timeunit) | Echo time unit  |
 | `effective_echo_time` | `Optional[decimal.Decimal]` | Effective echo time  |
 | `repetition_time` | `decimal.Decimal` | Repetition time (s) (BIDS RepetitionTime / DICOM Tag 0018,0080) |
-| `repetition_time_unit` | [TimeUnit](../aind_data_schema_models/units.md#timeunit) | Repetition time unit  |
+| `repetition_time_unit` | [TimeUnit](../biodata_models/units.md#timeunit) | Repetition time unit  |
 | `scanner_coordinate_system` | Optional[[CoordinateSystem](coordinates.md#coordinatesystem)] | Scanner coordinate system  |
 | `affine_transform` | Optional[List[[Translation](coordinates.md#translation) or [Rotation](coordinates.md#rotation) or [Scale](coordinates.md#scale) or [Affine](coordinates.md#affine)]] | MRI Scan affine transform (NIFTI sform/qform, Bruker vc_transform, etc) |
 | `subject_position` | [SubjectPosition](#subjectposition) | Subject position  |
@@ -315,7 +311,6 @@ Configuration of a manipulator
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| <del>`coordinate_system`</del> | Optional[[CoordinateSystem](coordinates.md#coordinatesystem)] | **[DEPRECATED]** Deprecated: use local_coordinate_system instead. Device coordinate system  |
 | `local_coordinate_system` | [CoordinateSystem](coordinates.md#coordinatesystem) | Device local coordinate system  |
 | `local_axis_positions` | [Translation](coordinates.md#translation) | Local axis positions  |
 | `device_name` | `str` | Device name (Must match a device defined in the instrument.json) |
@@ -353,7 +348,7 @@ Configuration of a channel in an olfactometer
 | `channel_index` | `int` | Channel index  |
 | `odorant` | `str` | Odorant  |
 | `dilution` | `decimal.Decimal` | Odorant dilution  |
-| `dilution_unit` | [ConcentrationUnit](../aind_data_schema_models/units.md#concentrationunit) | Dilution unit  |
+| `dilution_unit` | [ConcentrationUnit](../biodata_models/units.md#concentrationunit) | Dilution unit  |
 
 
 ### OlfactometerConfig
@@ -384,7 +379,7 @@ Description of an N-D image acquired in a specific imaging plane
 |-------|------|-------------|
 | `planes` | List[[Plane](#plane) or [CoupledPlane](#coupledplane) or [Slap2Plane](#slap2plane)] | Imaging planes  |
 | `channel_name` | `str` | Channel name  |
-| `dimensions_unit` | [SizeUnit](../aind_data_schema_models/units.md#sizeunit) | Dimensions unit  |
+| `dimensions_unit` | [SizeUnit](../biodata_models/units.md#sizeunit) | Dimensions unit  |
 | `image_to_acquisition_transform` | List[[Translation](coordinates.md#translation) or [Rotation](coordinates.md#rotation) or [Scale](coordinates.md#scale) or [Affine](coordinates.md#affine)] | Image to acquisition transform (Position, rotation, and scale of the image. Note that depth should be in the planes.) |
 | `dimensions` | Optional[[Scale](coordinates.md#scale) or [Rectangle](geometry.md#rectangle)] | Dimensions  |
 
@@ -399,10 +394,10 @@ Description of a stack of images acquired in a specific imaging plane
 | `depth_start` | `float` | Starting depth  |
 | `depth_end` | `float` | Ending depth  |
 | `depth_step` | `float` | Step size  |
-| `depth_unit` | [SizeUnit](../aind_data_schema_models/units.md#sizeunit) | Depth unit  |
+| `depth_unit` | [SizeUnit](../biodata_models/units.md#sizeunit) | Depth unit  |
 | `planes` | List[[Plane](#plane) or [CoupledPlane](#coupledplane) or [Slap2Plane](#slap2plane)] | Imaging planes  |
 | `channel_name` | `str` | Channel name  |
-| `dimensions_unit` | [SizeUnit](../aind_data_schema_models/units.md#sizeunit) | Dimensions unit  |
+| `dimensions_unit` | [SizeUnit](../biodata_models/units.md#sizeunit) | Dimensions unit  |
 | `image_to_acquisition_transform` | List[[Translation](coordinates.md#translation) or [Rotation](coordinates.md#rotation) or [Scale](coordinates.md#scale) or [Affine](coordinates.md#affine)] | Image to acquisition transform (Position, rotation, and scale of the image. Note that depth should be in the planes.) |
 | `dimensions` | Optional[[Scale](coordinates.md#scale) or [Rectangle](geometry.md#rectangle)] | Dimensions  |
 
@@ -414,10 +409,10 @@ Configuration of an imaging plane
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `depth` | `float` | Depth  |
-| `depth_unit` | [SizeUnit](../aind_data_schema_models/units.md#sizeunit) | Depth unit  |
+| `depth_unit` | [SizeUnit](../biodata_models/units.md#sizeunit) | Depth unit  |
 | `power` | `float` | Power  |
-| `power_unit` | [PowerUnit](../aind_data_schema_models/units.md#powerunit) | Power unit  |
-| `targeted_structure` | [BrainAtlas](../aind_data_schema_models/brain_atlas.md#ccfv3) | Targeted structure  |
+| `power_unit` | [PowerUnit](../biodata_models/units.md#powerunit) | Power unit  |
+| `targeted_structure` | [BrainAtlas](../biodata_models/brain_atlas.md#ccfv3) | Targeted structure  |
 
 
 ### PowerFunction
@@ -438,10 +433,9 @@ Configuration for a device inserted into a brain
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `primary_targeted_structure` | [BrainAtlas](../aind_data_schema_models/brain_atlas.md#ccfv3) | Targeted structure  |
-| `other_targeted_structure` | Optional[List[[BrainAtlas](../aind_data_schema_models/brain_atlas.md#ccfv3)]] | Other targeted structure  |
+| `primary_targeted_structure` | [BrainAtlas](../biodata_models/brain_atlas.md#ccfv3) | Targeted structure  |
+| `other_targeted_structure` | Optional[List[[BrainAtlas](../biodata_models/brain_atlas.md#ccfv3)]] | Other targeted structure  |
 | `atlas_coordinate` | Optional[[AtlasCoordinate](coordinates.md#atlascoordinate)] | Target coordinate in Acquisition.atlas  |
-| <del>`coordinate_system`</del> | Optional[[CoordinateSystem](coordinates.md#coordinatesystem)] | **[DEPRECATED]** Deprecated: use local_coordinate_system instead. Device coordinate system (Device coordinate system, defines un-rotated probe's orientation relative to the Acquisition.coordinate_system) |
 | `local_coordinate_system` | [CoordinateSystem](coordinates.md#coordinatesystem) | Device local coordinate system (Device coordinate system, defines un-rotated probe's orientation relative to the Acquisition.global_coordinate_system) |
 | `transform` | List[[Translation](coordinates.md#translation) or [Rotation](coordinates.md#rotation) or [Scale](coordinates.md#scale) or [Affine](coordinates.md#affine)] | Local to global transform (Entry coordinate, depth, and rotation in the Acquisition.global_coordinate_system) |
 | `dye` | `Optional[str]` | Dye  |
@@ -479,7 +473,7 @@ Description of an image sampling strategy
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `frame_rate` | `float` | Frame rate  |
-| `frame_rate_unit` | [FrequencyUnit](../aind_data_schema_models/units.md#frequencyunit) | Frame rate unit  |
+| `frame_rate_unit` | [FrequencyUnit](../biodata_models/units.md#frequencyunit) | Frame rate unit  |
 
 
 ### Slap2Plane
@@ -493,14 +487,14 @@ Configuration of a SLAP2 imaging plane (all imaging ROIs of a specific acquisiti
 | `fov_index` | `Optional[int]` | Field of view index (For FOVs that are imaged multiple times, assign a shared index to each instance of the FOV) |
 | `structure_types` | Optional[List[[NeuronStructure](#neuronstructure)]] | Structure type  |
 | `y_dilations` | `List[int]` | Unique Y dilations  |
-| `y_dilations_unit` | [SizeUnit](../aind_data_schema_models/units.md#sizeunit) | Dilation unit  |
+| `y_dilations_unit` | [SizeUnit](../biodata_models/units.md#sizeunit) | Dilation unit  |
 | `frame_rates` | `List[float]` | Unique frame rates  |
-| `frame_rates_unit` | [FrequencyUnit](../aind_data_schema_models/units.md#frequencyunit) | Frame rate unit  |
+| `frame_rates_unit` | [FrequencyUnit](../biodata_models/units.md#frequencyunit) | Frame rate unit  |
 | `depth` | `float` | Depth  |
-| `depth_unit` | [SizeUnit](../aind_data_schema_models/units.md#sizeunit) | Depth unit  |
+| `depth_unit` | [SizeUnit](../biodata_models/units.md#sizeunit) | Depth unit  |
 | `power` | `float` | Power  |
-| `power_unit` | [PowerUnit](../aind_data_schema_models/units.md#powerunit) | Power unit  |
-| `targeted_structure` | [BrainAtlas](../aind_data_schema_models/brain_atlas.md#ccfv3) | Targeted structure  |
+| `power_unit` | [PowerUnit](../biodata_models/units.md#powerunit) | Power unit  |
+| `targeted_structure` | [BrainAtlas](../biodata_models/brain_atlas.md#ccfv3) | Targeted structure  |
 
 
 ### SpeakerConfig
@@ -510,7 +504,7 @@ Configuration of auditory speaker configuration
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `volume` | `Optional[float]` | Volume (dB)  |
-| `volume_unit` | Optional[[SoundIntensityUnit](../aind_data_schema_models/units.md#soundintensityunit)] | Volume unit  |
+| `volume_unit` | Optional[[SoundIntensityUnit](../biodata_models/units.md#soundintensityunit)] | Volume unit  |
 | `device_name` | `str` | Device name (Must match a device defined in the instrument.json) |
 
 
@@ -523,7 +517,7 @@ Description of a stack image sampling strategy
 | `image_repeats` | `int` | Number of image repeats  |
 | `stack_repeats` | `int` | Number of stack repeats  |
 | `frame_rate` | `float` | Frame rate  |
-| `frame_rate_unit` | [FrequencyUnit](../aind_data_schema_models/units.md#frequencyunit) | Frame rate unit  |
+| `frame_rate_unit` | [FrequencyUnit](../biodata_models/units.md#frequencyunit) | Frame rate unit  |
 
 
 ### SubjectPosition

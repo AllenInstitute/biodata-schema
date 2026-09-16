@@ -8,7 +8,6 @@ Description of breeding info for subject
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| <del>`breeding_group`</del> | `Optional[str]` | **[DEPRECATED]** Field will be removed in future releases. Breeding Group  |
 | `maternal_id` | `str` | Maternal specimen ID  |
 | `maternal_genotype` | `str` | Maternal genotype  |
 | `paternal_id` | `str` | Paternal specimen ID  |
@@ -58,10 +57,10 @@ Description of a human subject
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `species` | `aind_data_schema_models.species.SpeciesModel` | Species  |
+| `species` | [Species](../biodata_models/species.md#species) | Species  |
 | `sex` | [Sex](#sex) | Sex  |
 | `year_of_birth` | `int` | Year of birth  |
-| `source` | [Organization](../aind_data_schema_models/organizations.md#organization) | Source (Where the subject was acquired from.) |
+| `source` | [Organization](../biodata_models/organizations.md#organization) | Source (Where the subject was acquired from.) |
 
 
 ### LightCycle
@@ -93,16 +92,16 @@ Description of a mouse subject
 |-------|------|-------------|
 | `sex` | [Sex](#sex) | Sex  |
 | `date_of_birth` | `datetime.date` | Date of birth  |
-| `strain` | [Strain](../aind_data_schema_models/species.md#strain) | Strain  |
-| `species` | [Species](../aind_data_schema_models/species.md#species) | Species  |
-| `alleles` | List[[PIDName](../aind_data_schema_models/pid_names.md#pidname)] | Alleles (Allele names and persistent IDs) |
+| `strain` | [Strain](../biodata_models/species.md#strain) | Strain  |
+| `species` | [Species](../biodata_models/species.md#species) | Species  |
+| `alleles` | List[[PIDName](../biodata_models/pid_names.md#pidname)] | Alleles (Allele names and persistent IDs) |
 | `genotype` | `str` | Genotype (Genotype of the animal providing both alleles) |
 | `breeding_info` | Optional[[BreedingInfo](#breedinginfo)] | Breeding Info  |
 | `wellness_reports` | List[[WellnessReport](#wellnessreport)] | Wellness Report  |
 | `housing` | Optional[[Housing](#housing)] | Housing  |
-| `source` | [Organization](../aind_data_schema_models/organizations.md#organization) | Source (Where the subject was acquired from. If bred in-house, use Allen Institute.) |
+| `source` | [Organization](../biodata_models/organizations.md#organization) | Source (Where the subject was acquired from. If bred in-house, use Allen Institute.) |
 | `restrictions` | `Optional[str]` | Restrictions (Any restrictions on use or publishing based on subject source) |
-| `rrid` | Optional[[PIDName](../aind_data_schema_models/pid_names.md#pidname)] | RRID (RRID of mouse if acquired from supplier) |
+| `rrid` | Optional[[PIDName](../biodata_models/pid_names.md#pidname)] | RRID (RRID of mouse if acquired from supplier) |
 
 
 ### NonHumanPrimateSubject
@@ -111,12 +110,12 @@ Description of a non-human primate subject
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `species` | [Species](../aind_data_schema_models/species.md#species) | species  |
+| `species` | [Species](../biodata_models/species.md#species) | species  |
 | `sex` | [Sex](#sex) | Sex  |
 | `date_of_birth` | `Optional[datetime.date]` | Date of birth  |
 | `year_of_birth` | `int` | Year of birth  |
 | `mating_status` | [MatingStatus](#matingstatus) | Mating status  |
-| `source` | [Organization](../aind_data_schema_models/organizations.md#organization) | Source (Where the subject was acquired from.) |
+| `source` | [Organization](../biodata_models/organizations.md#organization) | Source (Where the subject was acquired from.) |
 
 
 ### Sex

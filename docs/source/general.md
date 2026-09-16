@@ -68,7 +68,7 @@ but you are responsible for the content.
 
 **Q: Whom should I contact with questions or issues?**
 
-Questions about the schema should be directed to Saskia de Vries. [Issues](https://github.com/AllenNeuralDynamics/aind-data-schema/issues) can be opened on our GitHub repository. Questions about correcting errors in existing metadata can be directed to the [data migration repository](https://github.com/AllenNeuralDynamics/aind-data-migration-scripts/issues).
+Questions about the schema should be directed to Saskia de Vries. [Issues](https://github.com/AllenNeuralDynamics/biodata-schema/issues) can be opened on our GitHub repository. Questions about correcting errors in existing metadata can be directed to the [data migration repository](https://github.com/AllenNeuralDynamics/aind-data-migration-scripts/issues).
 
 **Q: What are the registries and atlases that are referenced in the schema?**
 
@@ -88,9 +88,7 @@ more ontologies into our schema. We currently use:
 
 ## Flexibility, versioning, and upgrading
 
-`aind-data-schema` is versioned using [Semantic Versioning](https://semver.org/). The core schemas listed above 
-also have their own version numbers, which are documented in the `schema_version` field of any JSON file 
-they are used to generate.
+`biodata-schema` is versioned using [Semantic Versioning](https://semver.org/).
 
 When new versions of schemas are released, data collectors can decide if they want to update the metadata
 from their existing data assets to the new schema. Metadata upgrading capabilities can be found in 

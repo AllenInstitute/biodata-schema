@@ -3,24 +3,25 @@
 import argparse
 from datetime import date, datetime, timezone
 
-from aind_data_schema_models.harp_types import HarpDeviceType
-from aind_data_schema_models.modalities import Modality
-from aind_data_schema_models.organizations import Organization
-from aind_data_schema_models.units import FrequencyUnit, SizeUnit
-from aind_data_schema.components.coordinates import (
-    CoordinateSystemLibrary,
-    Affine,
-    Translation,
-)
+from biodata_models.coordinates import AnatomicalRelative, AxisName, Direction, Origin
+from biodata_models.devices import CameraTarget
+from biodata_models.harp_types import HarpDeviceType
+from biodata_models.modalities import Modality
+from biodata_models.organizations import Organization
+from biodata_models.units import FrequencyUnit, PowerUnit, SizeUnit
 
-from aind_data_schema.components.devices import (
+from biodata_schema.components.connections import Connection
+from biodata_schema.components.coordinates import Affine, Axis, CoordinateSystem, Translation
+from biodata_schema.components.devices import (
     Camera,
     CameraAssembly,
+    Computer,
     DAQChannel,
     Device,
     Disc,
     EphysAssembly,
     EphysProbe,
+    FiberPatchCord,
     Filter,
     HarpDevice,
     Laser,
@@ -29,16 +30,21 @@ from aind_data_schema.components.devices import (
     Manipulator,
     Monitor,
     NeuropixelsBasestation,
-    FiberPatchCord,
     ProbePort,
-    Computer,
 )
-from aind_data_schema.components.measurements import Calibration
-from aind_data_schema.components.connections import Connection
-from aind_data_schema.core.instrument import Instrument
-from aind_data_schema_models.units import PowerUnit
-from aind_data_schema_models.coordinates import AnatomicalRelative
-from aind_data_schema_models.devices import CameraTarget
+from biodata_schema.components.measurements import Calibration
+from biodata_schema.core.instrument import Instrument
+
+BREGMA_ARI = CoordinateSystem(
+    name="BREGMA_ARI",
+    origin=Origin.BREGMA,
+    axis_unit=SizeUnit.MM,
+    axes=[
+        Axis(name=AxisName.AP, direction=Direction.PA),
+        Axis(name=AxisName.ML, direction=Direction.LR),
+        Axis(name=AxisName.SI, direction=Direction.SI),
+    ],
+)
 
 # Describes an instrument with running wheel, 2 behavior cameras, one Harp Behavior board,
 # one dual-color laser module, one stick microscope, and 2 Neuropixels probes
@@ -329,7 +335,7 @@ monitor = Monitor(
     relative_position=[AnatomicalRelative.ANTERIOR, AnatomicalRelative.RIGHT],
     contrast=None,
     brightness=None,
-    coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+    local_coordinate_system=BREGMA_ARI,
     transform=[
         Affine(
             affine_transform=[
@@ -337,16 +343,19 @@ monitor = Monitor(
                     -0.80914,
                     -0.58761,
                     0,
+                    0,
                 ],
                 [
                     -0.12391,
                     0.17063,
                     0.97751,
+                    0,
                 ],
                 [
                     -0.5744,
                     0.79095,
                     -0.21087,
+                    0,
                 ],
             ],
         ),
@@ -388,7 +397,7 @@ inst = Instrument(
     instrument_id="EPHYS1",
     modification_date=date(2023, 10, 3),
     modalities=[Modality.ECEPHYS],
-    coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+    global_coordinate_system=BREGMA_ARI,
     components=[
         ephys_assemblyA,
         ephys_assemblyB,

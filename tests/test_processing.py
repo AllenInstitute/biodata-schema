@@ -1,14 +1,14 @@
 """test processing"""
 
-import unittest
 from datetime import datetime
 
 import pydantic
-from aind_data_schema_models.system_architecture import CPUArchitecture, OperatingSystem
-from aind_data_schema_models.units import MemoryUnit
+import pytest
+from biodata_models.system_architecture import CPUArchitecture, OperatingSystem
+from biodata_models.units import MemoryUnit
 
-from aind_data_schema.components.identifiers import Code, DataAsset
-from aind_data_schema.core.processing import (
+from biodata_schema.components.identifiers import Code, DataAsset
+from biodata_schema.core.processing import (
     DataProcess,
     Processing,
     ProcessName,
@@ -28,13 +28,13 @@ code = Code(
 )
 
 
-class ProcessingTest(unittest.TestCase):
+class TestProcessing:
     """tests for processing schema"""
 
     def test_constructors(self):
         """test creation"""
 
-        with self.assertRaises(pydantic.ValidationError):
+        with pytest.raises(pydantic.ValidationError):
             Processing()
 
         # Create a valid Processing object
@@ -52,8 +52,8 @@ class ProcessingTest(unittest.TestCase):
             ]
         )
 
-        self.assertIsNotNone(p)
-        self.assertEqual(p.data_processes[0].name, ProcessName.DENOISING)
+        assert p is not None
+        assert p.data_processes[0].name == ProcessName.DENOISING
 
     def test_resource_usage(self):
         """Test the ResourceUsage class"""
@@ -64,16 +64,16 @@ class ProcessingTest(unittest.TestCase):
             cpu_usage=[ResourceTimestamped(timestamp=datetime.fromisoformat("2024-09-13"), usage=0.5)],
         )
 
-        self.assertIsNotNone(resources)
+        assert resources is not None
 
-        with self.assertRaises(pydantic.ValidationError):
+        with pytest.raises(pydantic.ValidationError):
             ResourceUsage()
 
     def test_resource_usage_unit_validators(self):
         """Test that unit validators work"""
 
         # Check ram
-        with self.assertRaises(ValueError) as e:
+        with pytest.raises(ValueError) as e:
             ResourceUsage(
                 os=OperatingSystem.MACOS_SONOMA,
                 architecture=CPUArchitecture.X86_64,
@@ -83,7 +83,7 @@ class ProcessingTest(unittest.TestCase):
 
         expected_exception = "Unit ram_unit is required when ram is set"
 
-        self.assertTrue(expected_exception in repr(e.exception))
+        assert expected_exception in repr(e.value)
 
         resources = ResourceUsage(
             os=OperatingSystem.MACOS_SONOMA,
@@ -92,10 +92,10 @@ class ProcessingTest(unittest.TestCase):
             ram=1,
             ram_unit=MemoryUnit.GB,
         )
-        self.assertIsNotNone(resources)
+        assert resources is not None
 
         # Check system memory
-        with self.assertRaises(ValueError) as e:
+        with pytest.raises(ValueError) as e:
             ResourceUsage(
                 os=OperatingSystem.MACOS_SONOMA,
                 architecture=CPUArchitecture.X86_64,
@@ -105,17 +105,15 @@ class ProcessingTest(unittest.TestCase):
 
         expected_exception = "Unit system_memory_unit is required when system_memory is set"
 
-        self.assertTrue(expected_exception in repr(e.exception))
+        assert expected_exception in repr(e.value)
 
-        # Test with no data_processes
-        # p = Processing(data_processes=[])
-        # self.assertIsNotNone(p)
+        # Test with no data_processes (covered by the model's default validation).
 
     def test_unique_process_names(self):
         """Test that process names are unique within a Processing object"""
 
         # Test with duplicate process names
-        with self.assertRaises(ValueError) as e:
+        with pytest.raises(ValueError) as e:
             Processing.create_with_sequential_process_graph(
                 data_processes=[
                     DataProcess(
@@ -136,7 +134,7 @@ class ProcessingTest(unittest.TestCase):
                     ),
                 ]
             )
-        self.assertIn("data_processes must have unique names", str(e.exception))
+        assert "data_processes must have unique names" in str(e.value)
 
     def test_validate_data_processes(self):
         """Test the validate_data_processes method"""
@@ -156,10 +154,10 @@ class ProcessingTest(unittest.TestCase):
                 ),
             ]
         )
-        self.assertIsNotNone(p)
+        assert p is not None
 
         # Test with data_processes as a list of lists
-        with self.assertRaises(pydantic.ValidationError):
+        with pytest.raises(pydantic.ValidationError):
             Processing(
                 data_processes=[
                     [
@@ -222,21 +220,21 @@ class ProcessingTest(unittest.TestCase):
 
         # Check that the process was renamed in data_processes
         process_names = [proc.name for proc in p.data_processes]
-        self.assertIn("new_name", process_names)
-        self.assertNotIn("process2", process_names)
+        assert "new_name" in process_names
+        assert "process2" not in process_names
 
         # Check that the process was renamed in dependency_graph keys
-        self.assertIn("new_name", p.dependency_graph)
-        self.assertNotIn("process2", p.dependency_graph)
+        assert "new_name" in p.dependency_graph
+        assert "process2" not in p.dependency_graph
 
         # Check that references to the process were updated in dependency_graph values
-        self.assertEqual(p.dependency_graph["process3"], ["new_name"])
-        self.assertEqual(p.dependency_graph["new_name"], ["process1"])
+        assert p.dependency_graph["process3"] == ["new_name"]
+        assert p.dependency_graph["new_name"] == ["process1"]
 
         # Test error case - renaming a process that doesn't exist
-        with self.assertRaises(ValueError) as e:
+        with pytest.raises(ValueError) as e:
             p.rename_process("non_existent", "another_name")
-        self.assertIn("not found in data_processes", str(e.exception))
+        assert "not found in data_processes" in str(e.value)
 
     def test_validate_process_graph(self):
         """Test the validate_process_graph method"""
@@ -267,7 +265,7 @@ class ProcessingTest(unittest.TestCase):
         }
 
         p = Processing(data_processes=[process1, process2], dependency_graph=dependency_graph)
-        self.assertIsNotNone(p)
+        assert p is not None
 
         # Invalid case 1 - process in data_processes not in dependency_graph
         process3 = DataProcess(
@@ -280,9 +278,9 @@ class ProcessingTest(unittest.TestCase):
             end_date_time=t,
         )
 
-        with self.assertRaises(ValueError) as e:
+        with pytest.raises(ValueError) as e:
             Processing(data_processes=[process1, process2, process3], dependency_graph=dependency_graph)
-        self.assertIn("dependency_graph must include all processes in data_processes", str(e.exception))
+        assert "dependency_graph must include all processes in data_processes" in str(e.value)
 
         # Invalid case 2 - process in dependency_graph not in data_processes
         invalid_graph = {
@@ -291,9 +289,9 @@ class ProcessingTest(unittest.TestCase):
             "process3": ["process2"],
         }
 
-        with self.assertRaises(ValueError) as e:
+        with pytest.raises(ValueError) as e:
             Processing(data_processes=[process1, process2], dependency_graph=invalid_graph)
-        self.assertIn("data_processes must include all processes in dependency_graph", str(e.exception))
+        assert "data_processes must include all processes in dependency_graph" in str(e.value)
 
     def test_dependency_graph_none(self):
         """Tests that no issue is raised if dependency_graph is None"""
@@ -307,6 +305,7 @@ class ProcessingTest(unittest.TestCase):
                     stage=ProcessStage.PROCESSING,
                     code=Code(
                         url="www.example.com/ephys_compression",
+                        version="0.0.1",
                     ),
                 ),
                 DataProcess(
@@ -315,12 +314,12 @@ class ProcessingTest(unittest.TestCase):
                     process_type=ProcessName.OTHER,
                     experimenters=["AIND Scientific Computing"],
                     stage=ProcessStage.PROCESSING,
-                    code=Code(url=""),
+                    code=Code(url="", version="0.0.1"),
                     notes="Data was copied.",
                 ),
             ]
         )
-        self.assertIsNone(processing.dependency_graph)
+        assert processing.dependency_graph is None
 
     def test_validate_pipeline_names(self):
         """Test the validate_pipeline_names method"""
@@ -359,7 +358,7 @@ class ProcessingTest(unittest.TestCase):
             dependency_graph={"process1": [], "process2": ["process1"]},
             pipelines=pipelines,
         )
-        self.assertIsNotNone(p)
+        assert p is not None
 
         # Invalid case - pipeline_name not in pipelines list
         process3 = DataProcess(
@@ -373,13 +372,13 @@ class ProcessingTest(unittest.TestCase):
             pipeline_name="NonExistentPipeline",
         )
 
-        with self.assertRaises(ValueError) as e:
+        with pytest.raises(ValueError) as e:
             Processing(
                 data_processes=[process1, process2, process3],
                 dependency_graph={"process1": [], "process2": ["process1"], "process3": ["process2"]},
                 pipelines=pipelines,
             )
-        self.assertIn("Pipeline name 'NonExistentPipeline' not found in pipelines list", str(e.exception))
+        assert "Pipeline name 'NonExistentPipeline' not found in pipelines list" in str(e.value)
 
     def test_order_processes(self):
         """Test the order_processes method"""
@@ -425,10 +424,10 @@ class ProcessingTest(unittest.TestCase):
         expected_order = [process2, process1, process3]  # t2 < t1 < t3
         actual_names = [proc.name for proc in p.data_processes]
         expected_names = [proc.name for proc in expected_order]
-        self.assertEqual(actual_names, expected_names)
+        assert actual_names == expected_names
 
         # Check that notes were updated
-        self.assertIn("Processes were reordered by start_date_time", p.notes)
+        assert "Processes were reordered by start_date_time" in p.notes
 
         # Test with already ordered processes
         process4 = DataProcess(
@@ -454,8 +453,8 @@ class ProcessingTest(unittest.TestCase):
         p2 = Processing(data_processes=[process4, process5], dependency_graph=dependency_graph2)
 
         # Check that order wasn't changed and no reordering note was added
-        self.assertEqual([proc.name for proc in p2.data_processes], ["process4", "process5"])
-        self.assertIsNone(p2.notes)
+        assert [proc.name for proc in p2.data_processes] == ["process4", "process5"]
+        assert p2.notes is None
 
         # Test with existing notes
         dependency_graph3 = {"process1": [], "process2": [], "process3": []}
@@ -464,15 +463,15 @@ class ProcessingTest(unittest.TestCase):
         )
 
         # Check that reordering note was appended to existing notes
-        self.assertIn("Existing notes; Processes were reordered by start_date_time", p3.notes)
+        assert "Existing notes; Processes were reordered by start_date_time" in p3.notes
 
         # Test with empty data_processes
         p4 = Processing(data_processes=[], dependency_graph={})
-        self.assertEqual(len(p4.data_processes), 0)
-        self.assertIsNone(p4.notes)
+        assert len(p4.data_processes) == 0
+        assert p4.notes is None
 
 
-class TestDataProcessValidateOther(unittest.TestCase):
+class TestDataProcessValidateOther:
     """Tests for DataProcess.validate_other"""
 
     def _make(self, process_type, **kwargs):
@@ -491,49 +490,45 @@ class TestDataProcessValidateOther(unittest.TestCase):
     def test_other_with_name_passes(self):
         """OTHER is allowed when a custom name is provided"""
         dp = self._make(ProcessName.OTHER, name="my custom step")
-        self.assertEqual(dp.process_type, ProcessName.OTHER)
+        assert dp.process_type == ProcessName.OTHER
 
     def test_other_with_notes_passes(self):
         """OTHER is allowed when notes describe the process"""
         dp = self._make(ProcessName.OTHER, notes="some detail")
-        self.assertEqual(dp.process_type, ProcessName.OTHER)
+        assert dp.process_type == ProcessName.OTHER
 
     def test_other_with_name_and_notes_passes(self):
         """OTHER is allowed when both name and notes are provided"""
         dp = self._make(ProcessName.OTHER, name="step", notes="detail")
-        self.assertEqual(dp.process_type, ProcessName.OTHER)
+        assert dp.process_type == ProcessName.OTHER
 
     def test_other_without_name_or_notes_fails(self):
         """OTHER without name or notes should raise a ValidationError"""
-        with self.assertRaises(pydantic.ValidationError) as ctx:
+        with pytest.raises(pydantic.ValidationError) as ctx:
             self._make(ProcessName.OTHER)
-        self.assertIn("name' or 'notes' must specify process details", str(ctx.exception))
+        assert "name' or 'notes' must specify process details" in str(ctx.value)
 
     # --- ProcessName.ANALYSIS ---
 
     def test_analysis_with_name_passes(self):
         """ANALYSIS is allowed when a custom name is provided"""
         dp = self._make(ProcessName.ANALYSIS, name="my analysis")
-        self.assertEqual(dp.process_type, ProcessName.ANALYSIS)
+        assert dp.process_type == ProcessName.ANALYSIS
 
     def test_analysis_with_notes_passes(self):
         """ANALYSIS is allowed when notes are provided"""
         dp = self._make(ProcessName.ANALYSIS, notes="analysis detail")
-        self.assertEqual(dp.process_type, ProcessName.ANALYSIS)
+        assert dp.process_type == ProcessName.ANALYSIS
 
     def test_analysis_without_name_or_notes_fails(self):
         """ANALYSIS without name or notes should raise a ValidationError"""
-        with self.assertRaises(pydantic.ValidationError) as ctx:
+        with pytest.raises(pydantic.ValidationError) as ctx:
             self._make(ProcessName.ANALYSIS)
-        self.assertIn("name' or 'notes' must specify process details", str(ctx.exception))
+        assert "name' or 'notes' must specify process details" in str(ctx.value)
 
     # --- Other process types are not affected ---
 
     def test_compression_without_name_or_notes_passes(self):
         """Non-OTHER/ANALYSIS types do not require name or notes"""
         dp = self._make(ProcessName.COMPRESSION)
-        self.assertEqual(dp.process_type, ProcessName.COMPRESSION)
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert dp.process_type == ProcessName.COMPRESSION

@@ -1,59 +1,57 @@
 """Test for the acquisition.json"""
 
 import inspect
-import unittest
 from datetime import datetime, timedelta, timezone
 from typing import get_args
 from zoneinfo import ZoneInfo
 
 import pydantic
-from aind_data_schema_models.brain_atlas import CCFv3
-from aind_data_schema_models.modalities import Modality
+import pytest
+from biodata_models.modalities import Modality
 from pydantic import ValidationError
 
-from aind_data_schema.components.configs import (
+from biodata_schema.components.configs import (
     DeviceConfig,
     EphysAssemblyConfig,
     ImagingConfig,
     Immersion,
-    ManipulatorConfig,
-    MISModuleConfig,
     MRIScan,
     SampleChamberConfig,
 )
-from aind_data_schema.components.coordinates import CoordinateSystemLibrary, Translation
-from aind_data_schema.core.acquisition import (
+from biodata_schema.components.connections import Connection
+from biodata_schema.core.acquisition import (
+    NON_IANA_TIMEZONES,
     Acquisition,
     AcquisitionSubjectDetails,
     DataStream,
     StimulusEpoch,
 )
-from aind_data_schema.components.connections import Connection
 from examples.barseq_acquisition import acquisition as barseq_acquisition
 from examples.ephys_acquisition import acquisition as ephys_acquisition
 from examples.exaspim_acquisition import acq as exaspim_acquisition
-from examples.mri_acquisition import acquisition as mri_acquisition, scan1
+from examples.mri_acquisition import acquisition as mri_acquisition
+from examples.mri_acquisition import scan1
 
 
-class AcquisitionTest(unittest.TestCase):
+class TestAcquisition:
     """Group of tests for the Acquisition class"""
 
     def test_constructors(self):
         """Test constructing acquisition files"""
 
-        with self.assertRaises(pydantic.ValidationError):
+        with pytest.raises(pydantic.ValidationError):
             Acquisition()
 
         acq = ephys_acquisition.model_copy()
-        self.assertIsNotNone(Acquisition.model_validate_json(acq.model_dump_json()))
+        assert Acquisition.model_validate_json(acq.model_dump_json()) is not None
 
-        self.assertIsNotNone(ephys_acquisition)
-        self.assertIsNotNone(exaspim_acquisition)
-        self.assertIsNotNone(mri_acquisition)
+        assert ephys_acquisition is not None
+        assert exaspim_acquisition is not None
+        assert mri_acquisition is not None
 
         scan1_dict = scan1.model_dump()
 
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             # Ensure that MRIScan validator is properly enforcing pulse_sequence_type notes requirements
             scan1_dict["pulse_sequence_type"] = "Other"
             scan1_dict["notes"] = ""
@@ -62,13 +60,13 @@ class AcquisitionTest(unittest.TestCase):
     def test_external_data_stream(self):
         """Test ExternalDataStream: valid without instrument_id, and DataStream requires instrument_id"""
         # Happy path: BARseq example uses ExternalDataStream and has no instrument_id
-        self.assertIsNotNone(barseq_acquisition)
-        self.assertIsNone(barseq_acquisition.instrument_id)
+        assert barseq_acquisition is not None
+        assert barseq_acquisition.instrument_id is None
 
         # Guard: DataStream without instrument_id should fail
         start = datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
         end = datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
-        with self.assertRaises(ValidationError) as context:
+        with pytest.raises(ValidationError) as context:
             Acquisition(
                 subject_id="123456",
                 acquisition_start_time=start,
@@ -84,90 +82,45 @@ class AcquisitionTest(unittest.TestCase):
                     )
                 ],
             )
-        self.assertIn("instrument_id is required", str(context.exception))
+        assert "instrument_id is required" in str(context.value)
 
     def test_check_subject_specimen_id(self):
         """Test that subject and specimen IDs match"""
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             acq = exaspim_acquisition.model_copy()
             acq.specimen_id = "654321"
 
             Acquisition.model_validate_json(acq.model_dump_json())
 
-        self.assertIn("Expected 123456 to appear in 654321", str(context.exception))
+        assert "Expected 123456 to appear in 654321" in str(context.value)
 
     def test_specimen_id_list_valid(self):
         """Test that specimen_id accepts a list of strings when all contain subject_id"""
         acq = exaspim_acquisition.model_copy()
         acq.specimen_id = ["123456_slide1", "123456_slide2"]
         validated = Acquisition.model_validate_json(acq.model_dump_json())
-        self.assertEqual(validated.specimen_id, ["123456_slide1", "123456_slide2"])
+        assert validated.specimen_id == ["123456_slide1", "123456_slide2"]
 
     def test_specimen_id_list_invalid(self):
         """Test that specimen_id list raises ValueError if any entry does not contain subject_id"""
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             acq = exaspim_acquisition.model_copy()
             acq.specimen_id = ["123456_slide1", "654321_slide2"]
             Acquisition.model_validate_json(acq.model_dump_json())
-        self.assertIn("Expected 123456 to appear in 654321_slide2", str(context.exception))
+        assert "Expected 123456 to appear in 654321_slide2" in str(context.value)
 
     def test_specimen_required(self):
         """Test that specimen ID is required for in vitro imaging modalities"""
-        with self.assertRaises(ValueError):
-            Acquisition(
-                experimenters=["Mam Moth"],
-                acquisition_start_time=datetime.now(),
-                acquisition_end_time=datetime.now(),
-                subject_id="123456",
-                acquisition_type="Test",
-                instrument_id="1234",
-                subject_details=AcquisitionSubjectDetails(
-                    mouse_platform_name="Running wheel",
-                ),
-                coordinate_system=CoordinateSystemLibrary.BREGMA_ARID,
-                data_streams=[
-                    DataStream(
-                        stream_start_time=datetime.now(),
-                        stream_end_time=datetime.now(),
-                        modalities=[Modality.SPIM],
-                        active_devices=["Stick_assembly", "Ephys_assemblyA"],
-                        configurations=[
-                            MISModuleConfig(
-                                device_name="Stick_assembly",
-                                arc_angle=24,
-                                module_angle=10,
-                            ),
-                            ManipulatorConfig(
-                                device_name="Ephys_assemblyA",
-                                arc_angle=0,
-                                module_angle=10,
-                                primary_targeted_structure=CCFv3.VISL,
-                                atlas_coordinates=[
-                                    Translation(
-                                        translation=[1, 1, 1, 0],
-                                    ),
-                                ],
-                                manipulator_coordinates=[
-                                    Translation(
-                                        translation=[1, 1, 1, 1],
-                                    )
-                                ],
-                                manipulator_axis_positions=[
-                                    Translation(
-                                        translation=[1, 1, 1, 0],
-                                    )
-                                ],
-                            ),
-                        ],
-                    )
-                ],
-            )
+        acq = exaspim_acquisition.model_copy()
+        acq.specimen_id = None
+        with pytest.raises(ValidationError, match="Specimen ID is required for modalities"):
+            Acquisition.model_validate_json(acq.model_dump_json())
 
     def test_check_modality_config_requirements(self):
         """Test that modality configuration requirements are enforced"""
 
         # Test missing required devices for ECEPHYS modality
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             DataStream(
                 stream_start_time=datetime.now(),
                 stream_end_time=datetime.now(),
@@ -186,13 +139,13 @@ class AcquisitionTest(unittest.TestCase):
                 EphysAssemblyConfig.model_construct(),
             ],
         )
-        self.assertIsNotNone(stream)
+        assert stream is not None
 
     def test_specimen_required_for_in_vitro_modalities(self):
         """Test that specimen ID is required for in vitro imaging modalities"""
 
         # Test case where specimen ID is missing for in vitro modality
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             Acquisition(
                 experimenters=["Mam Moth"],
                 acquisition_start_time=datetime.now(),
@@ -226,7 +179,7 @@ class AcquisitionTest(unittest.TestCase):
                     )
                 ],
             )
-        self.assertIn("Specimen ID is required for modalities", str(context.exception))
+        assert "Specimen ID is required for modalities" in str(context.value)
 
         # Test case where specimen ID is provided for in vitro modality
         acquisition = Acquisition(
@@ -263,7 +216,7 @@ class AcquisitionTest(unittest.TestCase):
                 )
             ],
         )
-        self.assertIsNotNone(acquisition)
+        assert acquisition is not None
 
     def test_check_connections(self):
         """Test that every device in a Connection is present in the active_devices list"""
@@ -280,10 +233,10 @@ class AcquisitionTest(unittest.TestCase):
                 Connection(source_device="DeviceB", target_device="SomeTarget"),
             ],
         )
-        self.assertIsNotNone(stream)
+        assert stream is not None
 
         # Test invalid connections
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             DataStream(
                 stream_start_time=datetime.now(),
                 stream_end_time=datetime.now(),
@@ -294,10 +247,10 @@ class AcquisitionTest(unittest.TestCase):
                     Connection(source_device="SomeTarget", target_device="DeviceA"),
                 ],
             )
-        self.assertIn("Missing devices in active_devices list for connection", str(context.exception))
+        assert "Missing devices in active_devices list for connection" in str(context.value)
 
         # Test invalid connections
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             DataStream(
                 stream_start_time=datetime.now(),
                 stream_end_time=datetime.now(),
@@ -308,7 +261,7 @@ class AcquisitionTest(unittest.TestCase):
                     Connection(source_device="DeviceA", target_device="SomeTarget"),
                 ],
             )
-        self.assertIn("Missing devices in active_devices list for connection", str(context.exception))
+        assert "Missing devices in active_devices list for connection" in str(context.value)
 
     def test_all_device_config_subclasses_covered(self):  # pragma: no cover
         """Test that all DeviceConfig subclasses are included in either DataStream or StimulusEpoch configurations
@@ -317,7 +270,7 @@ class AcquisitionTest(unittest.TestCase):
         """
 
         # Import the calibration and maintenance base classes to exclude them
-        from aind_data_schema.components.measurements import Calibration, Maintenance
+        from biodata_schema.components.measurements import Calibration, Maintenance
 
         # Get all subclasses of DeviceConfig using introspection
         def get_all_subclasses(cls):
@@ -384,10 +337,10 @@ class AcquisitionTest(unittest.TestCase):
                 f"the calibrations and maintenance fields respectively.\n"
                 f"Please add the missing configs to the appropriate discriminated union."
             )
-            self.fail(error_msg)
+            pytest.fail(error_msg)
 
         # If we get here, all device config subclasses are properly covered
-        self.assertTrue(True, "All DeviceConfig subclasses are properly covered in discriminated unions")
+        assert True, "All DeviceConfig subclasses are properly covered in discriminated unions"
 
     def test_datastream_add_basic(self):
         """Test combining two DataStream objects"""
@@ -401,18 +354,18 @@ class AcquisitionTest(unittest.TestCase):
 
         combined_stream = stream1 + stream2
 
-        self.assertIsNotNone(combined_stream)
-        self.assertEqual(combined_stream.stream_start_time, stream1.stream_start_time)
-        self.assertEqual(combined_stream.stream_end_time, stream1.stream_end_time)
-        self.assertEqual(len(combined_stream.modalities), 1)
-        self.assertEqual(len(combined_stream.active_devices), 4)
-        self.assertEqual(len(combined_stream.configurations), 4)
+        assert combined_stream is not None
+        assert combined_stream.stream_start_time == stream1.stream_start_time
+        assert combined_stream.stream_end_time == stream1.stream_end_time
+        assert len(combined_stream.modalities) == 1
+        assert len(combined_stream.active_devices) == 4
+        assert len(combined_stream.configurations) == 4
 
         # Also check that an error is raised if the streams cannot be combined
 
         stream2.stream_end_time = stream2.stream_end_time.replace(year=2100)
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             _ = stream1 + stream2
 
     def test_datastream_add_combines_notes(self):
@@ -429,8 +382,8 @@ class AcquisitionTest(unittest.TestCase):
 
         combined_stream = stream1 + stream2
 
-        self.assertIn("Note 1", combined_stream.notes)
-        self.assertIn("Note 2", combined_stream.notes)
+        assert "Note 1" in combined_stream.notes
+        assert "Note 2" in combined_stream.notes
 
     def test_datastream_add_with_duplicate_devices(self):
         """Test that overlapping active devices are logged as warning when combining"""
@@ -440,7 +393,7 @@ class AcquisitionTest(unittest.TestCase):
 
         combined_stream = stream1 + stream2
 
-        self.assertIsNotNone(combined_stream)
+        assert combined_stream is not None
 
     def test_datastream_add_combines_connections(self):
         """Test that connections are properly combined"""
@@ -456,7 +409,7 @@ class AcquisitionTest(unittest.TestCase):
 
         combined_stream = stream1 + stream2
 
-        self.assertEqual(len(combined_stream.connections), 2)
+        assert len(combined_stream.connections) == 2
 
     def test_merge_data_stream_lists_single_streams(self):
         """Test merging lists with single streams"""
@@ -469,7 +422,7 @@ class AcquisitionTest(unittest.TestCase):
 
         merged = Acquisition._merge_data_streams([stream1] + [stream2])
 
-        self.assertEqual(len(merged), 2)
+        assert len(merged) == 2
 
     def test_merge_data_stream_lists_overlapping_streams(self):
         """Test merging streams with overlapping start/end times"""
@@ -483,8 +436,8 @@ class AcquisitionTest(unittest.TestCase):
 
         merged = Acquisition._merge_data_streams([stream1] + [stream2])
 
-        self.assertEqual(len(merged), 1)
-        self.assertEqual(len(merged[0].active_devices), 4)
+        assert len(merged) == 1
+        assert len(merged[0].active_devices) == 4
 
     def test_merge_data_stream_lists_non_overlapping_streams(self):
         """Test merging streams with different start/end times"""
@@ -498,7 +451,7 @@ class AcquisitionTest(unittest.TestCase):
 
         merged = Acquisition._merge_data_streams([stream1] + [stream2])
 
-        self.assertEqual(len(merged), 2)
+        assert len(merged) == 2
 
     def test_merge_data_stream_lists_multiple_overlapping_groups(self):
         """Test merging multiple streams with multiple overlapping groups"""
@@ -532,8 +485,8 @@ class AcquisitionTest(unittest.TestCase):
         for m in merged:
             print(m.stream_start_time, m.stream_end_time, m.active_devices)
 
-        self.assertEqual(len(merged), 2)
-        self.assertEqual(len(merged[0].active_devices), 3)
+        assert len(merged) == 2
+        assert len(merged[0].active_devices) == 3
 
     def test_datastream_add_with_exaspim_example(self):
         """Test combining DataStreams using ExaSPIM example"""
@@ -545,9 +498,9 @@ class AcquisitionTest(unittest.TestCase):
 
         combined_stream = stream1 + stream2
 
-        self.assertIsNotNone(combined_stream)
-        self.assertIn(Modality.SPIM, combined_stream.modalities)
-        self.assertEqual(len(combined_stream.active_devices), 6)
+        assert combined_stream is not None
+        assert Modality.SPIM in combined_stream.modalities
+        assert len(combined_stream.active_devices) == 6
 
     def test_acquisition_start_time_local_with_zoneinfo(self):
         """acquisition_start_time_local converts correctly using a ZoneInfo IANA name"""
@@ -559,8 +512,8 @@ class AcquisitionTest(unittest.TestCase):
             acquisition_start_tz=TimeZoneName("America/Los_Angeles"),
         )
         local = acq.acquisition_start_time_local
-        self.assertEqual(local.tzinfo, ZoneInfo("America/Los_Angeles"))
-        self.assertEqual(local.hour, 13)
+        assert local.tzinfo == ZoneInfo("America/Los_Angeles")
+        assert local.hour == 13
 
     def test_acquisition_start_time_local_with_int_offset(self):
         """acquisition_start_time_local converts correctly using an integer UTC offset in hours"""
@@ -570,8 +523,8 @@ class AcquisitionTest(unittest.TestCase):
             acquisition_start_tz=-7,
         )
         local = acq.acquisition_start_time_local
-        self.assertEqual(local.utcoffset(), timedelta(hours=-7))
-        self.assertEqual(local.hour, 13)
+        assert local.utcoffset() == timedelta(hours=-7)
+        assert local.hour == 13
 
     def test_acquisition_start_time_local_with_no_tz(self):
         """acquisition_start_time_local returns acquisition_start_time unchanged when tz is None"""
@@ -580,7 +533,7 @@ class AcquisitionTest(unittest.TestCase):
             acquisition_start_time=dt,
             acquisition_start_tz=None,
         )
-        self.assertEqual(acq.acquisition_start_time_local, dt)
+        assert acq.acquisition_start_time_local == dt
 
     def test_acquisition_start_time_local_round_trip(self):
         """acquisition_start_time_local preserves the original wall-clock time after round-tripping
@@ -589,24 +542,37 @@ class AcquisitionTest(unittest.TestCase):
 
         acq = exaspim_acquisition.model_copy()
         local = acq.acquisition_start_time_local
-        self.assertEqual(local.year, exaspim_t.year)
-        self.assertEqual(local.month, exaspim_t.month)
-        self.assertEqual(local.day, exaspim_t.day)
-        self.assertEqual(local.hour, exaspim_t.hour)
-        self.assertEqual(local.minute, exaspim_t.minute)
-        self.assertEqual(local.second, exaspim_t.second)
-        self.assertEqual(local.tzinfo, exaspim_t.tzinfo)
+        assert local.year == exaspim_t.year
+        assert local.month == exaspim_t.month
+        assert local.day == exaspim_t.day
+        assert local.hour == exaspim_t.hour
+        assert local.minute == exaspim_t.minute
+        assert local.second == exaspim_t.second
+        assert local.tzinfo == exaspim_t.tzinfo
 
     def test_coerce_fixed_offset_tz_string(self):
         """Legacy '-07:00' strings are coerced to integer hour offsets"""
-        self.assertEqual(Acquisition.coerce_fixed_offset_tz_string("-07:00"), -7)
-        self.assertEqual(Acquisition.coerce_fixed_offset_tz_string("+05:30"), 5)
-        self.assertEqual(Acquisition.coerce_fixed_offset_tz_string("+00:00"), 0)
-        self.assertEqual(Acquisition.coerce_fixed_offset_tz_string("00:00"), 0)
-        self.assertIsNone(Acquisition.coerce_fixed_offset_tz_string(None))
-        self.assertEqual(Acquisition.coerce_fixed_offset_tz_string(-7), -7)
-        self.assertEqual(Acquisition.coerce_fixed_offset_tz_string("America/Los_Angeles"), "America/Los_Angeles")
+        assert Acquisition.coerce_fixed_offset_tz_string("-07:00") == -7
+        assert Acquisition.coerce_fixed_offset_tz_string("+05:30") == 5
+        assert Acquisition.coerce_fixed_offset_tz_string("+00:00") == 0
+        assert Acquisition.coerce_fixed_offset_tz_string("00:00") == 0
+        assert Acquisition.coerce_fixed_offset_tz_string(None) is None
+        assert Acquisition.coerce_fixed_offset_tz_string(-7) == -7
+        assert Acquisition.coerce_fixed_offset_tz_string("America/Los_Angeles") == "America/Los_Angeles"
 
+    def test_reject_non_iana_tz(self):
+        """Host timezone artifacts are rejected, real zones and offsets pass through"""
+        for name in NON_IANA_TIMEZONES:
+            with pytest.raises(ValueError) as context:
+                Acquisition.reject_non_iana_tz(name)
+            assert "is not an IANA timezone name" in str(context.value)
 
-if __name__ == "__main__":
-    unittest.main()
+        assert Acquisition.reject_non_iana_tz("America/Los_Angeles") == "America/Los_Angeles"
+        assert Acquisition.reject_non_iana_tz(-7) == -7
+        assert Acquisition.reject_non_iana_tz(None) is None
+
+    def test_non_iana_tz_absent_from_schema(self):
+        """The generated enum never advertises host timezone artifacts"""
+        enum = Acquisition.model_json_schema()["properties"]["acquisition_start_tz"]["anyOf"][1]["enum"]
+        assert not NON_IANA_TIMEZONES.intersection(enum)
+        assert "America/Los_Angeles" in enum

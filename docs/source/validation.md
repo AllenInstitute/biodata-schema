@@ -15,7 +15,7 @@ The following consistency rules are enforced:
 Construct it as follows:
 
 ```python
-from aind_data_schema.utils.compatibility_check import InstrumentAcquisitionCompatibility
+from biodata_schema.utils.compatibility_check import InstrumentAcquisitionCompatibility
 
 # Construct your Instrument and Acquisition objects
 
@@ -23,4 +23,4 @@ compatibility_check = InstrumentAcquisitionCompatibility(instrument, acquisition
 compatibility_check.run_compatibility_check(raise_for_missing_devices=True)
 ```
 
-The `raise_for_missing_devices` will raise a `ValidationError` if `Acquisition.active_devices` can't be found in the instrument. Note that if your situation includes implanted devices in the procedures, then errors will be raised because the procedures are not available. In that case, you should construct the a full `Metadata` object for validation.
+The `raise_for_missing_devices` will raise a `ValueError` if `Acquisition.active_devices` can't be found in the instrument. Note that if your situation includes implanted devices in the procedures, then errors will be raised because the procedures are not available. In that case, you should construct the a full `Metadata` object for validation.

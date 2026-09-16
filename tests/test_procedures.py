@@ -1,29 +1,28 @@
 """test Procedures"""
 
-import unittest
-import warnings
 from datetime import date
 from unittest.mock import patch
 
-from aind_data_schema_models.brain_atlas import CCFv3
-from aind_data_schema_models.coordinates import AnatomicalRelative
-from aind_data_schema_models.mouse_anatomy import InjectionTargets
-from aind_data_schema_models.organizations import Organization
-from aind_data_schema_models.units import ConcentrationUnit, CurrentUnit, SizeUnit, TimeUnit, VolumeUnit
+import pytest
+from biodata_models.brain_atlas import CCFv3
+from biodata_models.coordinates import AnatomicalRelative
+from biodata_models.mouse_anatomy import InjectionTargets, MouseBloodVessels
+from biodata_models.organizations import Organization
+from biodata_models.specimen_procedure_types import SpecimenProcedureType
+from biodata_models.units import ConcentrationUnit, CurrentUnit, SizeUnit, TimeUnit, VolumeUnit
 from pydantic import ValidationError
-from aind_data_schema_models.specimen_procedure_types import SpecimenProcedureType
 
-from aind_data_schema.components.configs import CatheterConfig
-from aind_data_schema.components.coordinates import CoordinateSystemLibrary, Origin, Translation
-from aind_data_schema.components.devices import Catheter
-from aind_data_schema.components.injection_procedures import (
+from biodata_schema.components.configs import CatheterConfig
+from biodata_schema.components.coordinates import Origin, ReferenceCoordinateSystem, Translation
+from biodata_schema.components.devices import Catheter, Device
+from biodata_schema.components.injection_procedures import (
     InjectionDynamics,
     InjectionProfile,
     NonViralMaterial,
     TarsVirusIdentifiers,
     ViralMaterial,
 )
-from aind_data_schema.components.specimen_procedures import (
+from biodata_schema.components.specimen_procedures import (
     HCRSeries,
     PlanarSection,
     PlanarSectioning,
@@ -32,33 +31,33 @@ from aind_data_schema.components.specimen_procedures import (
     SectionOrientation,
     SpecimenProcedure,
 )
-from aind_data_schema.components.subject_procedures import BrainInjection, Injection, Surgery
-from aind_data_schema.components.surgery_procedures import CatheterImplant, Craniotomy, CraniotomyType
-from aind_data_schema.core.procedures import Procedures
-from aind_data_schema.utils.exceptions import OneOfError
-from aind_data_schema_models.mouse_anatomy import MouseBloodVessels
+from biodata_schema.components.subject_procedures import BrainInjection, Injection, Surgery
+from biodata_schema.components.surgery_procedures import CatheterImplant, Craniotomy, CraniotomyType
+from biodata_schema.core.procedures import Procedures
+from biodata_schema.utils.exceptions import OneOfError
+from tests.coordinate_systems import BREGMA_ARI, BREGMA_RAS
 
 
-class ProceduresTests(unittest.TestCase):
+class TestProcedures:
     """test Procedures"""
 
-    def setUp(self):
+    def setup_method(self):
         """Set up test data"""
         self.start_date = date.fromisoformat("2020-10-10")
 
     def test_required_field_validation_check(self):
         """Tests that validation error is thrown if subject_id is not set."""
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             Procedures()
 
         p = Procedures(subject_id="12345")
-        self.assertEqual("12345", p.subject_id)
+        assert "12345" == p.subject_id
 
-    @patch("aind_data_schema_models.mouse_anatomy.get_emapa_id")
-    def test_unwrapped_injection_warns(self, mock_get_emapa_id):
-        """Unwrapped Injection in subject_procedures should emit a UserWarning"""
+    @patch("biodata_models.mouse_anatomy.get_emapa_id")
+    def test_unwrapped_injection_rejected(self, mock_get_emapa_id):
+        """Unwrapped Injection in subject_procedures should raise"""
         mock_get_emapa_id.return_value = "123456"
-        with self.assertWarns(UserWarning):
+        with pytest.raises(ValidationError):
             Procedures(
                 subject_id="12345",
                 subject_procedures=[
@@ -77,13 +76,13 @@ class ProceduresTests(unittest.TestCase):
                 ],
             )
 
-    @patch("aind_data_schema_models.mouse_anatomy.get_emapa_id")
+    @patch("biodata_models.mouse_anatomy.get_emapa_id")
     def test_injection_material_check(self, mock_get_emapa_id):
         """Check for validation error when injection_materials is empty"""
 
         mock_get_emapa_id.return_value = "123456"
 
-        with self.assertRaises(ValidationError) as e:
+        with pytest.raises(ValidationError) as e:
             Procedures(
                 subject_id="12345",
                 subject_procedures=[
@@ -111,13 +110,13 @@ class ProceduresTests(unittest.TestCase):
                 ],
             )
 
-        self.assertIn("injection_materials", repr(e.exception))
+        assert "injection_materials" in repr(e.value)
 
-    @patch("aind_data_schema_models.mouse_anatomy.get_emapa_id")
+    @patch("biodata_models.mouse_anatomy.get_emapa_id")
     def test_injection_material_none(self, mock_get_emapa_id):
         """Check for validation error when injection_materials is None"""
         mock_get_emapa_id.return_value = "123456"
-        with self.assertRaises(ValidationError) as e:
+        with pytest.raises(ValidationError) as e:
             Procedures(
                 subject_id="12345",
                 subject_procedures=[
@@ -145,23 +144,23 @@ class ProceduresTests(unittest.TestCase):
                 ],
             )
 
-        self.assertIn("injection_materials", repr(e.exception))
+        assert "injection_materials" in repr(e.value)
 
-    @patch("aind_data_schema_models.mouse_anatomy.get_emapa_id")
+    @patch("biodata_models.mouse_anatomy.get_emapa_id")
     def test_injection_materials_list(self, mock_get_emapa_id):
         """Valid injection_materials list"""
         mock_get_emapa_id.return_value = "123456"
 
         p = Procedures(
             subject_id="12345",
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
             subject_procedures=[
                 Surgery(
                     start_date=self.start_date,
                     experimenters=["Mam Moth"],
                     ethics_review_id="234",
                     protocol_id="123",
-                    coordinate_system=CoordinateSystemLibrary.BREGMA_ARID,
+                    global_coordinate_system=BREGMA_ARI,
                     measured_coordinates={
                         Origin.BREGMA: Translation(
                             translation=[0, 0, 0],
@@ -242,7 +241,11 @@ class ProceduresTests(unittest.TestCase):
                             coordinates=[
                                 [
                                     Translation(
-                                        translation=[0.5, 1, 0, 1],
+                                        translation=[0.5, 1, 0],
+                                    ),
+                                    Translation(
+                                        translation=[0, 0, 1],
+                                        reference_coordinate_system=ReferenceCoordinateSystem.LOCAL,
                                     ),
                                 ],
                             ],
@@ -253,13 +256,13 @@ class ProceduresTests(unittest.TestCase):
             ],
         )
 
-        self.assertEqual(1, len(p.subject_procedures))
-        self.assertEqual(p, Procedures.model_validate_json(p.model_dump_json()))
+        assert 1 == len(p.subject_procedures)
+        assert p == Procedures.model_validate_json(p.model_dump_json())
 
     def test_validate_procedure_type(self):
         """Test that the procedure type validation error works"""
 
-        with self.assertRaises(ValidationError) as e:
+        with pytest.raises(ValidationError) as e:
             SpecimenProcedure(
                 specimen_id="1000",
                 procedure_type="Other",
@@ -269,9 +272,9 @@ class ProceduresTests(unittest.TestCase):
                 protocol_id=["10"],
                 notes=None,
             )
-        self.assertIn("notes cannot be empty if procedure_type is Other", repr(e.exception))
+        assert "notes cannot be empty if procedure_type is Other" in repr(e.value)
 
-        with self.assertRaises(ValidationError) as e:
+        with pytest.raises(ValidationError) as e:
             SpecimenProcedure(
                 specimen_id="1000",
                 procedure_type="Immunolabeling",
@@ -281,11 +284,9 @@ class ProceduresTests(unittest.TestCase):
                 protocol_id=["10"],
                 notes=None,
             )
-        self.assertIn(
-            "FluorescentStain or ProbeReagent required if procedure_type is Immunolabeling", repr(e.exception)
-        )
+        assert "FluorescentStain or ProbeReagent required if procedure_type is Immunolabeling" in repr(e.value)
 
-        with self.assertRaises(ValidationError) as e:
+        with pytest.raises(ValidationError) as e:
             SpecimenProcedure(
                 specimen_id="1000",
                 procedure_type="Hybridization Chain Reaction",
@@ -295,9 +296,9 @@ class ProceduresTests(unittest.TestCase):
                 protocol_id=["10"],
                 notes=None,
             )
-        self.assertIn("HCRSeries required if procedure_type is HCR", repr(e.exception))
+        assert "HCRSeries required if procedure_type is HCR" in repr(e.value)
 
-        with self.assertRaises(ValidationError) as e:
+        with pytest.raises(ValidationError) as e:
             SpecimenProcedure(
                 specimen_id="1000",
                 procedure_type="Sectioning",
@@ -307,9 +308,9 @@ class ProceduresTests(unittest.TestCase):
                 protocol_id=["10"],
                 notes=None,
             )
-        self.assertIn("Sectioning required if procedure_type is Sectioning", repr(e.exception))
+        assert "Sectioning required if procedure_type is Sectioning" in repr(e.value)
 
-        with self.assertRaises(ValidationError) as e:
+        with pytest.raises(ValidationError) as e:
             SpecimenProcedure(
                 specimen_id="1000",
                 procedure_type=SpecimenProcedureType.BARSEQ,
@@ -319,9 +320,9 @@ class ProceduresTests(unittest.TestCase):
                 protocol_id=["10"],
                 notes=None,
             )
-        self.assertIn("GeneProbeSet required if procedure_type is BarSEQ", repr(e.exception))
+        assert "GeneProbeSet required if procedure_type is BarSEQ" in repr(e.value)
 
-        self.assertIsNotNone(
+        assert (
             SpecimenProcedure(
                 specimen_id="1000",
                 procedure_type="Other",
@@ -331,9 +332,9 @@ class ProceduresTests(unittest.TestCase):
                 protocol_id=["10"],
                 notes="some extra information",
             )
-        )
+        ) is not None
 
-        self.assertIsNotNone(
+        assert (
             SpecimenProcedure(
                 specimen_id="1000",
                 procedure_type="Sectioning",
@@ -344,12 +345,12 @@ class ProceduresTests(unittest.TestCase):
                 notes=None,
                 procedure_details=[Sectioning(sections=[Section(output_specimen_id="1000_spinal")])],
             )
-        )
+        ) is not None
 
     def test_validate_procedure_type_multiple(self):
         """Test that error thrown when multiple types are passed to procedure_details"""
 
-        with self.assertRaises(ValidationError) as e:
+        with pytest.raises(ValidationError) as e:
             SpecimenProcedure(
                 specimen_id="1000",
                 procedure_type="Other",
@@ -363,27 +364,7 @@ class ProceduresTests(unittest.TestCase):
                     PlanarSectioning.model_construct(),
                 ],
             )
-        self.assertIn("SpecimenProcedure.procedure_details should only contain one type of model", repr(e.exception))
-
-    def test_section_deprecated_coordinate_fields(self):
-        """Test that using deprecated coordinate fields in Section raises deprecation warnings"""
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            section = Section(
-                output_specimen_id="section1",
-                coordinate_system_name="CCFv3",
-                start_coordinate=Translation(translation=[0.5, 1.0, 0.0, 1.0]),
-                thickness=100.0,
-                thickness_unit=SizeUnit.UM,
-                partial_slice=[AnatomicalRelative.LEFT],
-            )
-            deprecation_warnings = [warning for warning in w if issubclass(warning.category, DeprecationWarning)]
-            self.assertGreaterEqual(len(deprecation_warnings), 1)
-            section_warnings = [warning for warning in deprecation_warnings if "Section fields" in str(warning.message)]
-            self.assertEqual(len(section_warnings), 1)
-            self.assertIn("partial_slice", str(section_warnings[0].message))
-            self.assertIn("PlanarSection", str(section_warnings[0].message))
-            self.assertEqual(section.output_specimen_id, "section1")
+        assert "SpecimenProcedure.procedure_details should only contain one type of model" in repr(e.value)
 
     def test_coordinate_volume_validator(self):
         """Test validator for list lengths on BrainInjection"""
@@ -428,10 +409,10 @@ class ProceduresTests(unittest.TestCase):
                 )
             ],
         )
-        self.assertEqual(len(inj1.coordinates), len(inj1.dynamics))
+        assert len(inj1.coordinates) == len(inj1.dynamics)
 
         # Different coordinates and dynamics list lengths should raise an error
-        with self.assertRaises(ValidationError) as e:
+        with pytest.raises(ValidationError) as e:
             BrainInjection(
                 protocol_id="abc",
                 coordinate_system_name="BREGMA_ARI",
@@ -467,16 +448,16 @@ class ProceduresTests(unittest.TestCase):
                 ],
             )
 
-        self.assertIn("Unmatched list sizes for injection volumes and coordinate depths", repr(e.exception))
+        assert "Unmatched list sizes for injection volumes and coordinate depths" in repr(e.value)
 
     def test_sectioning(self):
         """Test sectioning"""
 
         # Updated initialization to use the new Section class
         sectioning_procedure = PlanarSectioning(
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
             sections=[
-                Section(
+                PlanarSection(
                     output_specimen_id="123456_001",
                     targeted_structure=CCFv3.MOP,
                     coordinate_system_name="BREGMA_ARI",
@@ -487,7 +468,7 @@ class ProceduresTests(unittest.TestCase):
                         translation=[0.5, 0, 0],
                     ),
                 ),
-                Section(
+                PlanarSection(
                     output_specimen_id="123456_002",
                     coordinate_system_name="BREGMA_ARI",
                     start_coordinate=Translation(
@@ -497,7 +478,7 @@ class ProceduresTests(unittest.TestCase):
                         translation=[0.7, 0, 0],
                     ),
                 ),
-                Section(
+                PlanarSection(
                     output_specimen_id="123456_003",
                     coordinate_system_name="BREGMA_ARI",
                     start_coordinate=Translation(
@@ -509,7 +490,7 @@ class ProceduresTests(unittest.TestCase):
             ],
             section_orientation=SectionOrientation.CORONAL,
         )
-        self.assertIsNotNone(sectioning_procedure)
+        assert sectioning_procedure is not None
 
         valid_section = PlanarSection(
             output_specimen_id="123456_001",
@@ -520,10 +501,10 @@ class ProceduresTests(unittest.TestCase):
             thickness=100.0,
             thickness_unit=SizeUnit.UM,
         )
-        self.assertIsNotNone(valid_section)
+        assert valid_section is not None
 
         # Raise error if neither end_coordinate nor thickness is provided
-        with self.assertRaises(OneOfError):
+        with pytest.raises(OneOfError):
             PlanarSection(
                 output_specimen_id="123456_001",
                 coordinate_system_name="BREGMA_ARI",
@@ -535,7 +516,7 @@ class ProceduresTests(unittest.TestCase):
     def test_validate_subject_specimen_ids(self):
         """Test that the subject_id and specimen_id match"""
 
-        with self.assertRaises(ValidationError) as e:
+        with pytest.raises(ValidationError) as e:
             Procedures(
                 subject_id="12345",
                 specimen_procedures=[
@@ -551,7 +532,7 @@ class ProceduresTests(unittest.TestCase):
                 ],
             )
         expected_exception = "specimen_id must be an extension of the subject_id."
-        self.assertIn(expected_exception, str(e.exception))
+        assert expected_exception in str(e.value)
 
     def test_validate_subject_specimen_id_list_valid(self):
         """Test that specimen_id accepts a list of strings when all contain subject_id"""
@@ -570,7 +551,7 @@ class ProceduresTests(unittest.TestCase):
                 )
             ],
         )
-        self.assertIsNotNone(valid_procedure)
+        assert valid_procedure is not None
 
     def test_craniotomy_position_validation(self):
         """Test validation for craniotomy position"""
@@ -586,10 +567,10 @@ class ProceduresTests(unittest.TestCase):
             size=2.0,
             size_unit=SizeUnit.MM,
         )
-        self.assertIsNotNone(craniotomy)
+        assert craniotomy is not None
 
         # Missing position for required craniotomy types should raise an error
-        with self.assertRaises(ValueError) as e:
+        with pytest.raises(ValueError) as e:
             Craniotomy(
                 protocol_id="123",
                 craniotomy_type=CraniotomyType.CIRCLE,
@@ -597,9 +578,9 @@ class ProceduresTests(unittest.TestCase):
                 size=2.0,
                 size_unit=SizeUnit.MM,
             )
-        self.assertIn("Craniotomy.position must be provided for craniotomy type Circle", str(e.exception))
+        assert "Craniotomy.position must be provided for craniotomy type Circle" in str(e.value)
 
-        with self.assertRaises(ValueError) as e:
+        with pytest.raises(ValueError) as e:
             Craniotomy(
                 protocol_id="123",
                 craniotomy_type=CraniotomyType.SQUARE,
@@ -607,24 +588,22 @@ class ProceduresTests(unittest.TestCase):
                 size=2.0,
                 size_unit=SizeUnit.MM,
             )
-        self.assertIn("Craniotomy.position must be provided for craniotomy type Square", str(e.exception))
+        assert "Craniotomy.position must be provided for craniotomy type Square" in str(e.value)
 
-        with self.assertRaises(ValueError) as e:
+        with pytest.raises(ValueError) as e:
             Craniotomy(
                 protocol_id="123",
                 craniotomy_type=CraniotomyType.WHC,
                 coordinate_system_name="TestSystem",
             )
-        self.assertIn(
-            "Craniotomy.position must be provided for craniotomy type Whole hemisphere craniotomy", str(e.exception)
-        )
+        assert "Craniotomy.position must be provided for craniotomy type Whole hemisphere craniotomy" in str(e.value)
 
         # Should be okay for craniotomy types that do not require position
         craniotomy = Craniotomy(
             protocol_id="123",
             craniotomy_type=CraniotomyType.DHC,
         )
-        self.assertIsNotNone(craniotomy)
+        assert craniotomy is not None
 
     def test_craniotomy_system_name_if_position(self):
         """Test that coordinate_system_name is required if position is provided"""
@@ -639,10 +618,10 @@ class ProceduresTests(unittest.TestCase):
             size=2.0,
             size_unit=SizeUnit.MM,
         )
-        self.assertIsNotNone(craniotomy)
+        assert craniotomy is not None
 
         # Missing coordinate_system_name for required craniotomy types should raise an error
-        with self.assertRaises(ValueError) as e:
+        with pytest.raises(ValueError) as e:
             Craniotomy(
                 protocol_id="123",
                 craniotomy_type=CraniotomyType.CIRCLE,
@@ -652,9 +631,7 @@ class ProceduresTests(unittest.TestCase):
                 size=2.0,
                 size_unit=SizeUnit.MM,
             )
-        self.assertIn(
-            "Craniotomy.coordinate_system_name must be provided if Craniotomy.position is provided", str(e.exception)
-        )
+        assert "Craniotomy.coordinate_system_name must be provided if Craniotomy.position is provided" in str(e.value)
 
     def test_craniotomy_size_validation(self):
         """Test validation for craniotomy size"""
@@ -670,10 +647,10 @@ class ProceduresTests(unittest.TestCase):
             size=2.0,
             size_unit=SizeUnit.MM,
         )
-        self.assertIsNotNone(craniotomy)
+        assert craniotomy is not None
 
         # Missing size for required craniotomy types should raise an error
-        with self.assertRaises(ValueError) as e:
+        with pytest.raises(ValueError) as e:
             Craniotomy(
                 protocol_id="123",
                 craniotomy_type=CraniotomyType.CIRCLE,
@@ -682,9 +659,9 @@ class ProceduresTests(unittest.TestCase):
                     translation=[0.5, 1, 0, 0],
                 ),
             )
-        self.assertIn("Craniotomy.size must be provided for craniotomy type Circle", str(e.exception))
+        assert "Craniotomy.size must be provided for craniotomy type Circle" in str(e.value)
 
-        with self.assertRaises(ValueError) as e:
+        with pytest.raises(ValueError) as e:
             Craniotomy(
                 protocol_id="123",
                 craniotomy_type=CraniotomyType.SQUARE,
@@ -693,14 +670,14 @@ class ProceduresTests(unittest.TestCase):
                     translation=[0.5, 1, 0, 0],
                 ),
             )
-        self.assertIn("Craniotomy.size must be provided for craniotomy type Square", str(e.exception))
+        assert "Craniotomy.size must be provided for craniotomy type Square" in str(e.value)
 
         # Should be okay for craniotomy types that do not require size
         craniotomy = Craniotomy(
             protocol_id="123",
             craniotomy_type=CraniotomyType.DHC,
         )
-        self.assertIsNotNone(craniotomy)
+        assert craniotomy is not None
 
     def test_check_volume_or_current(self):
         """Test validation for InjectionDynamics to ensure either volume or injection_current is provided"""
@@ -711,7 +688,7 @@ class ProceduresTests(unittest.TestCase):
             volume=1.0,
             volume_unit=VolumeUnit.UL,
         )
-        self.assertIsNotNone(dynamics)
+        assert dynamics is not None
 
         # Should be valid with injection_current provided
         dynamics = InjectionDynamics(
@@ -719,23 +696,35 @@ class ProceduresTests(unittest.TestCase):
             injection_current=0.5,
             injection_current_unit=CurrentUnit.UA,
         )
-        self.assertIsNotNone(dynamics)
+        assert dynamics is not None
 
         # Should raise an error when neither volume nor injection_current is provided
-        with self.assertRaises(ValueError) as e:
+        with pytest.raises(ValueError) as e:
             InjectionDynamics(
                 profile=InjectionProfile.BOLUS,
             )
-        self.assertIn("Either volume or injection_current must be provided.", str(e.exception))
+        assert "Either volume or injection_current must be provided." in str(e.value)
 
     def test_get_device_names(self):
         """Test get_device_names method returns correct device names"""
 
         # Test with no devices
         procedures = Procedures(subject_id="12345")
-        self.assertEqual(procedures.get_device_names(), [])
+        assert procedures.get_device_names() == []
 
-    def test_get_device_names_with_surgery_procedures(self):
+    def test_get_device_names_with_constructed_surgery_procedure(self):
+        """Test device-name traversal without requiring external anatomy lookups."""
+        device = Device.model_construct(name="Catheter")
+        surgery_procedure = CatheterImplant.model_construct(implanted_device=device)
+        procedures = Procedures.model_construct(
+            subject_id="12345",
+            subject_procedures=[Surgery.model_construct(procedures=[surgery_procedure])],
+        )
+
+        assert procedures.get_device_names() == ["Catheter"]
+
+    @pytest.mark.online
+    def test_get_device_names_with_surgery_procedures(self):  # pragma: no cover
         """Test get_device_names method with nested surgery procedures"""
 
         device1 = Catheter(
@@ -768,8 +757,8 @@ class ProceduresTests(unittest.TestCase):
             ],
         )
         device_names = procedures.get_device_names()
-        self.assertIn("Catheter", device_names)
-        self.assertEqual(len(device_names), 1)
+        assert "Catheter" in device_names
+        assert len(device_names) == 1
 
     def test_procedures_addition_coordinate_system_validation(self):
         """Test that Procedures addition raises error for different coordinate systems"""
@@ -777,32 +766,28 @@ class ProceduresTests(unittest.TestCase):
         # Create two procedures with different coordinate systems
         p1 = Procedures(
             subject_id="12345",
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
         )
 
         p2 = Procedures(
             subject_id="12345",
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARID,  # Different coordinate system
+            global_coordinate_system=BREGMA_RAS,  # Different coordinate system
         )
 
         # Test that combining procedures with different coordinate systems raises ValueError
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             _ = p1 + p2
 
-        self.assertIn("Cannot merge differing coordinate systems", str(context.exception))
-        self.assertIn("BREGMA_ARI", str(context.exception))
-        self.assertIn("BREGMA_ARID", str(context.exception))
+        assert "Cannot merge differing coordinate systems" in str(context.value)
+        assert "BREGMA_ARI" in str(context.value)
+        assert "BREGMA_RAS" in str(context.value)
 
         # Test that combining procedures with same coordinate systems works
         p3 = Procedures(
             subject_id="12345",
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,  # Same coordinate system as p1
+            global_coordinate_system=BREGMA_ARI,  # Same coordinate system as p1
         )
 
         combined = p1 + p3
-        self.assertEqual(combined.global_coordinate_system, CoordinateSystemLibrary.BREGMA_ARI)
-        self.assertEqual(len(combined.subject_procedures), 0)  # Both started with empty procedures
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert combined.global_coordinate_system == BREGMA_ARI
+        assert len(combined.subject_procedures) == 0  # Both started with empty procedures

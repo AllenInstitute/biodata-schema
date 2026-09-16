@@ -1,7 +1,7 @@
-Welcome to aind-data-schema 
+Welcome to biodata-schema
 ===========================
 
-`Code repository <https://github.com/allenNeuralDynamics/aind-data-schema>`_
+`Code repository <https://github.com/allenNeuralDynamics/biodata-schema>`_
 
 
 Data acquired at the Allen Institute for Neural Dynamics (AIND) is accompanied by metadata describing how it was acquired, processed, and analyzed. This metadata is stored in JSON files according to the schema defined in this library. Our goal in capturing this metadata is to make our data findable and understandable.
@@ -41,10 +41,10 @@ I want to...
 ------------
 
 - :doc:`Create metadata for my data assets <example_workflow/example_workflow>`. 
-- :doc:`Learn about the philosophy behind aind-data-schema<general>`.
+- :doc:`Learn about the philosophy behind biodata-schema<general>`.
 - :doc:`Learn about how coordinate systems work<coordinate_systems>`.
-- `Report an issue or request an addition to the metadata schema <https://github.com/AllenNeuralDynamics/aind-data-schema/issues>`_.
-- `Build my own changes to the metadata schema <https://github.com/AllenNeuralDynamics/aind-data-schema/blob/dev/CONTRIBUTING.md>`_.
+- `Report an issue or request an addition to the metadata schema <https://github.com/AllenNeuralDynamics/biodata-schema/issues>`_.
+- `Build my own changes to the metadata schema <https://github.com/AllenNeuralDynamics/biodata-schema/blob/dev/CONTRIBUTING.md>`_.
 
 
 .. toctree::

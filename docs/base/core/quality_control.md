@@ -1,12 +1,12 @@
 # Quality control
 
-[Link to code](https://github.com/AllenNeuralDynamics/aind-data-schema/blob/dev/src/aind_data_schema/core/quality_control.py)
+[Link to code](https://github.com/AllenNeuralDynamics/biodata-schema/blob/dev/src/biodata_schema/core/quality_control.py)
 
 Quality control is a collection of **metrics** evaluated on a data asset.
 
 [QCMetric](#qcmetric) objects should be generated during pipelines: from raw data, during processing, and during analysis by researchers.
 
-Every [QCMetric](#qcmetric) has a `aind_data_schema.quality_control.State` which takes the value of the metric and compares it to some rule. Metrics can only pass or fail. Metrics that require manual evaluation are set to pending.
+Every [QCMetric](#qcmetric) has a `Status` which takes the value of the metric and compares it to some rule. Metrics can only pass or fail. Metrics that require manual evaluation are set to pending.
 
 ## Details
 
@@ -16,7 +16,7 @@ Each [QCMetric](#qcmetric) is a single value or array of values that can be comp
 
 Each [QCMetric](#qcmetric) has a [Status](#status). The [Status](#status) should depend directly on the `QCMetric.value`, either by a simple function: "value>5", or by a qualitative rule: "Field of view includes visual areas". The `QCMetric.description` field should describe the rule used to set the status. Metrics can be evaluated multiple times, in which case the new status should be appended the `QCMetric.status_history`.
 
-Each [QCMetric](#qcmetric) is annotated with three pieces of additional metadata: the [Stage](#stage) during which it was evaluated, the [Modality](aind_data_schema_models/modalities.md#modality) of the evaluated data, and [tags](#tags).
+Each [QCMetric](#qcmetric) is annotated with three pieces of additional metadata: the [Stage](#stage) during which it was evaluated, the [Modality](biodata_models/modalities.md#modality) of the evaluated data, and [tags](#tags).
 
 ### Curations
 

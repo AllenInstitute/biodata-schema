@@ -2,14 +2,13 @@
 
 import json
 import os
-import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, call, mock_open, patch
 
-from aind_data_schema.utils.json_writer import SchemaWriter
+from biodata_schema.utils.json_writer import SchemaWriter
 
 
-class SchemaWriterTests(unittest.TestCase):
+class TestSchemaWriter:
     """Tests for SchemaWriter methods"""
 
     TEST_ARGS = ["--output", "some_test_dir"]
@@ -24,8 +23,8 @@ class SchemaWriterTests(unittest.TestCase):
             # file_extension = schema.default_file_extension()
             # schema_filename = filename.replace(file_extension, "_schema.json")
             schema_contents = schema.model_json_schema()
-            self.assertIsNotNone(filename)
-            self.assertIsNotNone(schema_contents)
+            assert filename is not None
+            assert schema_contents is not None
 
     def test_parse_args(self):
         """Tests arguments are parsed correctly."""
@@ -35,9 +34,9 @@ class SchemaWriterTests(unittest.TestCase):
 
         expected_output = "some_test_dir"
 
-        self.assertEqual(expected_output, sw.configs.output)
-        self.assertEqual(self.TEST_ARGS, sw.args)
-        self.assertEqual(os.getcwd(), sw2.configs.output)
+        assert expected_output == sw.configs.output
+        assert self.TEST_ARGS == sw.args
+        assert os.getcwd() == sw2.configs.output
 
     @patch("builtins.open", new_callable=mock_open())
     @patch("os.path.exists")
@@ -106,7 +105,3 @@ class SchemaWriterTests(unittest.TestCase):
         )
         mock_file.assert_has_calls(open_calls, any_order=True)
         file_handle.write.assert_has_calls(write_calls, any_order=True)
-
-
-if __name__ == "__main__":
-    unittest.main()

@@ -1,35 +1,36 @@
 """test Imaging"""
 
-import unittest
 from datetime import datetime, timezone
 
-from aind_data_schema_models.modalities import Modality
-from aind_data_schema_models.organizations import Organization
+import pytest
+from biodata_models.modalities import Modality
+from biodata_models.organizations import Organization
 from pydantic import ValidationError
 
-from aind_data_schema.components.configs import Image
-from aind_data_schema.components.coordinates import Affine, CoordinateSystemLibrary, Rotation, Scale, Translation
-from aind_data_schema.components.devices import Laser, Objective, ScanningStage
-from aind_data_schema.components.identifiers import Code
-from aind_data_schema.core.acquisition import Acquisition
-from aind_data_schema.core.instrument import Instrument
-from aind_data_schema.core.processing import DataProcess, ProcessName, ProcessStage
+from biodata_schema.components.configs import Image
+from biodata_schema.components.coordinates import Affine, Rotation, Scale, Translation
+from biodata_schema.components.devices import Laser, Objective, ScanningStage
+from biodata_schema.components.identifiers import Code
+from biodata_schema.core.acquisition import Acquisition
+from biodata_schema.core.instrument import Instrument
+from biodata_schema.core.processing import DataProcess, ProcessName, ProcessStage
 from examples.exaspim_acquisition import acq
+from tests.coordinate_systems import BREGMA_ARI
 
 
-class ImagingTests(unittest.TestCase):
+class TestImaging:
     """test imaging schemas"""
 
     def test_acquisition_constructor(self):
         """testing Acquisition constructor"""
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             Acquisition()
 
-        self.assertIsNotNone(acq)
+        assert acq is not None
 
     def test_instrument_constructor(self):
         """testing Instrument constructor"""
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             Instrument()
 
         laser = Laser(
@@ -61,25 +62,25 @@ class ImagingTests(unittest.TestCase):
         i = Instrument(
             instrument_id="room_exaSPIM1-1_20231004",
             modalities=[Modality.SPIM],
-            coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+            global_coordinate_system=BREGMA_ARI,
             modification_date=datetime.now().date(),
             components=[objective, laser, scan_stage],
         )
 
-        self.assertIsNotNone(i)
+        assert i is not None
 
     def test_modality_spim_requires_components(self):
         """testing Modality SPIM requires components"""
-        with self.assertRaises(ValidationError) as e2:
+        with pytest.raises(ValidationError) as e2:
             Instrument(
                 instrument_id="room_exaSPIM1-1_20231004",
                 modalities=[Modality.SPIM],
                 modification_date=datetime(2020, 10, 10, 0, 0, 0).date(),
-                coordinate_system=CoordinateSystemLibrary.BREGMA_ARI,
+                global_coordinate_system=BREGMA_ARI,
                 components=[],
             )
 
-        self.assertIn("modality 'SPIM' requires at least one device", repr(e2.exception))
+        assert "modality 'SPIM' requires at least one device" in repr(e2.value)
 
     def test_registration(self):
         """test the tile models"""
@@ -117,11 +118,8 @@ class ImagingTests(unittest.TestCase):
             code=Code(
                 url="https://github.com/abcd",
                 parameters=parameters,
+                version="0.0.1",
             ),
         )
 
-        self.assertIsNotNone(t)
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert t is not None

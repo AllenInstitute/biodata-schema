@@ -1,17 +1,17 @@
 """tests for base"""
 
 import json
-import unittest
 import warnings
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Literal, Optional
 from unittest.mock import MagicMock, mock_open, patch
 
-from aind_data_schema_models.brain_atlas import BrainStructureModel
+import pytest
+from biodata_models.brain_atlas import BrainStructureModel
 from pydantic import Field, SkipValidation, ValidationError, create_model
 
-from aind_data_schema.base import (
+from biodata_schema.base import (
     MAX_FILE_SIZE,
     AwareDatetimeWithDefault,
     DataCoreModel,
@@ -19,10 +19,10 @@ from aind_data_schema.base import (
     GenericModel,
     is_dict_corrupt,
 )
-from aind_data_schema.core.subject import Subject
+from biodata_schema.core.subject import Subject
 
 
-class BaseTests(unittest.TestCase):
+class TestBase:
     """tests for the base module"""
 
     def test_described_by(self):
@@ -30,10 +30,9 @@ class BaseTests(unittest.TestCase):
 
         s = Subject.model_construct()
 
-        self.assertEqual(
+        assert s.describedBy == (
             "https://raw.githubusercontent.com/AllenNeuralDynamics/"
-            "aind-data-schema/main/src/aind_data_schema/core/subject.py",
-            s.describedBy,
+            "biodata-schema/main/src/biodata_schema/core/subject.py"
         )
 
     @patch("pathlib.Path.open", new_callable=mock_open)
@@ -43,7 +42,7 @@ class BaseTests(unittest.TestCase):
         s = Subject.model_construct()
         s.write_standard_file(output_directory=Path("dir"), suffix=".foo.bar")
         mock_open.assert_called_once_with("w")
-        self.assertEqual(1, 1)
+        assert 1 == 1
 
     def test_aware_datetime_with_default(self):
         """Tests AwareDatetimeWithDefault adds tzinfo as default"""
@@ -54,7 +53,7 @@ class BaseTests(unittest.TestCase):
         model_instance = test_model(dt=datetime_without_tz)
 
         # Verify that a timezone was attached if not supplied.
-        self.assertEqual(expected_dt, model_instance.dt)
+        assert expected_dt == model_instance.dt
 
     def test_aware_datetime_with_setting(self):
         """Tests AwareDatetimeWithDefault honors timezone input by user"""
@@ -64,7 +63,7 @@ class BaseTests(unittest.TestCase):
         model_instance = test_model(dt=datetime_with_tz)
 
         expected_json = '{"dt":"2020-10-10T01:02:03Z"}'
-        self.assertEqual(expected_json, model_instance.model_dump_json())
+        assert expected_json == model_instance.model_dump_json()
 
     def test_units(self):
         """Test that models with value/value_unit pairs throw errors properly"""
@@ -75,14 +74,15 @@ class BaseTests(unittest.TestCase):
             value: Optional[str] = Field(default=None)
             value_unit: Optional[str] = Field(default=None)
 
-        self.assertRaises(ValidationError, lambda: UnitValueModel(value="value"))
+        with pytest.raises(ValidationError):
+            UnitValueModel(value="value")
 
         test0 = UnitValueModel(value="value", value_unit="unit")
-        self.assertIsNotNone(test0)
+        assert test0 is not None
 
         # it's fine if units are set and the value isn't
         test1 = UnitValueModel(value_unit="unit")
-        self.assertIsNotNone(test1)
+        assert test1 is not None
 
         # Multi-unit condition
         class MultiModel(DataModel):
@@ -92,13 +92,27 @@ class BaseTests(unittest.TestCase):
             value_multi_two_with_depth: Optional[str] = Field(default=None)
             value_multi_unit: Optional[str] = Field(default=None)
 
-        self.assertRaises(ValidationError, lambda: MultiModel(value_multi_one_with_depth="value"))
+        with pytest.raises(ValidationError):
+            MultiModel(value_multi_one_with_depth="value")
 
         test2 = MultiModel(value_multi_one_with_depth="value1", value_multi_unit="unit")
-        self.assertIsNotNone(test2)
+        assert test2 is not None
 
         test3 = MultiModel(value_multi_unit="unit")
-        self.assertIsNotNone(test3)
+        assert test3 is not None
+
+    def test_zero_multi_value_requires_unit(self):
+        """A zero-valued member of a measurement group still needs units."""
+
+        class Measurement(DataModel):
+            """Measurement with shared units."""
+
+            value_start: Optional[float] = None
+            value_unit: Optional[str] = None
+
+        with pytest.raises(ValidationError, match="Unit value_unit is required"):
+            Measurement(value_start=0)
+        assert Measurement(value_start=0, value_unit="mm").value_start == 0
 
     def test_is_dict_corrupt(self):
         """Tests is_dict_corrupt method"""
@@ -123,23 +137,20 @@ class BaseTests(unittest.TestCase):
             None,
         ]
         for contents in good_contents:
-            with self.subTest(contents=contents):
-                self.assertFalse(is_dict_corrupt(contents))
+            assert not is_dict_corrupt(contents)
         for contents in bad_contents:
-            with self.subTest(contents=contents):
-                self.assertTrue(is_dict_corrupt(contents))
+            assert is_dict_corrupt(contents)
         for contents in invalid_types:
-            with self.subTest(contents=contents):
-                self.assertTrue(is_dict_corrupt(contents))
+            assert is_dict_corrupt(contents)
 
     def test_generic_model_constructor(self):
         """Tests default constructor for GenericModel"""
         model = GenericModel()
-        self.assertEqual("{}", model.model_dump_json())
+        assert "{}" == model.model_dump_json()
 
         params = {"foo": "bar"}
         model = GenericModel(**params)
-        self.assertEqual('{"foo":"bar"}', model.model_dump_json())
+        assert '{"foo":"bar"}' == model.model_dump_json()
 
     def test_generic_model_validate_fieldnames(self):
         """Tests that fieldnames are validated in GenericModel"""
@@ -151,9 +162,9 @@ class BaseTests(unittest.TestCase):
             with warnings.catch_warnings(record=True) as w:
                 warnings.simplefilter("always")
                 GenericModel(**params)
-                self.assertTrue(any("fields that contain '.' or '$'" in str(warning.message) for warning in w))
+                assert any("fields that contain '.' or '$'" in str(warning.message) for warning in w)
                 GenericModel.model_validate(params)
-                self.assertTrue(any("fields that contain '.' or '$'" in str(warning.message) for warning in w))
+                assert any("fields that contain '.' or '$'" in str(warning.message) for warning in w)
 
     def test_ccf_validator(self):
         """Tests that CCFv3 validator works"""
@@ -163,7 +174,8 @@ class BaseTests(unittest.TestCase):
 
             targeted_structure: BrainStructureModel
 
-        self.assertRaises(ValueError, StructureModel, targeted_structure="invalid")
+        with pytest.raises(ValueError):
+            StructureModel(targeted_structure="invalid")
 
     def test_schema_bump(self):
         """Test that schema version are bumped successfully
@@ -176,7 +188,7 @@ class BaseTests(unittest.TestCase):
             schema_version: SkipValidation[Literal["1.0.0"]] = "1.0.0"
 
         v1_init = TestCoreModel()
-        self.assertEqual("1.0.0", v1_init.schema_version)
+        assert "1.0.0" == v1_init.schema_version
 
         # Re-define TestCoreModel with a bumped schema version
         class TestCoreModel(DataCoreModel):
@@ -187,7 +199,7 @@ class BaseTests(unittest.TestCase):
             extra_field: str = "extra_field"
 
         v2_from_v1 = TestCoreModel(**v1_init.model_dump())
-        self.assertEqual("1.0.1", v2_from_v1.schema_version)
+        assert "1.0.1" == v2_from_v1.schema_version
 
         # Re-re-define to make sure that the extra field is not allowed
         class TestCoreModel(DataCoreModel):
@@ -198,10 +210,11 @@ class BaseTests(unittest.TestCase):
 
         # Check that adding additional fields still fails validation
         # this is to ensure you can't get a bumped schema_version without passing validation
-        self.assertRaises(ValidationError, lambda: TestCoreModel(**v2_from_v1.model_dump()))
+        with pytest.raises(ValidationError):
+            TestCoreModel(**v2_from_v1.model_dump())
 
     @patch("pathlib.Path.open", new_callable=mock_open)
-    @patch("aind_data_schema.base.logger")
+    @patch("biodata_schema.base.logger")
     def test_write_standard_file_size_warning(self, mock_logger: MagicMock, mock_open: MagicMock):
         """Tests that a warning is logged if the file size exceeds MAX_FILE_SIZE"""
 
@@ -213,7 +226,7 @@ class BaseTests(unittest.TestCase):
         mock_logger.warning.assert_called_once_with(f"File size exceeds {MAX_FILE_SIZE / 1024} KB: dir/subject.foo.bar")
 
 
-class DataModelTests(unittest.TestCase):
+class TestDataModel:
     """Tests for DataModel"""
 
     def test_generate_object_type(self):
@@ -225,7 +238,7 @@ class DataModelTests(unittest.TestCase):
             value: str
 
         model_instance = TestModel(value="test")
-        self.assertEqual(model_instance.object_type, "Test model")
+        assert model_instance.object_type == "Test model"
 
         class AnotherTestModel(DataModel):
             """Another temporary test model"""
@@ -233,7 +246,7 @@ class DataModelTests(unittest.TestCase):
             value: str
 
         another_model_instance = AnotherTestModel(value="test")
-        self.assertEqual(another_model_instance.object_type, "Another test model")
+        assert another_model_instance.object_type == "Another test model"
 
         class QCModel(DataModel):
             """Test model with two capital letters in a row"""
@@ -241,7 +254,7 @@ class DataModelTests(unittest.TestCase):
             value: str
 
         qc_model_instance = QCModel(value="test")
-        self.assertEqual(qc_model_instance.object_type, "QC model")
+        assert qc_model_instance.object_type == "QC model"
 
     def test_object_type_unique(self):
         """Test that all subclasses of DataModel have unique object_type values"""
@@ -252,12 +265,12 @@ class DataModelTests(unittest.TestCase):
         object_types = {}
         for subclass in subclasses:
             object_type = subclass._object_type_from_name()
-            self.assertNotIn(object_type, object_types.values())
+            assert object_type not in object_types.values()
 
             object_types[subclass.__name__] = object_type
 
 
-class DataCoreModelTests(unittest.TestCase):
+class TestDataCoreModel:
     """Tests for DataCoreModel"""
 
     def test_default_filename(self):
@@ -269,7 +282,7 @@ class DataCoreModelTests(unittest.TestCase):
             describedBy: str = "modelv1"
             schema_version: str = "1.0.0"
 
-        self.assertEqual(TestModel.default_filename(), "test_model.json")
+        assert TestModel.default_filename() == "test_model.json"
 
         class AnotherTestModel(DataCoreModel):
             """Another temporary test model"""
@@ -277,7 +290,7 @@ class DataCoreModelTests(unittest.TestCase):
             describedBy: str = "modelv1"
             schema_version: str = "1.0.0"
 
-        self.assertEqual(AnotherTestModel.default_filename(), "another_test_model.json")
+        assert AnotherTestModel.default_filename() == "another_test_model.json"
 
         class ChildModel(TestModel):
             """Child model inheriting from TestModel"""
@@ -285,10 +298,10 @@ class DataCoreModelTests(unittest.TestCase):
             describedBy: str = "modelv1"
             schema_version: str = "1.0.0"
 
-        self.assertEqual(ChildModel.default_filename(), "test_model.json")
+        assert ChildModel.default_filename() == "test_model.json"
 
     @patch("pathlib.Path.open", new_callable=mock_open)
-    @patch("aind_data_schema.utils.validators.recursive_check_paths")
+    @patch("biodata_schema.utils.validators.recursive_check_paths")
     def test_write_standard_file(self, mock_recursive_check_paths: MagicMock, mock_open: MagicMock):
         """Tests write_standard_file method"""
 
@@ -306,8 +319,8 @@ class DataCoreModelTests(unittest.TestCase):
         mock_open.assert_called_once_with("w")
 
     @patch("pathlib.Path.open", new_callable=mock_open)
-    @patch("aind_data_schema.base.logger")
-    @patch("aind_data_schema.utils.validators.recursive_check_paths")
+    @patch("biodata_schema.base.logger")
+    @patch("biodata_schema.utils.validators.recursive_check_paths")
     def test_write_standard_file_size_warning(
         self, mock_recursive_check_paths: MagicMock, mock_logger: MagicMock, mock_open: MagicMock
     ):
@@ -329,7 +342,7 @@ class DataCoreModelTests(unittest.TestCase):
         )
 
     @patch("pathlib.Path.open", new_callable=mock_open)
-    @patch("aind_data_schema.utils.validators.recursive_check_paths")
+    @patch("biodata_schema.utils.validators.recursive_check_paths")
     def test_write_standard_file_string_output_directory(
         self, mock_recursive_check_paths: MagicMock, mock_open: MagicMock
     ):
@@ -346,10 +359,8 @@ class DataCoreModelTests(unittest.TestCase):
         mock_open.assert_called_once_with("w")
 
     @patch("pathlib.Path.open", new_callable=mock_open)
-    @patch("aind_data_schema.utils.validators.recursive_check_paths")
-    def test_write_standard_file_no_output_directory(
-        self, mock_recursive_check_paths: MagicMock, mock_open: MagicMock
-    ):
+    @patch("biodata_schema.utils.validators.recursive_check_paths")
+    def test_write_standard_file_no_output_directory(self, mock_recursive_check_paths: MagicMock, mock_open: MagicMock):
         """Tests write_standard_file with no output_directory (defaults to cwd)"""
 
         class TestModel(DataCoreModel):
@@ -361,7 +372,3 @@ class DataCoreModelTests(unittest.TestCase):
         model_instance = TestModel()
         model_instance.write_standard_file()
         mock_open.assert_called_once_with("w")
-
-
-if __name__ == "__main__":
-    unittest.main()

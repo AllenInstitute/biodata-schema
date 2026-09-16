@@ -1,38 +1,37 @@
 """Tests for subjects details models"""
 
-import unittest
-import warnings
 from datetime import datetime
 
-from aind_data_schema_models.organizations import Organization
-from aind_data_schema_models.pid_names import PIDName
-from aind_data_schema_models.registries import Registry
-from aind_data_schema_models.species import Species, Strain
+import pytest
+from biodata_models.organizations import Organization
+from biodata_models.pid_names import PIDName
+from biodata_models.registries import Registry
+from biodata_models.species import Species, Strain
 
-from aind_data_schema.components.subjects import (
+from biodata_schema.components.subjects import (
     BreedingInfo,
     CalibrationObject,
     Housing,
     HumanSubject,
     LightCycle,
+    MatingStatus,
     MouseSubject,
     NonHumanPrimateSubject,
     Sex,
-    MatingStatus,
 )
 
 
-class TestMouseSubject(unittest.TestCase):
+class TestMouseSubject:
     """Test the mouse subject model"""
 
-    def setUp(self):
+    def setup_method(self):
         """Set up the tests"""
         self.now = datetime.now()
 
     def test_validate_inhouse_breeding_info(self):
         """Test the inhouse breeding info validator"""
 
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             MouseSubject(
                 sex=Sex.MALE,
                 date_of_birth=self.now.date(),
@@ -49,12 +48,12 @@ class TestMouseSubject(unittest.TestCase):
                 ),
                 alleles=[PIDName(registry_identifier="12345", name="adsf", registry=Registry.MGI)],
             )
-        self.assertIn("Breeding info should be provided for subjects bred in house", str(context.exception))
+        assert "Breeding info should be provided for subjects bred in house" in str(context.value)
 
     def test_validate_species_strain(self):
         """Test the species and strain validator"""
 
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             MouseSubject(
                 sex=Sex.MALE,
                 date_of_birth=self.now.date(),
@@ -71,18 +70,18 @@ class TestMouseSubject(unittest.TestCase):
                 ),
                 alleles=[PIDName(registry_identifier="12345", name="adsf", registry=Registry.MGI)],
             )
-        self.assertIn("The animal species and it's strain's species do not match", str(context.exception))
+        assert "The animal species and it's strain's species do not match" in str(context.value)
 
 
-class TestHumanSubject(unittest.TestCase):
+class TestHumanSubject:
     """Test the human subject model"""
 
     def test_validate_species_is_human(self):
         """Test the species validator"""
 
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             HumanSubject(sex=Sex.MALE, species=Species.HOUSE_MOUSE, year_of_birth=1962, source=Organization.UCSD)
-        self.assertIn("HumanSubject species must be HUMAN", str(context.exception))
+        assert "HumanSubject species must be HUMAN" in str(context.value)
 
     def test_validate_species_is_human_success(self):
         """Test the species validator with valid human species"""
@@ -90,16 +89,28 @@ class TestHumanSubject(unittest.TestCase):
         # This test covers line 173 - the successful return path
         subject = HumanSubject(sex=Sex.FEMALE, species=Species.HUMAN, year_of_birth=1990, source=Organization.AI)
 
-        self.assertEqual(subject.species, Species.HUMAN)
-        self.assertEqual(subject.sex, Sex.FEMALE)
-        self.assertEqual(subject.year_of_birth, 1990)
-        self.assertEqual(subject.source, Organization.AI)
+        assert subject.species == Species.HUMAN
+        assert subject.sex == Sex.FEMALE
+        assert subject.year_of_birth == 1990
+        assert subject.source == Organization.AI
+
+    def test_validate_species_is_human_from_dict(self):
+        """Test the species validator with a serialized human species"""
+
+        subject = HumanSubject(
+            sex=Sex.FEMALE,
+            species=Species.HUMAN.model_dump(),
+            year_of_birth=1990,
+            source=Organization.AI,
+        )
+
+        assert subject.species == Species.HUMAN
 
 
-class TestNonHumanPrimateSubject(unittest.TestCase):
+class TestNonHumanPrimateSubject:
     """Test the non-human primate subject model"""
 
-    def setUp(self):
+    def setup_method(self):
         """Set up the tests"""
         self.now = datetime.now()
 
@@ -114,12 +125,12 @@ class TestNonHumanPrimateSubject(unittest.TestCase):
             source=Organization.JAX,
         )
 
-        self.assertEqual(subject.species, Species.RHESUS_MACAQUE)
-        self.assertEqual(subject.sex, Sex.MALE)
-        self.assertIsNone(subject.date_of_birth)
-        self.assertEqual(subject.year_of_birth, 2019)
-        self.assertEqual(subject.mating_status, MatingStatus.UNMATED)
-        self.assertEqual(subject.source, Organization.JAX)
+        assert subject.species == Species.RHESUS_MACAQUE
+        assert subject.sex == Sex.MALE
+        assert subject.date_of_birth is None
+        assert subject.year_of_birth == 2019
+        assert subject.mating_status == MatingStatus.UNMATED
+        assert subject.source == Organization.JAX
 
     def test_non_human_primate_mating_status_unknown(self):
         """Test NonHumanPrimateSubject with unknown mating status"""
@@ -132,7 +143,7 @@ class TestNonHumanPrimateSubject(unittest.TestCase):
             source=Organization.AI,
         )
 
-        self.assertEqual(subject.mating_status, MatingStatus.UNKNOWN)
+        assert subject.mating_status == MatingStatus.UNKNOWN
 
     def test_validate_date_year_consistency_valid(self):
         """Test that date_of_birth year matching year_of_birth is valid"""
@@ -148,14 +159,14 @@ class TestNonHumanPrimateSubject(unittest.TestCase):
             source=Organization.COLUMBIA,
         )
 
-        self.assertEqual(subject.date_of_birth, birth_date)
-        self.assertEqual(subject.year_of_birth, 2020)
+        assert subject.date_of_birth == birth_date
+        assert subject.year_of_birth == 2020
 
     def test_validate_date_year_consistency_invalid(self):
         """Test that mismatched date_of_birth year and year_of_birth raises ValueError"""
         from datetime import date
 
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             NonHumanPrimateSubject(
                 species=Species.RHESUS_MACAQUE,
                 sex=Sex.MALE,
@@ -165,7 +176,7 @@ class TestNonHumanPrimateSubject(unittest.TestCase):
                 source=Organization.COLUMBIA,
             )
 
-        self.assertIn("Date of birth (2019) does not match year of birth (2020)", str(context.exception))
+        assert "Date of birth (2019) does not match year of birth (2020)" in str(context.value)
 
     def test_validate_date_year_consistency_no_date(self):
         """Test that validation passes when date_of_birth is None"""
@@ -179,11 +190,11 @@ class TestNonHumanPrimateSubject(unittest.TestCase):
             source=Organization.AI,
         )
 
-        self.assertIsNone(subject.date_of_birth)
-        self.assertEqual(subject.year_of_birth, 2021)
+        assert subject.date_of_birth is None
+        assert subject.year_of_birth == 2021
 
 
-class TestCalibrationObject(unittest.TestCase):
+class TestCalibrationObject:
     """Test the calibration object model"""
 
     def test_calibration_object_with_description_only(self):
@@ -191,59 +202,31 @@ class TestCalibrationObject(unittest.TestCase):
 
         calibration_obj = CalibrationObject(description="Simple calibration sphere")
 
-        self.assertEqual(calibration_obj.description, "Simple calibration sphere")
-        self.assertFalse(calibration_obj.empty)  # Default should be False
-        self.assertIsNone(calibration_obj.objects)  # Default should be None
+        assert calibration_obj.description == "Simple calibration sphere"
+        assert not calibration_obj.empty  # Default should be False
+        assert calibration_obj.objects is None  # Default should be None
 
     def test_calibration_object_empty(self):
         """Test creating an empty CalibrationObject"""
 
         calibration_obj = CalibrationObject(empty=True, description="Empty calibration - no object used")
 
-        self.assertTrue(calibration_obj.empty)
-        self.assertEqual(calibration_obj.description, "Empty calibration - no object used")
-        self.assertIsNone(calibration_obj.objects)
+        assert calibration_obj.empty
+        assert calibration_obj.description == "Empty calibration - no object used"
+        assert calibration_obj.objects is None
 
 
-class TestBreedingInfo(unittest.TestCase):
+class TestBreedingInfo:
     """Test the breeding info model"""
 
-    def test_breeding_info_deprecated_field_warning(self):
-        """Test that breeding_group field triggers deprecation warning and is cleared"""
-
-        # Capture warnings
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")  # Ensure all warnings are triggered
-
-            breeding_info = BreedingInfo(
-                breeding_group="test_group",  # This should trigger warning and be cleared
-                maternal_id="M001",
-                maternal_genotype="wt/wt",
-                paternal_id="P001",
-                paternal_genotype="wt/wt",
-            )
-
-            # Check that warning was issued
-            self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
-            self.assertIn("breeding_group", str(w[0].message))
-
-            # Check that the field was cleared to None
-            self.assertIsNone(breeding_info.breeding_group)
-
-    def test_breeding_info_without_deprecated_field(self):
-        """Test creating BreedingInfo without the deprecated breeding_group field"""
+    def test_breeding_info(self):
+        """Test creating BreedingInfo"""
 
         breeding_info = BreedingInfo(
             maternal_id="M001", maternal_genotype="wt/wt", paternal_id="P001", paternal_genotype="wt/wt"
         )
 
-        self.assertEqual(breeding_info.maternal_id, "M001")
-        self.assertEqual(breeding_info.maternal_genotype, "wt/wt")
-        self.assertEqual(breeding_info.paternal_id, "P001")
-        self.assertEqual(breeding_info.paternal_genotype, "wt/wt")
-        self.assertIsNone(breeding_info.breeding_group)
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert breeding_info.maternal_id == "M001"
+        assert breeding_info.maternal_genotype == "wt/wt"
+        assert breeding_info.paternal_id == "P001"
+        assert breeding_info.paternal_genotype == "wt/wt"

@@ -9,7 +9,7 @@ from datetime import date
 from os.path import abspath, dirname
 from pathlib import Path
 
-from aind_data_schema import __version__ as package_version
+from biodata_schema import __version__ as package_version
 
 INSTITUTE_NAME = "Allen Institute for Neural Dynamics"
 
@@ -43,7 +43,7 @@ myst_enable_extensions = [
 
 html_theme = "furo"
 html_static_path = ["_static"]
-html_title = "aind-data-schema"
+html_title = "biodata-schema"
 html_favicon = "_static/favicon.ico"
 html_theme_options = {
     "light_logo": "light-logo.svg",
@@ -58,7 +58,7 @@ myst_heading_anchors = 3
 
 
 def _write_schema_diagram_json():
-    from aind_data_schema.utils.schema_tree import write_schema_diagram_json
+    from biodata_schema.utils.schema_tree import write_schema_diagram_json
 
     write_schema_diagram_json(Path(dirname(this_file_path)) / "_static" / "schema-diagram" / "schema_diagram.json")
 
@@ -67,7 +67,7 @@ _write_schema_diagram_json()
 
 
 def setup(app):
-    app.add_css_file('custom.css')
+    app.add_css_file("custom.css")
 
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.

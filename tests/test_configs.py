@@ -1,18 +1,17 @@
 """Test for configs"""
 
-import unittest
-
-from aind_data_schema_models.brain_atlas import CCFv3
-from aind_data_schema_models.units import PowerUnit, SizeUnit
+import pytest
+from biodata_models.brain_atlas import CCFv3
+from biodata_models.units import PowerUnit, SizeUnit
 from pydantic import ValidationError
 
-from aind_data_schema.components.configs import CoupledPlane, ImagingConfig, PlanarImage, Plane
-from aind_data_schema.components.coordinates import Scale, Translation
+from biodata_schema.components.configs import CoupledPlane, ImagingConfig, PlanarImage, Plane
+from biodata_schema.components.coordinates import Scale, Translation
 from examples.bergamo_ophys_acquisition import a as bergamo_acquisition
 from examples.exaspim_acquisition import acq as exaspim_acquisition
 
 
-class ImagingConfigTest(unittest.TestCase):
+class TestImagingConfig:
     """Test for ImagingConfig"""
 
     def test_image_channels_invalid(self):
@@ -23,23 +22,23 @@ class ImagingConfigTest(unittest.TestCase):
         imaging_config = acq.data_streams[0].configurations[0]
         imaging_config.channels = []
 
-        with self.assertRaises(ValueError) as e:
+        with pytest.raises(ValueError) as e:
             ImagingConfig.model_validate_json(imaging_config.model_dump_json())
 
-        self.assertIn("must be defined in the ImagingConfig.channels", str(e.exception))
+        assert "must be defined in the ImagingConfig.channels" in str(e.value)
 
         acq2 = exaspim_acquisition.model_copy()
         imaging_config2 = acq2.data_streams[0].configurations[0]
         imaging_config2.channels = []
-        with self.assertRaises(ValueError) as e:
+        with pytest.raises(ValueError) as e:
             ImagingConfig.model_validate_json(imaging_config2.model_dump_json())
-        self.assertIn("must be defined in the ImagingConfig.channels", str(e.exception))
+        assert "must be defined in the ImagingConfig.channels" in str(e.value)
 
 
-class TestPlanarImage(unittest.TestCase):
+class TestPlanarImage:
     """Test for PlanarImage class"""
 
-    def setUp(self):
+    def setup_method(self):
         """Set up common values for tests"""
         self.channel_name = "test_channel"
         self.dimensions = Scale(scale=[512, 512])
@@ -71,12 +70,12 @@ class TestPlanarImage(unittest.TestCase):
             image_to_acquisition_transform=self.transform,
             planes=[self.plane],
         )
-        self.assertEqual(len(planar_image.planes), 1)
-        self.assertIsInstance(planar_image.planes[0], Plane)
+        assert len(planar_image.planes) == 1
+        assert isinstance(planar_image.planes[0], Plane)
 
     def test_planar_image_with_multiple_planes_raises_error(self):
         """Test PlanarImage with multiple Plane objects - should raise ValueError"""
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             PlanarImage(
                 channel_name=self.channel_name,
                 dimensions=self.dimensions,
@@ -85,9 +84,8 @@ class TestPlanarImage(unittest.TestCase):
                 planes=[self.plane, self.plane],
             )
 
-        self.assertIn(
-            "For single-plane optical physiology only a single Plane should be in PlanarImage.planes",
-            str(context.exception),
+        assert "For single-plane optical physiology only a single Plane should be in PlanarImage.planes" in str(
+            context.value
         )
 
     def test_planar_image_with_multiple_coupled_planes(self):
@@ -99,13 +97,13 @@ class TestPlanarImage(unittest.TestCase):
             image_to_acquisition_transform=self.transform,
             planes=[self.coupled_plane, self.coupled_plane],
         )
-        self.assertEqual(len(planar_image.planes), 2)
-        self.assertIsInstance(planar_image.planes[0], CoupledPlane)
-        self.assertIsInstance(planar_image.planes[1], CoupledPlane)
+        assert len(planar_image.planes) == 2
+        assert isinstance(planar_image.planes[0], CoupledPlane)
+        assert isinstance(planar_image.planes[1], CoupledPlane)
 
     def test_planar_image_with_mixed_plane_types(self):
         """Test PlanarImage with mixed Plane and CoupledPlane objects - should raise ValueError"""
-        with self.assertRaises(ValidationError) as context:
+        with pytest.raises(ValidationError) as context:
             PlanarImage(
                 channel_name=self.channel_name,
                 dimensions=self.dimensions,
@@ -114,11 +112,6 @@ class TestPlanarImage(unittest.TestCase):
                 planes=[self.plane, self.coupled_plane],
             )
 
-        self.assertIn(
-            "For single-plane optical physiology only a single Plane should be in PlanarImage.planes",
-            str(context.exception),
+        assert "For single-plane optical physiology only a single Plane should be in PlanarImage.planes" in str(
+            context.value
         )
-
-
-if __name__ == "__main__":
-    unittest.main()
