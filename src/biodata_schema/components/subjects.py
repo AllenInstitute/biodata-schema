@@ -222,8 +222,9 @@ class CellLine(DataModel):
     def _validate_pid_registry(cls, value: PIDName, expected: Registry | str, field_name: str) -> PIDName:
         """Ensure a PIDName field uses the expected registry"""
 
+        expected_label = expected.value if isinstance(expected, Registry) else expected
         if not cls._registry_matches(value.registry, expected):
-            raise ValueError(f"{field_name} must use the {expected} registry")
+            raise ValueError(f"{field_name} must use the {expected_label} registry")
         return value
 
     @field_validator("cell_line_type", mode="after")

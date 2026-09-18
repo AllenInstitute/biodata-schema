@@ -285,12 +285,12 @@ class TestCellLine:
             (
                 "protein",
                 PIDName(registry_identifier="P12345", name="GFAP", registry=Registry.NCBI),
-                "Registry.UNIPROT",
+                Registry.UNIPROT.value,
             ),
             (
                 "gene",
                 PIDName(registry_identifier="672", name="BRCA1", registry=Registry.UNIPROT),
-                "Registry.NCBI",
+                Registry.NCBI.value,
             ),
             (
                 "fluorescent_protein",
