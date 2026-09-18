@@ -243,13 +243,13 @@ class TestCellLine:
         cell_line = CellLine(
             cell_line_name="HEK293T",
             cell_line_type=PIDName(
-                registry_identifier="CLO:0000001", name="immortalized cell line", registry=Registry.NCBI
+                registry_identifier="CLO:0000001", name="immortalized cell line", registry="Cell Line Ontology"
             ),
             species=Species.HUMAN,
             protein=PIDName(registry_identifier="P12345", name="GFAP", registry=Registry.UNIPROT),
             gene=PIDName(registry_identifier="672", name="BRCA1", registry=Registry.NCBI),
             cell_structure="nucleus",
-            fluorescent_protein=PIDName(registry_identifier="FPbase:123", name="EGFP", registry=Registry.UNIPROT),
+            fluorescent_protein=PIDName(registry_identifier="FPbase:123", name="EGFP", registry="FPbase"),
         )
 
         assert cell_line.cell_line_name == "HEK293T"
@@ -262,7 +262,7 @@ class TestCellLine:
             CellLine(
                 cell_line_name="HEK293T",
                 cell_line_type=PIDName(
-                    registry_identifier="CLO:0000001", name="immortalized cell line", registry=Registry.NCBI
+                    registry_identifier="CLO:0000001", name="immortalized cell line", registry="Cell Line Ontology"
                 ),
                 species=Species.HUMAN,
                 protein=PIDName(registry_identifier="P12345", name="GFAP", registry=Registry.UNIPROT),
@@ -273,3 +273,52 @@ class TestCellLine:
         errors = exc_info.value.errors()
         assert len(errors) == 1
         assert errors[0]["loc"] == ("fluorescent_protein",)
+
+    @pytest.mark.parametrize(
+        ("field_name", "field_value", "expected_registry"),
+        [
+            (
+                "cell_line_type",
+                PIDName(registry_identifier="CLO:0000001", name="immortalized cell line", registry=Registry.NCBI),
+                "Cell Line Ontology",
+            ),
+            (
+                "protein",
+                PIDName(registry_identifier="P12345", name="GFAP", registry=Registry.NCBI),
+                "Registry.UNIPROT",
+            ),
+            (
+                "gene",
+                PIDName(registry_identifier="672", name="BRCA1", registry=Registry.UNIPROT),
+                "Registry.NCBI",
+            ),
+            (
+                "fluorescent_protein",
+                PIDName(registry_identifier="FPbase:123", name="EGFP", registry=Registry.UNIPROT),
+                "FPbase",
+            ),
+        ],
+    )
+    def test_cell_line_requires_expected_registry(self, field_name, field_value, expected_registry):
+        """Test CellLine PIDName registries are validated"""
+
+        kwargs = {
+            "cell_line_name": "HEK293T",
+            "cell_line_type": PIDName(
+                registry_identifier="CLO:0000001", name="immortalized cell line", registry="Cell Line Ontology"
+            ),
+            "species": Species.HUMAN,
+            "protein": PIDName(registry_identifier="P12345", name="GFAP", registry=Registry.UNIPROT),
+            "gene": PIDName(registry_identifier="672", name="BRCA1", registry=Registry.NCBI),
+            "cell_structure": "nucleus",
+            "fluorescent_protein": PIDName(registry_identifier="FPbase:123", name="EGFP", registry="FPbase"),
+        }
+        kwargs[field_name] = field_value
+
+        with pytest.raises(pydantic.ValidationError) as exc_info:
+            CellLine(**kwargs)
+
+        errors = exc_info.value.errors()
+        assert len(errors) == 1
+        assert errors[0]["loc"] == (field_name,)
+        assert expected_registry in errors[0]["msg"]

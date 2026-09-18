@@ -7,6 +7,7 @@ from typing import Annotated, List, Optional
 
 from biodata_models.organizations import Organization
 from biodata_models.pid_names import PIDName
+from biodata_models.registries import Registry
 from biodata_models.species import Species, Strain
 from pydantic import Field, field_validator, model_validator
 from pydantic_core.core_schema import ValidationInfo
@@ -202,6 +203,52 @@ class CellLine(DataModel):
         ..., title="Fluorescent protein", description="Fluorescent protein uses FPbase registry"
     )
     clone_number: Optional[int] = Field(default=None, title="Clone number")
+
+    @staticmethod
+    def _registry_matches(actual: Registry | str | None, expected: Registry | str) -> bool:
+        """Check whether a PID registry matches the expected enum or string label"""
+
+        actual_options = {actual}
+        if isinstance(actual, Registry):
+            actual_options.update({actual.name, actual.value})
+
+        expected_options = {expected}
+        if isinstance(expected, Registry):
+            expected_options.update({expected.name, expected.value})
+
+        return bool(actual_options & expected_options)
+
+    @classmethod
+    def _validate_pid_registry(cls, value: PIDName, expected: Registry | str, field_name: str) -> PIDName:
+        """Ensure a PIDName field uses the expected registry"""
+
+        if not cls._registry_matches(value.registry, expected):
+            raise ValueError(f"{field_name} must use the {expected} registry")
+        return value
+
+    @field_validator("cell_line_type", mode="after")
+    def validate_cell_line_type_registry(cls, value: PIDName) -> PIDName:
+        """Ensure cell line type uses the Cell Line Ontology registry"""
+
+        return cls._validate_pid_registry(value, "Cell Line Ontology", "cell_line_type")
+
+    @field_validator("protein", mode="after")
+    def validate_protein_registry(cls, value: PIDName) -> PIDName:
+        """Ensure protein uses the UniProt registry"""
+
+        return cls._validate_pid_registry(value, Registry.UNIPROT, "protein")
+
+    @field_validator("gene", mode="after")
+    def validate_gene_registry(cls, value: PIDName) -> PIDName:
+        """Ensure gene uses the NCBI registry"""
+
+        return cls._validate_pid_registry(value, Registry.NCBI, "gene")
+
+    @field_validator("fluorescent_protein", mode="after")
+    def validate_fluorescent_protein_registry(cls, value: PIDName) -> PIDName:
+        """Ensure fluorescent protein uses the FPbase registry"""
+
+        return cls._validate_pid_registry(value, "FPbase", "fluorescent_protein")
 
 
 class CalibrationObject(DataModel):

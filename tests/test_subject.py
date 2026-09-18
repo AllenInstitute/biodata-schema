@@ -62,13 +62,13 @@ class TestSubject:
             subject_details=CellLine(
                 cell_line_name="HEK293T",
                 cell_line_type=PIDName(
-                    registry_identifier="CLO:0000001", name="immortalized cell line", registry=Registry.NCBI
+                    registry_identifier="CLO:0000001", name="immortalized cell line", registry="Cell Line Ontology"
                 ),
                 species=Species.HUMAN,
                 protein=PIDName(registry_identifier="P12345", name="GFAP", registry=Registry.UNIPROT),
                 gene=PIDName(registry_identifier="672", name="BRCA1", registry=Registry.NCBI),
                 cell_structure="nucleus",
-                fluorescent_protein=PIDName(registry_identifier="FPbase:123", name="EGFP", registry=Registry.UNIPROT),
+                fluorescent_protein=PIDName(registry_identifier="FPbase:123", name="EGFP", registry="FPbase"),
             ),
         )
 
@@ -76,3 +76,4 @@ class TestSubject:
 
         assert isinstance(restored.subject_details, CellLine)
         assert restored.subject_details.cell_line_name == "HEK293T"
+        assert restored.subject_details.gene.registry == Registry.NCBI
