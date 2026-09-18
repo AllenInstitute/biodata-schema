@@ -5,7 +5,13 @@ from typing import Literal, Optional
 from pydantic import Field, SkipValidation
 
 from biodata_schema.base import DataCoreModel, Discriminated
-from biodata_schema.components.subjects import CalibrationObject, CellLine, HumanSubject, MouseSubject, NonHumanPrimateSubject
+from biodata_schema.components.subjects import (
+    CalibrationObject,
+    CellLine,
+    HumanSubject,
+    MouseSubject,
+    NonHumanPrimateSubject,
+)
 
 
 class Subject(DataCoreModel):
