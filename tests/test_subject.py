@@ -9,7 +9,7 @@ from biodata_models.pid_names import PIDName
 from biodata_models.registries import Registry
 from biodata_models.species import Species, Strain
 
-from biodata_schema.components.subjects import BreedingInfo, Housing, LightCycle, MouseSubject
+from biodata_schema.components.subjects import BreedingInfo, CellLine, Housing, LightCycle, MouseSubject
 from biodata_schema.core.subject import Subject
 
 
@@ -53,3 +53,26 @@ class TestSubject:
         Subject.model_validate_json(s.model_dump_json())
 
         assert s is not None
+
+    def test_cell_line_subject_constructor(self):
+        """try building Subjects with cell line details"""
+
+        s = Subject(
+            subject_id="cell-line-123",
+            subject_details=CellLine(
+                cell_line_name="HEK293T",
+                cell_line_type=PIDName(
+                    registry_identifier="CLO:0000001", name="immortalized cell line", registry=Registry.NCBI
+                ),
+                species=Species.HUMAN,
+                protein=PIDName(registry_identifier="P12345", name="GFAP", registry=Registry.UNIPROT),
+                gene=PIDName(registry_identifier="672", name="BRCA1", registry=Registry.NCBI),
+                cell_structure="nucleus",
+                fluorescent_protein=PIDName(registry_identifier="FPbase:123", name="EGFP", registry=Registry.UNIPROT),
+            ),
+        )
+
+        restored = Subject.model_validate_json(s.model_dump_json())
+
+        assert isinstance(restored.subject_details, CellLine)
+        assert restored.subject_details.cell_line_name == "HEK293T"

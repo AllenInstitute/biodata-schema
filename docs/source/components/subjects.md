@@ -35,8 +35,8 @@ Description of a cultured cell line
 | `cell_line_type` | [PIDName](../biodata_models/pid_names.md#pidname) | Cell line type (Uses Cell Line Ontology) |
 | `species` | [Species](../biodata_models/species.md#species) | Species  |
 | `protein` | [PIDName](../biodata_models/pid_names.md#pidname) | Protein labeled (Protein uses UniProt registry) |
-| `gene` | [PIDName](../biodata_models/pid_names.md#pidname) | Gene targeted (Gene uses NCBI taxonomy) |
-| `cell_structure` | `str` | Cell structure protein found in  |
+| `gene` | [PIDName](../biodata_models/pid_names.md#pidname) | Gene targeted (Gene uses NCBI registry) |
+| `cell_structure` | `str` | Cell structure protein found in (Use controlled cellular structure terms, such as Gene Ontology cellular component names) |
 | `fluorescent_protein` | [PIDName](../biodata_models/pid_names.md#pidname) | Fluorescent protein  |
 | `clone_number` | `Optional[int]` | Clone number  |
 
@@ -152,5 +152,4 @@ Wellness report on animal health
 |-------|------|-------------|
 | `date` | `datetime.date` | Date  |
 | `report` | `str` | Report  |
-
 

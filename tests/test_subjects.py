@@ -2,6 +2,7 @@
 
 from datetime import datetime
 
+import pydantic
 import pytest
 from biodata_models.organizations import Organization
 from biodata_models.pid_names import PIDName
@@ -11,6 +12,7 @@ from biodata_models.species import Species, Strain
 from biodata_schema.components.subjects import (
     BreedingInfo,
     CalibrationObject,
+    CellLine,
     Housing,
     HumanSubject,
     LightCycle,
@@ -230,3 +232,40 @@ class TestBreedingInfo:
         assert breeding_info.maternal_genotype == "wt/wt"
         assert breeding_info.paternal_id == "P001"
         assert breeding_info.paternal_genotype == "wt/wt"
+
+
+class TestCellLine:
+    """Test the cell line model"""
+
+    def test_cell_line(self):
+        """Test creating CellLine"""
+
+        cell_line = CellLine(
+            cell_line_name="HEK293T",
+            cell_line_type=PIDName(
+                registry_identifier="CLO:0000001", name="immortalized cell line", registry=Registry.NCBI
+            ),
+            species=Species.HUMAN,
+            protein=PIDName(registry_identifier="P12345", name="GFAP", registry=Registry.UNIPROT),
+            gene=PIDName(registry_identifier="672", name="BRCA1", registry=Registry.NCBI),
+            cell_structure="nucleus",
+            fluorescent_protein=PIDName(registry_identifier="FPbase:123", name="EGFP", registry=Registry.UNIPROT),
+        )
+
+        assert cell_line.cell_line_name == "HEK293T"
+        assert cell_line.cell_structure == "nucleus"
+
+    def test_cell_line_requires_fluorescent_protein(self):
+        """Test CellLine required fields"""
+
+        with pytest.raises(pydantic.ValidationError):
+            CellLine(
+                cell_line_name="HEK293T",
+                cell_line_type=PIDName(
+                    registry_identifier="CLO:0000001", name="immortalized cell line", registry=Registry.NCBI
+                ),
+                species=Species.HUMAN,
+                protein=PIDName(registry_identifier="P12345", name="GFAP", registry=Registry.UNIPROT),
+                gene=PIDName(registry_identifier="672", name="BRCA1", registry=Registry.NCBI),
+                cell_structure="nucleus",
+            )

@@ -192,8 +192,12 @@ class CellLine(DataModel):
     cell_line_type: PIDName = Field(..., title="Cell line type", description="Uses Cell Line Ontology")
     species: Species.ONE_OF = Field(..., title="Species")
     protein: PIDName = Field(..., title="Protein labeled", description="Protein uses UniProt registry")
-    gene: PIDName = Field(..., title="Gene targeted", description="Gene uses NCBI taxonomy")
-    cell_structure: str = Field(..., title="Cell structure protein found in")  # TODO: ontology or enum in model?
+    gene: PIDName = Field(..., title="Gene targeted", description="Gene uses NCBI registry")
+    cell_structure: str = Field(
+        ...,
+        title="Cell structure protein found in",
+        description="Use controlled cellular structure terms, such as Gene Ontology cellular component names",
+    )  # TODO: ontology or enum in model?
     fluorescent_protein: PIDName = Field(..., title="Fluorescent protein", description="Uses FPbase")
     clone_number: Optional[int] = Field(default=None, title="Clone number")
 
