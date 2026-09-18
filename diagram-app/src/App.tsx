@@ -14,6 +14,7 @@ import { loadSchema } from "./loadSchema";
 import { nodeTypes } from "./nodes";
 import { edgeTypes } from "./edges";
 import { useDarkMode } from "./useDarkMode";
+import AcquisitionViewer from "./AcquisitionViewer";
 import {
   branchOf,
   buildInstanceTree,
@@ -248,9 +249,12 @@ const panelButtonStyle: CSSProperties = {
 };
 
 export default function App() {
+  const queryView = new URLSearchParams(window.location.search).get("view");
+  const requestedView = queryView ?? document.body.dataset.diagramView;
+  const comparison = requestedView === "procedures" || requestedView === "acquisition" ? requestedView : null;
   return (
     <ReactFlowProvider>
-      <Viewer />
+      {comparison ? <AcquisitionViewer section={comparison} /> : <Viewer />}
     </ReactFlowProvider>
   );
 }
