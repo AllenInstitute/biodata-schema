@@ -258,7 +258,7 @@ class TestCellLine:
     def test_cell_line_requires_fluorescent_protein(self):
         """Test CellLine required fields"""
 
-        with pytest.raises(pydantic.ValidationError):
+        with pytest.raises(pydantic.ValidationError) as exc_info:
             CellLine(
                 cell_line_name="HEK293T",
                 cell_line_type=PIDName(
@@ -269,3 +269,7 @@ class TestCellLine:
                 gene=PIDName(registry_identifier="672", name="BRCA1", registry=Registry.NCBI),
                 cell_structure="nucleus",
             )
+
+        errors = exc_info.value.errors()
+        assert len(errors) == 1
+        assert errors[0]["loc"] == ("fluorescent_protein",)
