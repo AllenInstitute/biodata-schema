@@ -2,12 +2,12 @@
 
 import logging
 from datetime import date
-from typing import List, Literal, Optional
+from typing import Annotated, List, Literal, Optional
 
 from biodata_models.modalities import Modality
 from pydantic import Field, SkipValidation, field_validator, model_validator
 
-from biodata_schema.base import DataCoreModel, DiscriminatedList
+from biodata_schema.base import DataCoreModel, DiscriminatedList, DraftRequirement
 from biodata_schema.components.connections import Connection
 from biodata_schema.components.coordinates import CoordinateSystem
 from biodata_schema.components.devices import (
@@ -82,7 +82,7 @@ class Instrument(DataCoreModel):
 
     # instrument definition
     location: Optional[str] = Field(default=None, title="Location", description="Location of the instrument")
-    instrument_id: str = Field(
+    instrument_id: Annotated[str, DraftRequirement] = Field(
         ...,
         description="Unique instrument identifier",
         title="Instrument ID",
