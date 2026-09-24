@@ -291,6 +291,27 @@ class TestMetadata:
                 procedures=self.procedures.model_copy(update={"subject_id": "999"}),
                 processing=self.processing,
             )
+        with pytest.raises(ValidationError, match="data_description.subject_id=999"):
+            Metadata(
+                name=self.sample_name,
+                location=self.sample_location,
+                data_description=self.dd.model_copy(update={"subject_id": "999"}),
+                subject=self.subject,
+                procedures=self.procedures,
+                processing=self.processing,
+            )
+        with pytest.raises(ValidationError, match="acquisition.subject_id=999"):
+            Metadata(
+                name=self.sample_name,
+                location=self.sample_location,
+                subject=self.subject,
+                acquisition=Acquisition.model_construct(
+                    acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
+                    subject_id="999",
+                    subject_details=AcquisitionSubjectDetails.model_construct(),
+                    data_streams=[],
+                ),
+            )
 
     def test_create_from_core_jsons_invalid(self):
         """Tests metadata json creation with invalid inputs"""
