@@ -32955,8 +32955,16 @@
          "title": "Calibrations"
       },
       "global_coordinate_system": {
-         "$ref": "#/$defs/CoordinateSystem",
-         "description": "Origin and axis definitions for determining the position of the instrument's components",
+         "anyOf": [
+            {
+               "$ref": "#/$defs/CoordinateSystem"
+            },
+            {
+               "const": "NotApplicable",
+               "type": "string"
+            }
+         ],
+         "description": "Origin and axis definitions for determining the position of the instrument's components, or 'NotApplicable' when no coordinate data are present",
          "title": "Global coordinate system"
       },
       "temperature_control": {

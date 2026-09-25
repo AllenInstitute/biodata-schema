@@ -76,6 +76,17 @@ fields.
 Set `Instrument.global_coordinate_system`, `ManipulatorConfig.local_coordinate_system`, and
 `ProbeConfig.local_coordinate_system` explicitly.
 
+Core files now require `global_coordinate_system` to be either a real `CoordinateSystem`
+or the literal string `"NotApplicable"`. Use `"NotApplicable"` only when the core file
+contains no `Translation`, `Rotation`, `Scale`, or `Affine` objects. When migrating older
+files with a missing or `null` value, inspect the file: set the matching coordinate system
+if coordinate data are present, otherwise set `"NotApplicable"`. Do not convert `null`
+to `"NotApplicable"` without checking the file contents.
+
+For optional nested overrides such as `Surgery.global_coordinate_system`, `null` continues
+to mean “inherit the enclosing frame.” Use `"NotApplicable"` when that nested procedure
+contains no coordinate data.
+
 ## 2. `Section` coordinate fields
 
 Use `PlanarSection` for sections with coordinate data. Version 3 removes these fields from

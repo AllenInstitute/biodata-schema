@@ -1,19 +1,34 @@
 """Validator utility functions"""
 
+from __future__ import annotations
+
 import logging
+from collections.abc import Mapping
+from dataclasses import dataclass
 from datetime import date, datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, List, Optional, Union
+from typing import TYPE_CHECKING, Any, List, Literal, Optional, Union
 
 from pydantic_extra_types.timezone_name import TimeZoneName
 
 from biodata_schema.components.wrappers import AssetPath
 
+if TYPE_CHECKING:
+    from biodata_schema.components.coordinates import CoordinateSystem
+
 logger = logging.getLogger(__name__)
 
 # Fields that should have the same length as the coordinate system axes
 AXIS_TYPES = ["Translation", "Rotation", "Scale"]
+
+
+@dataclass(frozen=True)
+class _CoordinateSystemContext:
+    """Coordinate frames inherited while validating a model tree."""
+
+    frame: CoordinateSystem | Literal["NotApplicable"] | None = None
+    local_frame: Optional[CoordinateSystem] = None
 
 
 class TimeValidation(Enum):
@@ -109,54 +124,6 @@ def _time_validation_recurse_helper(data, acquisition_start_time, acquisition_en
             recursive_time_validation_check(attr_value, acquisition_start_time, acquisition_end_time)
 
 
-def _recurse_helper(data, **kwargs):
-    """Helper function for recursive coordinate system validation.
-
-    Recursively processes lists and objects, calling recursive_coord_system_check
-    on each element or attribute.
-
-    Parameters
-    ----------
-    data : Any
-        The data structure to process recursively
-    **kwargs
-        Keyword arguments passed to recursive_coord_system_check
-    """
-    if isinstance(data, (list, tuple, dict)):
-        items = data.values() if isinstance(data, dict) else data
-        for item in items:
-            recursive_coord_system_check(item, **kwargs)
-        return
-    elif hasattr(data, "__dict__"):
-        for attr_name, attr_value in data.__dict__.items():
-            if attr_name == "object_type":
-                continue  # skip object_type
-            if callable(attr_value):
-                continue  # skip methods
-
-            if attr_name == "dimensions" and hasattr(data, "dimensions_unit"):
-                continue
-            field_kwargs = kwargs
-            if attr_name == "local_axis_positions" and getattr(data, "local_coordinate_system", None):
-                field_kwargs = dict(
-                    kwargs,
-                    coordinate_system_name=data.local_coordinate_system.name,
-                    axis_count=len(data.local_coordinate_system.axes),
-                )
-            recursive_coord_system_check(attr_value, **field_kwargs)
-
-
-def _iter_transforms(value):
-    """Find transforms in a field, including nested transform lists and mappings."""
-    from biodata_schema.components.coordinates import Affine, Rotation, Scale, Translation
-
-    if isinstance(value, (Translation, Rotation, Scale, Affine)):
-        yield value
-    elif isinstance(value, (list, tuple, dict)):
-        for item in value.values() if isinstance(value, dict) else value:
-            yield from _iter_transforms(item)
-
-
 def _check_transform_dimensions(transform, axis_count: int):
     """Check the parameters of a transform against its coordinate frame."""
     from biodata_schema.components.coordinates import Affine, Rotation, Scale
@@ -178,117 +145,152 @@ def _check_transform_dimensions(transform, axis_count: int):
         )
 
 
-def _system_check_helper(data, coordinate_system_name: Optional[str], axis_count: Optional[int]):
-    """Helper function to validate coordinate system requirements for objects with transforms.
+def _iter_model_fields(data, model_fields):
+    """Yield coordinate-relevant values from declared Pydantic fields."""
+    skip_dimensions = "dimensions_unit" in model_fields
+    for field_name, field_value in vars(data).items():
+        if field_name not in model_fields:
+            continue
+        if field_name == "object_type" or (field_name == "dimensions" and skip_dimensions):
+            continue
+        if not callable(field_value):
+            yield field_name, field_value
 
-    Only validates coordinate system requirements if the object contains transform components
-    (Translation, Rotation, or Scale). Objects without transforms don't require coordinate systems.
 
-    Parameters
-    ----------
-    data : object
-        The object to validate
-    coordinate_system_name : Optional[str]
-        Expected coordinate system name (can be None if no transforms present)
-    axis_count : Optional[int]
-        Expected number of axes in the coordinate system (can be None if no transforms present)
+def _resolve_coordinate_context(data, inherited):
+    """Apply this model's frame declarations to its inherited context."""
+    from biodata_schema.components.coordinates import AtlasCoordinate
 
-    Raises
-    ------
-    ValueError
-        If coordinate system is required but missing, system name doesn't match,
-        or transform field length doesn't match axis count
-    """
-    object_type = getattr(data, "object_type", type(data).__name__)
-    transform_components = (
-        [transform for value in vars(data).values() for transform in _iter_transforms(value)]
-        if hasattr(data, "__dict__")
-        else []
+    declared_frame = getattr(data, "global_coordinate_system", None)
+    if declared_frame is None and isinstance(data, AtlasCoordinate):
+        declared_frame = data.coordinate_system
+
+    if declared_frame is None:
+        frame = inherited.frame
+        inherited_local_frame = inherited.local_frame
+    else:
+        frame = declared_frame
+        inherited_local_frame = None
+
+    local_frame = getattr(data, "local_coordinate_system", None) or inherited_local_frame
+    if frame is None and local_frame is not None:
+        frame = local_frame
+
+    return _CoordinateSystemContext(frame=frame, local_frame=local_frame)
+
+
+def _validate_transform_in_frame(transform, context):
+    """Check one transform against its global or local coordinate frame."""
+    from biodata_schema.components.coordinates import (
+        NOT_APPLICABLE_COORDINATE_SYSTEM,
+        CoordinateSystem,
     )
-    if transform_components:
-        if not coordinate_system_name or not axis_count:
-            raise ValueError(
-                f"CoordinateSystem is required when a Transform or Coordinate is present (object_type: {object_type})"
-            )
 
-        if data.coordinate_system_name != coordinate_system_name:
-            raise ValueError(
-                f"System name mismatch for {object_type}, expected {coordinate_system_name}, "
-                f"found {data.coordinate_system_name}"
-            )
+    if context.frame == NOT_APPLICABLE_COORDINATE_SYSTEM:
+        raise ValueError(
+            f"CoordinateSystem is NotApplicable but coordinate data are present "
+            f"(object_type: {transform.object_type})"
+        )
 
-        for transform_component in transform_components:
-            _check_transform_dimensions(transform_component, axis_count)
+    reference = getattr(transform, "reference_coordinate_system", "global")
+    frame = context.local_frame if reference == "local" and context.local_frame is not None else context.frame
+    if frame is None:
+        frame = context.local_frame
+    if not isinstance(frame, CoordinateSystem) or not frame.axes:
+        raise ValueError(
+            f"CoordinateSystem is required when a Transform or Coordinate is present "
+            f"(object_type: {transform.object_type})"
+        )
+    _check_transform_dimensions(transform, len(frame.axes))
+
+
+def _validate_declared_coordinate_system(data, context, has_transforms):
+    """Check a wrapper's declared name after visiting its children."""
+    if not has_transforms or not hasattr(data, "coordinate_system_name"):
+        return
+    from biodata_schema.components.coordinates import CoordinateSystem
+
+    object_type = getattr(data, "object_type", type(data).__name__)
+    if not isinstance(context.frame, CoordinateSystem) or not context.frame.axes:
+        raise ValueError(
+            f"CoordinateSystem is required when a Transform or Coordinate is present "
+            f"(object_type: {object_type})"
+        )
+    if data.coordinate_system_name != context.frame.name:
+        raise ValueError(
+            f"System name mismatch for {object_type}, expected {context.frame.name}, "
+            f"found {data.coordinate_system_name}"
+        )
+
+
+def _validate_core_coordinate_system(data, has_transforms):
+    """Require a concrete frame for transforms and NotApplicable otherwise."""
+    from biodata_schema.components.coordinates import (
+        NOT_APPLICABLE_COORDINATE_SYSTEM,
+        CoordinateSystem,
+    )
+
+    core_frame = getattr(data, "global_coordinate_system", None)
+    if has_transforms and not isinstance(core_frame, CoordinateSystem):
+        raise ValueError("global_coordinate_system must be a CoordinateSystem when coordinate data are present")
+    if not has_transforms and core_frame != NOT_APPLICABLE_COORDINATE_SYSTEM:
+        raise ValueError("global_coordinate_system must be 'NotApplicable' when no coordinate data are present")
 
 
 def recursive_coord_system_check(
-    data, coordinate_system_name: Optional[str], axis_count: Optional[int], local_coordinate_system=None
-):
-    """Recursively validate coordinate system requirements for objects with transforms.
+    data: Any,
+    context: Optional[_CoordinateSystemContext] = None,
+    *,
+    validate_core_coordinate_system: bool = False,
+) -> bool:
+    """Validate coordinate frames and transforms in one depth-first pass."""
+    from pydantic import BaseModel
 
-    Traverses the data structure and validates that objects with transform components
-    (Translation, Rotation, Scale) have the correct coordinate system name and that
-    transform field lengths match the expected axis count.
-
-    Parameters
-    ----------
-    data : Any
-        The data structure to validate recursively
-    coordinate_system_name : Optional[str]
-        Expected coordinate system name (can be None if no transforms present)
-    axis_count : Optional[int]
-        Expected number of axes in the coordinate system (can be None if no transforms present)
-
-    Raises
-    ------
-    ValueError
-        If coordinate system is required but missing, system name doesn't match,
-        or transform field length doesn't match axis count
-
-    Notes
-    -----
-    Objects without transform components are not required to have coordinate systems.
-    Nested global coordinate systems override the inherited global frame. Local frames
-    apply to local-reference transforms; atlas coordinates carry their own frame.
-    """
-    from biodata_schema.components.coordinates import Affine, Rotation, Scale, Translation
+    from biodata_schema.components.coordinates import (
+        NOT_APPLICABLE_COORDINATE_SYSTEM,
+        Affine,
+        Rotation,
+        Scale,
+        Translation,
+    )
 
     if data is None or isinstance(data, Enum):
-        return
+        return False
 
-    _cs = getattr(data, "global_coordinate_system", None) or getattr(data, "coordinate_system", None)
-    if _cs:
-        coordinate_system_name = _cs.name
-        axis_count = len(_cs.axes)
-        local_coordinate_system = None
-    local_coordinate_system = getattr(data, "local_coordinate_system", None) or local_coordinate_system
-    if axis_count is None and local_coordinate_system is not None:
-        coordinate_system_name = local_coordinate_system.name
-        axis_count = len(local_coordinate_system.axes)
+    context = _resolve_coordinate_context(data, context or _CoordinateSystemContext())
 
     if isinstance(data, (Translation, Rotation, Scale, Affine)):
-        reference = getattr(data, "reference_coordinate_system", "global")
-        transform_axis_count = axis_count
-        if reference == "local" and local_coordinate_system is not None:
-            transform_axis_count = len(local_coordinate_system.axes)
-        if not transform_axis_count:
-            raise ValueError(
-                f"CoordinateSystem is required when a Transform or Coordinate is present "
-                f"(object_type: {data.object_type})"
+        _validate_transform_in_frame(data, context)
+        return True
+
+    if isinstance(data, Mapping):
+        children = ((None, value) for value in data.values())
+    elif isinstance(data, (list, tuple)):
+        children = ((None, value) for value in data)
+    elif isinstance(data, BaseModel):
+        children = _iter_model_fields(data, type(data).model_fields)
+    else:
+        return False
+
+    has_transforms = False
+    for field_name, child in children:
+        child_context = context
+        if (
+            field_name == "local_axis_positions"
+            and context.local_frame is not None
+            and context.frame != NOT_APPLICABLE_COORDINATE_SYSTEM
+        ):
+            child_context = _CoordinateSystemContext(
+                frame=context.local_frame,
+                local_frame=context.local_frame,
             )
-        _check_transform_dimensions(data, transform_axis_count)
-        return
+        child_has_transforms = recursive_coord_system_check(child, child_context)
+        has_transforms = has_transforms or child_has_transforms
 
-    # Check if the object we are looking at has a coordinate_system_name field
-    if hasattr(data, "coordinate_system_name"):
-        _system_check_helper(data, coordinate_system_name, axis_count)
-
-    _recurse_helper(
-        data=data,
-        coordinate_system_name=coordinate_system_name,
-        axis_count=axis_count,
-        local_coordinate_system=local_coordinate_system,
-    )
+    _validate_declared_coordinate_system(data, context, has_transforms)
+    if validate_core_coordinate_system:
+        _validate_core_coordinate_system(data, has_transforms)
+    return has_transforms
 
 
 def recursive_get_named_objects(obj: Any) -> List[tuple]:

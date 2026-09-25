@@ -9,7 +9,7 @@ from pydantic import Field, SkipValidation, field_validator, model_validator
 
 from biodata_schema.base import DataCoreModel, DiscriminatedList
 from biodata_schema.components.connections import Connection
-from biodata_schema.components.coordinates import CoordinateSystem
+from biodata_schema.components.coordinates import CoordinateSystemOrNotApplicable
 from biodata_schema.components.devices import (
     AdditionalImagingDevice,
     AirPuffDevice,
@@ -55,7 +55,12 @@ from biodata_schema.components.devices import (
     Wheel,
 )
 from biodata_schema.components.measurements import CALIBRATIONS
-from biodata_schema.utils.merge import merge_notes, merge_optional_list, merge_str_alphabetical
+from biodata_schema.utils.merge import (
+    merge_coordinate_systems,
+    merge_notes,
+    merge_optional_list,
+    merge_str_alphabetical,
+)
 from biodata_schema.utils.validators import recursive_get_device_names, recursive_get_named_objects
 
 logger = logging.getLogger(__name__)
@@ -104,10 +109,13 @@ class Instrument(DataCoreModel):
     )
 
     # coordinate system
-    global_coordinate_system: CoordinateSystem = Field(
+    global_coordinate_system: CoordinateSystemOrNotApplicable = Field(
         ...,
         title="Global coordinate system",
-        description="Origin and axis definitions for determining the position of the instrument's components",
+        description=(
+            "Origin and axis definitions for determining the position of the instrument's components, or "
+            "'NotApplicable' when no coordinate data are present"
+        ),
     )
 
     # instrument details
@@ -359,7 +367,14 @@ class Instrument(DataCoreModel):
 
         # Check for incompatible key fields
         location_check = self.location != other.location
-        coord_sys_check = self.global_coordinate_system != other.global_coordinate_system
+        try:
+            global_coordinate_system = merge_coordinate_systems(
+                self.global_coordinate_system, other.global_coordinate_system
+            )
+            coord_sys_check = False
+        except ValueError:
+            global_coordinate_system = self.global_coordinate_system
+            coord_sys_check = True
         temp_control_check = self.temperature_control != other.temperature_control
 
         if any([location_check, coord_sys_check, temp_control_check]):
@@ -398,7 +413,7 @@ class Instrument(DataCoreModel):
             modification_date=latest_modification_date,
             modalities=combined_modalities,
             calibrations=combined_calibrations,
-            global_coordinate_system=self.global_coordinate_system,
+            global_coordinate_system=global_coordinate_system,
             temperature_control=self.temperature_control,
             notes=combined_notes,
             connections=combined_connections,

@@ -341,6 +341,7 @@ acquisition = Acquisition(
         "Kenta Hagihara",
     ],
     subject_id="687582",
+    global_coordinate_system="NotApplicable",
     acquisition_start_time=t_start,
     acquisition_end_time=t_end,
     acquisition_type="Pavlovian Conditioning",

@@ -284,7 +284,7 @@ inst = Instrument(
     instrument_id="exaSPIM1",
     modalities=[Modality.SPIM],
     modification_date=datetime.date(2023, 10, 4),
-    global_coordinate_system=SPIM_RPI,
+    global_coordinate_system="NotApplicable",
     components=[
         *objectives,
         *detectors,

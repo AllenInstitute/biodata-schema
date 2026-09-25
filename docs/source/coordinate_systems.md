@@ -4,8 +4,14 @@ The metadata schema supports flexible definitions of coordinate systems. This al
 
 Unlike many parts of the metadata schema where fields are just floats or strings, it is critical to understand **how coordinate systems are stored in the schema** to be able to use them properly. There are two rules to be aware of:
 
-1. Each [Instrument](instrument.md), [Acquisition](acquisition.md), and [Procedures](procedures.md) has its own `.global_coordinate_system` field. In most assets, the global coordinate system is the same in all three files.
+1. Each [Instrument](instrument.md), [Acquisition](acquisition.md), and [Procedures](procedures.md) requires a `.global_coordinate_system` value. In most assets, the global coordinate system is the same in all three files.
 2. Local to global transforms (i.e. a [Translation](components/coordinates.md#translation), [Rotation](components/coordinates.md#rotation), or [Scale](components/coordinates.md#scale)) that position devices or configurations of devices **must be defined in it's core file's coordinate system**. To help you avoid mistakes, these transform fields are paired with a `.coordinate_system_name` field which must match the name of the global coordinate system defined in the core file.
+
+## Applicability
+
+Use a real `CoordinateSystem` when coordinate data are present anywhere in a core file. If no `Translation`, `Rotation`, `Scale`, or `Affine` objects are present, set `.global_coordinate_system` to the literal string `"NotApplicable"`. This explicit value is different from `null` or an omitted field; core files must not use `null` to mean that coordinates do not apply.
+
+Nested coordinate-system overrides, such as a surgery's frame, may be omitted or set to `null` to inherit the enclosing frame. A nested override can use `"NotApplicable"` when its subtree contains no coordinate data.
 
 The top-level coordinate systems in the instrument, acquisition, and procedures are generally defined in *in vivo* space, usually relative to an origin on an animal's skull. Often when targeting coordinates in the brain we plan our experiments in a **standardized atlas** like the mouse common coordinate framework. When you encounter a field that that requires an atlas transform (i.e. a point or vector in an atlas), you'll see that an [Atlas](components/coordinates.md#atlas) will have to be defined alongside that transform. An Atlas library is available in `biodata_schema.components.coordinates.AtlasLibrary` for your convenience.
 

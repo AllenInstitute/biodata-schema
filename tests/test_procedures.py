@@ -35,7 +35,7 @@ from biodata_schema.components.subject_procedures import BrainInjection, Injecti
 from biodata_schema.components.surgery_procedures import CatheterImplant, Craniotomy, CraniotomyType
 from biodata_schema.core.procedures import Procedures
 from biodata_schema.utils.exceptions import OneOfError
-from tests.coordinate_systems import BREGMA_ARI, BREGMA_RAS
+from tests.coordinate_systems import BREGMA_ARI
 
 
 class TestProcedures:
@@ -50,7 +50,7 @@ class TestProcedures:
         with pytest.raises(ValidationError):
             Procedures()
 
-        p = Procedures(subject_id="12345")
+        p = Procedures(subject_id="12345", global_coordinate_system="NotApplicable")
         assert "12345" == p.subject_id
 
     @patch("biodata_models.mouse_anatomy.get_emapa_id")
@@ -60,6 +60,7 @@ class TestProcedures:
         with pytest.raises(ValidationError):
             Procedures(
                 subject_id="12345",
+                global_coordinate_system="NotApplicable",
                 subject_procedures=[
                     Injection(
                         injection_materials=[NonViralMaterial(name="saline", source=Organization.OTHER)],
@@ -85,6 +86,7 @@ class TestProcedures:
         with pytest.raises(ValidationError) as e:
             Procedures(
                 subject_id="12345",
+                global_coordinate_system="NotApplicable",
                 subject_procedures=[
                     Surgery(
                         start_date=self.start_date,
@@ -119,6 +121,7 @@ class TestProcedures:
         with pytest.raises(ValidationError) as e:
             Procedures(
                 subject_id="12345",
+                global_coordinate_system="NotApplicable",
                 subject_procedures=[
                     Surgery(
                         start_date=self.start_date,
@@ -519,6 +522,7 @@ class TestProcedures:
         with pytest.raises(ValidationError) as e:
             Procedures(
                 subject_id="12345",
+                global_coordinate_system="NotApplicable",
                 specimen_procedures=[
                     SpecimenProcedure(
                         specimen_id="9999_1000",
@@ -539,6 +543,7 @@ class TestProcedures:
 
         valid_procedure = Procedures(
             subject_id="12345",
+            global_coordinate_system="NotApplicable",
             specimen_procedures=[
                 SpecimenProcedure(
                     specimen_id=["12345_001", "12345_002"],
@@ -709,7 +714,7 @@ class TestProcedures:
         """Test get_device_names method returns correct device names"""
 
         # Test with no devices
-        procedures = Procedures(subject_id="12345")
+        procedures = Procedures(subject_id="12345", global_coordinate_system="NotApplicable")
         assert procedures.get_device_names() == []
 
     def test_get_device_names_with_constructed_surgery_procedure(self):
@@ -748,6 +753,7 @@ class TestProcedures:
 
         procedures = Procedures(
             subject_id="12345",
+            global_coordinate_system="NotApplicable",
             subject_procedures=[
                 Surgery(
                     start_date=self.start_date,
@@ -760,34 +766,19 @@ class TestProcedures:
         assert "Catheter" in device_names
         assert len(device_names) == 1
 
-    def test_procedures_addition_coordinate_system_validation(self):
-        """Test that Procedures addition raises error for different coordinate systems"""
+    def test_procedures_addition_not_applicable_coordinate_system(self):
+        """Procedures without coordinates retain NotApplicable when combined."""
 
-        # Create two procedures with different coordinate systems
         p1 = Procedures(
             subject_id="12345",
-            global_coordinate_system=BREGMA_ARI,
+            global_coordinate_system="NotApplicable",
         )
 
         p2 = Procedures(
             subject_id="12345",
-            global_coordinate_system=BREGMA_RAS,  # Different coordinate system
+            global_coordinate_system="NotApplicable",
         )
 
-        # Test that combining procedures with different coordinate systems raises ValueError
-        with pytest.raises(ValueError) as context:
-            _ = p1 + p2
-
-        assert "Cannot merge differing coordinate systems" in str(context.value)
-        assert "BREGMA_ARI" in str(context.value)
-        assert "BREGMA_RAS" in str(context.value)
-
-        # Test that combining procedures with same coordinate systems works
-        p3 = Procedures(
-            subject_id="12345",
-            global_coordinate_system=BREGMA_ARI,  # Same coordinate system as p1
-        )
-
-        combined = p1 + p3
-        assert combined.global_coordinate_system == BREGMA_ARI
+        combined = p1 + p2
+        assert combined.global_coordinate_system == "NotApplicable"
         assert len(combined.subject_procedures) == 0  # Both started with empty procedures

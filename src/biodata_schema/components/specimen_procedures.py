@@ -15,7 +15,10 @@ from biodata_schema.base import (
     DataModel,
     DiscriminatedList,
 )
-from biodata_schema.components.coordinates import Atlas, CoordinateSystem, Translation
+from biodata_schema.components.coordinates import (
+    CoordinateSystemOrAtlasOrNotApplicable,
+    Translation,
+)
 from biodata_schema.components.identifiers import ProtocolListMixin
 from biodata_schema.components.reagent import (
     FluorescentReagent,
@@ -87,10 +90,13 @@ class Sectioning(DataModel):
 class PlanarSectioning(Sectioning):
     """Description of a sectioning procedure performed on the coronal, sagittal, or transverse/axial plane"""
 
-    global_coordinate_system: Optional[CoordinateSystem | Atlas] = Field(
+    global_coordinate_system: Optional[CoordinateSystemOrAtlasOrNotApplicable] = Field(
         default=None,
         title="Sectioning global coordinate system",
-        description="Only required if different from the Procedures.global_coordinate_system",
+        description=(
+            "Overrides Procedures.global_coordinate_system when different; use 'NotApplicable' when this "
+            "sectioning contains no coordinate data"
+        ),
     )
 
     sections: List[Union[Section, PlanarSection]] = Field(

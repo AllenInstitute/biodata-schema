@@ -61,7 +61,7 @@ Description of subject procedures performed at one time
 | `weight_unit` | [MassUnit](../biodata_models/units.md#massunit) | Weight unit  |
 | `anaesthesia` | Optional[[Anaesthetic](surgery_procedures.md#anaesthetic)] | Anaesthesia  |
 | `workstation_id` | `Optional[str]` | Workstation ID  |
-| `global_coordinate_system` | Optional[[CoordinateSystem](coordinates.md#coordinatesystem)] | Surgery global coordinate system (Only required when the Surgery.global_coordinate_system is different from the Procedures.global_coordinate_system) |
+| `global_coordinate_system` | Optional[[CoordinateSystem](coordinates.md#coordinatesystem) or `Literal["NotApplicable"]`] | Surgery global coordinate system (Overrides the Procedures frame when different; `None` inherits it and `NotApplicable` means this surgery has no coordinate data) |
 | `measured_coordinates` | Optional[Dict[[Origin](../biodata_models/coordinates.md#origin), [Translation](coordinates.md#translation)]] | Measured coordinates (Coordinates measured during the procedure, for example Bregma and Lambda) |
 | `procedures` | List[[CatheterImplant](surgery_procedures.md#catheterimplant) or [Craniotomy](surgery_procedures.md#craniotomy) or [DeviceImplant](surgery_procedures.md#deviceimplant) or [ProbeImplant](surgery_procedures.md#probeimplant) or [Headframe](surgery_procedures.md#headframe) or [BrainInjection](surgery_procedures.md#braininjection) or [Injection](injection_procedures.md#injection) or [MyomatrixInsertion](surgery_procedures.md#myomatrixinsertion) or [GenericSurgeryProcedure](surgery_procedures.md#genericsurgeryprocedure) or [Perfusion](surgery_procedures.md#perfusion) or [SampleCollection](surgery_procedures.md#samplecollection)] | Procedures  |
 | `notes` | `Optional[str]` | Notes  |

@@ -42,6 +42,7 @@ a = Acquisition(
     acquisition_start_time=t,
     acquisition_end_time=t,
     subject_id="652567",
+    global_coordinate_system="NotApplicable",
     acquisition_type="Parameter Testing",
     instrument_id="FIP1",
     ethics_review_id=["2115"],

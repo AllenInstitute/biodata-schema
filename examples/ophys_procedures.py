@@ -82,6 +82,7 @@ config = ProbeConfig(
 
 p = Procedures(
     subject_id="625100",
+    global_coordinate_system=BREGMA_ARI,
     subject_procedures=[
         Surgery(
             start_date=t.date(),

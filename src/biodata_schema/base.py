@@ -270,6 +270,9 @@ class DataCoreModel(DataModel):
     def coordinate_system_validator(self):
         """Validate that all coordinates match the defined coordinate system"""
 
-        recursive_coord_system_check(self, None, None)
+        recursive_coord_system_check(
+            self,
+            validate_core_coordinate_system=hasattr(self, "global_coordinate_system"),
+        )
 
         return self

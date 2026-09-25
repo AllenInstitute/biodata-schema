@@ -399,7 +399,7 @@ inst = Instrument(
     instrument_id="FIP-Behavior",
     modification_date=date(2000, 1, 1),
     modalities=[Modality.BEHAVIOR, Modality.FIB],
-    global_coordinate_system=BREGMA_ARI,
+    global_coordinate_system="NotApplicable",
     components=[
         camera1,
         camera2,

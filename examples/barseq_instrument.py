@@ -228,7 +228,7 @@ instrument = Instrument(
     location="243",
     instrument_id="Dogwood",
     modification_date=date(2024, 7, 9),
-    global_coordinate_system=IMAGE_XYZ,
+    global_coordinate_system="NotApplicable",
     modalities=[Modality.BARSEQ],
     notes=(
         "BarSEQ imaging system with Nikon Ti2-E inverted microscope, X-Light V3 spinning disk confocal, "

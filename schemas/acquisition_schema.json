@@ -13291,11 +13291,11 @@
                "$ref": "#/$defs/CoordinateSystem"
             },
             {
-               "type": "null"
+               "const": "NotApplicable",
+               "type": "string"
             }
          ],
-         "default": null,
-         "description": "Origin and axis definitions for determining the configured position of devices during acquisition. Required when coordinates are provided within the Acquisition",
+         "description": "Origin and axis definitions for determining the configured position of devices during acquisition. Use 'NotApplicable' when no coordinate data are present",
          "title": "Global coordinate system"
       },
       "calibrations": {
@@ -13393,6 +13393,7 @@
       "acquisition_start_time",
       "acquisition_end_time",
       "acquisition_type",
+      "global_coordinate_system",
       "data_streams"
    ],
    "title": "Acquisition",

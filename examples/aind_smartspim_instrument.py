@@ -264,7 +264,7 @@ inst = Instrument(
     location="440",
     instrument_id="SmartSPIM1",
     modification_date=date(2023, 10, 4),
-    global_coordinate_system=SPIM_RPI,
+    global_coordinate_system="NotApplicable",
     modalities=[Modality.SPIM],
     components=[
         scope,

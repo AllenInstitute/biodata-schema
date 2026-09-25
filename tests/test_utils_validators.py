@@ -3,20 +3,21 @@
 from datetime import date, datetime, timedelta, timezone
 from enum import Enum
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Literal, Optional
 from unittest.mock import MagicMock, patch
 
 import pytest
 from biodata_models.units import SizeUnit, VolumeUnit
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 from pydantic_extra_types.timezone_name import TimeZoneName
 
-from biodata_schema.base import AwareDatetimeWithDefault, DataModel
+from biodata_schema.base import AwareDatetimeWithDefault, DataCoreModel, DataModel
 from biodata_schema.components.configs import DeviceConfig, ManipulatorConfig
 from biodata_schema.components.coordinates import (
     Affine,
     AtlasCoordinate,
     AtlasLibrary,
+    CoordinateSystemOrNotApplicable,
     ReferenceCoordinateSystem,
     Rotation,
     Scale,
@@ -29,8 +30,7 @@ from biodata_schema.components.wrappers import AssetPath
 from biodata_schema.utils.validators import (
     TimeValidation,
     _convert_to_comparable,
-    _recurse_helper,
-    _system_check_helper,
+    _CoordinateSystemContext,
     _time_validation_recurse_helper,
     _validate_time_constraint,
     extract_timezone_from_datetime,
@@ -42,6 +42,60 @@ from biodata_schema.utils.validators import (
     validate_creation_time_after_midnight,
 )
 from tests.coordinate_systems import BREGMA_ARI
+
+
+def _coordinate_context(system_name=None, axis_count=None, local_coordinate_system=None):
+    frame = None
+    if system_name is not None and axis_count:
+        frame = BREGMA_ARI.model_copy(update={"name": system_name, "axes": BREGMA_ARI.axes[:axis_count]})
+    return _CoordinateSystemContext(frame=frame, local_frame=local_coordinate_system)
+
+
+class CoordinateValidationCore(DataCoreModel):
+    """Small core model for coordinate-system applicability tests."""
+
+    describedBy: str = "https://example.org/coordinate-validation-core"
+    schema_version: Literal["3.0.2"] = "3.0.2"
+    global_coordinate_system: CoordinateSystemOrNotApplicable
+    transform: Optional[Translation] = None
+
+
+def test_core_coordinate_system_null_is_not_applicable():
+    """Core coordinate frames must not use null as the NotApplicable value."""
+    with pytest.raises(ValidationError):
+        CoordinateValidationCore(global_coordinate_system=None)
+
+
+def test_core_coordinate_system_not_applicable_without_transforms():
+    """A core model without coordinate data must explicitly say NotApplicable."""
+    model = CoordinateValidationCore(global_coordinate_system="NotApplicable")
+
+    assert model.global_coordinate_system == "NotApplicable"
+
+
+def test_core_coordinate_system_real_frame_without_transforms_fails():
+    """A real frame is invalid when the core model has no coordinate data."""
+    with pytest.raises(ValidationError, match="must be 'NotApplicable'"):
+        CoordinateValidationCore(global_coordinate_system=BREGMA_ARI)
+
+
+def test_core_coordinate_system_not_applicable_with_transforms_fails():
+    """NotApplicable is invalid when the core model contains coordinate data."""
+    with pytest.raises(ValidationError, match="NotApplicable but coordinate data are present"):
+        CoordinateValidationCore(
+            global_coordinate_system="NotApplicable",
+            transform=Translation(translation=[0.5, 1.0, 2.0]),
+        )
+
+
+def test_core_coordinate_system_real_frame_with_transforms_passes():
+    """A real frame is valid when the core model contains coordinate data."""
+    model = CoordinateValidationCore(
+        global_coordinate_system=BREGMA_ARI,
+        transform=Translation(translation=[0.5, 1.0, 2.0]),
+    )
+
+    assert model.global_coordinate_system == BREGMA_ARI
 
 
 class TestCompatibilityCheck:
@@ -67,115 +121,6 @@ class TranslationWrapper(DataModel):
     translation: Translation
 
 
-class TestRecurseHelper:
-    """Tests for _recurse_helper function"""
-
-    def setup_method(self):
-        """Set up test data"""
-        self.coordinate_system_name = "BREGMA_ARI"
-
-    def test_recurse_helper_with_list(self):
-        """Test _recurse_helper with a list of coordinates"""
-        data = [
-            TranslationWrapper(
-                coordinate_system_name=self.coordinate_system_name,
-                translation=Translation(
-                    translation=[0.5, 1],
-                ),
-            ),
-            TranslationWrapper(
-                coordinate_system_name=self.coordinate_system_name,
-                translation=Translation(
-                    translation=[0.5, 1],
-                ),
-            ),
-        ]
-        _recurse_helper(data, coordinate_system_name=self.coordinate_system_name, axis_count=2)
-
-    def test_recurse_helper_with_object(self):
-        """Test _recurse_helper with a single coordinate object"""
-        data = TranslationWrapper(
-            coordinate_system_name=self.coordinate_system_name,
-            translation=Translation(
-                translation=[0.5, 1],
-            ),
-        )
-        _recurse_helper(data, coordinate_system_name=self.coordinate_system_name, axis_count=2)
-
-    def test_recurse_helper_skips_callable_attributes(self):
-        """Test _recurse_helper skips methods while traversing an object."""
-
-        class ObjectWithCallable:
-            """Object containing a callable and a transform."""
-
-            def __init__(self):
-                self.callback = lambda: None
-                self.translation = Translation(translation=[0.5, 1])
-
-        _recurse_helper(ObjectWithCallable(), coordinate_system_name=self.coordinate_system_name, axis_count=2)
-
-
-class TestRecursiveSystemCheckHelper:
-    """Test for _system_check_helper function"""
-
-    def setup_method(self):
-        """Set up test data"""
-        self.coordinate_system_name = "BREGMA_ARI"
-        self.translation_wrapper = TranslationWrapper(
-            coordinate_system_name=self.coordinate_system_name, translation=Translation(translation=[0.5, 1])
-        )
-
-    def test_system_check_helper_valid(self):
-        """Test _system_check_helper with valid data"""
-        _system_check_helper(self.translation_wrapper, self.coordinate_system_name, axis_count=2)
-        # No exception raised means test passed
-
-    def test_system_check_helper_missing_system_name(self):
-        """Test _system_check_helper with missing coordinate_system_name"""
-        with pytest.raises(ValueError):
-            _system_check_helper(self.translation_wrapper, None, axis_count=2)
-
-    def test_system_check_helper_missing_axis_count(self):
-        """Test _system_check_helper with missing axis_count"""
-        with pytest.raises(ValueError):
-            _system_check_helper(self.translation_wrapper, self.coordinate_system_name, axis_count=None)
-
-    def test_system_check_helper_wrong_system_name(self):
-        """Test _system_check_helper with wrong coordinate_system_name"""
-        with pytest.raises(ValueError) as context:
-            _system_check_helper(self.translation_wrapper, "WRONG_SYSTEM", axis_count=2)
-        assert "WRONG_SYSTEM" in str(context.value)
-        assert self.coordinate_system_name in str(context.value)
-
-    def test_system_check_helper_wrong_axis_count(self):
-        """Test _system_check_helper with wrong axis_count"""
-        with pytest.raises(ValueError) as context:
-            _system_check_helper(self.translation_wrapper, self.coordinate_system_name, axis_count=3)
-        assert "3" in str(context.value)
-        assert "2" in str(context.value)
-
-    def test_system_check_helper_multiple_axis_types(self):
-        """Test _system_check_helper with multiple axis types"""
-
-        class MultiAxisWrapper(DataModel):
-            """Wrapper with multiple axis types"""
-
-            coordinate_system_name: str
-            translation: Translation
-            rotation: Rotation
-            scale: Scale
-
-        obj = MultiAxisWrapper(
-            coordinate_system_name=self.coordinate_system_name,
-            translation=Translation(translation=[0.5, 1]),
-            rotation=Rotation(angles=[90, 180]),
-            scale=Scale(scale=[1.0, 2.0]),
-        )
-
-        _system_check_helper(obj, self.coordinate_system_name, axis_count=2)
-        # No exception means test passed
-
-
 class TestRecursiveCoordSystemCheck:
     """Tests for recursive_coord_system_check function"""
 
@@ -191,7 +136,7 @@ class TestRecursiveCoordSystemCheck:
                 translation=[0.5, 1],
             ),
         )
-        recursive_coord_system_check(data, self.coordinate_system_name, axis_count=2)
+        recursive_coord_system_check(data, _coordinate_context(self.coordinate_system_name, 2))
 
     def test_recursive_coord_system_check_with_invalid_system_name(self):
         """Test recursive_coord_system_check with invalid system name"""
@@ -202,14 +147,14 @@ class TestRecursiveCoordSystemCheck:
             ),
         )
         with pytest.raises(ValueError) as context:
-            recursive_coord_system_check(data, self.coordinate_system_name, axis_count=2)
+            recursive_coord_system_check(data, _coordinate_context(self.coordinate_system_name, 2))
 
         assert "System name mismatch" in str(context.value)
 
     def test_recursive_coord_system_check_with_empty_data(self):
         """Test recursive_coord_system_check with empty data"""
         data = None
-        recursive_coord_system_check(data, self.coordinate_system_name, axis_count=0)
+        recursive_coord_system_check(data)
 
     def test_recursive_coord_system_check_with_list_of_coordinates(self):
         """Test recursive_coord_system_check with a list of coordinates"""
@@ -227,7 +172,7 @@ class TestRecursiveCoordSystemCheck:
                 ),
             ),
         ]
-        recursive_coord_system_check(data, self.coordinate_system_name, axis_count=2)
+        recursive_coord_system_check(data, _coordinate_context(self.coordinate_system_name, 2))
 
     def test_recursive_coord_system_check_with_axis_count_mismatch(self):
         """Test recursive_coord_system_check with axis count mismatch"""
@@ -238,7 +183,7 @@ class TestRecursiveCoordSystemCheck:
             ),
         )
         with pytest.raises(ValueError) as context:
-            recursive_coord_system_check(data, self.coordinate_system_name, axis_count=2)
+            recursive_coord_system_check(data, _coordinate_context(self.coordinate_system_name, 2))
 
         assert "Axis count mismatch" in str(context.value)
 
@@ -251,7 +196,7 @@ class TestRecursiveCoordSystemCheck:
         )
 
         with pytest.raises(ValueError) as context:
-            recursive_coord_system_check(data, None, axis_count=0)
+            recursive_coord_system_check(data, _coordinate_context())
 
         assert "CoordinateSystem is required" in str(context.value)
 
@@ -263,7 +208,7 @@ class TestRecursiveCoordSystemCheck:
         )
 
         with pytest.raises(ValueError, match="CoordinateSystem is required"):
-            recursive_coord_system_check(data, None, axis_count=None)
+            recursive_coord_system_check(data)
 
     def test_recursive_coord_system_check_object_without_transforms(self):
         """Test recursive_coord_system_check with object without transforms (should not require coordinate system)"""
@@ -277,21 +222,7 @@ class TestRecursiveCoordSystemCheck:
         data = ObjectWithoutTransforms(coordinate_system_name=self.coordinate_system_name, some_field="test_value")
 
         # Should not raise any exception even with None coordinate_system_name and axis_count
-        recursive_coord_system_check(data, None, axis_count=0)
-
-    def test_system_check_helper_object_without_transforms(self):
-        """Test _system_check_helper with object without transforms (should not require coordinate system)"""
-
-        class ObjectWithoutTransforms(DataModel):
-            """Object without any transform components"""
-
-            coordinate_system_name: str
-            some_field: str
-
-        data = ObjectWithoutTransforms(coordinate_system_name=self.coordinate_system_name, some_field="test_value")
-
-        # Should not raise any exception even with None coordinate_system_name and axis_count
-        _system_check_helper(data, None, axis_count=0)
+        recursive_coord_system_check(data)
 
     def test_mixed_objects_with_and_without_transforms(self):
         """Test with a mix of objects with and without transforms"""
@@ -319,7 +250,7 @@ class TestRecursiveCoordSystemCheck:
         )
 
         # Should pass validation - only the object with transforms is checked
-        recursive_coord_system_check(container, self.coordinate_system_name, axis_count=2)
+        recursive_coord_system_check(container, _coordinate_context(self.coordinate_system_name, 2))
 
 
 @pytest.mark.parametrize("system_name", ["ARI", "", "NONEXISTENT"])
@@ -333,7 +264,7 @@ def test_section_requires_exact_system_name(system_name):
         thickness_unit=SizeUnit.MM,
     )
     with pytest.raises(ValueError, match="System name mismatch"):
-        recursive_coord_system_check(section, "BREGMA_ARI", 3)
+        recursive_coord_system_check(section, _coordinate_context("BREGMA_ARI", 3))
 
 
 @pytest.mark.parametrize("field_name", ["start_coordinate", "end_coordinate"])
@@ -347,7 +278,7 @@ def test_section_checks_coordinate_dimensions(field_name):
     )
     values[field_name] = Translation(translation=[0, 0])
     with pytest.raises(ValueError, match="Axis count mismatch"):
-        recursive_coord_system_check(PlanarSection(**values), "BREGMA_ARI", 3)
+        recursive_coord_system_check(PlanarSection(**values), _coordinate_context("BREGMA_ARI", 3))
 
 
 @pytest.mark.parametrize(
@@ -367,7 +298,7 @@ def test_injection_checks_nested_transform_lists(system_name, axis_count, coordi
         dynamics=[InjectionDynamics(profile=InjectionProfile.BOLUS, volume=1, volume_unit=VolumeUnit.UL)],
     )
     with pytest.raises(ValueError, match=error):
-        recursive_coord_system_check(injection, system_name, axis_count)
+        recursive_coord_system_check(injection, _coordinate_context(system_name, axis_count))
 
 
 @pytest.mark.parametrize(
@@ -388,13 +319,17 @@ def test_device_transform_dimensions(transform):
         transform: list[Translation | Rotation | Scale | Affine]
 
     with pytest.raises(ValueError, match="Axis count mismatch"):
-        recursive_coord_system_check(Config(device_name="probe", transform=[transform]), "BREGMA_ARI", 3)
+        recursive_coord_system_check(
+            Config(device_name="probe", transform=[transform]), _coordinate_context("BREGMA_ARI", 3)
+        )
 
 
 def test_measured_coordinate_dictionary():
     """Measured coordinates inside mappings retain their containing frame."""
     with pytest.raises(ValueError, match="Axis count mismatch"):
-        recursive_coord_system_check({"lambda": Translation(translation=[-4.1, 0])}, "BREGMA_ARI", 3)
+        recursive_coord_system_check(
+            {"lambda": Translation(translation=[-4.1, 0])}, _coordinate_context("BREGMA_ARI", 3)
+        )
 
 
 def test_local_and_atlas_coordinate_frames():
@@ -404,19 +339,15 @@ def test_local_and_atlas_coordinate_frames():
         local_coordinate_system=BREGMA_ARI,
         local_axis_positions=Translation(translation=[0, 0, 0]),
     )
-    recursive_coord_system_check(manipulator, None, None)
-    recursive_coord_system_check(
-        AtlasCoordinate(translation=[0, 0, 0], coordinate_system=AtlasLibrary.CCFv3_10um), None, None
-    )
+    recursive_coord_system_check(manipulator)
+    recursive_coord_system_check(AtlasCoordinate(translation=[0, 0, 0], coordinate_system=AtlasLibrary.CCFv3_10um))
     recursive_coord_system_check(
         Translation(translation=[0, 0, 1], reference_coordinate_system=ReferenceCoordinateSystem.LOCAL),
-        "planar",
-        2,
-        local_coordinate_system=BREGMA_ARI,
+        _coordinate_context("planar", 2, local_coordinate_system=BREGMA_ARI),
     )
     with pytest.raises(ValueError, match="Axis count mismatch"):
         recursive_coord_system_check(
-            Translation(translation=[0, 0, 1]), "planar", 2, local_coordinate_system=BREGMA_ARI
+            Translation(translation=[0, 0, 1]), _coordinate_context("planar", 2, local_coordinate_system=BREGMA_ARI)
         )
 
 

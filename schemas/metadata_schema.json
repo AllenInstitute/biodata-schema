@@ -749,11 +749,11 @@
                      "$ref": "#/$defs/CoordinateSystem"
                   },
                   {
-                     "type": "null"
+                     "const": "NotApplicable",
+                     "type": "string"
                   }
                ],
-               "default": null,
-               "description": "Origin and axis definitions for determining the configured position of devices during acquisition. Required when coordinates are provided within the Acquisition",
+               "description": "Origin and axis definitions for determining the configured position of devices during acquisition. Use 'NotApplicable' when no coordinate data are present",
                "title": "Global coordinate system"
             },
             "calibrations": {
@@ -851,6 +851,7 @@
             "acquisition_start_time",
             "acquisition_end_time",
             "acquisition_type",
+            "global_coordinate_system",
             "data_streams"
          ],
          "title": "Acquisition",
@@ -21147,8 +21148,16 @@
                "title": "Calibrations"
             },
             "global_coordinate_system": {
-               "$ref": "#/$defs/CoordinateSystem",
-               "description": "Origin and axis definitions for determining the position of the instrument's components",
+               "anyOf": [
+                  {
+                     "$ref": "#/$defs/CoordinateSystem"
+                  },
+                  {
+                     "const": "NotApplicable",
+                     "type": "string"
+                  }
+               ],
+               "description": "Origin and axis definitions for determining the position of the instrument's components, or 'NotApplicable' when no coordinate data are present",
                "title": "Global coordinate system"
             },
             "temperature_control": {
@@ -35023,11 +35032,15 @@
                      "$ref": "#/$defs/Atlas"
                   },
                   {
+                     "const": "NotApplicable",
+                     "type": "string"
+                  },
+                  {
                      "type": "null"
                   }
                ],
                "default": null,
-               "description": "Only required if different from the Procedures.global_coordinate_system",
+               "description": "Overrides Procedures.global_coordinate_system when different; use 'NotApplicable' when this sectioning contains no coordinate data",
                "title": "Sectioning global coordinate system"
             },
             "section_orientation": {
@@ -37407,11 +37420,11 @@
                      "$ref": "#/$defs/CoordinateSystem"
                   },
                   {
-                     "type": "null"
+                     "const": "NotApplicable",
+                     "type": "string"
                   }
                ],
-               "default": null,
-               "description": "Origin and axis definitions for determining the configured position of devices implanted during procedures. Required when coordinates are provided within the Procedures",
+               "description": "Origin and axis definitions for determining the configured position of devices implanted during procedures. Use 'NotApplicable' when no coordinate data are present",
                "title": "Global Coordinate System"
             },
             "notes": {
@@ -37428,7 +37441,8 @@
             }
          },
          "required": [
-            "subject_id"
+            "subject_id",
+            "global_coordinate_system"
          ],
          "title": "Procedures",
          "type": "object"
@@ -41968,11 +41982,15 @@
                      "$ref": "#/$defs/CoordinateSystem"
                   },
                   {
+                     "const": "NotApplicable",
+                     "type": "string"
+                  },
+                  {
                      "type": "null"
                   }
                ],
                "default": null,
-               "description": "Only required when the Surgery.global_coordinate_system is different from the Procedures.global_coordinate_system",
+               "description": "Overrides Procedures.global_coordinate_system when different; use 'NotApplicable' when this surgery contains no coordinate data",
                "title": "Surgery global coordinate system"
             },
             "measured_coordinates": {

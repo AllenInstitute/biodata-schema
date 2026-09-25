@@ -15,7 +15,6 @@ from biodata_schema.core.acquisition import Acquisition
 from biodata_schema.core.instrument import Instrument
 from biodata_schema.core.processing import DataProcess, ProcessName, ProcessStage
 from examples.exaspim_acquisition import acq
-from tests.coordinate_systems import BREGMA_ARI
 
 
 class TestImaging:
@@ -62,7 +61,7 @@ class TestImaging:
         i = Instrument(
             instrument_id="room_exaSPIM1-1_20231004",
             modalities=[Modality.SPIM],
-            global_coordinate_system=BREGMA_ARI,
+            global_coordinate_system="NotApplicable",
             modification_date=datetime.now().date(),
             components=[objective, laser, scan_stage],
         )
@@ -76,7 +75,7 @@ class TestImaging:
                 instrument_id="room_exaSPIM1-1_20231004",
                 modalities=[Modality.SPIM],
                 modification_date=datetime(2020, 10, 10, 0, 0, 0).date(),
-                global_coordinate_system=BREGMA_ARI,
+                global_coordinate_system="NotApplicable",
                 components=[],
             )
 

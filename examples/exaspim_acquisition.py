@@ -129,6 +129,7 @@ acq = Acquisition(
     experimenters=["John Smith"],
     specimen_id="123456-123",
     subject_id="123456",
+    global_coordinate_system=SPIM_RPI,
     instrument_id="exaSPIM1",
     maintenance=[
         Maintenance(

@@ -243,7 +243,7 @@ class TestComposability:
         assert combined.subject_procedures[3].start_date == self.procedures_time1.date()
 
         # Test combining with different subject IDs raises ValueError
-        p3 = Procedures(subject_id="different_id")
+        p3 = Procedures(subject_id="different_id", global_coordinate_system="NotApplicable")
         with pytest.raises(ValueError):
             _ = p1 + p3
 

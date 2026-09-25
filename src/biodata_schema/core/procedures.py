@@ -5,7 +5,7 @@ from typing import List, Literal, Optional
 from pydantic import Field, SkipValidation, model_validator
 
 from biodata_schema.base import DataCoreModel, DiscriminatedList
-from biodata_schema.components.coordinates import CoordinateSystem
+from biodata_schema.components.coordinates import CoordinateSystemOrNotApplicable
 from biodata_schema.components.injection_procedures import Injection
 from biodata_schema.components.specimen_procedures import SpecimenProcedure
 from biodata_schema.components.subject_procedures import (
@@ -39,12 +39,12 @@ class Procedures(DataCoreModel):
     )
 
     # Coordinate system
-    global_coordinate_system: Optional[CoordinateSystem] = Field(
-        default=None,
+    global_coordinate_system: CoordinateSystemOrNotApplicable = Field(
+        ...,
         title="Global Coordinate System",
         description=(
             "Origin and axis definitions for determining the configured position of devices implanted during"
-            " procedures. Required when coordinates are provided within the Procedures"
+            " procedures. Use 'NotApplicable' when no coordinate data are present"
         ),
     )
 

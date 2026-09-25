@@ -43,7 +43,7 @@ perfusion = procedures.Surgery(
     start_date=date(2022, 11, 17),
     experimenters=["LAS"],
     ethics_review_id="2234",
-    global_coordinate_system=BREGMA_ARI,
+    global_coordinate_system="NotApplicable",
     procedures=[
         Perfusion(
             protocol_id="dx.doi.org/10.17504/protocols.io.8epv51bejl1b/v6",
@@ -95,6 +95,7 @@ embedding = procedures.SpecimenProcedure(
 
 all_procedures = procedures.Procedures(
     subject_id=specimen_id,
+    global_coordinate_system="NotApplicable",
     subject_procedures=[
         perfusion,
     ],

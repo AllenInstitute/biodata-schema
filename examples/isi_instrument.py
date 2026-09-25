@@ -14,7 +14,7 @@ The rig consists of:
 import argparse
 from datetime import date
 
-from biodata_models.coordinates import AnatomicalRelative, AxisName, Direction, Origin
+from biodata_models.coordinates import AnatomicalRelative
 from biodata_models.devices import (
     CameraChroma,
     CameraTarget,
@@ -26,7 +26,6 @@ from biodata_models.modalities import Modality
 from biodata_models.organizations import Organization
 from biodata_models.units import SizeUnit
 
-from biodata_schema.components.coordinates import Axis, CoordinateSystem
 from biodata_schema.components.devices import (
     Camera,
     CameraAssembly,
@@ -40,17 +39,6 @@ from biodata_schema.components.devices import (
     MotorizedStage,
 )
 from biodata_schema.core.instrument import Instrument
-
-BREGMA_ARI = CoordinateSystem(
-    name="BREGMA_ARI",
-    origin=Origin.BREGMA,
-    axis_unit=SizeUnit.MM,
-    axes=[
-        Axis(name=AxisName.AP, direction=Direction.PA),
-        Axis(name=AxisName.ML, direction=Direction.LR),
-        Axis(name=AxisName.SI, direction=Direction.SI),
-    ],
-)
 
 acquisition_computer = Computer(
     name="Acquisition Computer",
@@ -225,7 +213,7 @@ inst = Instrument(
     instrument_id="ISIV.1",
     modification_date=date(2026, 5, 15),
     modalities=[Modality.ISI],
-    global_coordinate_system=BREGMA_ARI,
+    global_coordinate_system="NotApplicable",
     temperature_control=True,
     notes="",
     components=[

@@ -358,7 +358,7 @@ instrument = Instrument(
     location="443",
     instrument_id="SLAP2_1_VCO_1",
     modification_date=datetime.now().date(),
-    global_coordinate_system=BREGMA_ARI,
+    global_coordinate_system="NotApplicable",
     modalities=[Modality.SLAP2, Modality.BEHAVIOR, Modality.BEHAVIOR_VIDEOS],
     notes=(
         "Devices and connections not currently directly controlled or read out by"

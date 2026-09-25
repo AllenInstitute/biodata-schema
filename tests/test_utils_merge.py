@@ -4,6 +4,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from biodata_schema.components.coordinates import NOT_APPLICABLE_COORDINATE_SYSTEM
 from biodata_schema.utils.merge import (
     merge_coordinate_systems,
     merge_notes,
@@ -225,6 +226,22 @@ class TestMergeCoordinateSystems:
         """Test when both inputs are the same"""
 
         assert merge_coordinate_systems(self.CSA, self.CSA) == self.CSA
+
+    def test_real_coordinate_system_wins_over_not_applicable(self):
+        """A defined frame takes precedence over a NotApplicable declaration."""
+
+        assert merge_coordinate_systems(self.CSA, NOT_APPLICABLE_COORDINATE_SYSTEM) == self.CSA
+        assert merge_coordinate_systems(NOT_APPLICABLE_COORDINATE_SYSTEM, self.CSA) == self.CSA
+
+    def test_not_applicable_is_preserved_without_a_real_frame(self):
+        """NotApplicable is retained when neither input supplies a frame."""
+
+        assert merge_coordinate_systems(None, NOT_APPLICABLE_COORDINATE_SYSTEM) == NOT_APPLICABLE_COORDINATE_SYSTEM
+        assert merge_coordinate_systems(NOT_APPLICABLE_COORDINATE_SYSTEM, None) == NOT_APPLICABLE_COORDINATE_SYSTEM
+        assert (
+            merge_coordinate_systems(NOT_APPLICABLE_COORDINATE_SYSTEM, NOT_APPLICABLE_COORDINATE_SYSTEM)
+            == NOT_APPLICABLE_COORDINATE_SYSTEM
+        )
 
     def test_both_different(self):
         """Test when both inputs are different"""

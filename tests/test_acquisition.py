@@ -69,6 +69,7 @@ class TestAcquisition:
         with pytest.raises(ValidationError) as context:
             Acquisition(
                 subject_id="123456",
+                global_coordinate_system="NotApplicable",
                 acquisition_start_time=start,
                 acquisition_end_time=end,
                 acquisition_type="Test",
@@ -151,6 +152,7 @@ class TestAcquisition:
                 acquisition_start_time=datetime.now(),
                 acquisition_end_time=datetime.now(),
                 subject_id="123456",
+                global_coordinate_system="NotApplicable",
                 acquisition_type="Test",
                 instrument_id="1234",
                 subject_details=AcquisitionSubjectDetails(
@@ -187,6 +189,7 @@ class TestAcquisition:
             acquisition_start_time=datetime.now(),
             acquisition_end_time=datetime.now(),
             subject_id="123456",
+            global_coordinate_system="NotApplicable",
             specimen_id="SP123456",
             acquisition_type="Test",
             instrument_id="1234",

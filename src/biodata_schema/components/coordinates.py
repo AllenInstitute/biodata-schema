@@ -1,7 +1,7 @@
 """Classes to define device positions, orientations, and coordinates"""
 
 from enum import Enum
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 from biodata_models.atlas import AtlasName
 from biodata_models.coordinates import AxisName, Direction, Origin
@@ -155,6 +155,11 @@ class Atlas(CoordinateSystem):
     size_unit: SizeUnit = Field(default=SizeUnit.PX, title="Size unit")
     resolution: List[float] = Field(..., title="Resolution")
     resolution_unit: SizeUnit = Field(..., title="Resolution unit")
+
+
+NOT_APPLICABLE_COORDINATE_SYSTEM = "NotApplicable"
+CoordinateSystemOrNotApplicable = CoordinateSystem | Literal["NotApplicable"]
+CoordinateSystemOrAtlasOrNotApplicable = CoordinateSystem | Atlas | Literal["NotApplicable"]
 
 
 class AtlasCoordinate(Translation):
