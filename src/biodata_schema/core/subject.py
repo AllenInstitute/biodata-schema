@@ -10,7 +10,7 @@ from biodata_schema.components.subjects import (
     CellLine,
     HumanSubject,
     MouseSubject,
-    NonHumanPrimateSubject
+    NonHumanPrimateSubject,
 )
 
 
