@@ -34,7 +34,9 @@ def _model_types(annotation: Any) -> Iterator[type[BaseModel]]:
 
 def _is_draft_requirement(field_info: Any) -> bool:
     """Return whether a Pydantic field has the draft-requirement marker."""
-    return any(metadata is DraftRequirement or isinstance(metadata, DraftRequirement) for metadata in field_info.metadata)
+    return any(
+        metadata is DraftRequirement or isinstance(metadata, DraftRequirement) for metadata in field_info.metadata
+    )
 
 
 def _has_draft_requirements(model: type[BaseModel], visited: set[type[BaseModel]] | None = None) -> bool:
@@ -74,11 +76,7 @@ def _project_model_schema(model: type[BaseModel], definitions: dict[str, dict]) 
             required.append(output_field_name)
             continue
 
-        child_models = [
-            child
-            for child in _model_types(field_info.annotation)
-            if _has_draft_requirements(child)
-        ]
+        child_models = [child for child in _model_types(field_info.annotation) if _has_draft_requirements(child)]
         if not child_models:
             continue
 

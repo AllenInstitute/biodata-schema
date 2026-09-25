@@ -297,6 +297,31 @@ class Metadata(DataCoreModel):
         return self
 
     @model_validator(mode="after")
+    def validate_subject_id_consistency(self):
+        """Validator to ensure procedures, acquisition, and data_description subject_id match subject.subject_id"""
+
+        if not self.subject:
+            return self
+
+        expected = self.subject.subject_id
+        mismatches = []
+        # getattr guards against objects built with model_construct() that omit subject_id
+        procedures_subject_id = getattr(self.procedures, "subject_id", None)
+        if procedures_subject_id is not None and procedures_subject_id != expected:
+            mismatches.append(f"procedures.subject_id={procedures_subject_id}")
+        acquisition_subject_id = getattr(self.acquisition, "subject_id", None)
+        if acquisition_subject_id is not None and acquisition_subject_id != expected:
+            mismatches.append(f"acquisition.subject_id={acquisition_subject_id}")
+        data_description_subject_id = getattr(self.data_description, "subject_id", None)
+        if data_description_subject_id is not None and data_description_subject_id != expected:
+            mismatches.append(f"data_description.subject_id={data_description_subject_id}")
+
+        if mismatches:
+            raise ValueError(f"subject_id mismatch with subject.subject_id={expected}: {', '.join(mismatches)}")
+
+        return self
+
+    @model_validator(mode="after")
     def validate_training_protocol_references(self):
         """Validate that training_protocol_name in StimulusEpoch matches a TrainingProtocol in procedures"""
 
