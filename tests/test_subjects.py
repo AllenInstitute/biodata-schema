@@ -266,9 +266,8 @@ class TestCellLine:
                 registry=Registry.FPBASE,
                 registry_identifier="R9NL8",
             ),
-            clone_number=1,   
+            clone_number=1,
         )
 
-        assert subject.cell_structure=="cytoskeleton"
-        assert subject.species==Species.HUMAN
-
+        assert subject.cell_structure == "cytoskeleton"
+        assert subject.species == Species.HUMAN
