@@ -5,7 +5,7 @@ from datetime import time
 from enum import Enum
 from typing import Annotated, List, Optional
 
-from biodata_models.cell_line import CellLine
+from biodata_models.cell_line import CellLineModel
 from biodata_models.organizations import Organization
 from biodata_models.pid_names import PIDName
 from biodata_models.species import Species, Strain
@@ -202,7 +202,7 @@ class CellLine(DataModel):
     """Description of a cultured cell line"""
 
     cell_line_name: str = Field(..., title="Cell line name")
-    cell_line_type: CellLine = Field(..., title="Cell line type")
+    cell_line_type: CellLineModel = Field(..., title="Cell line type")
     species: Species.ONE_OF = Field(..., title="Species")
     protein: PIDName = Field(..., title="Protein labeled", description="Protein uses UniProt registry")
     gene: PIDName = Field(..., title="Gene targeted", description="Gene uses NCBI taxonomy")
