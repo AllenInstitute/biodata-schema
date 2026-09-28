@@ -197,6 +197,7 @@ class CalibrationObject(DataModel):
         default=None, title="Objects", description="For calibration objects that are built up from one or more devices."
     )
 
+
 class CellLine(DataModel):
     """Description of a cultured cell line"""
 
@@ -205,7 +206,6 @@ class CellLine(DataModel):
     species: Species.ONE_OF = Field(..., title="Species")
     protein: PIDName = Field(..., title="Protein labeled", description="Protein uses UniProt registry")
     gene: PIDName = Field(..., title="Gene targeted", description="Gene uses NCBI taxonomy")
-    cell_structure: str = Field(..., title="Cell structure protein found in") # TODO: ontology or enum in model?
+    cell_structure: str = Field(..., title="Cell structure protein found in")  # TODO: ontology or enum in model?
     fluorescent_protein: PIDName = Field(..., title="Fluorescent protein", desciption="Uses FPbase")
     clone_number: Optional[int] = Field(default=None, title="Clone number")
-    
