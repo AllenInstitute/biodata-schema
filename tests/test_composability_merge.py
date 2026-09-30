@@ -148,7 +148,7 @@ class TestComposability:
         assert merged_acq.acquisition_start_time == t
         assert merged_acq.acquisition_end_time == t
         assert merged_acq.acquisition_type == "ExaSPIM"
-        assert merged_acq.instrument_id == acq1.instrument_id
+        assert merged_acq.instrument_name == acq1.instrument_name
 
         empty_type_acq = self.exaspim_acquisition.model_copy()
         empty_type_acq.acquisition_type = ""
@@ -202,17 +202,17 @@ class TestComposability:
         acq1.schema_version = acq1_orig_schema_v
 
         # Test incompatible subject IDs
-        acq2.subject_id = "different_id"
+        acq2.subject_name = "different_id"
         with pytest.raises(ValueError) as context:
             acq1 + acq2
         assert "Cannot combine Acquisition objects that differ in key fields" in repr(context.value)
 
-        # Test instrument_id merging
-        acq2.subject_id = acq1.subject_id
-        acq1.instrument_id = "instrument_zebra"
-        acq2.instrument_id = "instrument_apple"
+        # Test instrument_name merging
+        acq2.subject_name = acq1.subject_name
+        acq1.instrument_name = "instrument_zebra"
+        acq2.instrument_name = "instrument_apple"
         merged_acq_instruments = acq1 + acq2
-        assert merged_acq_instruments.instrument_id == "instrument_apple_instrument_zebra"
+        assert merged_acq_instruments.instrument_name == "instrument_apple_instrument_zebra"
 
         # Test incompatible SubjectDetails
         acq1 = self.exaspim_acquisition.model_copy()
@@ -235,7 +235,7 @@ class TestComposability:
 
         combined = p1 + p2
 
-        assert combined.subject_id == "625100"
+        assert combined.subject_name == "625100"
         assert len(combined.subject_procedures) == 4
         assert combined.subject_procedures[0].start_date == self.procedures_time0.date()
         assert combined.subject_procedures[1].start_date == self.procedures_time1.date()
@@ -243,7 +243,7 @@ class TestComposability:
         assert combined.subject_procedures[3].start_date == self.procedures_time1.date()
 
         # Test combining with different subject IDs raises ValueError
-        p3 = Procedures(subject_id="different_id")
+        p3 = Procedures(subject_name="different_id")
         with pytest.raises(ValueError):
             _ = p1 + p3
 

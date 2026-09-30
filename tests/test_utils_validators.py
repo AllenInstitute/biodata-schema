@@ -48,16 +48,16 @@ class TestCompatibilityCheck:
     """Tests compatibility checks"""
 
     def test_subj_spec_valid(self):
-        """Test subject_id specimen_id valid"""
-        subject_id = "123456"
-        specimen_id = "123456-valid"
-        assert subject_specimen_id_compatibility(subject_id, specimen_id)
+        """Test subject_name specimen_name valid"""
+        subject_name = "123456"
+        specimen_name = "123456-valid"
+        assert subject_specimen_id_compatibility(subject_name, specimen_name)
 
     def test_subj_spec_invalid(self):
-        """Test invalid subject_id specimen_id"""
-        subject_id = "123456"
-        specimen_id = "invalid"
-        assert not subject_specimen_id_compatibility(subject_id, specimen_id)
+        """Test invalid subject_name specimen_name"""
+        subject_name = "123456"
+        specimen_name = "invalid"
+        assert not subject_specimen_id_compatibility(subject_name, specimen_name)
 
 
 class TranslationWrapper(DataModel):

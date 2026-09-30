@@ -46,7 +46,7 @@ class TestInstrumentAcquisitionCompatibility:
     def test_compare_instrument_id_error(self):
         """Tests that an error is raised when instrument ids do not match"""
         ophys_acquisition = self.ophys_acquisition.model_copy()
-        ophys_acquisition.instrument_id = "wrong_id"
+        ophys_acquisition.instrument_name = "wrong_id"
         with pytest.raises(ValueError) as context:
             InstrumentAcquisitionCompatibility(
                 instrument=self.ophys_instrument, acquisition=ophys_acquisition

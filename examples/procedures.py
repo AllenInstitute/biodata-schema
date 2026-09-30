@@ -161,7 +161,7 @@ surgery1 = Surgery(
 )
 
 p = Procedures(
-    subject_id="625100",
+    subject_name="625100",
     subject_procedures=[
         surgery1,
         Surgery(

@@ -38,12 +38,12 @@
                "description": "DOI for protocols.io",
                "title": "Protocol ID"
             },
-            "subject_id": {
+            "subject_name": {
                "description": "Unique identifier for the subject",
                "title": "Subject ID",
                "type": "string"
             },
-            "specimen_id": {
+            "specimen_name": {
                "anyOf": [
                   {
                      "type": "string"
@@ -59,7 +59,7 @@
                   }
                ],
                "default": null,
-               "description": "Required for in vitro modalities. Standard format is {subject_id} with a _### suffix, as needed",
+               "description": "Required for in vitro modalities. Standard format is {subject_name} with a _### suffix, as needed",
                "title": "Specimen ID"
             },
             "acquisition_start_time": {
@@ -713,7 +713,7 @@
                "default": null,
                "title": "Ethics review ID"
             },
-            "instrument_id": {
+            "instrument_name": {
                "anyOf": [
                   {
                      "type": "string"
@@ -723,7 +723,7 @@
                   }
                ],
                "default": null,
-               "description": "Should match the Instrument.instrument_id. Required when instrument metadata is available.",
+               "description": "Should match the Instrument.instrument_name. Required when instrument metadata is available.",
                "title": "Instrument ID"
             },
             "acquisition_type": {
@@ -847,7 +847,7 @@
             }
          },
          "required": [
-            "subject_id",
+            "subject_name",
             "acquisition_start_time",
             "acquisition_end_time",
             "acquisition_type",
@@ -3350,7 +3350,7 @@
                "title": "Object Type",
                "type": "string"
             },
-            "maternal_id": {
+            "maternal_name": {
                "title": "Maternal specimen ID",
                "type": "string"
             },
@@ -3358,7 +3358,7 @@
                "title": "Maternal genotype",
                "type": "string"
             },
-            "paternal_id": {
+            "paternal_name": {
                "title": "Paternal specimen ID",
                "type": "string"
             },
@@ -3368,9 +3368,9 @@
             }
          },
          "required": [
-            "maternal_id",
+            "maternal_name",
             "maternal_genotype",
-            "paternal_id",
+            "paternal_name",
             "paternal_genotype"
          ],
          "title": "BreedingInfo",
@@ -8304,7 +8304,7 @@
                "$ref": "#/$defs/License",
                "default": "CC-BY-4.0"
             },
-            "subject_id": {
+            "subject_name": {
                "anyOf": [
                   {
                      "pattern": "^[^_]+$",
@@ -8350,7 +8350,7 @@
                   }
                ],
                "default": null,
-               "description": "When left blank, a name will be generated based on subject_id and creation_time. Conventionally also used as the name of the data folder.",
+               "description": "When left blank, a name will be generated based on subject_name and creation_time. Conventionally also used as the name of the data folder.",
                "title": "Data asset name"
             },
             "institution": {
@@ -21003,7 +21003,7 @@
                "description": "Location of the instrument",
                "title": "Location"
             },
-            "instrument_id": {
+            "instrument_name": {
                "description": "Unique instrument identifier",
                "title": "Instrument ID",
                "type": "string"
@@ -21361,7 +21361,7 @@
             }
          },
          "required": [
-            "instrument_id",
+            "instrument_name",
             "modification_date",
             "modalities",
             "global_coordinate_system",
@@ -34585,7 +34585,7 @@
                "title": "Protocol ID"
             },
             "output_specimen_ids": {
-               "description": "IDs of specimens resulting from this procedure. Whole brains can use the {subject_id}, partial sections should always include a suffix {subject_id}_###",
+               "description": "IDs of specimens resulting from this procedure. Whole brains can use the {subject_name}, partial sections should always include a suffix {subject_name}_###",
                "items": {
                   "type": "string"
                },
@@ -37348,7 +37348,7 @@
                "title": "Schema Version",
                "type": "string"
             },
-            "subject_id": {
+            "subject_name": {
                "description": "Unique identifier for the subject of data acquisition",
                "title": "Subject ID",
                "type": "string"
@@ -37428,7 +37428,7 @@
             }
          },
          "required": [
-            "subject_id"
+            "subject_name"
          ],
          "title": "Procedures",
          "type": "object"
@@ -40485,7 +40485,7 @@
                "$ref": "#/$defs/Slap2AcquisitionType",
                "title": "SLAP2 ROI acquisition type"
             },
-            "specimen_id": {
+            "specimen_name": {
                "anyOf": [
                   {
                      "type": "string"
@@ -40495,7 +40495,7 @@
                   }
                ],
                "default": null,
-               "description": "Unique index identifying the cell being imaged: <subject_id>_###",
+               "description": "Unique index identifying the cell being imaged: <subject_name>_###",
                "title": "Specimen ID"
             },
             "fov_index": {
@@ -41405,7 +41405,7 @@
                "default": null,
                "title": "Procedure name"
             },
-            "specimen_id": {
+            "specimen_name": {
                "anyOf": [
                   {
                      "type": "string"
@@ -41519,7 +41519,7 @@
          },
          "required": [
             "procedure_type",
-            "specimen_id",
+            "specimen_name",
             "start_date",
             "end_date"
          ],
@@ -41792,7 +41792,7 @@
                "title": "Schema Version",
                "type": "string"
             },
-            "subject_id": {
+            "subject_name": {
                "description": "Unique identifier for the subject of data acquisition",
                "title": "Subject ID",
                "type": "string"
@@ -41837,7 +41837,7 @@
             }
          },
          "required": [
-            "subject_id",
+            "subject_name",
             "subject_details"
          ],
          "title": "Subject",

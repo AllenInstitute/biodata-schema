@@ -14,7 +14,7 @@ class Subject(DataCoreModel):
     _DESCRIBED_BY_URL = DataCoreModel._DESCRIBED_BY_BASE_URL.default + "biodata_schema/core/subject.py"
     describedBy: str = Field(default=_DESCRIBED_BY_URL, json_schema_extra={"const": _DESCRIBED_BY_URL})
     schema_version: SkipValidation[Literal["3.0.2"]] = Field(default="3.0.2")
-    subject_id: str = Field(
+    subject_name: str = Field(
         ...,
         description="Unique identifier for the subject of data acquisition",
         title="Subject ID",

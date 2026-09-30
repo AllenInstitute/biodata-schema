@@ -6024,7 +6024,7 @@
                "$ref": "#/$defs/Slap2AcquisitionType",
                "title": "SLAP2 ROI acquisition type"
             },
-            "specimen_id": {
+            "specimen_name": {
                "anyOf": [
                   {
                      "type": "string"
@@ -6034,7 +6034,7 @@
                   }
                ],
                "default": null,
-               "description": "Unique index identifying the cell being imaged: <subject_id>_###",
+               "description": "Unique index identifying the cell being imaged: <subject_name>_###",
                "title": "Specimen ID"
             },
             "fov_index": {
@@ -12580,12 +12580,12 @@
          "description": "DOI for protocols.io",
          "title": "Protocol ID"
       },
-      "subject_id": {
+      "subject_name": {
          "description": "Unique identifier for the subject",
          "title": "Subject ID",
          "type": "string"
       },
-      "specimen_id": {
+      "specimen_name": {
          "anyOf": [
             {
                "type": "string"
@@ -12601,7 +12601,7 @@
             }
          ],
          "default": null,
-         "description": "Required for in vitro modalities. Standard format is {subject_id} with a _### suffix, as needed",
+         "description": "Required for in vitro modalities. Standard format is {subject_name} with a _### suffix, as needed",
          "title": "Specimen ID"
       },
       "acquisition_start_time": {
@@ -13255,7 +13255,7 @@
          "default": null,
          "title": "Ethics review ID"
       },
-      "instrument_id": {
+      "instrument_name": {
          "anyOf": [
             {
                "type": "string"
@@ -13265,7 +13265,7 @@
             }
          ],
          "default": null,
-         "description": "Should match the Instrument.instrument_id. Required when instrument metadata is available.",
+         "description": "Should match the Instrument.instrument_name. Required when instrument metadata is available.",
          "title": "Instrument ID"
       },
       "acquisition_type": {
@@ -13389,7 +13389,7 @@
       }
    },
    "required": [
-      "subject_id",
+      "subject_name",
       "acquisition_start_time",
       "acquisition_end_time",
       "acquisition_type",

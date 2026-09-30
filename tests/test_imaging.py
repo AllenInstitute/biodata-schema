@@ -60,7 +60,7 @@ class TestImaging:
         )
 
         i = Instrument(
-            instrument_id="room_exaSPIM1-1_20231004",
+            instrument_name="room_exaSPIM1-1_20231004",
             modalities=[Modality.SPIM],
             global_coordinate_system=BREGMA_ARI,
             modification_date=datetime.now().date(),
@@ -73,7 +73,7 @@ class TestImaging:
         """testing Modality SPIM requires components"""
         with pytest.raises(ValidationError) as e2:
             Instrument(
-                instrument_id="room_exaSPIM1-1_20231004",
+                instrument_name="room_exaSPIM1-1_20231004",
                 modalities=[Modality.SPIM],
                 modification_date=datetime(2020, 10, 10, 0, 0, 0).date(),
                 global_coordinate_system=BREGMA_ARI,

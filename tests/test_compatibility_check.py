@@ -21,7 +21,7 @@ class TestInstrumentAcquisitionCompatibility:
         self.mock_acquisition = MagicMock(spec=Acquisition)
 
         # Mock instrument attributes
-        self.mock_instrument.instrument_id = "instrument_1"
+        self.mock_instrument.instrument_name = "instrument_1"
 
         device0 = MagicMock(spec=Device)
         device0.name = "component_1"
@@ -33,7 +33,7 @@ class TestInstrumentAcquisitionCompatibility:
         self.mock_instrument.get_component_names.return_value = ["component_1", "component_2"]
 
         # Mock acquisition attributes
-        self.mock_acquisition.instrument_id = "instrument_1"
+        self.mock_acquisition.instrument_name = "instrument_1"
         self.mock_acquisition.data_streams = [MagicMock(active_devices=["component_1"])]
         self.mock_acquisition.stimulus_epochs = [MagicMock(active_devices=["component_2"])]
 
@@ -49,7 +49,7 @@ class TestInstrumentAcquisitionCompatibility:
 
     def test_compare_instrument_id_failure(self):
         """Test that instrument IDs mismatch raises ValueError."""
-        self.mock_acquisition.instrument_id = "instrument_2"
+        self.mock_acquisition.instrument_name = "instrument_2"
         checker = InstrumentAcquisitionCompatibility(self.mock_instrument, self.mock_acquisition)
         error = checker._compare_instrument_id()
         assert isinstance(error, ValueError)
@@ -77,7 +77,7 @@ class TestInstrumentAcquisitionCompatibility:
 
     def test_run_compatibility_check_failure(self):
         """Test that compatibility check raises ValueError when comparisons fail."""
-        self.mock_acquisition.instrument_id = "instrument_2"
+        self.mock_acquisition.instrument_name = "instrument_2"
         checker = InstrumentAcquisitionCompatibility(self.mock_instrument, self.mock_acquisition)
         with pytest.raises(ValueError) as context:
             checker.run_compatibility_check()

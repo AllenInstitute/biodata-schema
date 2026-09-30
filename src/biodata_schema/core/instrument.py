@@ -82,7 +82,7 @@ class Instrument(DataCoreModel):
 
     # instrument definition
     location: Optional[str] = Field(default=None, title="Location", description="Location of the instrument")
-    instrument_id: str = Field(
+    instrument_name: str = Field(
         ...,
         description="Unique instrument identifier",
         title="Instrument ID",
@@ -175,7 +175,7 @@ class Instrument(DataCoreModel):
         names = recursive_get_device_names(self.components)
 
         # Include the instrument ID as a valid name
-        names = names + [self.instrument_id]
+        names = names + [self.instrument_name]
 
         return names
 
@@ -370,8 +370,8 @@ class Instrument(DataCoreModel):
                 f"temperature_control: {self.temperature_control}/{other.temperature_control}"
             )
 
-        # Combine instrument_id
-        instrument_id = merge_str_alphabetical(self.instrument_id, other.instrument_id)
+        # Combine instrument_name
+        instrument_name = merge_str_alphabetical(self.instrument_name, other.instrument_name)
 
         # Combine modalities and sort
         combined_modalities = list(set(self.modalities + other.modalities))
@@ -394,7 +394,7 @@ class Instrument(DataCoreModel):
 
         return Instrument(
             location=self.location,
-            instrument_id=instrument_id,
+            instrument_name=instrument_name,
             modification_date=latest_modification_date,
             modalities=combined_modalities,
             calibrations=combined_calibrations,

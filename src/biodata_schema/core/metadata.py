@@ -140,7 +140,7 @@ class Metadata(DataCoreModel):
     def validate_subject_details_if_not_specimen(self):
         """Check that subject details are present if an in vivo experiment"""
 
-        if self.acquisition and not self.acquisition.specimen_id:
+        if self.acquisition and not self.acquisition.specimen_name:
             if not self.acquisition.subject_details:
                 raise ValueError("Acquisition.subject_details are required for in vivo experiments")
 
@@ -291,8 +291,8 @@ class Metadata(DataCoreModel):
             and self.subject.subject_details
             and isinstance(self.subject.subject_details, CalibrationObject)
         ):
-            if self.subject.subject_id != "calibration":
-                raise ValueError("CalibrationObject subject_id must be 'calibration'.")
+            if self.subject.subject_name != "calibration":
+                raise ValueError("CalibrationObject subject_name must be 'calibration'.")
 
         return self
 

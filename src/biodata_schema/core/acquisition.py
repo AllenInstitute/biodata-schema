@@ -381,11 +381,11 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
     schema_version: SkipValidation[Literal["3.0.0"]] = Field(default="3.0.0")
 
     # ID
-    subject_id: str = Field(default=..., title="Subject ID", description="Unique identifier for the subject")
-    specimen_id: Optional[Union[str, List[str]]] = Field(
+    subject_name: str = Field(default=..., title="Subject ID", description="Unique identifier for the subject")
+    specimen_name: Optional[Union[str, List[str]]] = Field(
         default=None,
         title="Specimen ID",
-        description="Required for in vitro modalities. Standard format is {subject_id} with a _### suffix, as needed",
+        description="Required for in vitro modalities. Standard format is {subject_name} with a _### suffix, as needed",
     )
 
     # Acquisition metadata
@@ -431,10 +431,10 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
         title="experimenter(s)",
     )
     ethics_review_id: Optional[List[str]] = Field(default=None, title="Ethics review ID")
-    instrument_id: Optional[str] = Field(
+    instrument_name: Optional[str] = Field(
         default=None,
         title="Instrument ID",
-        description="Should match the Instrument.instrument_id. Required when instrument metadata is available.",
+        description="Should match the Instrument.instrument_name. Required when instrument metadata is available.",
     )
     acquisition_type: str = Field(
         ...,
@@ -517,22 +517,22 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
     @model_validator(mode="after")
     def check_subject_specimen_id(self):
         """Check that the subject and specimen IDs match"""
-        if self.specimen_id and self.subject_id:
-            ids = self.specimen_id if isinstance(self.specimen_id, list) else [self.specimen_id]
+        if self.specimen_name and self.subject_name:
+            ids = self.specimen_name if isinstance(self.specimen_name, list) else [self.specimen_name]
             for sid in ids:
-                if not subject_specimen_id_compatibility(self.subject_id, sid):
-                    raise ValueError(f"Expected {self.subject_id} to appear in {sid}")
+                if not subject_specimen_id_compatibility(self.subject_name, sid):
+                    raise ValueError(f"Expected {self.subject_name} to appear in {sid}")
 
         return self
 
     @model_validator(mode="after")
     def instrument_id_required_for_data_streams(self):
-        """Require instrument_id when any standard DataStream is present"""
+        """Require instrument_name when any standard DataStream is present"""
         if not hasattr(self, "data_streams"):
             return self
         if any(isinstance(stream, DataStream) for stream in self.data_streams):
-            if not self.instrument_id:
-                raise ValueError("instrument_id is required when data_streams contains a DataStream")
+            if not self.instrument_name:
+                raise ValueError("instrument_name is required when data_streams contains a DataStream")
         return self
 
     @model_validator(mode="after")
@@ -544,7 +544,7 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
 
         for stream in self.data_streams:
             if any([modality.abbreviation in SPECIMEN_MODALITIES for modality in stream.modalities]):
-                if not self.specimen_id:
+                if not self.specimen_name:
                     raise ValueError(f"Specimen ID is required for modalities {stream.modalities}")
 
         return self
@@ -592,21 +592,21 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
         coordinate_system = merge_coordinate_systems(self.global_coordinate_system, other.global_coordinate_system)
 
         # Check for incompatible key fields
-        subj_check = self.subject_id != other.subject_id
-        spec_check = self.specimen_id != other.specimen_id
+        subj_check = self.subject_name != other.subject_name
+        spec_check = self.specimen_name != other.specimen_name
         exp_type_check = bool(self.acquisition_type and other.acquisition_type) and (
             self.acquisition_type != other.acquisition_type
         )
         if any([subj_check, spec_check, exp_type_check]):
             raise ValueError(
                 "Cannot combine Acquisition objects that differ in key fields:\n"
-                f"subject_id: {self.subject_id}/{other.subject_id}\n"
-                f"specimen_id: {self.specimen_id}/{other.specimen_id}\n"
+                f"subject_name: {self.subject_name}/{other.subject_name}\n"
+                f"specimen_name: {self.specimen_name}/{other.specimen_name}\n"
                 f"acquisition_type: {self.acquisition_type}/{other.acquisition_type}"
             )
 
-        # Combine instrument_id
-        instrument_id = merge_str_alphabetical(self.instrument_id, other.instrument_id)
+        # Combine instrument_name
+        instrument_name = merge_str_alphabetical(self.instrument_name, other.instrument_name)
 
         details_check = self.subject_details and other.subject_details
         if details_check:
@@ -640,12 +640,12 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
         acquisition_type = self.acquisition_type or other.acquisition_type
 
         return Acquisition(
-            subject_id=self.subject_id,
-            specimen_id=self.specimen_id,
+            subject_name=self.subject_name,
+            specimen_name=self.specimen_name,
             experimenters=experimenters,
             protocol_id=protocol_id,
             ethics_review_id=ethics_review_id,
-            instrument_id=instrument_id,
+            instrument_name=instrument_name,
             calibrations=calibrations,
             global_coordinate_system=coordinate_system,
             maintenance=maintenance,

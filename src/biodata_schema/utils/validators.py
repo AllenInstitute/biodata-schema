@@ -27,9 +27,9 @@ class TimeValidation(Enum):
     """Time should be before the end time."""
 
 
-def subject_specimen_id_compatibility(subject_id: str, specimen_id: str) -> bool:
-    """Check whether a subject_id and specimen_id are compatible"""
-    return subject_id in specimen_id
+def subject_specimen_id_compatibility(subject_name: str, specimen_name: str) -> bool:
+    """Check whether a subject_name and specimen_name are compatible"""
+    return subject_name in specimen_name
 
 
 def recursive_time_validation_check(data, acquisition_start_time=None, acquisition_end_time=None):

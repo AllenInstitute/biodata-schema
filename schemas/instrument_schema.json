@@ -32811,7 +32811,7 @@
          "description": "Location of the instrument",
          "title": "Location"
       },
-      "instrument_id": {
+      "instrument_name": {
          "description": "Unique instrument identifier",
          "title": "Instrument ID",
          "type": "string"
@@ -33169,7 +33169,7 @@
       }
    },
    "required": [
-      "instrument_id",
+      "instrument_name",
       "modification_date",
       "modalities",
       "global_coordinate_system",

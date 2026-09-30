@@ -69,7 +69,7 @@ def derive_data_description_from_raw(
         raise ValueError(f"Derived name({derived_name}) does not match allowed Regex pattern")
 
     return DataDescription(
-        subject_id=_get_or_default(data_description, "subject_id", kwargs),
+        subject_name=_get_or_default(data_description, "subject_name", kwargs),
         license=_get_or_default(data_description, "license", kwargs),
         creation_time=creation_time,
         tags=_get_or_default(data_description, "tags", kwargs),
@@ -134,7 +134,7 @@ def derive_data_description_from_derived(
         raise ValueError(f"Derived name({derived_name}) does not match allowed Regex pattern")
 
     return DataDescription(
-        subject_id=_get_or_default(data_description, "subject_id", kwargs),
+        subject_name=_get_or_default(data_description, "subject_name", kwargs),
         license=_get_or_default(data_description, "license", kwargs),
         creation_time=creation_time,
         tags=_get_or_default(data_description, "tags", kwargs),
@@ -233,7 +233,7 @@ def derive_data_description_analyzed(
         raise ValueError(f"Analyzed name({analyzed_name}) does not match allowed Regex pattern")
 
     return DataDescription(
-        subject_id=_get_or_default(data_description, "subject_id", kwargs),
+        subject_name=_get_or_default(data_description, "subject_name", kwargs),
         license=_get_or_default(data_description, "license", kwargs),
         creation_time=creation_time,
         tags=_get_or_default(data_description, "tags", kwargs),
@@ -266,9 +266,9 @@ def _get_unique_subject_ids(metadata_list) -> List[str]:
     subject_ids = set()
     for m in metadata_list:
         if m.subject:
-            subject_ids.add(m.subject.subject_id)
-        elif m.data_description and m.data_description.subject_id:
-            subject_ids.add(m.data_description.subject_id)
+            subject_ids.add(m.subject.subject_name)
+        elif m.data_description and m.data_description.subject_name:
+            subject_ids.add(m.data_description.subject_name)
     return list(subject_ids)
 
 

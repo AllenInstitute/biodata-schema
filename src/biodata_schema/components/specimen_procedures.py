@@ -126,7 +126,7 @@ class SpecimenProcedure(ProtocolListMixin, DataModel):
 
     procedure_type: SpecimenProcedureType = Field(..., title="Procedure type")
     procedure_name: Optional[str] = Field(default=None, title="Procedure name")
-    specimen_id: Union[str, List[str]] = Field(..., title="Specimen ID(s)")
+    specimen_name: Union[str, List[str]] = Field(..., title="Specimen ID(s)")
     start_date: date = Field(..., title="Start date")
     end_date: date = Field(..., title="End date")
     experimenters: List[str] = Field(

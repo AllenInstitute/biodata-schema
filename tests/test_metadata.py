@@ -65,7 +65,7 @@ class TestMetadata:
         cls.spim_instrument = spim_inst
 
         subject = Subject(
-            subject_id="123456",
+            subject_name="123456",
             subject_details=MouseSubject(
                 species=Species.HOUSE_MOUSE,
                 strain=Strain.C57BL_6J,
@@ -73,9 +73,9 @@ class TestMetadata:
                 date_of_birth=datetime(2022, 11, 22, 8, 43, 00, tzinfo=timezone.utc).date(),
                 source=Organization.AI,
                 breeding_info=BreedingInfo(
-                    maternal_id="546543",
+                    maternal_name="546543",
                     maternal_genotype="Emx1-IRES-Cre/wt; Camk2a-tTa/Camk2a-tTA",
-                    paternal_id="232323",
+                    paternal_name="232323",
                     paternal_genotype="Ai93(TITL-GCaMP6f)/wt",
                 ),
                 genotype="Emx1-IRES-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt",
@@ -84,7 +84,7 @@ class TestMetadata:
         )
         dd = DataDescription(
             modalities=[Modality.ECEPHYS],
-            subject_id="123456",
+            subject_name="123456",
             data_level="raw",
             creation_time=datetime(2022, 11, 22, 8, 43, 00, tzinfo=timezone.utc),
             institution=Organization.AIND,
@@ -93,7 +93,7 @@ class TestMetadata:
             project_name="Test",
         )
         procedures = Procedures(
-            subject_id="12345",
+            subject_name="12345",
         )
         processing = Processing.create_with_sequential_process_graph(
             data_processes=[
@@ -142,7 +142,7 @@ class TestMetadata:
                 data_description=DataDescription.model_construct(
                     creation_time=datetime(2020, 12, 12, 12, 12, 12),
                     modalities=[Modality.SPIM],
-                    subject_id="655019",
+                    subject_name="655019",
                     data_level="raw",
                 ),
                 subject=subject,
@@ -170,7 +170,7 @@ class TestMetadata:
                 data_description=DataDescription.model_construct(
                     creation_time=datetime(2020, 12, 12, 12, 12, 12),
                     modalities=modalities,
-                    subject_id="655019",
+                    subject_name="655019",
                     data_level="raw",
                 ),
                 subject=subject,
@@ -178,7 +178,7 @@ class TestMetadata:
                 instrument=ephys_inst,
                 processing=Processing.model_construct(),
                 acquisition=Acquisition.model_construct(
-                    instrument_id="323_EPHYS1_20231003",
+                    instrument_name="323_EPHYS1_20231003",
                     acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
                     subject_details=AcquisitionSubjectDetails.model_construct(),
                 ),
@@ -190,7 +190,7 @@ class TestMetadata:
 
         modalities = [Modality.ECEPHYS]
         inst = Instrument.model_construct(
-            instrument_id="123_EPHYS1_20220101",
+            instrument_name="123_EPHYS1_20220101",
             modalities=modalities,
             components=[ephys_assembly],
             global_coordinate_system=BREGMA_ARI,
@@ -202,7 +202,7 @@ class TestMetadata:
                 data_description=DataDescription.model_construct(
                     creation_time=datetime(2020, 12, 12, 12, 12, 12),
                     modalities=modalities,
-                    subject_id="655019",
+                    subject_name="655019",
                     data_level="raw",
                 ),
                 subject=subject,
@@ -210,7 +210,7 @@ class TestMetadata:
                 instrument=inst,
                 processing=Processing.model_construct(),
                 acquisition=Acquisition.model_construct(
-                    instrument_id="123_EPHYS2_20230101",
+                    instrument_name="123_EPHYS2_20230101",
                     acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
                     subject_details=AcquisitionSubjectDetails.model_construct(mouse_platform_name="platform1"),
                     data_streams=[],
@@ -353,7 +353,7 @@ class TestMetadata:
         """Tests that acquisition connections are validated correctly."""
         # Case where all connection devices are present in instrument components
         instrument = Instrument.model_construct(
-            instrument_id="Test",
+            instrument_name="Test",
             components=[
                 EphysProbe.model_construct(name="Probe A"),
                 Laser.model_construct(name="Laser A"),
@@ -361,7 +361,7 @@ class TestMetadata:
             modalities=[],
         )
         acquisition = Acquisition.model_construct(
-            instrument_id="Test",
+            instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             data_streams=[
                 DataStream.model_construct(active_devices=["Probe A", "Laser A"], modalities=[], configurations=[]),
@@ -379,7 +379,7 @@ class TestMetadata:
 
         # Case where connection devices are missing
         acquisition = Acquisition.model_construct(
-            instrument_id="Test",
+            instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             data_streams=[
                 DataStream.model_construct(
@@ -403,7 +403,7 @@ class TestMetadata:
 
         # Case where source device is missing
         acquisition_missing_source = Acquisition.model_construct(
-            instrument_id="Test",
+            instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             data_streams=[
                 DataStream.model_construct(
@@ -429,7 +429,7 @@ class TestMetadata:
         """Tests that acquisition active devices are validated correctly."""
         # Case where all active devices are present in instrument components
         instrument = Instrument.model_construct(
-            instrument_id="Test",
+            instrument_name="Test",
             components=[
                 EphysProbe.model_construct(name="Probe A"),
                 Laser.model_construct(name="Laser A"),
@@ -437,7 +437,7 @@ class TestMetadata:
             modalities=[],
         )
         acquisition = Acquisition.model_construct(
-            instrument_id="Test",
+            instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             data_streams=[
                 DataStream.model_construct(active_devices=["Probe A", "Laser A"], modalities=[], configurations=[]),
@@ -455,7 +455,7 @@ class TestMetadata:
 
         # Case where active devices are missing from both instrument and procedures
         acquisition = Acquisition.model_construct(
-            instrument_id="Test",
+            instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             data_streams=[
                 DataStream.model_construct(
@@ -485,7 +485,7 @@ class TestMetadata:
         procedures = Procedures.model_construct(subject_procedures=[training_protocol])
         stimulus_epoch = StimulusEpoch.model_construct(training_protocol_name="Protocol A")
         acquisition = Acquisition.model_construct(
-            instrument_id="Test",
+            instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             stimulus_epochs=[stimulus_epoch],
             data_streams=[],
@@ -504,7 +504,7 @@ class TestMetadata:
         # Case where training protocol reference doesn't match
         stimulus_epoch_invalid = StimulusEpoch.model_construct(training_protocol_name="Missing Protocol")
         acquisition_invalid = Acquisition.model_construct(
-            instrument_id="Test",
+            instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             stimulus_epochs=[stimulus_epoch_invalid],
             data_streams=[],
@@ -547,7 +547,7 @@ class TestMetadata:
         # Case where stimulus epoch has no training protocol name (should pass)
         stimulus_epoch_none = StimulusEpoch.model_construct(training_protocol_name=None)
         acquisition_none = Acquisition.model_construct(
-            instrument_id="Test",
+            instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             data_streams=[],
             stimulus_epochs=[stimulus_epoch_none],
@@ -592,7 +592,7 @@ class TestMetadata:
         data_description = DataDescription(
             creation_time=test_datetime,
             modalities=[Modality.ECEPHYS],
-            subject_id="655019",
+            subject_name="655019",
             data_level=DataLevel.RAW,
             institution=Organization.AIND,
             funding_source=[Funding(funder=Organization.NINDS)],
@@ -602,7 +602,7 @@ class TestMetadata:
 
         # Create acquisition with matching end time using model_construct
         acquisition = Acquisition.model_construct(
-            instrument_id="Test",
+            instrument_name="Test",
             acquisition_start_time=datetime(2023, 4, 3, 18, 0, 0, tzinfo=timezone.utc),
             acquisition_end_time=test_datetime,
             data_streams=[],
@@ -624,7 +624,7 @@ class TestMetadata:
         data_description_later = DataDescription(
             creation_time=later_same_day,
             modalities=[Modality.ECEPHYS],
-            subject_id="655019",
+            subject_name="655019",
             data_level=DataLevel.RAW,
             institution=Organization.AIND,
             funding_source=[Funding(funder=Organization.NINDS)],
@@ -646,7 +646,7 @@ class TestMetadata:
         data_description_next_day = DataDescription(
             creation_time=next_day,
             modalities=[Modality.ECEPHYS],
-            subject_id="655019",
+            subject_name="655019",
             data_level=DataLevel.RAW,
             institution=Organization.AIND,
             funding_source=[Funding(funder=Organization.NINDS)],
@@ -668,7 +668,7 @@ class TestMetadata:
         data_description_before = DataDescription(
             creation_time=before_midnight,
             modalities=[Modality.ECEPHYS],
-            subject_id="655019",
+            subject_name="655019",
             data_level=DataLevel.RAW,
             institution=Organization.AIND,
             funding_source=[Funding(funder=Organization.NINDS)],
@@ -722,7 +722,7 @@ class TestMetadata:
         acquisition_end = datetime(2023, 4, 3, 19, 0, 0, tzinfo=timezone.utc)
 
         acquisition = Acquisition.model_construct(
-            instrument_id="Test",
+            instrument_name="Test",
             acquisition_start_time=acquisition_start,
             acquisition_end_time=acquisition_end,
             data_streams=[],
@@ -732,7 +732,7 @@ class TestMetadata:
         # Test case where subject's date_of_birth is before acquisition (should pass)
         valid_birth_date = datetime(2022, 1, 1, tzinfo=timezone.utc).date()
         valid_subject = Subject(
-            subject_id="123456",
+            subject_name="123456",
             subject_details=MouseSubject(
                 species=Species.HOUSE_MOUSE,
                 strain=Strain.C57BL_6J,
@@ -741,9 +741,9 @@ class TestMetadata:
                 source=Organization.AI,
                 genotype="wt",
                 breeding_info=BreedingInfo(
-                    maternal_id="123",
+                    maternal_name="123",
                     maternal_genotype="wt",
-                    paternal_id="456",
+                    paternal_name="456",
                     paternal_genotype="wt",
                 ),
                 housing=Housing(cage_id="123"),
@@ -762,7 +762,7 @@ class TestMetadata:
         # Test case where subject's date_of_birth is after acquisition end (should fail)
         invalid_birth_date = datetime(2023, 4, 4, tzinfo=timezone.utc).date()  # After acquisition
         invalid_subject = Subject(
-            subject_id="123456",
+            subject_name="123456",
             subject_details=MouseSubject(
                 species=Species.HOUSE_MOUSE,
                 strain=Strain.C57BL_6J,
@@ -771,9 +771,9 @@ class TestMetadata:
                 source=Organization.AI,
                 genotype="wt",
                 breeding_info=BreedingInfo(
-                    maternal_id="123",
+                    maternal_name="123",
                     maternal_genotype="wt",
-                    paternal_id="456",
+                    paternal_name="456",
                     paternal_genotype="wt",
                 ),
                 housing=Housing(cage_id="123"),
@@ -799,7 +799,7 @@ class TestMetadata:
         acquisition_end = datetime(2023, 4, 3, 19, 0, 0, tzinfo=timezone.utc)
 
         acquisition = Acquisition.model_construct(
-            instrument_id="Test",
+            instrument_name="Test",
             acquisition_start_time=acquisition_start,
             acquisition_end_time=acquisition_end,
             data_streams=[],
@@ -869,13 +869,13 @@ class TestMetadata:
 
         # Create a subject with CalibrationObject
         calibration_subject = Subject(
-            subject_id="calibration_object_001",
+            subject_name="calibration_object_001",
             subject_details=CalibrationObject(
                 description="Test calibration object",
             ),
         )
 
-        with pytest.raises(ValueError, match="CalibrationObject subject_id must be 'calibration'"):
+        with pytest.raises(ValueError, match="CalibrationObject subject_name must be 'calibration'"):
             Metadata(
                 name="Test Metadata",
                 location="Test Location",
@@ -883,7 +883,7 @@ class TestMetadata:
                 data_description=data_description,
             )
 
-        calibration_subject.subject_id = "calibration"
+        calibration_subject.subject_name = "calibration"
         metadata = Metadata(
             name="Test Metadata",
             location="Test Location",
@@ -893,14 +893,14 @@ class TestMetadata:
         assert metadata is not None
 
     def test_validate_subject_details_if_not_specimen(self):
-        """Tests that subject details are required if acquisition.specimen_id is not provided"""
+        """Tests that subject details are required if acquisition.specimen_name is not provided"""
 
-        # Case where specimen_id is provided - should pass without subject_details
+        # Case where specimen_name is provided - should pass without subject_details
         acquisition_with_specimen = Acquisition.model_construct(
-            instrument_id="Test",
+            instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
-            subject_id="123456",
-            specimen_id="123456-001",
+            subject_name="123456",
+            specimen_name="123456-001",
             data_streams=[],
         )
         metadata_with_specimen = Metadata(
@@ -911,11 +911,11 @@ class TestMetadata:
         )
         assert metadata_with_specimen is not None
 
-        # Case where specimen_id is not provided and subject_details is provided - should pass
+        # Case where specimen_name is not provided and subject_details is provided - should pass
         acquisition_with_details = Acquisition.model_construct(
-            instrument_id="Test",
+            instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
-            subject_id="123456",
+            subject_name="123456",
             data_streams=[],
             subject_details=AcquisitionSubjectDetails.model_construct(),
         )
@@ -927,10 +927,10 @@ class TestMetadata:
         )
         assert metadata_with_details is not None
 
-        # Case where neither specimen_id nor subject_details is provided - should fail
+        # Case where neither specimen_name nor subject_details is provided - should fail
         acquisition_missing_both = Acquisition.model_construct(
-            subject_id="123456",
-            instrument_id="Test",
+            subject_name="123456",
+            instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             data_streams=[],
         )

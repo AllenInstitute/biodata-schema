@@ -394,7 +394,7 @@ blue_laser_calibration = Calibration(
 
 inst = Instrument(
     location="323",
-    instrument_id="EPHYS1",
+    instrument_name="EPHYS1",
     modification_date=date(2023, 10, 3),
     modalities=[Modality.ECEPHYS],
     global_coordinate_system=BREGMA_ARI,

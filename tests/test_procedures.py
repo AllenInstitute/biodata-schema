@@ -46,12 +46,12 @@ class TestProcedures:
         self.start_date = date.fromisoformat("2020-10-10")
 
     def test_required_field_validation_check(self):
-        """Tests that validation error is thrown if subject_id is not set."""
+        """Tests that validation error is thrown if subject_name is not set."""
         with pytest.raises(ValidationError):
             Procedures()
 
-        p = Procedures(subject_id="12345")
-        assert "12345" == p.subject_id
+        p = Procedures(subject_name="12345")
+        assert "12345" == p.subject_name
 
     @patch("biodata_models.mouse_anatomy.get_emapa_id")
     def test_unwrapped_injection_rejected(self, mock_get_emapa_id):
@@ -59,7 +59,7 @@ class TestProcedures:
         mock_get_emapa_id.return_value = "123456"
         with pytest.raises(ValidationError):
             Procedures(
-                subject_id="12345",
+                subject_name="12345",
                 subject_procedures=[
                     Injection(
                         injection_materials=[NonViralMaterial(name="saline", source=Organization.OTHER)],
@@ -84,7 +84,7 @@ class TestProcedures:
 
         with pytest.raises(ValidationError) as e:
             Procedures(
-                subject_id="12345",
+                subject_name="12345",
                 subject_procedures=[
                     Surgery(
                         start_date=self.start_date,
@@ -118,7 +118,7 @@ class TestProcedures:
         mock_get_emapa_id.return_value = "123456"
         with pytest.raises(ValidationError) as e:
             Procedures(
-                subject_id="12345",
+                subject_name="12345",
                 subject_procedures=[
                     Surgery(
                         start_date=self.start_date,
@@ -152,7 +152,7 @@ class TestProcedures:
         mock_get_emapa_id.return_value = "123456"
 
         p = Procedures(
-            subject_id="12345",
+            subject_name="12345",
             global_coordinate_system=BREGMA_ARI,
             subject_procedures=[
                 Surgery(
@@ -264,7 +264,7 @@ class TestProcedures:
 
         with pytest.raises(ValidationError) as e:
             SpecimenProcedure(
-                specimen_id="1000",
+                specimen_name="1000",
                 procedure_type="Other",
                 start_date=self.start_date,
                 end_date=date.fromisoformat("2020-10-11"),
@@ -276,7 +276,7 @@ class TestProcedures:
 
         with pytest.raises(ValidationError) as e:
             SpecimenProcedure(
-                specimen_id="1000",
+                specimen_name="1000",
                 procedure_type="Immunolabeling",
                 start_date=self.start_date,
                 end_date=date.fromisoformat("2020-10-11"),
@@ -288,7 +288,7 @@ class TestProcedures:
 
         with pytest.raises(ValidationError) as e:
             SpecimenProcedure(
-                specimen_id="1000",
+                specimen_name="1000",
                 procedure_type="Hybridization Chain Reaction",
                 start_date=date.fromisoformat("2020-10-10"),
                 end_date=date.fromisoformat("2020-10-11"),
@@ -300,7 +300,7 @@ class TestProcedures:
 
         with pytest.raises(ValidationError) as e:
             SpecimenProcedure(
-                specimen_id="1000",
+                specimen_name="1000",
                 procedure_type="Sectioning",
                 start_date=date.fromisoformat("2020-10-10"),
                 end_date=date.fromisoformat("2020-10-11"),
@@ -312,7 +312,7 @@ class TestProcedures:
 
         with pytest.raises(ValidationError) as e:
             SpecimenProcedure(
-                specimen_id="1000",
+                specimen_name="1000",
                 procedure_type=SpecimenProcedureType.BARSEQ,
                 start_date=date.fromisoformat("2020-10-10"),
                 end_date=date.fromisoformat("2020-10-11"),
@@ -324,7 +324,7 @@ class TestProcedures:
 
         assert (
             SpecimenProcedure(
-                specimen_id="1000",
+                specimen_name="1000",
                 procedure_type="Other",
                 start_date=date.fromisoformat("2020-10-10"),
                 end_date=date.fromisoformat("2020-10-11"),
@@ -336,7 +336,7 @@ class TestProcedures:
 
         assert (
             SpecimenProcedure(
-                specimen_id="1000",
+                specimen_name="1000",
                 procedure_type="Sectioning",
                 start_date=date.fromisoformat("2020-10-10"),
                 end_date=date.fromisoformat("2020-10-11"),
@@ -352,7 +352,7 @@ class TestProcedures:
 
         with pytest.raises(ValidationError) as e:
             SpecimenProcedure(
-                specimen_id="1000",
+                specimen_name="1000",
                 procedure_type="Other",
                 start_date=date.fromisoformat("2020-10-10"),
                 end_date=date.fromisoformat("2020-10-11"),
@@ -514,14 +514,14 @@ class TestProcedures:
             )
 
     def test_validate_subject_specimen_ids(self):
-        """Test that the subject_id and specimen_id match"""
+        """Test that the subject_name and specimen_name match"""
 
         with pytest.raises(ValidationError) as e:
             Procedures(
-                subject_id="12345",
+                subject_name="12345",
                 specimen_procedures=[
                     SpecimenProcedure(
-                        specimen_id="9999_1000",
+                        specimen_name="9999_1000",
                         procedure_type="Other",
                         start_date=date.fromisoformat("2020-10-10"),
                         end_date=date.fromisoformat("2020-10-11"),
@@ -531,17 +531,17 @@ class TestProcedures:
                     )
                 ],
             )
-        expected_exception = "specimen_id must be an extension of the subject_id."
+        expected_exception = "specimen_name must be an extension of the subject_name."
         assert expected_exception in str(e.value)
 
     def test_validate_subject_specimen_id_list_valid(self):
-        """Test that specimen_id accepts a list of strings when all contain subject_id"""
+        """Test that specimen_name accepts a list of strings when all contain subject_name"""
 
         valid_procedure = Procedures(
-            subject_id="12345",
+            subject_name="12345",
             specimen_procedures=[
                 SpecimenProcedure(
-                    specimen_id=["12345_001", "12345_002"],
+                    specimen_name=["12345_001", "12345_002"],
                     procedure_type="Other",
                     start_date=date.fromisoformat("2020-10-10"),
                     end_date=date.fromisoformat("2020-10-11"),
@@ -709,7 +709,7 @@ class TestProcedures:
         """Test get_device_names method returns correct device names"""
 
         # Test with no devices
-        procedures = Procedures(subject_id="12345")
+        procedures = Procedures(subject_name="12345")
         assert procedures.get_device_names() == []
 
     def test_get_device_names_with_constructed_surgery_procedure(self):
@@ -717,7 +717,7 @@ class TestProcedures:
         device = Device.model_construct(name="Catheter")
         surgery_procedure = CatheterImplant.model_construct(implanted_device=device)
         procedures = Procedures.model_construct(
-            subject_id="12345",
+            subject_name="12345",
             subject_procedures=[Surgery.model_construct(procedures=[surgery_procedure])],
         )
 
@@ -747,7 +747,7 @@ class TestProcedures:
         )
 
         procedures = Procedures(
-            subject_id="12345",
+            subject_name="12345",
             subject_procedures=[
                 Surgery(
                     start_date=self.start_date,
@@ -765,12 +765,12 @@ class TestProcedures:
 
         # Create two procedures with different coordinate systems
         p1 = Procedures(
-            subject_id="12345",
+            subject_name="12345",
             global_coordinate_system=BREGMA_ARI,
         )
 
         p2 = Procedures(
-            subject_id="12345",
+            subject_name="12345",
             global_coordinate_system=BREGMA_RAS,  # Different coordinate system
         )
 
@@ -784,7 +784,7 @@ class TestProcedures:
 
         # Test that combining procedures with same coordinate systems works
         p3 = Procedures(
-            subject_id="12345",
+            subject_name="12345",
             global_coordinate_system=BREGMA_ARI,  # Same coordinate system as p1
         )
 
