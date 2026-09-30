@@ -585,7 +585,7 @@ class MRIScan(DeviceConfig):
     repetition_time_unit: TimeUnit = Field(default=TimeUnit.S, title="Repetition time unit")
 
     # fields required to get correct orientation
-    scanner_coordinate_system: Optional[CoordinateSystem] = Field(default=None, title="Scanner coordinate system")
+    local_coordinate_system: Optional[CoordinateSystem] = Field(default=None, title="Scanner coordinate system")
     affine_transform: Optional[TRANSFORM_TYPES] = Field(
         default=None, title="MRI Scan affine transform", description="NIFTI sform/qform, Bruker vc_transform, etc"
     )
