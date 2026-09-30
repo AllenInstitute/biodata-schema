@@ -29,6 +29,27 @@ class TestQualityControl:
 
         assert quality_control is not None
 
+    def test_metrics_must_have_unique_name_and_tags(self):
+        """Metrics with the same name and tags are not allowed"""
+        metric = QCMetric(
+            name="Unique metric",
+            modality=Modality.ECEPHYS,
+            stage=Stage.PROCESSING,
+            value=True,
+            status_history=[
+                QCStatus(evaluator="Test", timestamp=datetime.fromisoformat("2020-10-10"), status=Status.PASS)
+            ],
+            tags={"group": "one"},
+        )
+
+        with pytest.raises(ValidationError, match="unique name and tags"):
+            QualityControl(metrics=[metric, metric.model_copy()], default_grouping=["group"])
+
+        QualityControl(
+            metrics=[metric, metric.model_copy(update={"tags": {"group": "two"}})],
+            default_grouping=["group"],
+        )
+
     def test_tags_property(self):
         """test that QualityControl.tags returns all unique tag values"""
         tags = quality_control.tags
@@ -81,7 +102,7 @@ class TestQualityControl:
 
         assert test_metrics[0].status.status == Status.PASS
 
-        q = QualityControl(metrics=test_metrics + test_metrics, default_grouping=["group"])  # duplicate the metrics
+        q = QualityControl(metrics=test_metrics, default_grouping=["group"])
 
         # check that overall status gets auto-set if it has never been set before
         assert q.evaluate_status() == Status.PASS

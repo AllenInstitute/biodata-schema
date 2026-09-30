@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Any, List, Literal, Optional, Union
 
 from biodata_models.modalities import Modality
-from pydantic import Field, SkipValidation, model_validator
+from pydantic import Field, SkipValidation, field_validator, model_validator
 
 from biodata_schema.base import AwareDatetimeWithDefault, DataCoreModel, DataModel, DiscriminatedList
 from biodata_schema.utils.merge import merge_notes, merge_optional_list, merge_str_tuple_lists, remove_duplicates
@@ -129,6 +129,15 @@ class QualityControl(DataCoreModel):
         title="Status mapping",
         description="Mapping of tags, modalities, and stages to their evaluated status, automatically computed",
     )
+
+    @field_validator("metrics")
+    @classmethod
+    def validate_unique_metrics(cls, metrics):
+        """Ensure metrics have unique name and tag combinations"""
+        metric_hashes = {hash((metric.name, frozenset(metric.tags.items()))) for metric in metrics}
+        if len(metric_hashes) != len(metrics):
+            raise ValueError("Metrics must have unique name and tags.")
+        return metrics
 
     @property
     def tags(self) -> List[str]:
