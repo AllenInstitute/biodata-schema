@@ -272,6 +272,8 @@ class DataCoreModel(DataModel):
 
         recursive_coord_system_check(
             self,
+            None,
+            None,
             validate_core_coordinate_system=hasattr(self, "global_coordinate_system"),
         )
 
