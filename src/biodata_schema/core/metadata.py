@@ -5,7 +5,7 @@ import json
 import logging
 import warnings
 from pathlib import Path
-from typing import Dict, List, Literal, Optional, Union, get_args
+from typing import Annotated, Dict, List, Literal, Optional, Union, get_args
 
 from biodata_models.modalities import Modality
 from pydantic import (
@@ -19,7 +19,7 @@ from pydantic import (
     model_validator,
 )
 
-from biodata_schema.base import DataCoreModel
+from biodata_schema.base import DataCoreModel, DraftRequirement
 from biodata_schema.components.identifiers import DatabaseIdentifiers
 from biodata_schema.components.subject_procedures import TrainingProtocol
 from biodata_schema.components.subjects import CalibrationObject
@@ -80,7 +80,7 @@ class Metadata(DataCoreModel):
         description="Name of the data asset.",
         title="Data Asset Name",
     )
-    location: str = Field(
+    location: Annotated[str, DraftRequirement] = Field(
         ...,
         title="Location",
         description="Current location of the data asset.",
@@ -293,6 +293,31 @@ class Metadata(DataCoreModel):
         ):
             if self.subject.subject_name != "calibration":
                 raise ValueError("CalibrationObject subject_name must be 'calibration'.")
+
+        return self
+
+    @model_validator(mode="after")
+    def validate_subject_id_consistency(self):
+        """Validator to ensure procedures, acquisition, and data_description subject_name match subject.subject_name"""
+
+        if not self.subject:
+            return self
+
+        expected = self.subject.subject_name
+        mismatches = []
+        # getattr guards against objects built with model_construct() that omit subject_name
+        procedures_subject_name = getattr(self.procedures, "subject_name", None)
+        if procedures_subject_name is not None and procedures_subject_name != expected:
+            mismatches.append(f"procedures.subject_name={procedures_subject_name}")
+        acquisition_subject_name = getattr(self.acquisition, "subject_name", None)
+        if acquisition_subject_name is not None and acquisition_subject_name != expected:
+            mismatches.append(f"acquisition.subject_name={acquisition_subject_name}")
+        data_description_subject_name = getattr(self.data_description, "subject_name", None)
+        if data_description_subject_name is not None and data_description_subject_name != expected:
+            mismatches.append(f"data_description.subject_name={data_description_subject_name}")
+
+        if mismatches:
+            raise ValueError(f"subject_name mismatch with subject.subject_name={expected}: {', '.join(mismatches)}")
 
         return self
 
