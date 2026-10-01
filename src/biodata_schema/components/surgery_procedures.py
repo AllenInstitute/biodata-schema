@@ -3,9 +3,9 @@
 from enum import Enum
 from typing import List, Optional, Union
 
+from biodata_models.anatomy import MouseAnatomyLookup
 from biodata_models.brain_atlas import BrainStructureModel
 from biodata_models.coordinates import AnatomicalRelative
-from biodata_models.mouse_anatomy import MouseAnatomyModel
 from biodata_models.organizations import Organization
 from biodata_models.units import SizeUnit, TimeUnit, VolumeUnit
 from pydantic import Field, field_validator, model_validator
@@ -176,7 +176,7 @@ class Headframe(ProtocolMixin, DataModel):
 class GroundWireImplant(DataModel):
     """Ground wire implant procedure"""
 
-    ground_electrode_location: MouseAnatomyModel = Field(..., title="Location of ground electrode")
+    ground_electrode_location: MouseAnatomyLookup = Field(..., title="Location of ground electrode")
     ground_wire_hole: Optional[int] = Field(
         default=None, title="Ground wire hole", description="For SHIELD implants, the hole number for the ground wire"
     )

@@ -1,12 +1,11 @@
 """test Procedures"""
 
 from datetime import date
-from unittest.mock import patch
 
 import pytest
+from biodata_models.anatomy import MouseAnatomyLookup
 from biodata_models.brain_atlas import CCFv3
 from biodata_models.coordinates import AnatomicalRelative
-from biodata_models.mouse_anatomy import InjectionTargets, MouseBloodVessels
 from biodata_models.organizations import Organization
 from biodata_models.specimen_procedure_types import SpecimenProcedureType
 from biodata_models.units import ConcentrationUnit, CurrentUnit, SizeUnit, TimeUnit, VolumeUnit
@@ -38,6 +37,11 @@ from biodata_schema.utils.exceptions import OneOfError
 from tests.coordinate_systems import BREGMA_ARI, BREGMA_RAS
 
 
+def mouse_anatomy(name: str) -> MouseAnatomyLookup:
+    """Construct an offline anatomy lookup fixture."""
+    return MouseAnatomyLookup(name=name, registry_identifier="EMAPA:TEST")
+
+
 class TestProcedures:
     """test Procedures"""
 
@@ -53,10 +57,8 @@ class TestProcedures:
         p = Procedures(subject_id="12345")
         assert "12345" == p.subject_id
 
-    @patch("biodata_models.mouse_anatomy.get_emapa_id")
-    def test_unwrapped_injection_rejected(self, mock_get_emapa_id):
+    def test_unwrapped_injection_rejected(self):
         """Unwrapped Injection in subject_procedures should raise"""
-        mock_get_emapa_id.return_value = "123456"
         with pytest.raises(ValidationError):
             Procedures(
                 subject_id="12345",
@@ -76,11 +78,8 @@ class TestProcedures:
                 ],
             )
 
-    @patch("biodata_models.mouse_anatomy.get_emapa_id")
-    def test_injection_material_check(self, mock_get_emapa_id):
+    def test_injection_material_check(self):
         """Check for validation error when injection_materials is empty"""
-
-        mock_get_emapa_id.return_value = "123456"
 
         with pytest.raises(ValidationError) as e:
             Procedures(
@@ -102,7 +101,7 @@ class TestProcedures:
                                         profile=InjectionProfile.BOLUS,
                                     )
                                 ],
-                                targeted_structure=InjectionTargets.RETRO_ORBITAL,
+                                targeted_structure=mouse_anatomy("Retro-orbital"),
                                 relative_position=[AnatomicalRelative.LEFT],
                             ),
                         ],
@@ -112,10 +111,8 @@ class TestProcedures:
 
         assert "injection_materials" in repr(e.value)
 
-    @patch("biodata_models.mouse_anatomy.get_emapa_id")
-    def test_injection_material_none(self, mock_get_emapa_id):
+    def test_injection_material_none(self):
         """Check for validation error when injection_materials is None"""
-        mock_get_emapa_id.return_value = "123456"
         with pytest.raises(ValidationError) as e:
             Procedures(
                 subject_id="12345",
@@ -136,7 +133,7 @@ class TestProcedures:
                                         profile=InjectionProfile.BOLUS,
                                     )
                                 ],
-                                targeted_structure=InjectionTargets.RETRO_ORBITAL,
+                                targeted_structure=mouse_anatomy("Retro-orbital"),
                                 relative_position=[AnatomicalRelative.LEFT],
                             ),
                         ],
@@ -146,10 +143,8 @@ class TestProcedures:
 
         assert "injection_materials" in repr(e.value)
 
-    @patch("biodata_models.mouse_anatomy.get_emapa_id")
-    def test_injection_materials_list(self, mock_get_emapa_id):
+    def test_injection_materials_list(self):
         """Valid injection_materials list"""
-        mock_get_emapa_id.return_value = "123456"
 
         p = Procedures(
             subject_id="12345",
@@ -183,7 +178,7 @@ class TestProcedures:
                                     titer=2300000000,
                                 )
                             ],
-                            targeted_structure=InjectionTargets.RETRO_ORBITAL,
+                            targeted_structure=mouse_anatomy("Retro-orbital"),
                             relative_position=[AnatomicalRelative.LEFT],
                             dynamics=[
                                 InjectionDynamics(
@@ -206,7 +201,7 @@ class TestProcedures:
                                     concentration_unit=ConcentrationUnit.UM,
                                 )
                             ],
-                            targeted_structure=InjectionTargets.INTRAPERITONEAL,
+                            targeted_structure=mouse_anatomy("Intraperitoneal"),
                             dynamics=[
                                 InjectionDynamics(
                                     volume=1,
@@ -723,8 +718,7 @@ class TestProcedures:
 
         assert procedures.get_device_names() == ["Catheter"]
 
-    @pytest.mark.online
-    def test_get_device_names_with_surgery_procedures(self):  # pragma: no cover
+    def test_get_device_names_with_surgery_procedures(self):
         """Test get_device_names method with nested surgery procedures"""
 
         device1 = Catheter(
@@ -736,7 +730,7 @@ class TestProcedures:
 
         config = CatheterConfig(
             device_name="Catheter",
-            targeted_structure=MouseBloodVessels.CAROTID_ARTERY,
+            targeted_structure=mouse_anatomy("Carotid artery"),
         )
 
         # Test with surgery containing procedures with implanted devices

@@ -9,7 +9,7 @@ Description of an injection procedure
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `injection_materials` | List[[ViralMaterial](#viralmaterial) or [NonViralMaterial](#nonviralmaterial)] | Injection material  |
-| `targeted_structure` | Optional[[MouseAnatomyModel](../biodata_models/external.md#mouseanatomymodel)] | Injection target (Use InjectionTargets) |
+| `targeted_structure` | Optional[[MouseAnatomyLookup](../biodata_models/external.md#mouseanatomylookup)] | Injection target (Mouse anatomy term from EMAPA) |
 | `relative_position` | Optional[List[[AnatomicalRelative](../biodata_models/coordinates.md#anatomicalrelative)]] | Relative position  |
 | `dynamics` | List[[InjectionDynamics](#injectiondynamics)] | Injection dynamics (List of injection events, one per location/depth) |
 | `protocol_id` | `Optional[str]` | Protocol ID (DOI for protocols.io) |

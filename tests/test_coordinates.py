@@ -143,16 +143,20 @@ class TestAtlas:
 
 
 class TestCoordinateSystemMouseAnatomyOrigin:
-    """Tests for CoordinateSystem with MouseAnatomyModel as origin"""
+    """Tests for CoordinateSystem with MouseAnatomyLookup as origin"""
 
-    @pytest.mark.online
-    def test_mouse_anatomy_origin(self):  # pragma: no cover
-        """Test that CoordinateSystem accepts a MouseAnatomyModel as origin"""
-        from biodata_models.mouse_anatomy import MouseAnatomy
+    def test_mouse_anatomy_origin(self):
+        """Test that CoordinateSystem accepts a MouseAnatomyLookup as origin"""
+        from biodata_models.anatomy import MouseAnatomyLookup
+
+        frontonasal_suture = MouseAnatomyLookup(
+            name="Frontonasal suture",
+            registry_identifier="EMAPA:TEST",
+        )
 
         cs = CoordinateSystem(
             name="TEST_MOUSE_ANATOMY",
-            origin=MouseAnatomy.FRONTONASAL_SUTURE,
+            origin=frontonasal_suture,
             axis_unit=SizeUnit.MM,
             axes=[
                 Axis(name=AxisName.AP, direction=Direction.PA),
@@ -160,7 +164,7 @@ class TestCoordinateSystemMouseAnatomyOrigin:
                 Axis(name=AxisName.SI, direction=Direction.SI),
             ],
         )
-        assert cs.origin == MouseAnatomy.FRONTONASAL_SUTURE
+        assert cs.origin == frontonasal_suture
 
         cs_roundtrip = CoordinateSystem.model_validate(cs.model_dump())
-        assert cs_roundtrip.origin == MouseAnatomy.FRONTONASAL_SUTURE
+        assert cs_roundtrip.origin == frontonasal_suture
