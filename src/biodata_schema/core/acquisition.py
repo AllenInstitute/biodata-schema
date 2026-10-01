@@ -18,6 +18,7 @@ from biodata_schema.base import (
     DataCoreModel,
     DataModel,
     DiscriminatedList,
+    DraftRequirement,
     GenericModel,
 )
 from biodata_schema.components.configs import (
@@ -389,7 +390,7 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
     )
 
     # Acquisition metadata
-    acquisition_start_time: AwareDatetimeWithDefault = Field(
+    acquisition_start_time: Annotated[AwareDatetimeWithDefault, DraftRequirement] = Field(
         ...,
         title="Acquisition start time",
         description="During validation, timezone information will be moved into the acquisition_start_tz field.",
