@@ -4,8 +4,8 @@ from datetime import date
 from enum import Enum
 from typing import List, Optional
 
+from biodata_models.anatomy import MouseAnatomyLookup
 from biodata_models.coordinates import AnatomicalRelative
-from biodata_models.mouse_anatomy import MouseAnatomyModel
 from biodata_models.pid_names import PIDName
 from biodata_models.units import CurrentUnit, TimeUnit, VolumeUnit
 from pydantic import Field, model_validator
@@ -109,8 +109,8 @@ class Injection(ProtocolMixin, DataModel):
     injection_materials: DiscriminatedList[ViralMaterial | NonViralMaterial] = Field(
         ..., title="Injection material", min_length=1
     )
-    targeted_structure: Optional[MouseAnatomyModel] = Field(
-        default=None, title="Injection target", description="Use InjectionTargets"
+    targeted_structure: Optional[MouseAnatomyLookup] = Field(
+        default=None, title="Injection target", description="Mouse anatomy term from EMAPA"
     )
     relative_position: Optional[List[AnatomicalRelative]] = Field(default=None, title="Relative position")
 

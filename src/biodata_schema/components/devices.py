@@ -6,6 +6,7 @@ from decimal import Decimal
 from enum import Enum
 from typing import List, Literal, Optional
 
+from biodata_models.anatomy import MouseAnatomyLookup
 from biodata_models.coordinates import AnatomicalRelative
 from biodata_models.devices import (
     BinMode,
@@ -28,7 +29,6 @@ from biodata_models.devices import (
     StageAxisDirection,
 )
 from biodata_models.harp_types import HarpDeviceType
-from biodata_models.mouse_anatomy import MouseAnatomyModel
 from biodata_models.organizations import Organization
 from biodata_models.units import (
     FrequencyUnit,
@@ -704,19 +704,23 @@ class Scanner(Device):
 class MyomatrixContact(DataModel):
     """Description of a contact on a myomatrix thread"""
 
-    body_part: MouseAnatomyModel = Field(..., title="Body part of contact insertion", description="Use MouseBodyParts")
+    body_part: MouseAnatomyLookup = Field(
+        ..., title="Body part of contact insertion", description="Mouse anatomy term from EMAPA"
+    )
     relative_position: AnatomicalRelative = Field(
         ..., title="Relative position", description="Position relative to procedures coordinate system"
     )
-    muscle: MouseAnatomyModel = Field(..., title="Muscle of contact insertion", description="Use MouseEmgMuscles")
+    muscle: MouseAnatomyLookup = Field(
+        ..., title="Muscle of contact insertion", description="Mouse anatomy term from EMAPA"
+    )
     in_muscle: bool = Field(..., title="In muscle")
 
 
 class MyomatrixThread(DataModel):
     """Description of a thread of a myomatrix array"""
 
-    ground_electrode_location: MouseAnatomyModel = Field(
-        ..., title="Location of ground electrode", description="Use GroundWireLocations"
+    ground_electrode_location: MouseAnatomyLookup = Field(
+        ..., title="Location of ground electrode", description="Mouse anatomy term from EMAPA"
     )
     contacts: List[MyomatrixContact] = Field(..., title="Contacts")
 

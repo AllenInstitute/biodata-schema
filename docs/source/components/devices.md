@@ -676,9 +676,9 @@ Description of a contact on a myomatrix thread
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `body_part` | [MouseAnatomyModel](../biodata_models/external.md#mouseanatomymodel) | Body part of contact insertion (Use MouseBodyParts) |
+| `body_part` | [MouseAnatomyLookup](../biodata_models/external.md#mouseanatomylookup) | Body part of contact insertion (Mouse anatomy term from EMAPA) |
 | `relative_position` | [AnatomicalRelative](../biodata_models/coordinates.md#anatomicalrelative) | Relative position (Position relative to procedures coordinate system) |
-| `muscle` | [MouseAnatomyModel](../biodata_models/external.md#mouseanatomymodel) | Muscle of contact insertion (Use MouseEmgMuscles) |
+| `muscle` | [MouseAnatomyLookup](../biodata_models/external.md#mouseanatomylookup) | Muscle of contact insertion (Mouse anatomy term from EMAPA) |
 | `in_muscle` | `bool` | In muscle  |
 
 
@@ -688,7 +688,7 @@ Description of a thread of a myomatrix array
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `ground_electrode_location` | [MouseAnatomyModel](../biodata_models/external.md#mouseanatomymodel) | Location of ground electrode (Use GroundWireLocations) |
+| `ground_electrode_location` | [MouseAnatomyLookup](../biodata_models/external.md#mouseanatomylookup) | Location of ground electrode (Mouse anatomy term from EMAPA) |
 | `contacts` | List[[MyomatrixContact](#myomatrixcontact)] | Contacts  |
 
 

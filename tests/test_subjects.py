@@ -263,7 +263,7 @@ class TestCellLine:
             fluorescent_protein=PIDName(
                 name="enhanced GFP",
                 abbreviation="EGFP",
-                registry=Registry.FPBASE,
+                registry=Registry.FPbase,
                 registry_identifier="R9NL8",
             ),
             clone_number=1,

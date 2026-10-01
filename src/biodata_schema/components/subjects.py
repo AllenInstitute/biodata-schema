@@ -202,7 +202,9 @@ class CellLine(DataModel):
     """Description of a cultured cell line"""
 
     cell_line_name: str = Field(..., title="Cell line name")
-    cell_line_type: CellLineModel = Field(..., title="Cell line type", description="Use CellLineLookup.get/search_by_name to populate")
+    cell_line_type: CellLineModel = Field(
+        ..., title="Cell line type", description="Use CellLineLookup.get_by_name/search_by_name to populate"
+    )
     species: Species.ONE_OF = Field(..., title="Species")
     protein: PIDName = Field(..., title="Protein labeled", description="Protein uses UniProt registry")
     gene: PIDName = Field(..., title="Gene targeted", description="Gene uses NCBI taxonomy")
