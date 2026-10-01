@@ -242,10 +242,10 @@ class Slap2Plane(Plane):
 
     slap2_acquisition_type: Slap2AcquisitionType = Field(..., title="SLAP2 ROI acquisition type")
 
-    specimen_id: Optional[str] = Field(
+    specimen_name: Optional[str] = Field(
         default=None,
         title="Specimen ID",
-        description="Unique index identifying the cell being imaged: <subject_id>_###",
+        description="Unique index identifying the cell being imaged: <subject_name>_###",
     )
     fov_index: Optional[int] = Field(
         default=None,

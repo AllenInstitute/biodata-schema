@@ -222,7 +222,7 @@ physiosuite = Device(
 
 inst = Instrument(
     location="",
-    instrument_id="ISIV.1",
+    instrument_name="ISIV.1",
     modification_date=date(2026, 5, 15),
     modalities=[Modality.ISI],
     global_coordinate_system=BREGMA_ARI,

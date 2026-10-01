@@ -300,8 +300,8 @@ Code(url="https://github.com/AllenNeuralDynamics/example", version="0.0.1")  # o
 Wrap each injection in a `Surgery` or `NonSurgicalInjection`:
 
 ```python
-Procedures(subject_id="12345", subject_procedures=[Injection(...)])  # ValidationError
-Procedures(subject_id="12345", subject_procedures=[Surgery(procedures=[Injection(...)])])  # ok
+Procedures(subject_name="12345", subject_procedures=[Injection(...)])  # ValidationError
+Procedures(subject_name="12345", subject_procedures=[Surgery(procedures=[Injection(...)])])  # ok
 ```
 
 ### Give `Instrument` components unique names
@@ -352,12 +352,12 @@ Monitor(..., contrast=50, contrast_unit=UnitlessUnit.PERCENT)  # ok
 
 ### Use `calibration` as the `CalibrationObject` subject ID
 
-`CalibrationObject` subjects must use `"calibration"` as their `subject_id`.
+`CalibrationObject` subjects must use `"calibration"` as their `subject_name`.
 `Metadata.validate_calibration_object_tags` raises a validation error for any other value:
 
 ```python
 Subject(
-    subject_id="calibration",
+    subject_name="calibration",
     subject_details=CalibrationObject(...),
 )
 ```

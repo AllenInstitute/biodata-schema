@@ -226,7 +226,7 @@ daq = DAQDevice(
 
 instrument = Instrument(
     location="243",
-    instrument_id="Dogwood",
+    instrument_name="Dogwood",
     modification_date=date(2024, 7, 9),
     global_coordinate_system=IMAGE_XYZ,
     modalities=[Modality.BARSEQ],

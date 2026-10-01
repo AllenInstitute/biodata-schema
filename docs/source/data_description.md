@@ -6,7 +6,7 @@ The `data_description.json` file tracks administrative information about a data 
 
 ## Uniqueness
 
-Every data asset is uniquely identified by its `DataDescription.name` field, which combines the `subject_id` and acquisition `session_end_time`. You can group data assets together using the `DataDescription.tags: List[str]`. Tags should be shared across assets within experiments. **Do not repeat information in the tags that already exists elsewhere in the metadata**, for example modalities should never be included in tags.
+Every data asset is uniquely identified by its `DataDescription.name` field, which combines the `subject_name` and acquisition `session_end_time`. You can group data assets together using the `DataDescription.tags: List[str]`. Tags should be shared across assets within experiments. **Do not repeat information in the tags that already exists elsewhere in the metadata**, for example modalities should never be included in tags.
 
 ## Example
 
@@ -24,10 +24,10 @@ Description of a logical collection of data files
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `license` | [License](biodata_models/licenses.md#license) | License  |
-| `subject_id` | `Optional[str]` | Subject ID (Unique identifier for the subject of data acquisition) |
+| `subject_name` | `Optional[str]` | Subject ID (Unique identifier for the subject of data acquisition) |
 | `creation_time` | `datetime (timezone-aware)` | Creation Time (Time that data files were created, used to uniquely identify the data) |
 | `tags` | `Optional[List[str]]` | Tags (Descriptive strings to help categorize and search for data) |
-| `name` | `Optional[str]` | Data asset name (When left blank, a name will be generated based on subject_id and creation_time. Conventionally also used as the name of the data folder.) |
+| `name` | `Optional[str]` | Data asset name (When left blank, a name will be generated based on subject_name and creation_time. Conventionally also used as the name of the data folder.) |
 | `institution` | [Organization](biodata_models/organizations.md#organization) | Institution (An established society, corporation, foundation or other organization that collected this data) |
 | `funding_source` | List[[Funding](data_description.md#funding)] | Funding source (Funding source. If internal funding, select 'Allen Institute') |
 | `data_level` | [DataLevel](biodata_models/data_name_patterns.md#datalevel) | Data Level (Level of processing that data has undergone) |

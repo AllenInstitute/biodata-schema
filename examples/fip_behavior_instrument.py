@@ -396,7 +396,7 @@ calibrations = [
 
 inst = Instrument(
     location="447",
-    instrument_id="FIP-Behavior",
+    instrument_name="FIP-Behavior",
     modification_date=date(2000, 1, 1),
     modalities=[Modality.BEHAVIOR, Modality.FIB],
     global_coordinate_system=BREGMA_ARI,

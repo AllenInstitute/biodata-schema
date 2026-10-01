@@ -18,11 +18,11 @@ class InstrumentAcquisitionCompatibility:
         self.acquisition = acquisition
 
     def _compare_instrument_id(self) -> Optional[ValueError]:
-        """Compares instrument_id"""
-        if self.acquisition.instrument_id != self.inst.instrument_id:
+        """Compares instrument_name"""
+        if self.acquisition.instrument_name != self.inst.instrument_name:
             return ValueError(
-                f"Instrument ID in acquisition {self.acquisition.instrument_id} "
-                f"does not match the instrument's {self.inst.instrument_id}."
+                f"Instrument ID in acquisition {self.acquisition.instrument_name} "
+                f"does not match the instrument's {self.inst.instrument_name}."
             )  # noqa: E501
         else:
             return None

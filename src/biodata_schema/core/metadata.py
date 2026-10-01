@@ -140,7 +140,7 @@ class Metadata(DataCoreModel):
     def validate_subject_details_if_not_specimen(self):
         """Check that subject details are present if an in vivo experiment"""
 
-        if self.acquisition and not self.acquisition.specimen_id:
+        if self.acquisition and not self.acquisition.specimen_name:
             if not self.acquisition.subject_details:
                 raise ValueError("Acquisition.subject_details are required for in vivo experiments")
 
@@ -291,33 +291,33 @@ class Metadata(DataCoreModel):
             and self.subject.subject_details
             and isinstance(self.subject.subject_details, CalibrationObject)
         ):
-            if self.subject.subject_id != "calibration":
-                raise ValueError("CalibrationObject subject_id must be 'calibration'.")
+            if self.subject.subject_name != "calibration":
+                raise ValueError("CalibrationObject subject_name must be 'calibration'.")
 
         return self
 
     @model_validator(mode="after")
     def validate_subject_id_consistency(self):
-        """Validator to ensure procedures, acquisition, and data_description subject_id match subject.subject_id"""
+        """Validator to ensure procedures, acquisition, and data_description subject_name match subject.subject_name"""
 
         if not self.subject:
             return self
 
-        expected = self.subject.subject_id
+        expected = self.subject.subject_name
         mismatches = []
-        # getattr guards against objects built with model_construct() that omit subject_id
-        procedures_subject_id = getattr(self.procedures, "subject_id", None)
-        if procedures_subject_id is not None and procedures_subject_id != expected:
-            mismatches.append(f"procedures.subject_id={procedures_subject_id}")
-        acquisition_subject_id = getattr(self.acquisition, "subject_id", None)
-        if acquisition_subject_id is not None and acquisition_subject_id != expected:
-            mismatches.append(f"acquisition.subject_id={acquisition_subject_id}")
-        data_description_subject_id = getattr(self.data_description, "subject_id", None)
-        if data_description_subject_id is not None and data_description_subject_id != expected:
-            mismatches.append(f"data_description.subject_id={data_description_subject_id}")
+        # getattr guards against objects built with model_construct() that omit subject_name
+        procedures_subject_name = getattr(self.procedures, "subject_name", None)
+        if procedures_subject_name is not None and procedures_subject_name != expected:
+            mismatches.append(f"procedures.subject_name={procedures_subject_name}")
+        acquisition_subject_name = getattr(self.acquisition, "subject_name", None)
+        if acquisition_subject_name is not None and acquisition_subject_name != expected:
+            mismatches.append(f"acquisition.subject_name={acquisition_subject_name}")
+        data_description_subject_name = getattr(self.data_description, "subject_name", None)
+        if data_description_subject_name is not None and data_description_subject_name != expected:
+            mismatches.append(f"data_description.subject_name={data_description_subject_name}")
 
         if mismatches:
-            raise ValueError(f"subject_id mismatch with subject.subject_id={expected}: {', '.join(mismatches)}")
+            raise ValueError(f"subject_name mismatch with subject.subject_name={expected}: {', '.join(mismatches)}")
 
         return self
 

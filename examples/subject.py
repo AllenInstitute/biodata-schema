@@ -14,7 +14,7 @@ from biodata_schema.core.subject import Subject
 t = datetime(2022, 11, 22, 8, 43, 00, tzinfo=timezone.utc)
 
 s = Subject(
-    subject_id="123456",
+    subject_name="123456",
     subject_details=MouseSubject(
         species=Species.HOUSE_MOUSE,
         strain=Strain.C57BL_6J,
@@ -22,9 +22,9 @@ s = Subject(
         date_of_birth=t.date(),
         source=Organization.AI,
         breeding_info=BreedingInfo(
-            maternal_id="546543",
+            maternal_name="546543",
             maternal_genotype="Emx1-IRES-Cre/wt; Camk2a-tTa/Camk2a-tTA",
-            paternal_id="232323",
+            paternal_name="232323",
             paternal_genotype="Ai93(TITL-GCaMP6f)/wt",
         ),
         genotype="Emx1-IRES-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt",

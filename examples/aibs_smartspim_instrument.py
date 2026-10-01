@@ -220,7 +220,7 @@ spim_scope = Microscope(
 
 inst = Instrument(
     location="440",
-    instrument_id="SmartSPIM2",
+    instrument_name="SmartSPIM2",
     modification_date=datetime.date(2023, 10, 4),
     global_coordinate_system=SIPE_MONITOR_RTF,
     modalities=[Modality.SPIM],

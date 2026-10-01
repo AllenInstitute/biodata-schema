@@ -340,7 +340,7 @@ calibration = Calibration(
 
 instrument = r.Instrument(
     location="428",
-    instrument_id="FIP1",
+    instrument_name="FIP1",
     modification_date=date(2023, 10, 3),
     modalities=[Modality.FIB],
     global_coordinate_system=BREGMA_ARI,

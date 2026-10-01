@@ -26,7 +26,7 @@ class Procedures(DataCoreModel):
     describedBy: str = Field(default=_DESCRIBED_BY_URL, json_schema_extra={"const": _DESCRIBED_BY_URL})
 
     schema_version: SkipValidation[Literal["3.0.2"]] = Field(default="3.0.2")
-    subject_id: str = Field(
+    subject_name: str = Field(
         ...,
         description="Unique identifier for the subject of data acquisition",
         title="Subject ID",
@@ -87,21 +87,21 @@ class Procedures(DataCoreModel):
 
     @model_validator(mode="after")
     def validate_subject_specimen_ids(self):
-        """Validate that the subject_id and specimen_id match"""
+        """Validate that the subject_name and specimen_name match"""
 
         # Return if no specimen procedures
         if self.specimen_procedures:
-            subject_id = self.subject_id
+            subject_name = self.subject_name
             flat_specimen_ids = []
             for spec_proc in self.specimen_procedures:
-                sid = spec_proc.specimen_id
+                sid = spec_proc.specimen_name
                 if isinstance(sid, list):
                     flat_specimen_ids.extend(sid)
                 else:
                     flat_specimen_ids.append(sid)
 
-            if any(not subject_specimen_id_compatibility(subject_id, spec_id) for spec_id in flat_specimen_ids):
-                raise ValueError("specimen_id must be an extension of the subject_id.")
+            if any(not subject_specimen_id_compatibility(subject_name, spec_id) for spec_id in flat_specimen_ids):
+                raise ValueError("specimen_name must be an extension of the subject_name.")
 
         return self
 
@@ -111,13 +111,13 @@ class Procedures(DataCoreModel):
         if not self.schema_version == other.schema_version:
             raise ValueError("Schema versions must match to combine Procedures")
 
-        if not self.subject_id == other.subject_id:
+        if not self.subject_name == other.subject_name:
             raise ValueError("Subject IDs must match to combine Procedures objects.")
 
         coordinate_system = merge_coordinate_systems(self.global_coordinate_system, other.global_coordinate_system)
 
         return Procedures(
-            subject_id=self.subject_id,
+            subject_name=self.subject_name,
             subject_procedures=self.subject_procedures + other.subject_procedures,
             specimen_procedures=self.specimen_procedures + other.specimen_procedures,
             global_coordinate_system=coordinate_system,

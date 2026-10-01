@@ -44,7 +44,7 @@ class TestDataDescription:
             data_level=DataLevel.RAW,
             funding_source=[f],
             modalities=[Modality.ECEPHYS],
-            subject_id="12345",
+            subject_name="12345",
             investigators=[Person(name="Jane Smith")],
             project_name="Test",
         )
@@ -65,7 +65,7 @@ class TestDataDescription:
         with pytest.raises(ValueError):
             DataDescription(
                 modalities=[Modality.SPIM],
-                subject_id="1234",
+                subject_name="1234",
                 data_level=DataLevel.RAW,
                 creation_time=dt,
                 institution=Organization.AIND,
@@ -84,7 +84,7 @@ class TestDataDescription:
             data_level=DataLevel.RAW,
             funding_source=[f],
             modalities=[Modality.ECEPHYS],
-            subject_id="12345",
+            subject_name="12345",
             investigators=[Person(name="Jane Smith")],
             project_name="Test",
         )
@@ -101,7 +101,7 @@ class TestDataDescription:
             data_level=DataLevel.RAW,
             funding_source=[f],
             modalities=[Modality.ECEPHYS],
-            subject_id="12345",
+            subject_name="12345",
             investigators=[Person(name="Jane Smith")],
             project_name="Test",
         )
@@ -116,7 +116,7 @@ class TestDataDescription:
         f = Funding(funder=Organization.NINDS, grant_number="grant001")
         dd = DataDescription(
             modalities=[Modality.SPIM],
-            subject_id="1234",
+            subject_name="1234",
             data_level=DataLevel.RAW,
             creation_time=dt,
             institution=Organization.AIND,
@@ -133,7 +133,7 @@ class TestDataDescription:
         with pytest.raises(ValidationError):
             DataDescription(
                 modalities=[Modality.SPIM],
-                subject_id="",
+                subject_name="",
                 data_level=DataLevel.RAW,
                 creation_time=dt,
                 institution=Organization.AIND,
@@ -156,7 +156,7 @@ class TestDataDescription:
         f = Funding(funder=Organization.NINDS, grant_number="grant001")
         dr = DataDescription(
             modalities=[Modality.SPIM],
-            subject_id="1234",
+            subject_name="1234",
             data_level=DataLevel.RAW,
             creation_time=dt,
             institution=Organization.AIND,
@@ -166,11 +166,11 @@ class TestDataDescription:
         )
 
         # also over-write with specimen ID
-        dd = derive_data_description_from_raw(dr, "process", subject_id="1234-56")
+        dd = derive_data_description_from_raw(dr, "process", subject_name="1234-56")
         assert dd is not None
 
     def test_raw_no_subject_id(self):
-        """Test that creating a raw data description without subject_id raises an error"""
+        """Test that creating a raw data description without subject_name raises an error"""
         dt = datetime.datetime.now()
 
         with pytest.raises(ValueError) as context:
@@ -184,7 +184,7 @@ class TestDataDescription:
                 project_name="Test",
             )
 
-        assert "subject_id" in str(context.value)
+        assert "subject_name" in str(context.value)
 
     def test_derived_bad_creation_time(self):
         """Test that a validation error is raised if the creation time is not a datetime object"""
@@ -196,7 +196,7 @@ class TestDataDescription:
             data_level=DataLevel.RAW,
             funding_source=[Funding(funder=Organization.NINDS, grant_number="grant001")],
             modalities=[Modality.ECEPHYS],
-            subject_id="12345",
+            subject_name="12345",
             investigators=[Person(name="Jane Smith")],
             project_name="Test",
         )
@@ -216,7 +216,7 @@ class TestDataDescription:
         with pytest.raises(ValidationError) as e:
             DataDescription(
                 modalities=[Modality.SPIM],
-                subject_id="1234",
+                subject_name="1234",
                 data_level=DataLevel.RAW,
                 project_name="a_32r&!#R$&#",
                 creation_time=datetime.datetime(2020, 10, 10, 10, 10, 10),
@@ -245,7 +245,7 @@ class TestDataDescription:
             data_level=DataLevel.RAW,
             funding_source=[Funding(funder=Organization.NINDS, grant_number="grant001")],
             modalities=[Modality.SPIM],
-            subject_id="12345",
+            subject_name="12345",
             investigators=[Person(name="Jane Smith")],
             project_name="Test",
         )
@@ -289,7 +289,7 @@ class TestDataDescription:
         with pytest.raises(ValueError) as context:
             DataDescription(
                 modalities=[Modality.SPIM],
-                subject_id="1234",
+                subject_name="1234",
                 data_level=DataLevel.RAW,
                 creation_time=datetime.datetime.now(),
                 institution=Organization.AIND,
@@ -309,7 +309,7 @@ class TestDataDescription:
             data_level=DataLevel.RAW,
             funding_source=[f],
             modalities=[Modality.ECEPHYS],
-            subject_id="12345",
+            subject_name="12345",
             investigators=[Person(name="Jane Smith")],
             project_name="Test",
         )
@@ -330,7 +330,7 @@ class TestDataDescription:
             data_level=DataLevel.RAW,
             funding_source=[f],
             modalities=[Modality.ECEPHYS],
-            subject_id="12345",
+            subject_name="12345",
             investigators=[Person(name="Jane Smith")],
             project_name="Test",
         )
@@ -366,7 +366,7 @@ class TestDataDescription:
             data_level=DataLevel.RAW,
             funding_source=[f],
             modalities=[Modality.ECEPHYS],
-            subject_id="12345",
+            subject_name="12345",
             investigators=[Person(name="Jane Smith")],
             project_name="Test",
         )

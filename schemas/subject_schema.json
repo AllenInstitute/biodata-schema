@@ -10,7 +10,7 @@
                "title": "Object Type",
                "type": "string"
             },
-            "maternal_id": {
+            "maternal_name": {
                "title": "Maternal specimen ID",
                "type": "string"
             },
@@ -18,7 +18,7 @@
                "title": "Maternal genotype",
                "type": "string"
             },
-            "paternal_id": {
+            "paternal_name": {
                "title": "Paternal specimen ID",
                "type": "string"
             },
@@ -28,9 +28,9 @@
             }
          },
          "required": [
-            "maternal_id",
+            "maternal_name",
             "maternal_genotype",
-            "paternal_id",
+            "paternal_name",
             "paternal_genotype"
          ],
          "title": "BreedingInfo",
@@ -8796,7 +8796,7 @@
          "title": "Schema Version",
          "type": "string"
       },
-      "subject_id": {
+      "subject_name": {
          "description": "Unique identifier for the subject of data acquisition",
          "title": "Subject ID",
          "type": "string"
@@ -8841,7 +8841,7 @@
       }
    },
    "required": [
-      "subject_id",
+      "subject_name",
       "subject_details"
    ],
    "title": "Subject",

@@ -8207,7 +8207,7 @@
                "title": "Protocol ID"
             },
             "output_specimen_ids": {
-               "description": "IDs of specimens resulting from this procedure. Whole brains can use the {subject_id}, partial sections should always include a suffix {subject_id}_###",
+               "description": "IDs of specimens resulting from this procedure. Whole brains can use the {subject_name}, partial sections should always include a suffix {subject_name}_###",
                "items": {
                   "type": "string"
                },
@@ -10281,7 +10281,7 @@
                "default": null,
                "title": "Procedure name"
             },
-            "specimen_id": {
+            "specimen_name": {
                "anyOf": [
                   {
                      "type": "string"
@@ -10395,7 +10395,7 @@
          },
          "required": [
             "procedure_type",
-            "specimen_id",
+            "specimen_name",
             "start_date",
             "end_date"
          ],
@@ -16838,7 +16838,7 @@
          "title": "Schema Version",
          "type": "string"
       },
-      "subject_id": {
+      "subject_name": {
          "description": "Unique identifier for the subject of data acquisition",
          "title": "Subject ID",
          "type": "string"
@@ -16918,7 +16918,7 @@
       }
    },
    "required": [
-      "subject_id"
+      "subject_name"
    ],
    "title": "Procedures",
    "type": "object"

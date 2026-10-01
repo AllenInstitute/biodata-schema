@@ -233,7 +233,7 @@ class Perfusion(ProtocolMixin, DataModel):
         title="Specimen ID",
         description=(
             "IDs of specimens resulting from this procedure."
-            " Whole brains can use the {subject_id}, partial sections should always include a suffix {subject_id}_###"
+            " Whole brains can use the {subject_name}, partial sections should always include a suffix {subject_name}_###"
         ),
     )
 
