@@ -35,7 +35,7 @@ Description of model evaluation
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `process_type` | [ProcessName](processing.md#processname) |   |
+| `process_type` | `str` |   |
 | `performance` | List[[PerformanceMetric](model.md#performancemetric)] | Evaluation performance  |
 | `name` | `str` | Name (Unique name of the processing step. If not provided, the type will be used as the name.) |
 | `stage` | [ProcessStage](processing.md#processstage) | Processing stage  |
@@ -65,7 +65,7 @@ Description of model training
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `process_type` | [ProcessName](processing.md#processname) |   |
+| `process_type` | `str` |   |
 | `train_performance` | List[[PerformanceMetric](model.md#performancemetric)] | Training performance (Performance on training set) |
 | `test_performance` | Optional[List[[PerformanceMetric](model.md#performancemetric)]] | Test performance (Performance on test data, evaluated during training) |
 | `test_evaluation_method` | `Optional[str]` | Test evaluation method (Approach to cross-validation or Train/test splitting) |

@@ -15,58 +15,6 @@ from biodata_schema.utils.merge import merge_notes, merge_optional_list, merge_p
 from biodata_schema.utils.validators import TimeValidation
 
 
-class ProcessName(str, Enum):
-    """Supported processing operations"""
-
-    ANALYSIS = "Analysis"
-    COMPRESSION = "Compression"
-    DENOISING = "Denoising"
-    EPHYS_CURATION = "Ephys curation"
-    EPHYS_POSTPROCESSING = "Ephys postprocessing"
-    EPHYS_PREPROCESSING = "Ephys preprocessing"
-    EPHYS_VISUALIZATION = "Ephys visualization"
-    FIDUCIAL_SEGMENTATION = "Fiducial segmentation"
-    FILE_FORMAT_CONVERSION = "File format conversion"
-    FIX_COLOR_RANGE = "Fix color range"
-    FLUORESCENCE_EVENT_DETECTION = "Fluorescence event detection"
-    IMAGE_ATLAS_ALIGNMENT = "Image atlas alignment"
-    IMAGE_BACKGROUND_SUBTRACTION = "Image background subtraction"
-    IMAGE_CELL_CLASSIFICATION = "Image cell classification"
-    IMAGE_CELL_QUANTIFICATION = "Image cell quantification"
-    IMAGE_CELL_SEGMENTATION = "Image cell segmentation"
-    IMAGE_CROSS_IMAGE_ALIGNMENT = "Image cross-image alignment"
-    IMAGE_DESTRIPING = "Image destriping"
-    IMAGE_FLAT_FIELD_CORRECTION = "Image flat-field correction"
-    IMAGE_IMPORTING = "Image importing"
-    IMAGE_MIP_VISUALIZATION = "Image mip visualization"
-    IMAGE_MULTISCALING = "Image multiscaling"
-    IMAGE_RADIAL_CORRECTION = "Image radial correction"
-    IMAGE_SPOT_DETECTION = "Image spot detection"
-    IMAGE_SPOT_SPECTRAL_UNMIXING = "Image spot spectral unmixing"
-    IMAGE_THRESHOLDING = "Image thresholding"
-    IMAGE_TILE_ALIGNMENT = "Image tile alignment"
-    IMAGE_TILE_FUSING = "Image tile fusing"
-    IMAGE_TILE_PROJECTION = "Image tile projection"
-    MANUAL_CURATION = "Manual curation"
-    MODEL_EVALUATION = "Model evaluation"
-    MODEL_TRAINING = "Model training"
-    NEURON_SKELETON_PROCESSING = "Neuron skeleton processing"
-    NEUROPIL_SUBTRACTION = "Neuropil subtraction"
-    OTHER = "Other"
-    PIPELINE = "Pipeline"
-    SIMULATION = "Simulation"
-    SKULL_STRIPPING = "Skull stripping"
-    SPATIAL_TIMESERIES_DEMIXING = "Spatial timeseries demixing"
-    SPIKE_SORTING = "Spike sorting"
-    VIDEO_ROI_CLASSIFICATION = "Video ROI classification"
-    VIDEO_ROI_CROSS_SESSION_MATCHING = "Video ROI cross session matching"
-    VIDEO_ROI_SEGMENTATION = "Video ROI segmentation"
-    VIDEO_ROI_TIMESERIES_EXTRACTION = "Video ROI timeseries extraction"
-    VIDEO_MOTION_CORRECTION = "Video motion correction"
-    VIDEO_PLANE_DECROSSTALK = "Video plane decrosstalk"
-    DF_F_ESTIMATION = "dF/F estimation"
-
-
 class ProcessStage(str, Enum):
     """Stages of processing"""
 
@@ -103,7 +51,7 @@ class ResourceUsage(DataModel):
 class DataProcess(DataModel):
     """Description of a single processing step"""
 
-    process_type: ProcessName = Field(..., title="Process type")
+    process_type: str = Field(..., title="Process type")
     name: str = Field(
         default="",
         title="Name",
@@ -125,16 +73,6 @@ class DataProcess(DataModel):
     output_parameters: Optional[GenericModel] = Field(default=None, description="Output parameters", title="Outputs")
     notes: Optional[str] = Field(default=None, title="Notes", validate_default=True)
     resources: Optional[ResourceUsage] = Field(default=None, title="Process resource usage")
-
-    @model_validator(mode="after")
-    def validate_generic_processtype(self) -> "DataProcess":
-        """Validate to be sure OTHER types are pinned down in name or notes"""
-
-        if self.process_type in [ProcessName.OTHER, ProcessName.ANALYSIS] and not (self.notes or self.name):
-            raise ValueError(
-                "If 'process_type' is Other or Analysis, either 'name' or 'notes' must specify process details."
-            )
-        return self
 
     @model_validator(mode="after")
     def fill_default_name(self) -> "DataProcess":

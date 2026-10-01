@@ -33,7 +33,7 @@ For assets created during analysis that aggregate across multiple acquisitions o
 from datetime import datetime, timezone
 
 from biodata_schema.core.metadata import Metadata
-from biodata_schema.core.processing import DataProcess, Processing, ProcessName, ProcessStage
+from biodata_schema.core.processing import DataProcess, Processing, ProcessStage
 from biodata_schema.core.quality_control import QCMetric, QCStatus, QualityControl, Stage, Status
 from biodata_schema.components.identifiers import Code
 from biodata_models.modalities import Modality
@@ -45,7 +45,7 @@ source = Metadata.model_validate_json(open("metadata.nd.json").read())
 new_processing = Processing.create_with_sequential_process_graph(
     data_processes=[
         DataProcess(
-            process_type=ProcessName.IMAGE_TILE_FUSING,
+            process_type="Image tile fusing",
             name="Tile fusing",
             experimenters=["Dr. Dan"],
             stage=ProcessStage.PROCESSING,
