@@ -93,7 +93,7 @@ class TestMetadata:
             project_name="Test",
         )
         procedures = Procedures(
-            subject_id="12345",
+            subject_id="123456",
         )
         processing = Processing.create_with_sequential_process_graph(
             data_processes=[
@@ -271,6 +271,47 @@ class TestMetadata:
         assert result["acquisition"] is None
         # also check the other fields
         assert expected_result == result
+
+    def test_validate_subject_id_consistency(self):
+        """Tests that mismatched subject_id across core files raises an error"""
+        Metadata(
+            name=self.sample_name,
+            location=self.sample_location,
+            data_description=self.dd,
+            subject=self.subject,
+            procedures=self.procedures,
+            processing=self.processing,
+        )
+        with pytest.raises(ValidationError, match="procedures.subject_id=999"):
+            Metadata(
+                name=self.sample_name,
+                location=self.sample_location,
+                data_description=self.dd,
+                subject=self.subject,
+                procedures=self.procedures.model_copy(update={"subject_id": "999"}),
+                processing=self.processing,
+            )
+        with pytest.raises(ValidationError, match="data_description.subject_id=999"):
+            Metadata(
+                name=self.sample_name,
+                location=self.sample_location,
+                data_description=self.dd.model_copy(update={"subject_id": "999"}),
+                subject=self.subject,
+                procedures=self.procedures,
+                processing=self.processing,
+            )
+        with pytest.raises(ValidationError, match="acquisition.subject_id=999"):
+            Metadata(
+                name=self.sample_name,
+                location=self.sample_location,
+                subject=self.subject,
+                acquisition=Acquisition.model_construct(
+                    acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
+                    subject_id="999",
+                    subject_details=AcquisitionSubjectDetails.model_construct(),
+                    data_streams=[],
+                ),
+            )
 
     def test_create_from_core_jsons_invalid(self):
         """Tests metadata json creation with invalid inputs"""
@@ -592,7 +633,7 @@ class TestMetadata:
         data_description = DataDescription(
             creation_time=test_datetime,
             modalities=[Modality.ECEPHYS],
-            subject_id="655019",
+            subject_id="123456",
             data_level=DataLevel.RAW,
             institution=Organization.AIND,
             funding_source=[Funding(funder=Organization.NINDS)],
@@ -624,7 +665,7 @@ class TestMetadata:
         data_description_later = DataDescription(
             creation_time=later_same_day,
             modalities=[Modality.ECEPHYS],
-            subject_id="655019",
+            subject_id="123456",
             data_level=DataLevel.RAW,
             institution=Organization.AIND,
             funding_source=[Funding(funder=Organization.NINDS)],
@@ -646,7 +687,7 @@ class TestMetadata:
         data_description_next_day = DataDescription(
             creation_time=next_day,
             modalities=[Modality.ECEPHYS],
-            subject_id="655019",
+            subject_id="123456",
             data_level=DataLevel.RAW,
             institution=Organization.AIND,
             funding_source=[Funding(funder=Organization.NINDS)],
@@ -668,7 +709,7 @@ class TestMetadata:
         data_description_before = DataDescription(
             creation_time=before_midnight,
             modalities=[Modality.ECEPHYS],
-            subject_id="655019",
+            subject_id="123456",
             data_level=DataLevel.RAW,
             institution=Organization.AIND,
             funding_source=[Funding(funder=Organization.NINDS)],
@@ -888,7 +929,7 @@ class TestMetadata:
             name="Test Metadata",
             location="Test Location",
             subject=calibration_subject,
-            data_description=data_description,
+            data_description=data_description.model_copy(update={"subject_id": "calibration"}),
         )
         assert metadata is not None
 
