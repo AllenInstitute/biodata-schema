@@ -10,7 +10,6 @@ from biodata_schema.components.identifiers import Code, DataAsset
 from biodata_schema.core.processing import (
     DataProcess,
     Processing,
-    ProcessName,
     ProcessStage,
     ResourceTimestamped,
     ResourceUsage,
@@ -62,7 +61,7 @@ p = Processing.create_with_sequential_process_graph(
     ],
     data_processes=[
         DataProcess(
-            process_type=ProcessName.IMAGE_TILE_FUSING,
+            process_type="Image tile fusing",
             experimenters=["Dr. Dan"],
             stage=ProcessStage.PROCESSING,
             start_date_time=t,
@@ -90,7 +89,7 @@ p = Processing.create_with_sequential_process_graph(
             ),
         ),
         DataProcess(
-            process_type=ProcessName.FILE_FORMAT_CONVERSION,
+            process_type="File format conversion",
             pipeline_name="Imaging processing pipeline",
             experimenters=["Dr. Dan"],
             stage=ProcessStage.PROCESSING,
@@ -104,7 +103,7 @@ p = Processing.create_with_sequential_process_graph(
             ),
         ),
         DataProcess(
-            process_type=ProcessName.IMAGE_DESTRIPING,
+            process_type="Image destriping",
             pipeline_name="Imaging processing pipeline",
             experimenters=["Dr. Dan"],
             stage=ProcessStage.PROCESSING,
@@ -121,7 +120,7 @@ p = Processing.create_with_sequential_process_graph(
             name="Analysis 1",
             stage=ProcessStage.ANALYSIS,
             experimenters=["Some Analyzer"],
-            process_type=ProcessName.ANALYSIS,
+            process_type="Analysis",
             start_date_time=t,
             end_date_time=t,
             output_path="path/to/outputs",
@@ -135,7 +134,7 @@ p = Processing.create_with_sequential_process_graph(
             name="Analysis 2",
             stage=ProcessStage.ANALYSIS,
             experimenters=["Some Analyzer"],
-            process_type=ProcessName.ANALYSIS,
+            process_type="Analysis",
             start_date_time=t,
             end_date_time=t,
             output_path="path/to/outputs",

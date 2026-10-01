@@ -11,7 +11,6 @@ from biodata_schema.components.identifiers import Code, DataAsset
 from biodata_schema.core.processing import (
     DataProcess,
     Processing,
-    ProcessName,
     ProcessStage,
     ResourceTimestamped,
     ResourceUsage,
@@ -42,7 +41,7 @@ class TestProcessing:
             data_processes=[
                 DataProcess(
                     experimenters=["Dr. Dan"],
-                    process_type=ProcessName.DENOISING,
+                    process_type="Denoising",
                     stage=ProcessStage.PROCESSING,
                     code=code,
                     output_path="./path/to/outputs",
@@ -53,7 +52,7 @@ class TestProcessing:
         )
 
         assert p is not None
-        assert p.data_processes[0].name == ProcessName.DENOISING
+        assert p.data_processes[0].name == "Denoising"
 
     def test_resource_usage(self):
         """Test the ResourceUsage class"""
@@ -118,7 +117,7 @@ class TestProcessing:
                 data_processes=[
                     DataProcess(
                         experimenters=["Dr. Dan"],
-                        process_type=ProcessName.DENOISING,
+                        process_type="Denoising",
                         stage=ProcessStage.PROCESSING,
                         start_date_time=t,
                         end_date_time=t,
@@ -126,7 +125,7 @@ class TestProcessing:
                     ),
                     DataProcess(
                         experimenters=["Dr. Dan"],
-                        process_type=ProcessName.DENOISING,
+                        process_type="Denoising",
                         stage=ProcessStage.PROCESSING,
                         start_date_time=t,
                         end_date_time=t,
@@ -145,7 +144,7 @@ class TestProcessing:
                 DataProcess(
                     experimenters=["Dr. Dan"],
                     name="My Analysis",
-                    process_type=ProcessName.ANALYSIS,
+                    process_type="Analysis",
                     stage=ProcessStage.ANALYSIS,
                     output_path="./path/to/outputs",
                     start_date_time=t,
@@ -164,7 +163,7 @@ class TestProcessing:
                         DataProcess(
                             experimenters=["Dr. Dan"],
                             name="My Analysis",
-                            process_type=ProcessName.ANALYSIS,
+                            process_type="Analysis",
                             stage=ProcessStage.ANALYSIS,
                             output_path="./path/to/outputs",
                             start_date_time=t,
@@ -181,7 +180,7 @@ class TestProcessing:
         process1 = DataProcess(
             name="process1",
             experimenters=["Dr. Dan"],
-            process_type=ProcessName.COMPRESSION,
+            process_type="Compression",
             stage=ProcessStage.PROCESSING,
             code=code,
             start_date_time=t,
@@ -190,7 +189,7 @@ class TestProcessing:
         process2 = DataProcess(
             name="process2",
             experimenters=["Dr. Dan"],
-            process_type=ProcessName.ANALYSIS,
+            process_type="Analysis",
             stage=ProcessStage.ANALYSIS,
             code=code,
             start_date_time=t,
@@ -199,7 +198,7 @@ class TestProcessing:
         process3 = DataProcess(
             name="process3",
             experimenters=["Dr. Dan"],
-            process_type=ProcessName.SPIKE_SORTING,
+            process_type="Spike sorting",
             stage=ProcessStage.PROCESSING,
             code=code,
             start_date_time=t,
@@ -242,7 +241,7 @@ class TestProcessing:
         process1 = DataProcess(
             name="process1",
             experimenters=["Dr. Dan"],
-            process_type=ProcessName.COMPRESSION,
+            process_type="Compression",
             stage=ProcessStage.PROCESSING,
             code=code,
             start_date_time=t,
@@ -251,7 +250,7 @@ class TestProcessing:
         process2 = DataProcess(
             name="process2",
             experimenters=["Dr. Dan"],
-            process_type=ProcessName.ANALYSIS,
+            process_type="Analysis",
             stage=ProcessStage.ANALYSIS,
             code=code,
             start_date_time=t,
@@ -271,7 +270,7 @@ class TestProcessing:
         process3 = DataProcess(
             name="process3",
             experimenters=["Dr. Dan"],
-            process_type=ProcessName.SPIKE_SORTING,
+            process_type="Spike sorting",
             stage=ProcessStage.PROCESSING,
             code=code,
             start_date_time=t,
@@ -300,7 +299,7 @@ class TestProcessing:
                 DataProcess(
                     start_date_time=datetime(2024, 10, 10, 1, 2, 3),
                     end_date_time=datetime(2024, 10, 11, 1, 2, 3),
-                    process_type=ProcessName.COMPRESSION,
+                    process_type="Compression",
                     experimenters=["AIND Scientific Computing"],
                     stage=ProcessStage.PROCESSING,
                     code=Code(
@@ -311,7 +310,7 @@ class TestProcessing:
                 DataProcess(
                     start_date_time=datetime(2024, 10, 10, 1, 2, 3),
                     end_date_time=datetime(2024, 10, 11, 1, 2, 4),
-                    process_type=ProcessName.OTHER,
+                    process_type="Other",
                     experimenters=["AIND Scientific Computing"],
                     stage=ProcessStage.PROCESSING,
                     code=Code(url="", version="0.0.1"),
@@ -334,7 +333,7 @@ class TestProcessing:
         process1 = DataProcess(
             name="process1",
             experimenters=["Dr. Dan"],
-            process_type=ProcessName.COMPRESSION,
+            process_type="Compression",
             stage=ProcessStage.PROCESSING,
             code=code,
             start_date_time=t,
@@ -344,7 +343,7 @@ class TestProcessing:
         process2 = DataProcess(
             name="process2",
             experimenters=["Dr. Dan"],
-            process_type=ProcessName.ANALYSIS,
+            process_type="Analysis",
             stage=ProcessStage.ANALYSIS,
             code=code,
             start_date_time=t,
@@ -364,7 +363,7 @@ class TestProcessing:
         process3 = DataProcess(
             name="process3",
             experimenters=["Dr. Dan"],
-            process_type=ProcessName.SPIKE_SORTING,
+            process_type="Spike sorting",
             stage=ProcessStage.PROCESSING,
             code=code,
             start_date_time=t,
@@ -391,7 +390,7 @@ class TestProcessing:
         process1 = DataProcess(
             name="process1",
             experimenters=["Dr. Dan"],
-            process_type=ProcessName.COMPRESSION,
+            process_type="Compression",
             stage=ProcessStage.PROCESSING,
             code=code,
             start_date_time=t1,
@@ -400,7 +399,7 @@ class TestProcessing:
         process2 = DataProcess(
             name="process2",
             experimenters=["Dr. Dan"],
-            process_type=ProcessName.ANALYSIS,
+            process_type="Analysis",
             stage=ProcessStage.ANALYSIS,
             code=code,
             start_date_time=t2,
@@ -409,7 +408,7 @@ class TestProcessing:
         process3 = DataProcess(
             name="process3",
             experimenters=["Dr. Dan"],
-            process_type=ProcessName.SPIKE_SORTING,
+            process_type="Spike sorting",
             stage=ProcessStage.PROCESSING,
             code=code,
             start_date_time=t3,
@@ -433,7 +432,7 @@ class TestProcessing:
         process4 = DataProcess(
             name="process4",
             experimenters=["Dr. Dan"],
-            process_type=ProcessName.COMPRESSION,
+            process_type="Compression",
             stage=ProcessStage.PROCESSING,
             code=code,
             start_date_time=t1,
@@ -442,7 +441,7 @@ class TestProcessing:
         process5 = DataProcess(
             name="process5",
             experimenters=["Dr. Dan"],
-            process_type=ProcessName.ANALYSIS,
+            process_type="Analysis",
             stage=ProcessStage.ANALYSIS,
             code=code,
             start_date_time=t3,
@@ -471,64 +470,22 @@ class TestProcessing:
         assert p4.notes is None
 
 
-class TestDataProcessValidateOther:
-    """Tests for DataProcess.validate_other"""
+class TestProcessingProcessTypeAcceptsArbitraryStrings:
+    """Tests for Processing types are open-ended strings, not a fixed enum."""
 
-    def _make(self, process_type, **kwargs):
-        """Helper method to create a DataProcess with default values and override with kwargs"""
-        return DataProcess(
-            process_type=process_type,
-            stage=ProcessStage.PROCESSING,
+    def test_process_type_accepts_arbitrary_strings(self):
+        """Processing types are open-ended strings, not a fixed enum."""
+        process = DataProcess(
             experimenters=["Dr. Dan"],
+            process_type="Cell-level tracking",
+            stage=ProcessStage.PROCESSING,
             code=code,
             start_date_time=t,
-            **kwargs,
+            end_date_time=t,
         )
+        process_type_schema = DataProcess.model_json_schema()["properties"]["process_type"]
 
-    # --- ProcessName.OTHER ---
-
-    def test_other_with_name_passes(self):
-        """OTHER is allowed when a custom name is provided"""
-        dp = self._make(ProcessName.OTHER, name="my custom step")
-        assert dp.process_type == ProcessName.OTHER
-
-    def test_other_with_notes_passes(self):
-        """OTHER is allowed when notes describe the process"""
-        dp = self._make(ProcessName.OTHER, notes="some detail")
-        assert dp.process_type == ProcessName.OTHER
-
-    def test_other_with_name_and_notes_passes(self):
-        """OTHER is allowed when both name and notes are provided"""
-        dp = self._make(ProcessName.OTHER, name="step", notes="detail")
-        assert dp.process_type == ProcessName.OTHER
-
-    def test_other_without_name_or_notes_fails(self):
-        """OTHER without name or notes should raise a ValidationError"""
-        with pytest.raises(pydantic.ValidationError) as ctx:
-            self._make(ProcessName.OTHER)
-        assert "name' or 'notes' must specify process details" in str(ctx.value)
-
-    # --- ProcessName.ANALYSIS ---
-
-    def test_analysis_with_name_passes(self):
-        """ANALYSIS is allowed when a custom name is provided"""
-        dp = self._make(ProcessName.ANALYSIS, name="my analysis")
-        assert dp.process_type == ProcessName.ANALYSIS
-
-    def test_analysis_with_notes_passes(self):
-        """ANALYSIS is allowed when notes are provided"""
-        dp = self._make(ProcessName.ANALYSIS, notes="analysis detail")
-        assert dp.process_type == ProcessName.ANALYSIS
-
-    def test_analysis_without_name_or_notes_fails(self):
-        """ANALYSIS without name or notes should raise a ValidationError"""
-        with pytest.raises(pydantic.ValidationError) as ctx:
-            self._make(ProcessName.ANALYSIS)
-        assert "name' or 'notes' must specify process details" in str(ctx.value)
-
-    # --- Other process types are not affected ---
-
-    def test_compression_without_name_or_notes_passes(self):
-        """Non-OTHER/ANALYSIS types do not require name or notes"""
-        dp = self._make(ProcessName.COMPRESSION)
-        assert dp.process_type == ProcessName.COMPRESSION
+        assert process.process_type == "Cell-level tracking"
+        assert process.name == "Cell-level tracking"
+        assert process_type_schema["type"] == "string"
+        assert "enum" not in process_type_schema

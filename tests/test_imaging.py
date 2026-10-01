@@ -13,7 +13,7 @@ from biodata_schema.components.devices import Laser, Objective, ScanningStage
 from biodata_schema.components.identifiers import Code
 from biodata_schema.core.acquisition import Acquisition
 from biodata_schema.core.instrument import Instrument
-from biodata_schema.core.processing import DataProcess, ProcessName, ProcessStage
+from biodata_schema.core.processing import DataProcess, ProcessStage
 from examples.exaspim_acquisition import acq
 from tests.coordinate_systems import BREGMA_ARI
 
@@ -109,7 +109,7 @@ class TestImaging:
             ],
         }
         t = DataProcess(
-            process_type=ProcessName.IMAGE_TILE_ALIGNMENT,
+            process_type="Image tile alignment",
             stage=ProcessStage.PROCESSING,
             experimenters=["Dr. Dan"],
             start_date_time=datetime.now(tz=timezone.utc),

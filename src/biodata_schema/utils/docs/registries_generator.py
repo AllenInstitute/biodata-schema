@@ -79,7 +79,6 @@ from biodata_models.units import (
 )
 
 # Processing
-from biodata_schema.core.processing import ProcessName
 from biodata_schema.utils.docs.utils import generate_enum_table, save_model_info, update_model_links
 
 # Special case classes that should be processed as model schemas even if they don't contain model instances
@@ -103,8 +102,6 @@ registries = [
     AnatomicalRelative,
     # Organization models
     Organization,
-    # Process names
-    ProcessName,
     # Reagent
     StainType,
     FluorophoreType,
