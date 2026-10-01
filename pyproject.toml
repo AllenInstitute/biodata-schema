@@ -70,7 +70,6 @@ ignore-words-list = 'nd,DeviceC'
 testpaths = ["tests"]
 strict_config = true
 strict_markers = true
-markers = ["online: tests requiring external services"]
 
 [tool.ruff]
 line-length = 120
