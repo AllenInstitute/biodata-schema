@@ -3,10 +3,11 @@
 from datetime import date
 
 import pytest
-from biodata_models.anatomy import MouseAnatomyLookup
+from biodata_models.anatomy import AnatomyModel
 from biodata_models.brain_atlas import CCFv3
 from biodata_models.coordinates import AnatomicalRelative
 from biodata_models.organizations import Organization
+from biodata_models.registries import Registry
 from biodata_models.specimen_procedure_types import SpecimenProcedureType
 from biodata_models.units import ConcentrationUnit, CurrentUnit, SizeUnit, TimeUnit, VolumeUnit
 from pydantic import ValidationError
@@ -37,9 +38,9 @@ from biodata_schema.utils.exceptions import OneOfError
 from tests.coordinate_systems import BREGMA_ARI, BREGMA_RAS
 
 
-def mouse_anatomy(name: str) -> MouseAnatomyLookup:
-    """Construct an offline anatomy lookup fixture."""
-    return MouseAnatomyLookup(name=name, registry_identifier="EMAPA:TEST")
+def mouse_anatomy(name: str) -> AnatomyModel:
+    """Construct an offline anatomy model fixture."""
+    return AnatomyModel(name=name, registry=Registry.EMAPA, registry_identifier="EMAPA:TEST")
 
 
 class TestProcedures:

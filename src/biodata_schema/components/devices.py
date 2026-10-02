@@ -6,7 +6,7 @@ from decimal import Decimal
 from enum import Enum
 from typing import List, Literal, Optional
 
-from biodata_models.anatomy import MouseAnatomyLookup
+from biodata_models.anatomy import AnatomyModel
 from biodata_models.coordinates import AnatomicalRelative
 from biodata_models.devices import (
     BinMode,
@@ -704,14 +704,18 @@ class Scanner(Device):
 class MyomatrixContact(DataModel):
     """Description of a contact on a myomatrix thread"""
 
-    body_part: MouseAnatomyLookup = Field(
-        ..., title="Body part of contact insertion", description="Mouse anatomy term from EMAPA"
+    body_part: AnatomyModel = Field(
+        ...,
+        title="Body part of contact insertion",
+        description="Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or HumanAnatomyLookup).",
     )
     relative_position: AnatomicalRelative = Field(
         ..., title="Relative position", description="Position relative to procedures coordinate system"
     )
-    muscle: MouseAnatomyLookup = Field(
-        ..., title="Muscle of contact insertion", description="Mouse anatomy term from EMAPA"
+    muscle: AnatomyModel = Field(
+        ...,
+        title="Muscle of contact insertion",
+        description="Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or HumanAnatomyLookup).",
     )
     in_muscle: bool = Field(..., title="In muscle")
 
@@ -719,8 +723,10 @@ class MyomatrixContact(DataModel):
 class MyomatrixThread(DataModel):
     """Description of a thread of a myomatrix array"""
 
-    ground_electrode_location: MouseAnatomyLookup = Field(
-        ..., title="Location of ground electrode", description="Mouse anatomy term from EMAPA"
+    ground_electrode_location: AnatomyModel = Field(
+        ...,
+        title="Location of ground electrode",
+        description="Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or HumanAnatomyLookup).",
     )
     contacts: List[MyomatrixContact] = Field(..., title="Contacts")
 

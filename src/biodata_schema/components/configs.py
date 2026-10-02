@@ -4,7 +4,7 @@ from decimal import Decimal
 from enum import Enum
 from typing import List, Optional
 
-from biodata_models.anatomy import MouseAnatomyLookup
+from biodata_models.anatomy import AnatomyModel
 from biodata_models.brain_atlas import BrainStructureModel
 from biodata_models.coordinates import AnatomicalRelative
 from biodata_models.devices import ImmersionMedium
@@ -621,6 +621,8 @@ class MRIScan(DeviceConfig):
 class CatheterConfig(DeviceConfig):
     """Configuration of a catheter"""
 
-    targeted_structure: MouseAnatomyLookup = Field(
-        ..., title="Targeted blood vessel", description="Mouse anatomy term from EMAPA"
+    targeted_structure: AnatomyModel = Field(
+        ...,
+        title="Targeted blood vessel",
+        description="Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or HumanAnatomyLookup).",
     )
