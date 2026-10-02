@@ -41,13 +41,21 @@ class GenericSubjectProcedure(ProtocolMixin, DataModel):
 
 class NonSurgicalInjection(DataModel):
     """Injection procedure performed outside of surgery,
-    which may include one or more injections at different locations/depths
+    which may include one or more injections at different locations/depths.
+
+    Common mouse injection sites, including intraperitoneal injection, are
+    available through MouseInjectionTargets.
     """
 
     start_date: date = Field(..., title="Start date")
     ethics_review_id: str = Field(..., title="Ethics review ID")
     protocol_id: Optional[str] = Field(default=None, title="Protocol ID", description="DOI for protocols.io")
-    injections: List[Injection] = Field(..., title="Injections", min_length=1)
+    injections: List[Injection] = Field(
+        ...,
+        title="Injections",
+        description="Use MouseInjectionTargets for common mouse injection sites such as intraperitoneal injection.",
+        min_length=1,
+    )
     notes: Optional[str] = Field(default=None, title="Notes")
 
 

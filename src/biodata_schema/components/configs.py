@@ -624,5 +624,9 @@ class CatheterConfig(DeviceConfig):
     targeted_structure: AnatomyModel = Field(
         ...,
         title="Targeted blood vessel",
-        description="Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or HumanAnatomyLookup).",
+        description=(
+            "Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or "
+            "HumanAnatomyLookup). For common mouse blood-vessel targets, use MouseBloodVessels and resolve the "
+            "target with MouseAnatomyLookup.get_by_name(...)."
+        ),
     )

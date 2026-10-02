@@ -36,14 +36,17 @@ Description of a non-surgical procedure performed on a subject
 ### NonSurgicalInjection
 
 Injection procedure performed outside of surgery,
-which may include one or more injections at different locations/depths
+which may include one or more injections at different locations/depths.
+
+Common mouse injection sites, including intraperitoneal injection, are
+available through MouseInjectionTargets.
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `start_date` | `datetime.date` | Start date  |
 | `ethics_review_id` | `str` | Ethics review ID  |
 | `protocol_id` | `Optional[str]` | Protocol ID (DOI for protocols.io) |
-| `injections` | List[[Injection](injection_procedures.md#injection)] | Injections  |
+| `injections` | List[[Injection](injection_procedures.md#injection)] | Injections (Use MouseInjectionTargets for common mouse injection sites such as intraperitoneal injection.) |
 | `notes` | `Optional[str]` | Notes  |
 
 

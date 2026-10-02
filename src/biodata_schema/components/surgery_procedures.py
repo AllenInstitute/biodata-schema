@@ -179,7 +179,11 @@ class GroundWireImplant(DataModel):
     ground_electrode_location: AnatomyModel = Field(
         ...,
         title="Location of ground electrode",
-        description="Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or HumanAnatomyLookup).",
+        description=(
+            "Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or "
+            "HumanAnatomyLookup). For common mouse ground-wire locations, use MouseGroundWireLocations and resolve "
+            "the target with MouseAnatomyLookup.get_by_name(...)."
+        ),
     )
     ground_wire_hole: Optional[int] = Field(
         default=None, title="Ground wire hole", description="For SHIELD implants, the hole number for the ground wire"
