@@ -86,8 +86,10 @@ class TestProcedures:
                 ],
             )
 
-    def test_injection_material_check(self):
+    @patch("biodata_models.anatomy.MouseAnatomyLookup.get_by_name")
+    def test_injection_material_check(self, mock_get_by_name):
         """Check for validation error when injection_materials is empty"""
+        mock_get_by_name.return_value = mouse_anatomy(MouseInjectionTargets.RETRO_ORBITAL.value)
 
         with pytest.raises(ValidationError) as e:
             Procedures(
@@ -109,7 +111,7 @@ class TestProcedures:
                                         profile=InjectionProfile.BOLUS,
                                     )
                                 ],
-                                targeted_structure=mouse_anatomy("Retro-orbital"),
+                                targeted_structure=MouseAnatomyLookup.get_by_name(MouseInjectionTargets.RETRO_ORBITAL),
                                 relative_position=[AnatomicalRelative.LEFT],
                             ),
                         ],
@@ -118,9 +120,12 @@ class TestProcedures:
             )
 
         assert "injection_materials" in repr(e.value)
+        mock_get_by_name.assert_called_once_with(MouseInjectionTargets.RETRO_ORBITAL)
 
-    def test_injection_material_none(self):
+    @patch("biodata_models.anatomy.MouseAnatomyLookup.get_by_name")
+    def test_injection_material_none(self, mock_get_by_name):
         """Check for validation error when injection_materials is None"""
+        mock_get_by_name.return_value = mouse_anatomy(MouseInjectionTargets.RETRO_ORBITAL.value)
         with pytest.raises(ValidationError) as e:
             Procedures(
                 subject_id="12345",
@@ -141,7 +146,7 @@ class TestProcedures:
                                         profile=InjectionProfile.BOLUS,
                                     )
                                 ],
-                                targeted_structure=mouse_anatomy("Retro-orbital"),
+                                targeted_structure=MouseAnatomyLookup.get_by_name(MouseInjectionTargets.RETRO_ORBITAL),
                                 relative_position=[AnatomicalRelative.LEFT],
                             ),
                         ],
@@ -150,6 +155,7 @@ class TestProcedures:
             )
 
         assert "injection_materials" in repr(e.value)
+        mock_get_by_name.assert_called_once_with(MouseInjectionTargets.RETRO_ORBITAL)
 
     @patch("biodata_models.anatomy.MouseAnatomyLookup.get_by_name")
     def test_injection_materials_list(self, mock_get_by_name):
@@ -737,8 +743,10 @@ class TestProcedures:
 
         assert procedures.get_device_names() == ["Catheter"]
 
-    def test_get_device_names_with_surgery_procedures(self):
+    @patch("biodata_models.anatomy.MouseAnatomyLookup.get_by_name")
+    def test_get_device_names_with_surgery_procedures(self, mock_get_by_name):
         """Test get_device_names method with nested surgery procedures"""
+        mock_get_by_name.return_value = mouse_anatomy(MouseBloodVessels.CAROTID_ARTERY.value)
 
         device1 = Catheter(
             name="Catheter",
@@ -749,7 +757,7 @@ class TestProcedures:
 
         config = CatheterConfig(
             device_name="Catheter",
-            targeted_structure=mouse_anatomy("Carotid artery"),
+            targeted_structure=MouseAnatomyLookup.get_by_name(MouseBloodVessels.CAROTID_ARTERY),
         )
 
         # Test with surgery containing procedures with implanted devices
@@ -772,6 +780,7 @@ class TestProcedures:
         device_names = procedures.get_device_names()
         assert "Catheter" in device_names
         assert len(device_names) == 1
+        mock_get_by_name.assert_called_once_with(MouseBloodVessels.CAROTID_ARTERY)
 
     @patch("biodata_models.anatomy.MouseAnatomyLookup.get_by_name")
     def test_catheter_blood_vessel_target_lookup(self, mock_get_by_name):
