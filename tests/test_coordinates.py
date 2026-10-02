@@ -142,15 +142,17 @@ class TestAtlas:
         assert atlas is not None
 
 
-class TestCoordinateSystemMouseAnatomyOrigin:
-    """Tests for CoordinateSystem with MouseAnatomyLookup as origin"""
+class TestCoordinateSystemAnatomyModelOrigin:
+    """Tests for CoordinateSystem with AnatomyModel as origin"""
 
-    def test_mouse_anatomy_origin(self):
-        """Test that CoordinateSystem accepts a MouseAnatomyLookup as origin"""
-        from biodata_models.anatomy import MouseAnatomyLookup
+    def test_anatomy_model_origin(self):
+        """Test that CoordinateSystem accepts an AnatomyModel as origin"""
+        from biodata_models.anatomy import AnatomyModel
+        from biodata_models.registries import Registry
 
-        frontonasal_suture = MouseAnatomyLookup(
+        frontonasal_suture = AnatomyModel(
             name="Frontonasal suture",
+            registry=Registry.EMAPA,
             registry_identifier="EMAPA:TEST",
         )
 

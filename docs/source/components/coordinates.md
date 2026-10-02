@@ -23,7 +23,7 @@ Definition an atlas
 | `size_unit` | [SizeUnit](../biodata_models/units.md#sizeunit) | Size unit  |
 | `resolution` | `List[float]` | Resolution  |
 | `resolution_unit` | [SizeUnit](../biodata_models/units.md#sizeunit) | Resolution unit  |
-| `origin` | ONE OF: [Origin](../biodata_models/coordinates.md#origin), [MouseAnatomyLookup](../biodata_models/external.md#mouseanatomylookup) | Origin (Defines the position of (0,0,0) in the coordinate system) |
+| `origin` | ONE OF: [Origin](../biodata_models/coordinates.md#origin), [AnatomyModel](../biodata_models/external.md#anatomymodel) | Origin (Defines the position of (0,0,0) in the coordinate system) |
 | `axes` | List[[Axis](#axis)] | Axis names (Axis names and directions) |
 | `axis_unit` | [SizeUnit](../biodata_models/units.md#sizeunit) | Size unit  |
 | `handedness` | Optional[[Handedness](#handedness)] | Handedness (Whether the coordinate system is right-handed or left-handed) |
@@ -57,7 +57,7 @@ Definition of a coordinate system
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `name` | `str` | Name (Convention is to use <Origin>_<POS_X_DIR><POS_Y_DIR><POS_Z_DIR> etc) |
-| `origin` | ONE OF: [Origin](../biodata_models/coordinates.md#origin), [MouseAnatomyLookup](../biodata_models/external.md#mouseanatomylookup) | Origin (Defines the position of (0,0,0) in the coordinate system) |
+| `origin` | ONE OF: [Origin](../biodata_models/coordinates.md#origin), [AnatomyModel](../biodata_models/external.md#anatomymodel) | Origin (Defines the position of (0,0,0) in the coordinate system) |
 | `axes` | List[[Axis](#axis)] | Axis names (Axis names and directions) |
 | `axis_unit` | [SizeUnit](../biodata_models/units.md#sizeunit) | Size unit  |
 | `handedness` | Optional[[Handedness](#handedness)] | Handedness (Whether the coordinate system is right-handed or left-handed) |

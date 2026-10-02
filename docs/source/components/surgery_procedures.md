@@ -100,7 +100,7 @@ Ground wire implant procedure
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `ground_electrode_location` | [MouseAnatomyLookup](../biodata_models/external.md#mouseanatomylookup) | Location of ground electrode  |
+| `ground_electrode_location` | [AnatomyModel](../biodata_models/external.md#anatomymodel) | Location of ground electrode (Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or HumanAnatomyLookup).) |
 | `ground_wire_hole` | `Optional[int]` | Ground wire hole (For SHIELD implants, the hole number for the ground wire) |
 | `ground_wire_material` | Optional[[GroundWireMaterial](#groundwirematerial)] | Ground wire material  |
 | `ground_wire_diameter` | `Optional[float]` | Ground wire diameter  |
