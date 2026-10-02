@@ -1,9 +1,16 @@
 """test Procedures"""
 
 from datetime import date
+from unittest.mock import call, patch
 
 import pytest
-from biodata_models.anatomy import AnatomyModel
+from biodata_models.anatomy import (
+    AnatomyModel,
+    MouseAnatomyLookup,
+    MouseBloodVessels,
+    MouseGroundWireLocations,
+    MouseInjectionTargets,
+)
 from biodata_models.brain_atlas import CCFv3
 from biodata_models.coordinates import AnatomicalRelative
 from biodata_models.organizations import Organization
@@ -32,7 +39,7 @@ from biodata_schema.components.specimen_procedures import (
     SpecimenProcedure,
 )
 from biodata_schema.components.subject_procedures import BrainInjection, Injection, Surgery
-from biodata_schema.components.surgery_procedures import CatheterImplant, Craniotomy, CraniotomyType
+from biodata_schema.components.surgery_procedures import CatheterImplant, Craniotomy, CraniotomyType, GroundWireImplant
 from biodata_schema.core.procedures import Procedures
 from biodata_schema.utils.exceptions import OneOfError
 from tests.coordinate_systems import BREGMA_ARI, BREGMA_RAS
@@ -144,8 +151,14 @@ class TestProcedures:
 
         assert "injection_materials" in repr(e.value)
 
-    def test_injection_materials_list(self):
+    @patch("biodata_models.anatomy.MouseAnatomyLookup.get_by_name")
+    def test_injection_materials_list(self, mock_get_by_name):
         """Valid injection_materials list"""
+        mock_get_by_name.side_effect = lambda target_name: AnatomyModel(
+            name=target_name.value,
+            registry=Registry.EMAPA,
+            registry_identifier="EMAPA:TEST",
+        )
 
         p = Procedures(
             subject_id="12345",
@@ -179,7 +192,7 @@ class TestProcedures:
                                     titer=2300000000,
                                 )
                             ],
-                            targeted_structure=mouse_anatomy("Retro-orbital"),
+                            targeted_structure=MouseAnatomyLookup.get_by_name(MouseInjectionTargets.RETRO_ORBITAL),
                             relative_position=[AnatomicalRelative.LEFT],
                             dynamics=[
                                 InjectionDynamics(
@@ -202,7 +215,7 @@ class TestProcedures:
                                     concentration_unit=ConcentrationUnit.UM,
                                 )
                             ],
-                            targeted_structure=mouse_anatomy("Intraperitoneal"),
+                            targeted_structure=MouseAnatomyLookup.get_by_name(MouseInjectionTargets.INTRAPERITONEAL),
                             dynamics=[
                                 InjectionDynamics(
                                     volume=1,
@@ -251,6 +264,11 @@ class TestProcedures:
                 )
             ],
         )
+
+        mock_get_by_name.assert_has_calls(
+            [call(MouseInjectionTargets.RETRO_ORBITAL), call(MouseInjectionTargets.INTRAPERITONEAL)]
+        )
+        assert mock_get_by_name.call_count == 2
 
         assert 1 == len(p.subject_procedures)
         assert p == Procedures.model_validate_json(p.model_dump_json())
@@ -754,6 +772,31 @@ class TestProcedures:
         device_names = procedures.get_device_names()
         assert "Catheter" in device_names
         assert len(device_names) == 1
+
+    @patch("biodata_models.anatomy.MouseAnatomyLookup.get_by_name")
+    def test_catheter_blood_vessel_target_lookup(self, mock_get_by_name):
+        """Common catheter blood-vessel targets can use the v2 lookup enum."""
+        mock_get_by_name.return_value = mouse_anatomy(MouseBloodVessels.CAROTID_ARTERY.value)
+
+        config = CatheterConfig(
+            device_name="Catheter",
+            targeted_structure=MouseAnatomyLookup.get_by_name(MouseBloodVessels.CAROTID_ARTERY),
+        )
+
+        assert config.targeted_structure.name == MouseBloodVessels.CAROTID_ARTERY.value
+        mock_get_by_name.assert_called_once_with(MouseBloodVessels.CAROTID_ARTERY)
+
+    @patch("biodata_models.anatomy.MouseAnatomyLookup.get_by_name")
+    def test_ground_wire_location_lookup(self, mock_get_by_name):
+        """Common ground-wire locations can use the v2 lookup enum."""
+        mock_get_by_name.return_value = mouse_anatomy(MouseGroundWireLocations.BRAIN.value)
+
+        implant = GroundWireImplant(
+            ground_electrode_location=MouseAnatomyLookup.get_by_name(MouseGroundWireLocations.BRAIN),
+        )
+
+        assert implant.ground_electrode_location.name == MouseGroundWireLocations.BRAIN.value
+        mock_get_by_name.assert_called_once_with(MouseGroundWireLocations.BRAIN)
 
     def test_procedures_addition_coordinate_system_validation(self):
         """Test that Procedures addition raises error for different coordinate systems"""

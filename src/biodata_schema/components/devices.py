@@ -707,7 +707,11 @@ class MyomatrixContact(DataModel):
     body_part: AnatomyModel = Field(
         ...,
         title="Body part of contact insertion",
-        description="Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or HumanAnatomyLookup).",
+        description=(
+            "Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or "
+            "HumanAnatomyLookup). For common mouse body-part targets, use MouseBodyParts and resolve the target "
+            "with MouseAnatomyLookup.get_by_name(...)."
+        ),
     )
     relative_position: AnatomicalRelative = Field(
         ..., title="Relative position", description="Position relative to procedures coordinate system"
@@ -715,7 +719,11 @@ class MyomatrixContact(DataModel):
     muscle: AnatomyModel = Field(
         ...,
         title="Muscle of contact insertion",
-        description="Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or HumanAnatomyLookup).",
+        description=(
+            "Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or "
+            "HumanAnatomyLookup). For common mouse EMG muscle targets, use MouseEmgMuscles and resolve the target "
+            "with MouseAnatomyLookup.get_by_name(...)."
+        ),
     )
     in_muscle: bool = Field(..., title="In muscle")
 
@@ -726,7 +734,11 @@ class MyomatrixThread(DataModel):
     ground_electrode_location: AnatomyModel = Field(
         ...,
         title="Location of ground electrode",
-        description="Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or HumanAnatomyLookup).",
+        description=(
+            "Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or "
+            "HumanAnatomyLookup). For common mouse ground-wire locations, use MouseGroundWireLocations and resolve "
+            "the target with MouseAnatomyLookup.get_by_name(...)."
+        ),
     )
     contacts: List[MyomatrixContact] = Field(..., title="Contacts")
 

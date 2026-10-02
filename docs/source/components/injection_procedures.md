@@ -9,7 +9,7 @@ Description of an injection procedure
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `injection_materials` | List[[ViralMaterial](#viralmaterial) or [NonViralMaterial](#nonviralmaterial)] | Injection material  |
-| `targeted_structure` | Optional[[AnatomyModel](../biodata_models/external.md#anatomymodel)] | Injection target (Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or HumanAnatomyLookup).) |
+| `targeted_structure` | Optional[[AnatomyModel](../biodata_models/external.md#anatomymodel)] | Injection target (Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or HumanAnatomyLookup). For common mouse injection sites, including intraperitoneal injection, use MouseInjectionTargets and resolve the target with MouseAnatomyLookup.get_by_name(...).) |
 | `relative_position` | Optional[List[[AnatomicalRelative](../biodata_models/coordinates.md#anatomicalrelative)]] | Relative position  |
 | `dynamics` | List[[InjectionDynamics](#injectiondynamics)] | Injection dynamics (List of injection events, one per location/depth) |
 | `protocol_id` | `Optional[str]` | Protocol ID (DOI for protocols.io) |
