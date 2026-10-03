@@ -94,16 +94,16 @@ wheels = [
 
 [[package]]
 name = "biodata-models"
-version = "1.0.1"
+version = "2.0.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "importlib-resources" },
     { name = "pydantic" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e0/06/04cb073d3a7b3aace223c559e2f964e515ce644a074a09cf9ebb0f3b7b07/biodata_models-1.0.1.tar.gz", hash = "sha256:d057dc3d3c154c9330771ea7cc9e4a408f90fa45d2c32f648f4c43cf06b9199b", size = 386193, upload-time = "2026-09-11T17:53:41.683Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c4/4a/e31189ed13493fcaf98ce69980005637182a64e0d12c6735bb68367564a8/biodata_models-2.0.2.tar.gz", hash = "sha256:babdf2da0552e23ae702e08584ceec28b74b1396335ba53feb0df5112a41e8b6", size = 146594, upload-time = "2026-10-02T22:14:42.952Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/30/ee/5f8560cc41e7e584d3ffba2ff3fa7fa30470c61d80534fe7d6f0bb53a19a/biodata_models-1.0.1-py3-none-any.whl", hash = "sha256:7b0d25ca936f4ebece75d5ab8b14c2418aa6501448ff76c52b4b123c75f613b0", size = 359546, upload-time = "2026-09-11T17:53:40.129Z" },
+    { url = "https://files.pythonhosted.org/packages/7f/18/ea6e82474610af0804df44f1c4971562f4fea595498d8c0c5761f487db40/biodata_models-2.0.2-py3-none-any.whl", hash = "sha256:d38fc817ed6e3b361f6279a65c8c5bcde136bd20b46848366f166fe2efba95ce", size = 113259, upload-time = "2026-10-02T22:14:41.262Z" },
 ]
 
 [[package]]
@@ -142,7 +142,7 @@ docs = [
 
 [package.metadata]
 requires-dist = [
-    { name = "biodata-models", specifier = ">=1.0.1,<2" },
+    { name = "biodata-models", specifier = ">=2.0.2,<3" },
     { name = "pydantic", specifier = ">=2.7,<3" },
     { name = "pydantic-extra-types" },
     { name = "tzdata" },
@@ -158,7 +158,7 @@ dev = [
     { name = "pytest", specifier = ">=8.3" },
     { name = "pytest-cov", specifier = ">=6" },
     { name = "ruff", specifier = ">=0.11" },
-    { name = "semver" },
+    { name = "semver", specifier = ">=3.0.0" },
 ]
 docs = [
     { name = "autodoc-pydantic" },

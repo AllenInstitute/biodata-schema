@@ -7,7 +7,7 @@ from pydantic import Field
 
 from biodata_schema.base import DataCoreModel, DataModel, DiscriminatedList, GenericModel
 from biodata_schema.components.identifiers import Code, Software
-from biodata_schema.core.processing import DataProcess, ProcessName
+from biodata_schema.core.processing import DataProcess
 
 
 class PerformanceMetric(DataModel):
@@ -20,14 +20,14 @@ class PerformanceMetric(DataModel):
 class ModelEvaluation(DataProcess):
     """Description of model evaluation"""
 
-    process_type: ProcessName = ProcessName.MODEL_EVALUATION
+    process_type: str = "Model evaluation"
     performance: List[PerformanceMetric] = Field(..., title="Evaluation performance")
 
 
 class ModelTraining(DataProcess):
     """Description of model training"""
 
-    process_type: ProcessName = ProcessName.MODEL_TRAINING
+    process_type: str = "Model training"
     train_performance: List[PerformanceMetric] = Field(
         ..., title="Training performance", description="Performance on training set"
     )

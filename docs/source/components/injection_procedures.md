@@ -4,12 +4,15 @@
 
 ### Injection
 
-Description of an injection procedure
+Description of an injection procedure.
+
+For common mouse injection targets, use MouseInjectionTargets with
+MouseAnatomyLookup.get_by_name(...).
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `injection_materials` | List[[ViralMaterial](#viralmaterial) or [NonViralMaterial](#nonviralmaterial)] | Injection material  |
-| `targeted_structure` | Optional[[MouseAnatomyModel](../biodata_models/external.md#mouseanatomymodel)] | Injection target (Use InjectionTargets) |
+| `targeted_structure` | Optional[[AnatomyModel](../biodata_models/external.md#anatomymodel)] | Injection target (Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or HumanAnatomyLookup).) |
 | `relative_position` | Optional[List[[AnatomicalRelative](../biodata_models/coordinates.md#anatomicalrelative)]] | Relative position  |
 | `dynamics` | List[[InjectionDynamics](#injectiondynamics)] | Injection dynamics (List of injection events, one per location/depth) |
 | `protocol_id` | `Optional[str]` | Protocol ID (DOI for protocols.io) |

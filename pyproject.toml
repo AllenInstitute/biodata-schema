@@ -14,7 +14,7 @@ readme = "README.md"
 dynamic = ["version"]
 
 dependencies = [
-    'biodata-models>=1.0.1,<2',
+    'biodata-models>=2.0.2,<3',
     'pydantic>=2.7, <3',
     'pydantic-extra-types',
     'tzdata',
@@ -30,7 +30,7 @@ dev = [
     'pytest>=8.3',
     'pytest-cov>=6',
     'ruff>=0.11',
-    'semver',
+    'semver>=3.0.0',
 ]
 
 docs = [
@@ -70,7 +70,6 @@ ignore-words-list = 'nd,DeviceC'
 testpaths = ["tests"]
 strict_config = true
 strict_markers = true
-markers = ["online: tests requiring external services"]
 
 [tool.ruff]
 line-length = 120
