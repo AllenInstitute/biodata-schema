@@ -112,11 +112,7 @@ class Injection(ProtocolMixin, DataModel):
     targeted_structure: Optional[AnatomyModel] = Field(
         default=None,
         title="Injection target",
-        description=(
-            "Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or "
-            "HumanAnatomyLookup). For common mouse injection sites, including intraperitoneal injection, use "
-            "MouseInjectionTargets and resolve the target with MouseAnatomyLookup.get_by_name(...)."
-        ),
+        description="Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or HumanAnatomyLookup).",
     )
     relative_position: Optional[List[AnatomicalRelative]] = Field(default=None, title="Relative position")
 

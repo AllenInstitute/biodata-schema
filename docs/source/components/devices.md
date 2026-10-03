@@ -676,9 +676,9 @@ Description of a contact on a myomatrix thread
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `body_part` | [AnatomyModel](../biodata_models/external.md#anatomymodel) | Body part of contact insertion (Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or HumanAnatomyLookup). For common mouse body-part targets, use MouseBodyParts and resolve the target with MouseAnatomyLookup.get_by_name(...).) |
+| `body_part` | [AnatomyModel](../biodata_models/external.md#anatomymodel) | Body part of contact insertion (For common mouse body parts, use MouseBodyParts with MouseAnatomyLookup.get_by_name.) |
 | `relative_position` | [AnatomicalRelative](../biodata_models/coordinates.md#anatomicalrelative) | Relative position (Position relative to procedures coordinate system) |
-| `muscle` | [AnatomyModel](../biodata_models/external.md#anatomymodel) | Muscle of contact insertion (Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or HumanAnatomyLookup). For common mouse EMG muscle targets, use MouseEmgMuscles and resolve the target with MouseAnatomyLookup.get_by_name(...).) |
+| `muscle` | [AnatomyModel](../biodata_models/external.md#anatomymodel) | Muscle of contact insertion (For common mouse EMG muscles, use MouseEmgMuscles with MouseAnatomyLookup.get_by_name.) |
 | `in_muscle` | `bool` | In muscle  |
 
 
@@ -688,7 +688,7 @@ Description of a thread of a myomatrix array
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `ground_electrode_location` | [AnatomyModel](../biodata_models/external.md#anatomymodel) | Location of ground electrode (Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or HumanAnatomyLookup). For common mouse ground-wire locations, use MouseGroundWireLocations and resolve the target with MouseAnatomyLookup.get_by_name(...).) |
+| `ground_electrode_location` | [AnatomyModel](../biodata_models/external.md#anatomymodel) | Location of ground electrode (For common mouse ground-wire locations, use MouseGroundWireLocations with MouseAnatomyLookup.get_by_name.) |
 | `contacts` | List[[MyomatrixContact](#myomatrixcontact)] | Contacts  |
 
 
