@@ -24,7 +24,7 @@ Configuration of a catheter
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `targeted_structure` | [AnatomyModel](../biodata_models/external.md#anatomymodel) | Targeted blood vessel (Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or HumanAnatomyLookup). For common mouse blood-vessel targets, use MouseBloodVessels and resolve the target with MouseAnatomyLookup.get_by_name(...).) |
+| `targeted_structure` | [AnatomyModel](../biodata_models/external.md#anatomymodel) | Targeted blood vessel (For common mouse blood-vessel targets, use MouseBloodVessels with MouseAnatomyLookup.get_by_name.) |
 | `device_name` | `str` | Device name (Must match a device defined in the instrument.json) |
 
 
