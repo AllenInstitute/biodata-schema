@@ -411,7 +411,7 @@ class Metadata(DataCoreModel):
         cls,
         metadata: "Union[Metadata, List[Metadata]]",
         process_name: str = "processed",
-        location: Optional[str] = None,
+        location: Optional[str] = "",
         new_processing: Optional[Processing] = None,
         new_quality_control: Optional[QualityControl] = None,
         **data_description_kwargs,
@@ -439,7 +439,8 @@ class Metadata(DataCoreModel):
             Shortened name for the process or pipeline that was run -
             used in creating name of derived asset. Defaults to 'processed'.
         location : Optional[str]
-            Location of the new derived data asset.
+            Location of the new derived data asset. Defaults to an empty string
+            when unknown.
         new_processing : Optional[Processing]
             New processing performed to create this derived asset.
         new_quality_control : Optional[QualityControl]
@@ -503,7 +504,7 @@ class Metadata(DataCoreModel):
 
         return cls(
             name=derived_dd.name,
-            location=location,
+            location="" if location is None else location,
             data_description=derived_dd,
             subject=subject,
             procedures=procedures,
