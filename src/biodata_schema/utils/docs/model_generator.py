@@ -24,8 +24,9 @@ special_cases = {
     "biodata_schema.core.quality_control.QCMetric": "{QCMetric} or {CurationMetric}",
     "biodata_schema.components.wrappers.AssetPath": "AssetPath",
     "biodata_schema.base._GenericModel": "dict",
-    "biodata_models.mouse_anatomy.MouseAnatomyModel": (
-        "[MouseAnatomyModel](biodata_models/external.md#mouseanatomymodel)"
+    "biodata_models.anatomy.AnatomyModel": "[AnatomyModel](biodata_models/external.md#anatomymodel)",
+    "biodata_models.anatomy.MouseAnatomyLookup": (
+        "[MouseAnatomyLookup](biodata_models/external.md#mouseanatomylookup)"
     ),
     "biodata_models.pid_names.PIDName": "{PIDName}",
 }

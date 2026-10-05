@@ -324,8 +324,8 @@
                "type": "string"
             },
             "process_type": {
-               "$ref": "#/$defs/ProcessName",
-               "title": "Process type"
+               "title": "Process type",
+               "type": "string"
             },
             "name": {
                "default": "",
@@ -464,60 +464,6 @@
             "Exabyte"
          ],
          "title": "MemoryUnit",
-         "type": "string"
-      },
-      "ProcessName": {
-         "description": "Process names",
-         "enum": [
-            "Analysis",
-            "Compression",
-            "Denoising",
-            "Ephys curation",
-            "Ephys postprocessing",
-            "Ephys preprocessing",
-            "Ephys visualization",
-            "Fiducial segmentation",
-            "File format conversion",
-            "Fix color range",
-            "Fluorescence event detection",
-            "Image atlas alignment",
-            "Image background subtraction",
-            "Image cell classification",
-            "Image cell quantification",
-            "Image cell segmentation",
-            "Image cross-image alignment",
-            "Image destriping",
-            "Image flat-field correction",
-            "Image importing",
-            "Image mip visualization",
-            "Image multiscaling",
-            "Image radial correction",
-            "Image spot detection",
-            "Image spot spectral unmixing",
-            "Image thresholding",
-            "Image tile alignment",
-            "Image tile fusing",
-            "Image tile projection",
-            "Manual curation",
-            "Model evaluation",
-            "Model training",
-            "Neuron skeleton processing",
-            "Neuropil subtraction",
-            "Other",
-            "Pipeline",
-            "Simulation",
-            "Skull stripping",
-            "Spatial timeseries demixing",
-            "Spike sorting",
-            "Video ROI classification",
-            "Video ROI cross session matching",
-            "Video ROI segmentation",
-            "Video ROI timeseries extraction",
-            "Video motion correction",
-            "Video plane decrosstalk",
-            "dF/F estimation"
-         ],
-         "title": "ProcessName",
          "type": "string"
       },
       "ProcessStage": {
