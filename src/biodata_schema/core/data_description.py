@@ -1,7 +1,7 @@
 """Generic metadata classes for data"""
 
 import re
-from typing import List, Literal, Optional
+from typing import Annotated, List, Literal, Optional
 
 from biodata_models.data_name_patterns import (
     DataLevel,
@@ -15,7 +15,7 @@ from biodata_models.modalities import Modality
 from biodata_models.organizations import Organization
 from pydantic import Field, SkipValidation, model_validator
 
-from biodata_schema.base import AwareDatetimeWithDefault, DataCoreModel, DataModel
+from biodata_schema.base import AwareDatetimeWithDefault, DataCoreModel, DataModel, DraftRequirement
 from biodata_schema.components.identifiers import Person
 
 
@@ -35,7 +35,7 @@ class DataDescription(DataCoreModel):
     _DESCRIBED_BY_URL = DataCoreModel._DESCRIBED_BY_BASE_URL.default + "biodata_schema/core/data_description.py"
     describedBy: str = Field(default=_DESCRIBED_BY_URL, json_schema_extra={"const": _DESCRIBED_BY_URL})
     schema_version: SkipValidation[Literal["3.0.0"]] = Field(default="3.0.0")
-    license: License = Field(default=License.CC_BY_40, title="License")
+    license: Annotated[License, DraftRequirement] = Field(default=License.CC_BY_40, title="License")
 
     subject_id: Optional[str] = Field(
         default=None,
@@ -89,7 +89,7 @@ class DataDescription(DataCoreModel):
         title="Investigators",
         min_length=1,
     )
-    project_name: str = Field(
+    project_name: Annotated[str, DraftRequirement] = Field(
         ...,
         pattern=DataRegex.NO_SPECIAL_CHARS_EXCEPT_SPACE.value,
         description="A name for a set of coordinated activities intended to achieve one or more objectives.",
