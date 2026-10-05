@@ -4,10 +4,7 @@
 
 ### Injection
 
-Description of an injection procedure.
-
-For common mouse injection targets, use MouseInjectionTargets with
-MouseAnatomyLookup.get_by_name(...).
+Description of an injection procedure
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|

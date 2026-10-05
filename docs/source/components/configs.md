@@ -298,7 +298,7 @@ Configuration of a 3D scan
 | `effective_echo_time` | `Optional[decimal.Decimal]` | Effective echo time  |
 | `repetition_time` | `decimal.Decimal` | Repetition time (s) (BIDS RepetitionTime / DICOM Tag 0018,0080) |
 | `repetition_time_unit` | [TimeUnit](../biodata_models/units.md#timeunit) | Repetition time unit  |
-| `scanner_coordinate_system` | Optional[[CoordinateSystem](coordinates.md#coordinatesystem)] | Scanner coordinate system  |
+| `local_coordinate_system` | Optional[[CoordinateSystem](coordinates.md#coordinatesystem)] | Scanner coordinate system  |
 | `affine_transform` | Optional[List[[Translation](coordinates.md#translation) or [Rotation](coordinates.md#rotation) or [Scale](coordinates.md#scale) or [Affine](coordinates.md#affine)]] | MRI Scan affine transform (NIFTI sform/qform, Bruker vc_transform, etc) |
 | `subject_position` | [SubjectPosition](#subjectposition) | Subject position  |
 | `notes` | `Optional[str]` | Notes  |
