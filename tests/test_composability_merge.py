@@ -9,7 +9,7 @@ from biodata_models.modalities import Modality
 from biodata_schema.components.identifiers import Code
 from biodata_schema.core.acquisition import AcquisitionSubjectDetails
 from biodata_schema.core.procedures import Procedures
-from biodata_schema.core.processing import DataProcess, Processing, ProcessName, ProcessStage
+from biodata_schema.core.processing import DataProcess, Processing, ProcessStage
 from biodata_schema.core.quality_control import QCMetric, QCStatus, QualityControl, Stage, Status
 from examples.exaspim_acquisition import acq
 from examples.procedures import p, t, t2
@@ -263,7 +263,7 @@ class TestComposability:
             data_processes=[
                 DataProcess(
                     experimenters=["Dr. Dan"],
-                    process_type=ProcessName.DENOISING,
+                    process_type="Denoising",
                     stage=ProcessStage.PROCESSING,
                     output_path="path/to/outputs1",
                     start_date_time=t,
@@ -281,7 +281,7 @@ class TestComposability:
             data_processes=[
                 DataProcess(
                     experimenters=["Dr. Jane"],
-                    process_type=ProcessName.COMPRESSION,
+                    process_type="Compression",
                     stage=ProcessStage.PROCESSING,
                     output_path="path/to/outputs2",
                     start_date_time=t,
@@ -300,8 +300,8 @@ class TestComposability:
 
         # Check that the combined object has the correct data_processes and notes
         assert len(combined.data_processes) == 2
-        assert combined.data_processes[0].name == ProcessName.DENOISING
-        assert combined.data_processes[1].name == ProcessName.COMPRESSION
+        assert combined.data_processes[0].name == "Denoising"
+        assert combined.data_processes[1].name == "Compression"
         assert "First processing object" in combined.notes
         assert "Second processing object" in combined.notes
         # check combined dependency graph
@@ -342,7 +342,7 @@ class TestComposability:
             data_processes=[
                 DataProcess(
                     experimenters=["Dr. Dan"],
-                    process_type=ProcessName.DENOISING,
+                    process_type="Denoising",
                     stage=ProcessStage.PROCESSING,
                     start_date_time=t,
                     code=Code(url="https://example.com", version="1.0"),
@@ -355,7 +355,7 @@ class TestComposability:
             data_processes=[
                 DataProcess(
                     experimenters=["Dr. Jane"],
-                    process_type=ProcessName.COMPRESSION,
+                    process_type="Compression",
                     stage=ProcessStage.PROCESSING,
                     start_date_time=t,
                     code=Code(url="https://example.com", version="1.0"),
@@ -372,7 +372,7 @@ class TestComposability:
             data_processes=[
                 DataProcess(
                     experimenters=["Dr. Dan"],
-                    process_type=ProcessName.DENOISING,
+                    process_type="Denoising",
                     stage=ProcessStage.PROCESSING,
                     start_date_time=t,
                     code=Code(url="https://example.com", version="1.0"),
@@ -384,7 +384,7 @@ class TestComposability:
             data_processes=[
                 DataProcess(
                     experimenters=["Dr. Jane"],
-                    process_type=ProcessName.COMPRESSION,
+                    process_type="Compression",
                     stage=ProcessStage.PROCESSING,
                     start_date_time=t,
                     code=Code(url="https://example.com", version="1.0"),

@@ -3,9 +3,29 @@
 import json
 import os
 from pathlib import Path
+from typing import Annotated, Optional, Union
 from unittest.mock import MagicMock, call, mock_open, patch
 
-from biodata_schema.utils.json_writer import SchemaWriter
+from jsonschema import Draft202012Validator
+from pydantic import BaseModel
+
+from biodata_schema.base import DraftRequirement
+from biodata_schema.core.metadata import Metadata
+from biodata_schema.utils.json_writer import (
+    SchemaWriter,
+    _add_referenced_definitions,
+    _has_draft_requirements,
+    _project_model_schema,
+    draft_metadata_schema,
+)
+from examples.aibs_smartspim_instrument import inst as instrument
+from examples.barseq_acquisition import acquisition
+from examples.data_description import d as data_description
+from examples.model import m as model
+from examples.procedures import p as procedures
+from examples.processing import p as processing
+from examples.quality_control import q as quality_control
+from examples.subject import s as subject
 
 
 class TestSchemaWriter:
@@ -31,12 +51,87 @@ class TestSchemaWriter:
         sw = SchemaWriter(self.TEST_ARGS)
 
         sw2 = SchemaWriter([])
+        sw3 = SchemaWriter(["--draft"])
 
         expected_output = "some_test_dir"
 
         assert expected_output == sw.configs.output
         assert self.TEST_ARGS == sw.args
         assert os.getcwd() == sw2.configs.output
+        assert sw3.configs.draft is True
+
+    def test_draft_metadata_schema(self):
+        """Tests that the draft schema contains only its required metadata fields."""
+        schema = draft_metadata_schema()
+
+        assert set(schema["properties"]) == {"location", "data_description", "subject", "acquisition", "instrument"}
+        assert set(schema["required"]) == set(schema["properties"])
+        assert schema["additionalProperties"] is True
+        assert set(schema["$defs"]) == {"License"}
+
+        expected_nested_fields = {
+            "data_description": {"project_name", "license"},
+            "subject": {"subject_id"},
+            "acquisition": {"acquisition_start_time"},
+            "instrument": {"instrument_id"},
+        }
+        for field_name, fields in expected_nested_fields.items():
+            nested_schema = schema["properties"][field_name]
+            assert set(nested_schema["properties"]) == fields
+            assert set(nested_schema["required"]) == fields
+            assert nested_schema["additionalProperties"] is True
+
+    def test_full_metadata_validates_against_draft_schema(self):
+        """Tests that a full metadata record validates against the draft schema."""
+        metadata = Metadata.model_construct(
+            name="full_metadata",
+            location="s3://bucket/full_metadata",
+            other_identifiers=None,
+            subject=subject,
+            data_description=data_description,
+            procedures=procedures,
+            instrument=instrument,
+            processing=processing,
+            acquisition=acquisition,
+            quality_control=quality_control,
+            model=model,
+        )
+        metadata_json = json.loads(metadata.model_dump_json(by_alias=True))
+
+        Draft202012Validator(draft_metadata_schema()).validate(metadata_json)
+
+    def test_draft_schema_projection_helpers(self):
+        """Tests nested, recursive, and union model projections."""
+
+        class NestedModel(BaseModel):
+            draft_field: Annotated[str, DraftRequirement]
+
+        class ParentModel(BaseModel):
+            nested: NestedModel
+
+        class UnionModelA(BaseModel):
+            draft_field: Annotated[str, DraftRequirement]
+
+        class UnionModelB(BaseModel):
+            draft_field: Annotated[str, DraftRequirement]
+
+        class UnionParentModel(BaseModel):
+            nested: Union[UnionModelA, UnionModelB]
+
+        class RecursiveModel(BaseModel):
+            child: Optional["RecursiveModel"] = None
+
+        RecursiveModel.model_rebuild()
+
+        assert _has_draft_requirements(ParentModel) is True
+        assert _has_draft_requirements(RecursiveModel) is False
+
+        union_schema = _project_model_schema(UnionParentModel, {})
+        assert len(union_schema["properties"]["nested"]["anyOf"]) == 2
+
+        references_schema = {"anyOf": [{"$ref": "#/$defs/Example"}, {"$ref": "#/$defs/Example"}]}
+        _add_referenced_definitions(references_schema, {"Example": {"type": "string"}})
+        assert references_schema["$defs"] == {"Example": {"type": "string"}}
 
     @patch("builtins.open", new_callable=mock_open())
     @patch("os.path.exists")
@@ -105,3 +200,18 @@ class TestSchemaWriter:
         )
         mock_file.assert_has_calls(open_calls, any_order=True)
         file_handle.write.assert_has_calls(write_calls, any_order=True)
+
+    @patch("builtins.open", new_callable=mock_open())
+    @patch("os.path.exists")
+    @patch("os.mkdir")
+    def test_write_draft_to_json(self, mock_mkdir: MagicMock, mock_path_exists: MagicMock, mock_file: MagicMock):
+        """Tests that the draft schema is written to its unversioned filename."""
+        mock_path_exists.return_value = False
+        sw = SchemaWriter(["--output", "some_test_dir", "--draft"])
+
+        sw.write_to_json()
+
+        output_file = Path("some_test_dir") / "draft_metadata.json"
+        mock_file.assert_any_call(output_file, "w")
+        draft_schema_json = json.dumps(draft_metadata_schema(), indent=3)
+        mock_file.return_value.__enter__.return_value.write.assert_any_call(draft_schema_json)
