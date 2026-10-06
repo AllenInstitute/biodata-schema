@@ -11,7 +11,7 @@ from biodata_models.organizations import Organization
 from biodata_schema.components.identifiers import Code, Person
 from biodata_schema.core.data_description import DataDescription, Funding
 from biodata_schema.core.metadata import Metadata
-from biodata_schema.core.processing import DataProcess, Processing, ProcessName, ProcessStage
+from biodata_schema.core.processing import DataProcess, Processing, ProcessStage
 from biodata_schema.core.quality_control import QCMetric, QCStatus, QualityControl, Stage, Status
 from biodata_schema.core.subject import Subject
 from biodata_schema.utils.inheritance import (
@@ -89,7 +89,7 @@ class TestFromMetadataSingleSource:
         self.new_processing = Processing.create_with_sequential_process_graph(
             data_processes=[
                 DataProcess(
-                    process_type=ProcessName.ANALYSIS,
+                    process_type="Analysis",
                     name="Derived analysis",
                     experimenters=["Dr. Test"],
                     stage=ProcessStage.ANALYSIS,
@@ -213,7 +213,7 @@ class TestFromMetadataMultipleSameSubject:
         new_proc = Processing.create_with_sequential_process_graph(
             data_processes=[
                 DataProcess(
-                    process_type=ProcessName.ANALYSIS,
+                    process_type="Analysis",
                     name="New step",
                     experimenters=["Dr. Test"],
                     stage=ProcessStage.ANALYSIS,
@@ -279,7 +279,7 @@ class TestFromMetadataDifferentSubjects:
         new_proc = Processing.create_with_sequential_process_graph(
             data_processes=[
                 DataProcess(
-                    process_type=ProcessName.ANALYSIS,
+                    process_type="Analysis",
                     name="New step",
                     experimenters=["Dr. Test"],
                     stage=ProcessStage.ANALYSIS,
@@ -302,7 +302,7 @@ class TestFromMetadataDifferentSubjects:
         new_proc = Processing.create_with_sequential_process_graph(
             data_processes=[
                 DataProcess(
-                    process_type=ProcessName.ANALYSIS,
+                    process_type="Analysis",
                     name="New step",
                     experimenters=["Dr. Test"],
                     stage=ProcessStage.ANALYSIS,

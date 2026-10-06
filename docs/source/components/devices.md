@@ -676,9 +676,9 @@ Description of a contact on a myomatrix thread
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `body_part` | [MouseAnatomyModel](../biodata_models/external.md#mouseanatomymodel) | Body part of contact insertion (Use MouseBodyParts) |
+| `body_part` | [AnatomyModel](../biodata_models/external.md#anatomymodel) | Body part of contact insertion (For common mouse body parts, use MouseBodyParts with MouseAnatomyLookup.get_by_name.) |
 | `relative_position` | [AnatomicalRelative](../biodata_models/coordinates.md#anatomicalrelative) | Relative position (Position relative to procedures coordinate system) |
-| `muscle` | [MouseAnatomyModel](../biodata_models/external.md#mouseanatomymodel) | Muscle of contact insertion (Use MouseEmgMuscles) |
+| `muscle` | [AnatomyModel](../biodata_models/external.md#anatomymodel) | Muscle of contact insertion (For common mouse EMG muscles, use MouseEmgMuscles with MouseAnatomyLookup.get_by_name.) |
 | `in_muscle` | `bool` | In muscle  |
 
 
@@ -688,7 +688,7 @@ Description of a thread of a myomatrix array
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `ground_electrode_location` | [MouseAnatomyModel](../biodata_models/external.md#mouseanatomymodel) | Location of ground electrode (Use GroundWireLocations) |
+| `ground_electrode_location` | [AnatomyModel](../biodata_models/external.md#anatomymodel) | Location of ground electrode (For common mouse ground-wire locations, use MouseGroundWireLocations with MouseAnatomyLookup.get_by_name.) |
 | `contacts` | List[[MyomatrixContact](#myomatrixcontact)] | Contacts  |
 
 
@@ -783,7 +783,7 @@ Multichannel electrophysiology DAQ
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `ports` | List[[ProbePort](#probeport)] | Acquisition board ports  |
-| `data_interface` | `"DataInterface.USB"` |   |
+| `data_interface` | `"USB"` |   |
 | `manufacturer` | [Organization](../biodata_models/organizations.md#organization) |   |
 | `channels` | List[[DAQChannel](#daqchannel)] | DAQ channels  |
 | `firmware_version` | `Optional[str]` | Firmware version  |

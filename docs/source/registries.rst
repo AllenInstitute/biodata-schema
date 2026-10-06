@@ -19,7 +19,6 @@ Registries are models that are linked to an external definition, like the NCBI s
    biodata_models/modalities
    biodata_models/organizations
    biodata_models/pid_names
-   biodata_models/process_names
    biodata_models/reagent
    biodata_models/registries
    biodata_models/species

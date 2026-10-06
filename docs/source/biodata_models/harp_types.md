@@ -36,6 +36,7 @@ Harp device types
 | `PLUMA` | `Pluma` | `2110` |
 | `POKE` | `Poke` | `1024` |
 | `PYCONTROLADAPTER` | `PyControlAdapter` | `1184` |
+| `QUAC` | `Quac` | `1411` |
 | `RFIDREADER` | `RfidReader` | `2094` |
 | `RGBARRAY` | `RgbArray` | `1264` |
 | `SIMPLEANALOGGENERATOR` | `SimpleAnalogGenerator` | `1121` |

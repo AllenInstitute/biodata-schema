@@ -24,7 +24,7 @@ from biodata_schema.core.data_description import DataDescription, Funding
 from biodata_schema.core.instrument import Instrument
 from biodata_schema.core.metadata import Metadata, create_metadata_json
 from biodata_schema.core.procedures import Procedures, Surgery
-from biodata_schema.core.processing import DataProcess, Processing, ProcessName, ProcessStage
+from biodata_schema.core.processing import DataProcess, Processing, ProcessStage
 from biodata_schema.core.subject import Subject
 from examples.aibs_smartspim_instrument import inst as spim_inst
 from examples.barseq_acquisition import acquisition as barseq_acquisition
@@ -100,7 +100,7 @@ class TestMetadata:
                 DataProcess(
                     experimenters=["Dr. Dan"],
                     name="My Analysis",
-                    process_type=ProcessName.ANALYSIS,
+                    process_type="Analysis",
                     stage=ProcessStage.ANALYSIS,
                     output_path="path/to/outputs",
                     start_date_time=t,
@@ -853,7 +853,7 @@ class TestMetadata:
                 DataProcess(
                     experimenters=["Dr. Dan"],
                     name="My Analysis",
-                    process_type=ProcessName.ANALYSIS,
+                    process_type="Analysis",
                     stage=ProcessStage.ANALYSIS,
                     output_path="path/to/outputs",
                     start_date_time=datetime(2023, 4, 3, 20, 0, 0, tzinfo=timezone.utc),  # After acquisition
@@ -881,7 +881,7 @@ class TestMetadata:
                 DataProcess(
                     experimenters=["Dr. Dan"],
                     name="My Analysis",
-                    process_type=ProcessName.ANALYSIS,
+                    process_type="Analysis",
                     stage=ProcessStage.ANALYSIS,
                     output_path="path/to/outputs",
                     start_date_time=datetime(2023, 4, 3, 17, 0, 0, tzinfo=timezone.utc),  # Before acquisition start

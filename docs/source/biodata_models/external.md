@@ -4,15 +4,23 @@ External registries act as an application programming interfaces (API). They all
 
 ## Model definitions
 
-### MouseAnatomyModel
+### AnatomyModel
 
-[EMAPA](https://www.ebi.ac.uk/ols4/ontologies/emapa)
-
-Base model for mouse anatomy. Some examples:
+Shared Pydantic model for species-specific anatomy terms. Fields typed as `AnatomyModel` can use a lookup subclass such as `MouseAnatomyLookup` or `HumanAnatomyLookup`, which provides ontology-specific lookup behavior.
 
 | Name | Registry | Registry Identifier |
 |------|-------|--------|
-| `heart` | `Registry.EMAPA` |  `16105`  |
+| `heart` | `Registry.EMAPA` | `EMAPA:16105` |
+
+### MouseAnatomyLookup
+
+[EMAPA](https://www.ebi.ac.uk/ols4/ontologies/emapa)
+
+Lookup model for mouse anatomy terms. Use `search_by_name` to find terms and `get_by_name` for an exact label match.
+
+| Name | Registry | Registry Identifier |
+|------|-------|--------|
+| `heart` | `Registry.EMAPA` | `EMAPA:16105` |
 
 ### Gene
 

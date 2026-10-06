@@ -24,7 +24,7 @@ Configuration of a catheter
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `targeted_structure` | [MouseAnatomyModel](../biodata_models/external.md#mouseanatomymodel) | Targeted blood vessel (Use options from MouseBloodVessels) |
+| `targeted_structure` | [AnatomyModel](../biodata_models/external.md#anatomymodel) | Targeted blood vessel (For common mouse blood-vessel targets, use MouseBloodVessels with MouseAnatomyLookup.get_by_name.) |
 | `device_name` | `str` | Device name (Must match a device defined in the instrument.json) |
 
 
@@ -298,7 +298,7 @@ Configuration of a 3D scan
 | `effective_echo_time` | `Optional[decimal.Decimal]` | Effective echo time  |
 | `repetition_time` | `decimal.Decimal` | Repetition time (s) (BIDS RepetitionTime / DICOM Tag 0018,0080) |
 | `repetition_time_unit` | [TimeUnit](../biodata_models/units.md#timeunit) | Repetition time unit  |
-| `scanner_coordinate_system` | Optional[[CoordinateSystem](coordinates.md#coordinatesystem)] | Scanner coordinate system  |
+| `local_coordinate_system` | Optional[[CoordinateSystem](coordinates.md#coordinatesystem)] | Scanner coordinate system  |
 | `affine_transform` | Optional[List[[Translation](coordinates.md#translation) or [Rotation](coordinates.md#rotation) or [Scale](coordinates.md#scale) or [Affine](coordinates.md#affine)]] | MRI Scan affine transform (NIFTI sform/qform, Bruker vc_transform, etc) |
 | `subject_position` | [SubjectPosition](#subjectposition) | Subject position  |
 | `notes` | `Optional[str]` | Notes  |

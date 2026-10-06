@@ -5,7 +5,6 @@ import warnings
 from enum import Enum
 from typing import Annotated, Dict, List, Literal, Optional
 
-from biodata_models.process_names import ProcessName
 from biodata_models.units import MemoryUnit, UnitlessUnit
 from pydantic import Field, SkipValidation, model_validator
 
@@ -52,7 +51,7 @@ class ResourceUsage(DataModel):
 class DataProcess(DataModel):
     """Description of a single processing step"""
 
-    process_type: ProcessName = Field(..., title="Process type")
+    process_type: str = Field(..., title="Process type")
     name: str = Field(
         default="",
         title="Name",
@@ -74,16 +73,6 @@ class DataProcess(DataModel):
     output_parameters: Optional[GenericModel] = Field(default=None, description="Output parameters", title="Outputs")
     notes: Optional[str] = Field(default=None, title="Notes", validate_default=True)
     resources: Optional[ResourceUsage] = Field(default=None, title="Process resource usage")
-
-    @model_validator(mode="after")
-    def validate_generic_processtype(self) -> "DataProcess":
-        """Validate to be sure OTHER types are pinned down in name or notes"""
-
-        if self.process_type in [ProcessName.OTHER, ProcessName.ANALYSIS] and not (self.notes or self.name):
-            raise ValueError(
-                "If 'process_type' is Other or Analysis, either 'name' or 'notes' must specify process details."
-            )
-        return self
 
     @model_validator(mode="after")
     def fill_default_name(self) -> "DataProcess":
