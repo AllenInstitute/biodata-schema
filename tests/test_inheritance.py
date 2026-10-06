@@ -113,6 +113,16 @@ class TestFromMetadataSingleSource:
             default_grouping=["modality"],
         )
 
+    @pytest.mark.parametrize("location_kwargs", [{}, {"location": None}, {"location": ""}])
+    def test_single_source_without_location(self, location_kwargs):
+        """An unknown derived location is represented by an empty string."""
+        source_location = self.source.location
+        result = Metadata.from_metadata(self.source, **location_kwargs)
+
+        assert result.location == ""
+        assert result.data_description.data_level == DataLevel.DERIVED
+        assert self.source.location == source_location
+
     def test_single_source_inherits_subject(self):
         """Subject should be inherited from the single source"""
         result = Metadata.from_metadata(
