@@ -1,3 +1,4 @@
+## 11. Warnings now raise errors
 # biodata-schema v3.0.0 migration guide
 
 Version 3 removes fields, classes, and methods that version 2 marked as deprecated. Version
@@ -25,11 +26,11 @@ The `aind-metadata-upgrader` package handles automatic metadata upgrades separat
 ---
 
 ## 1. `coordinate_system` renamed
-
+`Procedures.reject_injections` in `core/procedures.py` now rejects bare `Injection` objects.
 Version 2 split `coordinate_system` into `global_coordinate_system` for top-level and
 container models, and `local_coordinate_system` for device and config models. Version 3
-removes the old field and the validators that copied its value forward.
-
+Procedures(subject_id="12345", subject_procedures=[Injection(...)])  # ValidationError
+Procedures(subject_id="12345", subject_procedures=[Surgery(procedures=[Injection(...)])])  # ok
 Please see the [coordinate systems page on the documentation](https://biodata-schema.readthedocs.io/en/latest/coordinate_systems.html) for more details about coordinate systems specifically.
 
 ### Use `global_coordinate_system` for these models
@@ -61,11 +62,11 @@ ProbeConfig(..., coordinate_system=CoordinateSystemLibrary.BREGMA_ARI)
 ```
 
 **After**
-
+`CalibrationObject` subjects must use "calibration" as their `subject_id`.
 Here `BREGMA_ARI` is a coordinate system defined by your project, as shown in
 [section 9](#9-coordinatesystemlibrary-removed).
 
-```python
+    subject_id="calibration",
 Acquisition(..., global_coordinate_system=BREGMA_ARI)
 ProbeConfig(..., local_coordinate_system=BREGMA_ARI)
 ```
