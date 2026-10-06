@@ -158,7 +158,7 @@ p = Procedures(
             workstation_id="SWS 3",
             protocol_id="doi",
             procedures=[
-                Perfusion(protocol_id="dx.doi.org/10.17504/protocols.io.bg5vjy66", output_specimen_ids={"672640"})
+                Perfusion(protocol_id="dx.doi.org/10.17504/protocols.io.bg5vjy66", output_specimen_names={"672640"})
             ],
         ),
     ],

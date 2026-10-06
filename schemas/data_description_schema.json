@@ -637,10 +637,13 @@
          "enum": [
             "Addgene (ADDGENE)",
             "C. elegans Development Ontology (WBLS)",
+            "Cell Line Ontology (CLO)",
             "Digital Object Identifier (DOI)",
             "Drosophila Development (FBDV)",
             "Edinburgh Mouse Atlas Project (EMAPA)",
+            "Foundational Model of Anatomy (FMA)",
             "Human Developmental Stages (HSAPDV)",
+            "Human Disease Ontology (DOID)",
             "Mouse Developmental Stages (MMUSDV)",
             "Mouse Genome Informatics (MGI)",
             "NCBI GenBank (GENBANK)",
@@ -648,6 +651,7 @@
             "Open Researcher and Contributor ID (ORCID)",
             "Research Organization Registry (ROR)",
             "Research Resource Identifiers (RRID)",
+            "The Fluorescent Protein Database (FPbase)",
             "Universal Protein Resource (UNIPROT)"
          ],
          "title": "Registry",
@@ -6444,8 +6448,8 @@
             }
          ],
          "default": null,
-         "description": "Unique identifier for the subject of data acquisition",
-         "title": "Subject ID"
+         "description": "Unique name for the subject of data acquisition",
+         "title": "Subject name"
       },
       "creation_time": {
          "description": "Time that data files were created, used to uniquely identify the data",

@@ -307,6 +307,29 @@
          "title": "AnatomicalRelative",
          "type": "string"
       },
+      "AnatomyModel": {
+         "description": "Shared model for anatomy terms from different ontologies.",
+         "properties": {
+            "name": {
+               "title": "Name",
+               "type": "string"
+            },
+            "registry": {
+               "$ref": "#/$defs/Registry"
+            },
+            "registry_identifier": {
+               "title": "Registry Identifier",
+               "type": "string"
+            }
+         },
+         "required": [
+            "name",
+            "registry",
+            "registry_identifier"
+         ],
+         "title": "AnatomyModel",
+         "type": "object"
+      },
       "AngleUnit": {
          "description": "Enumeration of Angle Measurements",
          "enum": [
@@ -336,7 +359,7 @@
                      "$ref": "#/$defs/Origin"
                   },
                   {
-                     "$ref": "#/$defs/MouseAnatomyModel"
+                     "$ref": "#/$defs/AnatomyModel"
                   }
                ],
                "description": "Defines the position of (0,0,0) in the coordinate system",
@@ -946,8 +969,8 @@
                "type": "string"
             },
             "targeted_structure": {
-               "$ref": "#/$defs/MouseAnatomyModel",
-               "description": "Use options from MouseBloodVessels",
+               "$ref": "#/$defs/AnatomyModel",
+               "description": "For common mouse blood-vessel targets, use MouseBloodVessels with MouseAnatomyLookup.get_by_name.",
                "title": "Targeted blood vessel"
             }
          },
@@ -1464,7 +1487,7 @@
                      "$ref": "#/$defs/Origin"
                   },
                   {
-                     "$ref": "#/$defs/MouseAnatomyModel"
+                     "$ref": "#/$defs/AnatomyModel"
                   }
                ],
                "description": "Defines the position of (0,0,0) in the coordinate system",
@@ -2599,14 +2622,14 @@
             "targeted_structure": {
                "anyOf": [
                   {
-                     "$ref": "#/$defs/MouseAnatomyModel"
+                     "$ref": "#/$defs/AnatomyModel"
                   },
                   {
                      "type": "null"
                   }
                ],
                "default": null,
-               "description": "Use InjectionTargets",
+               "description": "Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or HumanAnatomyLookup).",
                "title": "Injection target"
             },
             "relative_position": {
@@ -3320,7 +3343,7 @@
                "default": "second",
                "title": "Repetition time unit"
             },
-            "scanner_coordinate_system": {
+            "local_coordinate_system": {
                "anyOf": [
                   {
                      "$ref": "#/$defs/CoordinateSystem"
@@ -3645,29 +3668,6 @@
          ],
          "title": "MemoryUnit",
          "type": "string"
-      },
-      "MouseAnatomyModel": {
-         "description": "Base model for mouse anatomy",
-         "properties": {
-            "name": {
-               "title": "Name",
-               "type": "string"
-            },
-            "registry": {
-               "$ref": "#/$defs/Registry"
-            },
-            "registry_identifier": {
-               "title": "Registry Identifier",
-               "type": "string"
-            }
-         },
-         "required": [
-            "name",
-            "registry",
-            "registry_identifier"
-         ],
-         "title": "MouseAnatomyModel",
-         "type": "object"
       },
       "MousePlatformConfig": {
          "additionalProperties": false,
@@ -5793,10 +5793,13 @@
          "enum": [
             "Addgene (ADDGENE)",
             "C. elegans Development Ontology (WBLS)",
+            "Cell Line Ontology (CLO)",
             "Digital Object Identifier (DOI)",
             "Drosophila Development (FBDV)",
             "Edinburgh Mouse Atlas Project (EMAPA)",
+            "Foundational Model of Anatomy (FMA)",
             "Human Developmental Stages (HSAPDV)",
+            "Human Disease Ontology (DOID)",
             "Mouse Developmental Stages (MMUSDV)",
             "Mouse Genome Informatics (MGI)",
             "NCBI GenBank (GENBANK)",
@@ -5804,6 +5807,7 @@
             "Open Researcher and Contributor ID (ORCID)",
             "Research Organization Registry (ROR)",
             "Research Resource Identifiers (RRID)",
+            "The Fluorescent Protein Database (FPbase)",
             "Universal Protein Resource (UNIPROT)"
          ],
          "title": "Registry",
@@ -6035,7 +6039,7 @@
                ],
                "default": null,
                "description": "Unique index identifying the cell being imaged: <subject_name>_###",
-               "title": "Specimen ID"
+               "title": "Specimen name"
             },
             "fov_index": {
                "anyOf": [
@@ -12581,8 +12585,8 @@
          "title": "Protocol ID"
       },
       "subject_name": {
-         "description": "Unique identifier for the subject",
-         "title": "Subject ID",
+         "description": "Unique name for the subject",
+         "title": "Subject name",
          "type": "string"
       },
       "specimen_name": {
@@ -12602,7 +12606,7 @@
          ],
          "default": null,
          "description": "Required for in vitro modalities. Standard format is {subject_name} with a _### suffix, as needed",
-         "title": "Specimen ID"
+         "title": "Specimen name"
       },
       "acquisition_start_time": {
          "description": "During validation, timezone information will be moved into the acquisition_start_tz field.",
@@ -13266,7 +13270,7 @@
          ],
          "default": null,
          "description": "Should match the Instrument.instrument_name. Required when instrument metadata is available.",
-         "title": "Instrument ID"
+         "title": "Instrument name"
       },
       "acquisition_type": {
          "description": "Descriptive string detailing the type of acquisition, should be consistent across similar acquisitions for the same experiment.",

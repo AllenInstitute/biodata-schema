@@ -10,7 +10,7 @@ The `procedures.json` file contains anything done to the subject or specimen pri
 
 ### SpecimenProcedure.specimen_name
 
-After perfusion or death we refer to specimens by the `specimen_name` field. When the tissue has not been sectioned in some way the `specimen_name` should be identical to the `subject_name`. Sectioned specimens should have a unique number appended as a suffix to the subject ID: `<subject_name>_<###>`.
+After perfusion or death we refer to specimens by the `specimen_name` field. When the tissue has not been sectioned in some way the `specimen_name` should be identical to the `subject_name`. Sectioned specimens should have a unique number appended as a suffix to the subject name: `<subject_name>_<###>`.
 
 ## Examples
 

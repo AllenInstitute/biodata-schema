@@ -39,8 +39,8 @@
                "title": "Protocol ID"
             },
             "subject_name": {
-               "description": "Unique identifier for the subject",
-               "title": "Subject ID",
+               "description": "Unique name for the subject",
+               "title": "Subject name",
                "type": "string"
             },
             "specimen_name": {
@@ -60,7 +60,7 @@
                ],
                "default": null,
                "description": "Required for in vitro modalities. Standard format is {subject_name} with a _### suffix, as needed",
-               "title": "Specimen ID"
+               "title": "Specimen name"
             },
             "acquisition_start_time": {
                "description": "During validation, timezone information will be moved into the acquisition_start_tz field.",
@@ -724,7 +724,7 @@
                ],
                "default": null,
                "description": "Should match the Instrument.instrument_name. Required when instrument metadata is available.",
-               "title": "Instrument ID"
+               "title": "Instrument name"
             },
             "acquisition_type": {
                "description": "Descriptive string detailing the type of acquisition, should be consistent across similar acquisitions for the same experiment.",
@@ -2368,6 +2368,29 @@
          "title": "AnatomicalRelative",
          "type": "string"
       },
+      "AnatomyModel": {
+         "description": "Shared model for anatomy terms from different ontologies.",
+         "properties": {
+            "name": {
+               "title": "Name",
+               "type": "string"
+            },
+            "registry": {
+               "$ref": "#/$defs/Registry"
+            },
+            "registry_identifier": {
+               "title": "Registry Identifier",
+               "type": "string"
+            }
+         },
+         "required": [
+            "name",
+            "registry",
+            "registry_identifier"
+         ],
+         "title": "AnatomyModel",
+         "type": "object"
+      },
       "AngleUnit": {
          "description": "Enumeration of Angle Measurements",
          "enum": [
@@ -3019,7 +3042,7 @@
                      "$ref": "#/$defs/Origin"
                   },
                   {
-                     "$ref": "#/$defs/MouseAnatomyModel"
+                     "$ref": "#/$defs/AnatomyModel"
                   }
                ],
                "description": "Defines the position of (0,0,0) in the coordinate system",
@@ -3351,7 +3374,7 @@
                "type": "string"
             },
             "maternal_name": {
-               "title": "Maternal specimen ID",
+               "title": "Maternal subject name",
                "type": "string"
             },
             "maternal_genotype": {
@@ -3359,7 +3382,7 @@
                "type": "string"
             },
             "paternal_name": {
-               "title": "Paternal specimen ID",
+               "title": "Paternal subject name",
                "type": "string"
             },
             "paternal_genotype": {
@@ -5310,8 +5333,8 @@
                "type": "string"
             },
             "targeted_structure": {
-               "$ref": "#/$defs/MouseAnatomyModel",
-               "description": "Use options from MouseBloodVessels",
+               "$ref": "#/$defs/AnatomyModel",
+               "description": "For common mouse blood-vessel targets, use MouseBloodVessels with MouseAnatomyLookup.get_by_name.",
                "title": "Targeted blood vessel"
             }
          },
@@ -7045,7 +7068,7 @@
                      "$ref": "#/$defs/Origin"
                   },
                   {
-                     "$ref": "#/$defs/MouseAnatomyModel"
+                     "$ref": "#/$defs/AnatomyModel"
                   }
                ],
                "description": "Defines the position of (0,0,0) in the coordinate system",
@@ -8315,8 +8338,8 @@
                   }
                ],
                "default": null,
-               "description": "Unique identifier for the subject of data acquisition",
-               "title": "Subject ID"
+               "description": "Unique name for the subject of data acquisition",
+               "title": "Subject name"
             },
             "creation_time": {
                "description": "Time that data files were created, used to uniquely identify the data",
@@ -18651,7 +18674,8 @@
                "type": "string"
             },
             "ground_electrode_location": {
-               "$ref": "#/$defs/MouseAnatomyModel",
+               "$ref": "#/$defs/AnatomyModel",
+               "description": "Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or HumanAnatomyLookup). For common mouse ground-wire locations, use MouseGroundWireLocations and resolve the target with MouseAnatomyLookup.get_by_name(...).",
                "title": "Location of ground electrode"
             },
             "ground_wire_hole": {
@@ -19442,6 +19466,7 @@
                      "Pluma": "#/$defs/_Pluma",
                      "Poke": "#/$defs/_Poke",
                      "PyControlAdapter": "#/$defs/_Pycontroladapter",
+                     "Quac": "#/$defs/_Quac",
                      "RfidReader": "#/$defs/_Rfidreader",
                      "RgbArray": "#/$defs/_Rgbarray",
                      "SimpleAnalogGenerator": "#/$defs/_Simpleanaloggenerator",
@@ -19540,6 +19565,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Pycontroladapter"
+                  },
+                  {
+                     "$ref": "#/$defs/_Quac"
                   },
                   {
                      "$ref": "#/$defs/_Rfidreader"
@@ -20812,14 +20840,14 @@
             "targeted_structure": {
                "anyOf": [
                   {
-                     "$ref": "#/$defs/MouseAnatomyModel"
+                     "$ref": "#/$defs/AnatomyModel"
                   },
                   {
                      "type": "null"
                   }
                ],
                "default": null,
-               "description": "Use InjectionTargets",
+               "description": "Species-specific anatomy term; use the appropriate lookup (e.g., MouseAnatomyLookup or HumanAnatomyLookup).",
                "title": "Injection target"
             },
             "relative_position": {
@@ -21004,8 +21032,8 @@
                "title": "Location"
             },
             "instrument_name": {
-               "description": "Unique instrument identifier",
-               "title": "Instrument ID",
+               "description": "Unique instrument name",
+               "title": "Instrument name",
                "type": "string"
             },
             "modification_date": {
@@ -25207,7 +25235,7 @@
                "default": "second",
                "title": "Repetition time unit"
             },
-            "scanner_coordinate_system": {
+            "local_coordinate_system": {
                "anyOf": [
                   {
                      "$ref": "#/$defs/CoordinateSystem"
@@ -28567,29 +28595,6 @@
          "title": "MotorizedStage",
          "type": "object"
       },
-      "MouseAnatomyModel": {
-         "description": "Base model for mouse anatomy",
-         "properties": {
-            "name": {
-               "title": "Name",
-               "type": "string"
-            },
-            "registry": {
-               "$ref": "#/$defs/Registry"
-            },
-            "registry_identifier": {
-               "title": "Registry Identifier",
-               "type": "string"
-            }
-         },
-         "required": [
-            "name",
-            "registry",
-            "registry_identifier"
-         ],
-         "title": "MouseAnatomyModel",
-         "type": "object"
-      },
       "MousePlatformConfig": {
          "additionalProperties": false,
          "description": "Configuration for mouse platforms",
@@ -29974,8 +29979,8 @@
                "type": "string"
             },
             "body_part": {
-               "$ref": "#/$defs/MouseAnatomyModel",
-               "description": "Use MouseBodyParts",
+               "$ref": "#/$defs/AnatomyModel",
+               "description": "For common mouse body parts, use MouseBodyParts with MouseAnatomyLookup.get_by_name.",
                "title": "Body part of contact insertion"
             },
             "relative_position": {
@@ -29984,8 +29989,8 @@
                "title": "Relative position"
             },
             "muscle": {
-               "$ref": "#/$defs/MouseAnatomyModel",
-               "description": "Use MouseEmgMuscles",
+               "$ref": "#/$defs/AnatomyModel",
+               "description": "For common mouse EMG muscles, use MouseEmgMuscles with MouseAnatomyLookup.get_by_name.",
                "title": "Muscle of contact insertion"
             },
             "in_muscle": {
@@ -30052,8 +30057,8 @@
                "type": "string"
             },
             "ground_electrode_location": {
-               "$ref": "#/$defs/MouseAnatomyModel",
-               "description": "Use GroundWireLocations",
+               "$ref": "#/$defs/AnatomyModel",
+               "description": "For common mouse ground-wire locations, use MouseGroundWireLocations with MouseAnatomyLookup.get_by_name.",
                "title": "Location of ground electrode"
             },
             "contacts": {
@@ -33325,6 +33330,7 @@
                      "Pluma": "#/$defs/_Pluma",
                      "Poke": "#/$defs/_Poke",
                      "PyControlAdapter": "#/$defs/_Pycontroladapter",
+                     "Quac": "#/$defs/_Quac",
                      "RfidReader": "#/$defs/_Rfidreader",
                      "RgbArray": "#/$defs/_Rgbarray",
                      "SimpleAnalogGenerator": "#/$defs/_Simpleanaloggenerator",
@@ -33423,6 +33429,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Pycontroladapter"
+                  },
+                  {
+                     "$ref": "#/$defs/_Quac"
                   },
                   {
                      "$ref": "#/$defs/_Rfidreader"
@@ -34586,17 +34595,17 @@
                "description": "DOI for protocols.io",
                "title": "Protocol ID"
             },
-            "output_specimen_ids": {
-               "description": "IDs of specimens resulting from this procedure. Whole brains can use the {subject_name}, partial sections should always include a suffix {subject_name}_###",
+            "output_specimen_names": {
+               "description": "Names of specimens resulting from this procedure. Whole brains can use the {subject_name}, partial sections should always include a suffix {subject_name}_###",
                "items": {
                   "type": "string"
                },
-               "title": "Specimen ID",
+               "title": "Specimen names",
                "type": "array"
             }
          },
          "required": [
-            "output_specimen_ids"
+            "output_specimen_names"
          ],
          "title": "Perfusion",
          "type": "object"
@@ -34892,9 +34901,9 @@
                "title": "Object Type",
                "type": "string"
             },
-            "output_specimen_id": {
-               "description": "Output IDs should generally follow the format {input_specimen_id}_###",
-               "title": "Specimen ID",
+            "output_specimen_name": {
+               "description": "Output names should generally follow the format {input_specimen_name}_###",
+               "title": "Specimen name",
                "type": "string"
             },
             "targeted_structure": {
@@ -34984,7 +34993,7 @@
             }
          },
          "required": [
-            "output_specimen_id",
+            "output_specimen_name",
             "coordinate_system_name",
             "start_coordinate"
          ],
@@ -37351,8 +37360,8 @@
                "type": "string"
             },
             "subject_name": {
-               "description": "Unique identifier for the subject of data acquisition",
-               "title": "Subject ID",
+               "description": "Unique name for the subject of data acquisition",
+               "title": "Subject name",
                "type": "string"
             },
             "subject_procedures": {
@@ -38628,10 +38637,13 @@
          "enum": [
             "Addgene (ADDGENE)",
             "C. elegans Development Ontology (WBLS)",
+            "Cell Line Ontology (CLO)",
             "Digital Object Identifier (DOI)",
             "Drosophila Development (FBDV)",
             "Edinburgh Mouse Atlas Project (EMAPA)",
+            "Foundational Model of Anatomy (FMA)",
             "Human Developmental Stages (HSAPDV)",
+            "Human Disease Ontology (DOID)",
             "Mouse Developmental Stages (MMUSDV)",
             "Mouse Genome Informatics (MGI)",
             "NCBI GenBank (GENBANK)",
@@ -38639,6 +38651,7 @@
             "Open Researcher and Contributor ID (ORCID)",
             "Research Organization Registry (ROR)",
             "Research Resource Identifiers (RRID)",
+            "The Fluorescent Protein Database (FPbase)",
             "Universal Protein Resource (UNIPROT)"
          ],
          "title": "Registry",
@@ -40296,9 +40309,9 @@
                "title": "Object Type",
                "type": "string"
             },
-            "output_specimen_id": {
-               "description": "Output IDs should generally follow the format {input_specimen_id}_###",
-               "title": "Specimen ID",
+            "output_specimen_name": {
+               "description": "Output names should generally follow the format {input_specimen_name}_###",
+               "title": "Specimen name",
                "type": "string"
             },
             "targeted_structure": {
@@ -40328,7 +40341,7 @@
             }
          },
          "required": [
-            "output_specimen_id"
+            "output_specimen_name"
          ],
          "title": "Section",
          "type": "object"
@@ -40444,7 +40457,7 @@
                ],
                "default": null,
                "description": "Unique index identifying the cell being imaged: <subject_name>_###",
-               "title": "Specimen ID"
+               "title": "Specimen name"
             },
             "fov_index": {
                "anyOf": [
@@ -41365,7 +41378,7 @@
                      "type": "array"
                   }
                ],
-               "title": "Specimen ID(s)"
+               "title": "Specimen name(s)"
             },
             "start_date": {
                "format": "date",
@@ -41741,8 +41754,8 @@
                "type": "string"
             },
             "subject_name": {
-               "description": "Unique identifier for the subject of data acquisition",
-               "title": "Subject ID",
+               "description": "Unique name for the subject of data acquisition",
+               "title": "Subject name",
                "type": "string"
             },
             "subject_details": {
@@ -49710,6 +49723,25 @@
             }
          },
          "title": "_Pycontroladapter",
+         "type": "object"
+      },
+      "_Quac": {
+         "description": "Model Quac",
+         "properties": {
+            "whoami": {
+               "const": 1411,
+               "default": 1411,
+               "title": "Whoami",
+               "type": "integer"
+            },
+            "name": {
+               "const": "Quac",
+               "default": "Quac",
+               "title": "Name",
+               "type": "string"
+            }
+         },
+         "title": "_Quac",
          "type": "object"
       },
       "_Quantifi": {

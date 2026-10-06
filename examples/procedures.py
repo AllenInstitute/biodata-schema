@@ -173,7 +173,7 @@ p = Procedures(
             procedures=[
                 Perfusion(
                     protocol_id="doi_of_protocol",
-                    output_specimen_ids=["2", "1"],
+                    output_specimen_names=["2", "1"],
                 )
             ],
         ),

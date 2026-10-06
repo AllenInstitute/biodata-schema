@@ -176,7 +176,7 @@ def generate_procedures(
         experimenters=[experimenter.name],
         ethics_review_id=ethics_review_id,
         protocol_id=protocol,
-        procedures=[Perfusion(protocol_id=protocol, output_specimen_ids=["1"])],
+        procedures=[Perfusion(protocol_id=protocol, output_specimen_names=["1"])],
     )
 
     # Return the full Procedures object

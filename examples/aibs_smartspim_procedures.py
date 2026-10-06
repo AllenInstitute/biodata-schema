@@ -47,7 +47,7 @@ perfusion = procedures.Surgery(
     procedures=[
         Perfusion(
             protocol_id="dx.doi.org/10.17504/protocols.io.8epv51bejl1b/v6",
-            output_specimen_ids=[
+            output_specimen_names=[
                 specimen_name,
             ],
         )

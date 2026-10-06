@@ -236,16 +236,16 @@ class MyomatrixInsertion(ProtocolMixin, DataModel):
 class Perfusion(ProtocolMixin, DataModel):
     """Description of a perfusion procedure that creates a specimen"""
 
-    output_specimen_ids: List[str] = Field(
+    output_specimen_names: List[str] = Field(
         ...,
-        title="Specimen ID",
+        title="Specimen names",
         description=(
-            "IDs of specimens resulting from this procedure."
+            "Names of specimens resulting from this procedure."
             " Whole brains can use the {subject_name}, partial sections should always include a suffix {subject_name}_###"
         ),
     )
 
-    @field_validator("output_specimen_ids", mode="before")
-    def validate_output_specimen_ids(cls, values: List[str]):
-        """Sort specimen IDs"""
+    @field_validator("output_specimen_names", mode="before")
+    def validate_output_specimen_names(cls, values: List[str]):
+        """Sort specimen names"""
         return sorted(values)

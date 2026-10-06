@@ -340,7 +340,7 @@ def test_section_requires_exact_system_name(system_name):
 def test_section_checks_coordinate_dimensions(field_name):
     """Both endpoints use the containing coordinate system's dimensions."""
     values = dict(
-        output_specimen_id="123456_001",
+        output_specimen_name="123456_001",
         coordinate_system_name="BREGMA_ARI",
         start_coordinate=Translation(translation=[0, 0, 0]),
         end_coordinate=Translation(translation=[0, 0, 1]),

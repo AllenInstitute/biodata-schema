@@ -159,7 +159,7 @@ Description of a perfusion procedure that creates a specimen
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `output_specimen_ids` | `List[str]` | Specimen ID (IDs of specimens resulting from this procedure. Whole brains can use the {subject_name}, partial sections should always include a suffix {subject_name}_###) |
+| `output_specimen_names` | `List[str]` | Specimen names (Names of specimens resulting from this procedure. Whole brains can use the {subject_name}, partial sections should always include a suffix {subject_name}_###) |
 | `protocol_id` | `Optional[str]` | Protocol ID (DOI for protocols.io) |
 
 
