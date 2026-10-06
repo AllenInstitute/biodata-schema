@@ -6,6 +6,7 @@ from decimal import Decimal
 from enum import Enum
 from typing import List, Literal, Optional
 
+from biodata_models.anatomy import AnatomyModel
 from biodata_models.coordinates import AnatomicalRelative
 from biodata_models.devices import (
     BinMode,
@@ -28,7 +29,6 @@ from biodata_models.devices import (
     StageAxisDirection,
 )
 from biodata_models.harp_types import HarpDeviceType
-from biodata_models.mouse_anatomy import MouseAnatomyModel
 from biodata_models.organizations import Organization
 from biodata_models.units import (
     FrequencyUnit,
@@ -704,19 +704,29 @@ class Scanner(Device):
 class MyomatrixContact(DataModel):
     """Description of a contact on a myomatrix thread"""
 
-    body_part: MouseAnatomyModel = Field(..., title="Body part of contact insertion", description="Use MouseBodyParts")
+    body_part: AnatomyModel = Field(
+        ...,
+        title="Body part of contact insertion",
+        description="For common mouse body parts, use MouseBodyParts with MouseAnatomyLookup.get_by_name.",
+    )
     relative_position: AnatomicalRelative = Field(
         ..., title="Relative position", description="Position relative to procedures coordinate system"
     )
-    muscle: MouseAnatomyModel = Field(..., title="Muscle of contact insertion", description="Use MouseEmgMuscles")
+    muscle: AnatomyModel = Field(
+        ...,
+        title="Muscle of contact insertion",
+        description="For common mouse EMG muscles, use MouseEmgMuscles with MouseAnatomyLookup.get_by_name.",
+    )
     in_muscle: bool = Field(..., title="In muscle")
 
 
 class MyomatrixThread(DataModel):
     """Description of a thread of a myomatrix array"""
 
-    ground_electrode_location: MouseAnatomyModel = Field(
-        ..., title="Location of ground electrode", description="Use GroundWireLocations"
+    ground_electrode_location: AnatomyModel = Field(
+        ...,
+        title="Location of ground electrode",
+        description="For common mouse ground-wire locations, use MouseGroundWireLocations with MouseAnatomyLookup.get_by_name.",
     )
     contacts: List[MyomatrixContact] = Field(..., title="Contacts")
 

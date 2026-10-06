@@ -45,9 +45,6 @@ from biodata_models.modalities import Modality
 from biodata_models.organizations import Organization
 from biodata_models.pid_names import PIDName
 
-# Processing
-from biodata_models.process_names import ProcessName
-
 # Reagent models
 from biodata_models.reagent import FluorophoreType, StainType
 
@@ -81,6 +78,7 @@ from biodata_models.units import (
     VolumeUnit,
 )
 
+# Processing
 from biodata_schema.utils.docs.utils import generate_enum_table, save_model_info, update_model_links
 
 # Special case classes that should be processed as model schemas even if they don't contain model instances
@@ -104,8 +102,6 @@ registries = [
     AnatomicalRelative,
     # Organization models
     Organization,
-    # Process names
-    ProcessName,
     # Reagent
     StainType,
     FluorophoreType,

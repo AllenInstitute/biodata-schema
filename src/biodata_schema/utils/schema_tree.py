@@ -250,6 +250,11 @@ def _doc_url(model_cls) -> str:
     everything else gets a page per module under its top-level package folder).
     """
     module = model_cls.__module__
+    if module == "biodata_models.anatomy" and model_cls.__name__ == "AnatomyModel":
+        return "biodata_models/external.html#anatomymodel"
+    if module == "biodata_models.anatomy" and model_cls.__name__ == "MouseAnatomyLookup":
+        return "biodata_models/external.html#mouseanatomylookup"
+
     for prefix in ("biodata_schema.", "biodata_models."):
         prefix_len = len(prefix)
         if module.startswith(prefix):
