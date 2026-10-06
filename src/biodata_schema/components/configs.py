@@ -244,7 +244,7 @@ class Slap2Plane(Plane):
 
     specimen_name: Optional[str] = Field(
         default=None,
-        title="Specimen ID",
+        title="Specimen name",
         description="Unique index identifying the cell being imaged: <subject_name>_###",
     )
     fov_index: Optional[int] = Field(

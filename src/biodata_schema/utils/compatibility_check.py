@@ -17,11 +17,11 @@ class InstrumentAcquisitionCompatibility:
         self.inst = instrument
         self.acquisition = acquisition
 
-    def _compare_instrument_id(self) -> Optional[ValueError]:
+    def _compare_instrument_name(self) -> Optional[ValueError]:
         """Compares instrument_name"""
         if self.acquisition.instrument_name != self.inst.instrument_name:
             return ValueError(
-                f"Instrument ID in acquisition {self.acquisition.instrument_name} "
+                f"Instrument name in acquisition {self.acquisition.instrument_name} "
                 f"does not match the instrument's {self.inst.instrument_name}."
             )  # noqa: E501
         else:
@@ -76,7 +76,7 @@ class InstrumentAcquisitionCompatibility:
         Creates a dictionary of fields and whether it matches in instrument and acquisition.
         """
         comparisons = [
-            self._compare_instrument_id(),
+            self._compare_instrument_name(),
             self._compare_stimulus_devices(),
             self._compare_active_devices(raise_for_missing_devices=raise_for_missing_devices),
         ]

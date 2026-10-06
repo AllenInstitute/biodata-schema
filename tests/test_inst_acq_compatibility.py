@@ -43,15 +43,15 @@ class TestInstrumentAcquisitionCompatibility:
         ).run_compatibility_check()
         assert example_ophys_check is None
 
-    def test_compare_instrument_id_error(self):
-        """Tests that an error is raised when instrument ids do not match"""
+    def test_compare_instrument_name_error(self):
+        """Tests that an error is raised when instrument names do not match"""
         ophys_acquisition = self.ophys_acquisition.model_copy()
-        ophys_acquisition.instrument_name = "wrong_id"
+        ophys_acquisition.instrument_name = "wrong_name"
         with pytest.raises(ValueError) as context:
             InstrumentAcquisitionCompatibility(
                 instrument=self.ophys_instrument, acquisition=ophys_acquisition
             ).run_compatibility_check()
-        assert "Instrument ID in acquisition wrong_id does not match the instrument's" in str(context.value)
+        assert "Instrument name in acquisition wrong_name does not match the instrument's" in str(context.value)
 
     def test_compare_stimulus_devices_error(self):
         """Tests that an error is raised when stimulus devices do not match"""

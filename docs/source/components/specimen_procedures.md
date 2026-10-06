@@ -41,7 +41,7 @@ Description of a single planar section of brain tissue
 | `thickness` | `Optional[float]` | Slice thickness  |
 | `thickness_unit` | Optional[[SizeUnit](../biodata_models/units.md#sizeunit)] | Slice thickness unit  |
 | `partial_slice` | Optional[List[[AnatomicalRelative](../biodata_models/coordinates.md#anatomicalrelative)]] | Partial slice (If sectioning does not include the entire slice, indicate which part of the slice is retained.) |
-| `output_specimen_id` | `str` | Specimen ID (Output IDs should generally follow the format {input_specimen_id}_###) |
+| `output_specimen_name` | `str` | Specimen ID (Output IDs should generally follow the format {input_specimen_name}_###) |
 | `targeted_structure` | Optional[[BrainAtlas](../biodata_models/brain_atlas.md#ccfv3)] | Targeted structure  |
 | `includes_surrounding_tissue` | `Optional[bool]` | Includes surrounding tissue (Whether the section includes additional tissue surrounding the targeted structure.) |
 
@@ -63,7 +63,7 @@ Description of a single section of brain tissue. Slices should use PlanarSection
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `output_specimen_id` | `str` | Specimen ID (Output IDs should generally follow the format {input_specimen_id}_###) |
+| `output_specimen_name` | `str` | Specimen ID (Output IDs should generally follow the format {input_specimen_name}_###) |
 | `targeted_structure` | Optional[[BrainAtlas](../biodata_models/brain_atlas.md#ccfv3)] | Targeted structure  |
 | `includes_surrounding_tissue` | `Optional[bool]` | Includes surrounding tissue (Whether the section includes additional tissue surrounding the targeted structure.) |
 
@@ -96,7 +96,7 @@ Description of surgical or other procedure performed on a specimen
 |-------|------|-------------|
 | `procedure_type` | [SpecimenProcedureType](../biodata_models/specimen_procedure_types.md#specimenproceduretype) | Procedure type  |
 | `procedure_name` | `Optional[str]` | Procedure name  |
-| `specimen_name` | `str or List[str]` | Specimen ID(s)  |
+| `specimen_name` | `str or List[str]` | Specimen name(s)  |
 | `start_date` | `datetime.date` | Start date  |
 | `end_date` | `datetime.date` | End date  |
 | `experimenters` | `List[str]` | experimenter(s)  |

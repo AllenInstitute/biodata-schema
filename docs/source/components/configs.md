@@ -483,7 +483,7 @@ Configuration of a SLAP2 imaging plane (all imaging ROIs of a specific acquisiti
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `slap2_acquisition_type` | {Slap2AcquisitionType} | SLAP2 ROI acquisition type  |
-| `specimen_name` | `Optional[str]` | Specimen ID (Unique index identifying the cell being imaged: <subject_name>_###) |
+| `specimen_name` | `Optional[str]` | Specimen name (Unique index identifying the cell being imaged: <subject_name>_###) |
 | `fov_index` | `Optional[int]` | Field of view index (For FOVs that are imaged multiple times, assign a shared index to each instance of the FOV) |
 | `structure_types` | Optional[List[[NeuronStructure](#neuronstructure)]] | Structure type  |
 | `y_dilations` | `List[int]` | Unique Y dilations  |

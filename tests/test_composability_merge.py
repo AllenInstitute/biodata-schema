@@ -201,8 +201,8 @@ class TestComposability:
 
         acq1.schema_version = acq1_orig_schema_v
 
-        # Test incompatible subject IDs
-        acq2.subject_name = "different_id"
+        # Test incompatible subject names
+        acq2.subject_name = "different_name"
         with pytest.raises(ValueError) as context:
             acq1 + acq2
         assert "Cannot combine Acquisition objects that differ in key fields" in repr(context.value)
@@ -242,8 +242,8 @@ class TestComposability:
         assert combined.subject_procedures[2].start_date == self.procedures_time0.date()
         assert combined.subject_procedures[3].start_date == self.procedures_time1.date()
 
-        # Test combining with different subject IDs raises ValueError
-        p3 = Procedures(subject_name="different_id")
+        # Test combining with different subject names raises ValueError
+        p3 = Procedures(subject_name="different_name")
         with pytest.raises(ValueError):
             _ = p1 + p3
 

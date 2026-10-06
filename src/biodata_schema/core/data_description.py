@@ -40,8 +40,8 @@ class DataDescription(DataCoreModel):
     subject_name: Optional[str] = Field(
         default=None,
         pattern=DataRegex.NO_UNDERSCORES.value,
-        description="Unique identifier for the subject of data acquisition",
-        title="Subject ID",
+        description="Unique name for the subject of data acquisition",
+        title="Subject name",
     )
     creation_time: AwareDatetimeWithDefault = Field(
         ...,
@@ -147,7 +147,7 @@ class DataDescription(DataCoreModel):
             raise ValueError(f"DataLevel({data_level}) not supported")
 
     @model_validator(mode="after")
-    def subject_id_when_raw(self):
+    def subject_name_when_raw(self):
         """Ensure that a subject_name is provided when data_level is RAW"""
         if self.data_level == DataLevel.RAW and self.subject_name is None:
             raise ValueError("subject_name must be set when data_level is RAW")

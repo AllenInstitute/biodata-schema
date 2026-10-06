@@ -284,7 +284,7 @@ class Metadata(DataCoreModel):
 
     @model_validator(mode="after")
     def validate_calibration_object_tags(self):
-        """Validator to ensure a CalibrationObject subject has the expected subject ID"""
+        """Validator to ensure a CalibrationObject subject has the expected subject name"""
 
         if (
             self.subject
@@ -297,7 +297,7 @@ class Metadata(DataCoreModel):
         return self
 
     @model_validator(mode="after")
-    def validate_subject_id_consistency(self):
+    def validate_subject_name_consistency(self):
         """Validator to ensure procedures, acquisition, and data_description subject_name match subject.subject_name"""
 
         if not self.subject:

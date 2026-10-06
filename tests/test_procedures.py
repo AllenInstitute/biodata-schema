@@ -363,7 +363,7 @@ class TestProcedures:
                 experimenters=["Mam Moth"],
                 protocol_id=["10"],
                 notes=None,
-                procedure_details=[Sectioning(sections=[Section(output_specimen_id="1000_spinal")])],
+                procedure_details=[Sectioning(sections=[Section(output_specimen_name="1000_spinal")])],
             )
         ) is not None
 
@@ -478,7 +478,7 @@ class TestProcedures:
             global_coordinate_system=BREGMA_ARI,
             sections=[
                 PlanarSection(
-                    output_specimen_id="123456_001",
+                    output_specimen_name="123456_001",
                     targeted_structure=CCFv3.MOP,
                     coordinate_system_name="BREGMA_ARI",
                     start_coordinate=Translation(
@@ -489,7 +489,7 @@ class TestProcedures:
                     ),
                 ),
                 PlanarSection(
-                    output_specimen_id="123456_002",
+                    output_specimen_name="123456_002",
                     coordinate_system_name="BREGMA_ARI",
                     start_coordinate=Translation(
                         translation=[0.5, 0, 0],
@@ -499,7 +499,7 @@ class TestProcedures:
                     ),
                 ),
                 PlanarSection(
-                    output_specimen_id="123456_003",
+                    output_specimen_name="123456_003",
                     coordinate_system_name="BREGMA_ARI",
                     start_coordinate=Translation(
                         translation=[0.7, 0, 0],
@@ -513,7 +513,7 @@ class TestProcedures:
         assert sectioning_procedure is not None
 
         valid_section = PlanarSection(
-            output_specimen_id="123456_001",
+            output_specimen_name="123456_001",
             coordinate_system_name="BREGMA_ARI",
             start_coordinate=Translation(
                 translation=[0.3, 0, 0, 0],
@@ -526,14 +526,14 @@ class TestProcedures:
         # Raise error if neither end_coordinate nor thickness is provided
         with pytest.raises(OneOfError):
             PlanarSection(
-                output_specimen_id="123456_001",
+                output_specimen_name="123456_001",
                 coordinate_system_name="BREGMA_ARI",
                 start_coordinate=Translation(
                     translation=[0.3, 0, 0],
                 ),
             )
 
-    def test_validate_subject_specimen_ids(self):
+    def test_validate_subject_specimen_names(self):
         """Test that the subject_name and specimen_name match"""
 
         with pytest.raises(ValidationError) as e:
@@ -554,7 +554,7 @@ class TestProcedures:
         expected_exception = "specimen_name must be an extension of the subject_name."
         assert expected_exception in str(e.value)
 
-    def test_validate_subject_specimen_id_list_valid(self):
+    def test_validate_subject_specimen_name_list_valid(self):
         """Test that specimen_name accepts a list of strings when all contain subject_name"""
 
         valid_procedure = Procedures(

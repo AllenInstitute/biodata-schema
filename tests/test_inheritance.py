@@ -18,7 +18,7 @@ from biodata_schema.utils.inheritance import (
     _accumulate_processing,
     _accumulate_quality_control,
     _get_root_asset_name,
-    _get_unique_subject_ids,
+    _get_unique_subject_names,
     _inherit_instrument_and_acquisition,
     _inherit_subject_and_procedures,
     derive_data_description_analyzed,
@@ -40,7 +40,7 @@ _counter = 0
 
 
 def _make_metadata(subject_name="123456"):
-    """Helper to create a Metadata object with a given subject ID and unique creation time"""
+    """Helper to create a Metadata object with a given subject name and unique creation time"""
     global _counter
     _counter += 1
     dd = DataDescription(
@@ -372,11 +372,11 @@ class TestInternalHelpers:
         simulated_dd = self.source.data_description.model_copy(update={"data_level": DataLevel.SIMULATED})
         assert _get_root_asset_name(simulated_dd) is None
 
-    def test_get_unique_subject_ids_from_data_description(self):
-        """_get_unique_subject_ids should extract subject ID from data_description when subject is None"""
+    def test_get_unique_subject_names_from_data_description(self):
+        """_get_unique_subject_names should extract subject name from data_description when subject is None"""
         no_subject = self.source.model_copy(update={"subject": None})
-        ids = _get_unique_subject_ids([no_subject])
-        assert ids == ["123456"]
+        subject_names = _get_unique_subject_names([no_subject])
+        assert subject_names == ["123456"]
 
     def test_inherit_subject_and_procedures_returns_none_when_no_subject_or_procedures(self):
         """_inherit_subject_and_procedures should return None when source has neither subject nor procedures"""

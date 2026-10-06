@@ -56,7 +56,7 @@ Description of an instrument
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `location` | `Optional[str]` | Location (Location of the instrument) |
-| `instrument_name` | `str` | Instrument ID (Unique instrument identifier) |
+| `instrument_name` | `str` | Instrument name (Unique instrument name) |
 | `modification_date` | `datetime.date` | Date of modification (Date of the last change to the instrument, hardware addition/removal, calibration, etc.) |
 | `modalities` | List[[Modality](biodata_models/modalities.md#modality)] | Modalities (List of all possible modalities that the instrument is capable of acquiring) |
 | `calibrations` | Optional[List[[Calibration](components/measurements.md#calibration) or [VolumeCalibration](components/measurements.md#volumecalibration) or [PowerCalibration](components/measurements.md#powercalibration)]] | Calibrations (List of calibration measurements takend during instrument setup and maintenance) |

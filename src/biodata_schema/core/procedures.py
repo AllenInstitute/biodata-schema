@@ -16,7 +16,7 @@ from biodata_schema.components.subject_procedures import (
     WaterRestriction,
 )
 from biodata_schema.utils.merge import merge_coordinate_systems, merge_notes
-from biodata_schema.utils.validators import recursive_get_device_names, subject_specimen_id_compatibility
+from biodata_schema.utils.validators import recursive_get_device_names, subject_specimen_name_compatibility
 
 
 class Procedures(DataCoreModel):
@@ -28,8 +28,8 @@ class Procedures(DataCoreModel):
     schema_version: SkipValidation[Literal["3.0.2"]] = Field(default="3.0.2")
     subject_name: str = Field(
         ...,
-        description="Unique identifier for the subject of data acquisition",
-        title="Subject ID",
+        description="Unique name for the subject of data acquisition",
+        title="Subject name",
     )
     subject_procedures: DiscriminatedList[
         Surgery | Injection | NonSurgicalInjection | TrainingProtocol | WaterRestriction | GenericSubjectProcedure
@@ -86,21 +86,24 @@ class Procedures(DataCoreModel):
         return self
 
     @model_validator(mode="after")
-    def validate_subject_specimen_ids(self):
+    def validate_subject_specimen_names(self):
         """Validate that the subject_name and specimen_name match"""
 
         # Return if no specimen procedures
         if self.specimen_procedures:
             subject_name = self.subject_name
-            flat_specimen_ids = []
+            specimen_names = []
             for spec_proc in self.specimen_procedures:
-                sid = spec_proc.specimen_name
-                if isinstance(sid, list):
-                    flat_specimen_ids.extend(sid)
+                specimen_name = spec_proc.specimen_name
+                if isinstance(specimen_name, list):
+                    specimen_names.extend(specimen_name)
                 else:
-                    flat_specimen_ids.append(sid)
+                    specimen_names.append(specimen_name)
 
-            if any(not subject_specimen_id_compatibility(subject_name, spec_id) for spec_id in flat_specimen_ids):
+            if any(
+                not subject_specimen_name_compatibility(subject_name, specimen_name)
+                for specimen_name in specimen_names
+            ):
                 raise ValueError("specimen_name must be an extension of the subject_name.")
 
         return self
@@ -112,7 +115,7 @@ class Procedures(DataCoreModel):
             raise ValueError("Schema versions must match to combine Procedures")
 
         if not self.subject_name == other.subject_name:
-            raise ValueError("Subject IDs must match to combine Procedures objects.")
+            raise ValueError("Subject names must match to combine Procedures objects.")
 
         coordinate_system = merge_coordinate_systems(self.global_coordinate_system, other.global_coordinate_system)
 

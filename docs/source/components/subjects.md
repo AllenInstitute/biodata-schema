@@ -8,9 +8,9 @@ Description of breeding info for subject
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `maternal_name` | `str` | Maternal specimen ID  |
+| `maternal_name` | `str` | Maternal subject name  |
 | `maternal_genotype` | `str` | Maternal genotype  |
-| `paternal_name` | `str` | Paternal specimen ID  |
+| `paternal_name` | `str` | Paternal subject name  |
 | `paternal_genotype` | `str` | Paternal genotype  |
 
 

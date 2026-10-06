@@ -59,7 +59,7 @@ from biodata_schema.utils.merge import (
 from biodata_schema.utils.validators import (
     TimeValidation,
     extract_timezone_from_datetime,
-    subject_specimen_id_compatibility,
+    subject_specimen_name_compatibility,
 )
 
 logger = logging.getLogger(__name__)
@@ -381,11 +381,11 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
     describedBy: str = Field(default=_DESCRIBED_BY_URL, json_schema_extra={"const": _DESCRIBED_BY_URL})
     schema_version: SkipValidation[Literal["3.0.0"]] = Field(default="3.0.0")
 
-    # ID
-    subject_name: str = Field(default=..., title="Subject ID", description="Unique identifier for the subject")
+    # Names
+    subject_name: str = Field(default=..., title="Subject name", description="Unique name for the subject")
     specimen_name: Optional[Union[str, List[str]]] = Field(
         default=None,
-        title="Specimen ID",
+        title="Specimen name",
         description="Required for in vitro modalities. Standard format is {subject_name} with a _### suffix, as needed",
     )
 
@@ -434,7 +434,7 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
     ethics_review_id: Optional[List[str]] = Field(default=None, title="Ethics review ID")
     instrument_name: Optional[str] = Field(
         default=None,
-        title="Instrument ID",
+        title="Instrument name",
         description="Should match the Instrument.instrument_name. Required when instrument metadata is available.",
     )
     acquisition_type: str = Field(
@@ -516,18 +516,18 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
         return self
 
     @model_validator(mode="after")
-    def check_subject_specimen_id(self):
-        """Check that the subject and specimen IDs match"""
+    def check_subject_specimen_names(self):
+        """Check that the subject and specimen names match"""
         if self.specimen_name and self.subject_name:
-            ids = self.specimen_name if isinstance(self.specimen_name, list) else [self.specimen_name]
-            for sid in ids:
-                if not subject_specimen_id_compatibility(self.subject_name, sid):
-                    raise ValueError(f"Expected {self.subject_name} to appear in {sid}")
+            specimen_names = self.specimen_name if isinstance(self.specimen_name, list) else [self.specimen_name]
+            for specimen_name in specimen_names:
+                if not subject_specimen_name_compatibility(self.subject_name, specimen_name):
+                    raise ValueError(f"Expected {self.subject_name} to appear in {specimen_name}")
 
         return self
 
     @model_validator(mode="after")
-    def instrument_id_required_for_data_streams(self):
+    def instrument_name_required_for_data_streams(self):
         """Require instrument_name when any standard DataStream is present"""
         if not hasattr(self, "data_streams"):
             return self
@@ -538,7 +538,7 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
 
     @model_validator(mode="after")
     def specimen_required(self):
-        """Check if specimen ID is required for in vitro imaging modalities"""
+        """Check if specimen name is required for in vitro imaging modalities"""
 
         if not hasattr(self, "data_streams"):  # bypass for testing
             return self
@@ -546,7 +546,7 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
         for stream in self.data_streams:
             if any([modality.abbreviation in SPECIMEN_MODALITIES for modality in stream.modalities]):
                 if not self.specimen_name:
-                    raise ValueError(f"Specimen ID is required for modalities {stream.modalities}")
+                    raise ValueError(f"Specimen name is required for modalities {stream.modalities}")
 
         return self
 

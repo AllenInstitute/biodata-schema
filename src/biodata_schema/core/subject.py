@@ -16,8 +16,8 @@ class Subject(DataCoreModel):
     schema_version: SkipValidation[Literal["3.0.2"]] = Field(default="3.0.2")
     subject_name: Annotated[str, DraftRequirement] = Field(
         ...,
-        description="Unique identifier for the subject of data acquisition",
-        title="Subject ID",
+        description="Unique name for the subject of data acquisition",
+        title="Subject name",
     )
 
     subject_details: Discriminated[MouseSubject | HumanSubject | NonHumanPrimateSubject | CalibrationObject] = Field(

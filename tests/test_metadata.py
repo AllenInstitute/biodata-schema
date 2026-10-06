@@ -217,7 +217,7 @@ class TestMetadata:
                 ),
             )
         assert (
-            "Instrument ID in acquisition 123_EPHYS2_20230101 does not match the instrument's 123_EPHYS1_20220101."
+            "Instrument name in acquisition 123_EPHYS2_20230101 does not match the instrument's 123_EPHYS1_20220101."
         ) in str(context.value)
 
     def test_validate_old_schema_version(self):
@@ -272,7 +272,7 @@ class TestMetadata:
         # also check the other fields
         assert expected_result == result
 
-    def test_validate_subject_id_consistency(self):
+    def test_validate_subject_name_consistency(self):
         """Tests that mismatched subject_name across core files raises an error"""
         Metadata(
             name=self.sample_name,
@@ -906,7 +906,7 @@ class TestMetadata:
         assert "start_date_time" in str(context.value)
 
     def test_validate_calibration_object_tags(self):
-        """Tests that CalibrationObject subjects use the calibration subject ID"""
+        """Tests that CalibrationObject subjects use the calibration subject name"""
 
         # Create a subject with CalibrationObject
         calibration_subject = Subject(

@@ -84,8 +84,8 @@ class TestAcquisition:
             )
         assert "instrument_name is required" in str(context.value)
 
-    def test_check_subject_specimen_id(self):
-        """Test that subject and specimen IDs match"""
+    def test_check_subject_specimen_names(self):
+        """Test that subject and specimen names match"""
         with pytest.raises(ValueError) as context:
             acq = exaspim_acquisition.model_copy()
             acq.specimen_name = "654321"
@@ -94,14 +94,14 @@ class TestAcquisition:
 
         assert "Expected 123456 to appear in 654321" in str(context.value)
 
-    def test_specimen_id_list_valid(self):
+    def test_specimen_name_list_valid(self):
         """Test that specimen_name accepts a list of strings when all contain subject_name"""
         acq = exaspim_acquisition.model_copy()
         acq.specimen_name = ["123456_slide1", "123456_slide2"]
         validated = Acquisition.model_validate_json(acq.model_dump_json())
         assert validated.specimen_name == ["123456_slide1", "123456_slide2"]
 
-    def test_specimen_id_list_invalid(self):
+    def test_specimen_name_list_invalid(self):
         """Test that specimen_name list raises ValueError if any entry does not contain subject_name"""
         with pytest.raises(ValueError) as context:
             acq = exaspim_acquisition.model_copy()
@@ -110,10 +110,10 @@ class TestAcquisition:
         assert "Expected 123456 to appear in 654321_slide2" in str(context.value)
 
     def test_specimen_required(self):
-        """Test that specimen ID is required for in vitro imaging modalities"""
+        """Test that specimen name is required for in vitro imaging modalities"""
         acq = exaspim_acquisition.model_copy()
         acq.specimen_name = None
-        with pytest.raises(ValidationError, match="Specimen ID is required for modalities"):
+        with pytest.raises(ValidationError, match="Specimen name is required for modalities"):
             Acquisition.model_validate_json(acq.model_dump_json())
 
     def test_check_modality_config_requirements(self):
@@ -142,9 +142,9 @@ class TestAcquisition:
         assert stream is not None
 
     def test_specimen_required_for_in_vitro_modalities(self):
-        """Test that specimen ID is required for in vitro imaging modalities"""
+        """Test that specimen name is required for in vitro imaging modalities"""
 
-        # Test case where specimen ID is missing for in vitro modality
+        # Test case where specimen name is missing for in vitro modality
         with pytest.raises(ValueError) as context:
             Acquisition(
                 experimenters=["Mam Moth"],
@@ -179,9 +179,9 @@ class TestAcquisition:
                     )
                 ],
             )
-        assert "Specimen ID is required for modalities" in str(context.value)
+        assert "Specimen name is required for modalities" in str(context.value)
 
-        # Test case where specimen ID is provided for in vitro modality
+        # Test case where specimen name is provided for in vitro modality
         acquisition = Acquisition(
             experimenters=["Mam Moth"],
             acquisition_start_time=datetime.now(),

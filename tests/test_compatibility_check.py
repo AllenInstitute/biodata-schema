@@ -42,18 +42,18 @@ class TestInstrumentAcquisitionCompatibility:
         checker = InstrumentAcquisitionCompatibility(inst, acq)
         assert checker.run_compatibility_check() is None
 
-    def test_compare_instrument_id_success(self):
-        """Test that instrument IDs match."""
+    def test_compare_instrument_name_success(self):
+        """Test that instrument names match."""
         checker = InstrumentAcquisitionCompatibility(self.mock_instrument, self.mock_acquisition)
-        assert checker._compare_instrument_id() is None
+        assert checker._compare_instrument_name() is None
 
-    def test_compare_instrument_id_failure(self):
-        """Test that instrument IDs mismatch raises ValueError."""
+    def test_compare_instrument_name_failure(self):
+        """Test that mismatched instrument names raise ValueError."""
         self.mock_acquisition.instrument_name = "instrument_2"
         checker = InstrumentAcquisitionCompatibility(self.mock_instrument, self.mock_acquisition)
-        error = checker._compare_instrument_id()
+        error = checker._compare_instrument_name()
         assert isinstance(error, ValueError)
-        assert "Instrument ID in acquisition" in str(error)
+        assert "Instrument name in acquisition" in str(error)
 
     def test_compare_stimulus_devices_success(self):
         """Test that stimulus devices in acquisition match instrument components."""
@@ -81,7 +81,7 @@ class TestInstrumentAcquisitionCompatibility:
         checker = InstrumentAcquisitionCompatibility(self.mock_instrument, self.mock_acquisition)
         with pytest.raises(ValueError) as context:
             checker.run_compatibility_check()
-        assert "Instrument ID in acquisition" in str(context.value)
+        assert "Instrument name in acquisition" in str(context.value)
 
     def test_compare_active_devices_missing_with_raise_false(self):
         """Test that missing active devices logs error when raise_for_missing_devices is False."""

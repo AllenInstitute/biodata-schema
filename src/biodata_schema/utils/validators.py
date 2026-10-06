@@ -27,7 +27,7 @@ class TimeValidation(Enum):
     """Time should be before the end time."""
 
 
-def subject_specimen_id_compatibility(subject_name: str, specimen_name: str) -> bool:
+def subject_specimen_name_compatibility(subject_name: str, specimen_name: str) -> bool:
     """Check whether a subject_name and specimen_name are compatible"""
     return subject_name in specimen_name
 

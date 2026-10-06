@@ -84,8 +84,8 @@ class Instrument(DataCoreModel):
     location: Optional[str] = Field(default=None, title="Location", description="Location of the instrument")
     instrument_name: Annotated[str, DraftRequirement] = Field(
         ...,
-        description="Unique instrument identifier",
-        title="Instrument ID",
+        description="Unique instrument name",
+        title="Instrument name",
     )
     modification_date: date = Field(
         ...,
@@ -174,7 +174,7 @@ class Instrument(DataCoreModel):
 
         names = recursive_get_device_names(self.components)
 
-        # Include the instrument ID as a valid name
+        # Include the instrument name as a valid name
         names = names + [self.instrument_name]
 
         return names

@@ -24,7 +24,7 @@ Description of a logical collection of data files
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `license` | [License](biodata_models/licenses.md#license) | License  |
-| `subject_name` | `Optional[str]` | Subject ID (Unique identifier for the subject of data acquisition) |
+| `subject_name` | `Optional[str]` | Subject name (Unique name for the subject of data acquisition) |
 | `creation_time` | `datetime (timezone-aware)` | Creation Time (Time that data files were created, used to uniquely identify the data) |
 | `tags` | `Optional[List[str]]` | Tags (Descriptive strings to help categorize and search for data) |
 | `name` | `Optional[str]` | Data asset name (When left blank, a name will be generated based on subject_name and creation_time. Conventionally also used as the name of the data folder.) |

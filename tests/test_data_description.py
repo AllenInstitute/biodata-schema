@@ -165,11 +165,11 @@ class TestDataDescription:
             project_name="Test",
         )
 
-        # also over-write with specimen ID
+        # also over-write with a subject name
         dd = derive_data_description_from_raw(dr, "process", subject_name="1234-56")
         assert dd is not None
 
-    def test_raw_no_subject_id(self):
+    def test_raw_no_subject_name(self):
         """Test that creating a raw data description without subject_name raises an error"""
         dt = datetime.datetime.now()
 
