@@ -51,6 +51,13 @@ npm --prefix diagram-app ci
 npm --prefix diagram-app run build
 ```
 
+The quality-control page embeds the interactive hierarchy builder (`qc-tree-app/`). Build its JS/CSS bundle before building the docs as well:
+
+```bash
+npm --prefix qc-tree-app ci
+npm --prefix qc-tree-app run build
+```
+
 Then to create the documentation html files, run:
 
 ```bash

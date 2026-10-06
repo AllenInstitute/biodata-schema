@@ -10,21 +10,24 @@ Every [QCMetric](#qcmetric) has a `Status` which takes the value of the metric a
 
 ## Details
 
+The metrics defined during quality control should define whether or not an asset can be used for analysis and the properties of an asset that could influence how an analysis is performed. There are two levels of QC:
+
+- Quality control metrics that are **not allowed to fail** are metrics that at `stage:raw` would prevent an asset from being processed or that at `stage:processing` would prevent an asset from being analyzed. This is a very high bar. Another way of saying this is that if the goals of the data acquisition were met, then all metrics that are 'not allowed to fail' should be passing.
+- Quality control metrics that are **allowed to fail** are metrics that will influence the analysis of data, for example by indicating that one element of an asset cannot be used. These assets do not invalidate further analysis but they change how analysis should be performed.
+
+The second kind of metrics are identified by the `QualityControl.allow_tag_failures` field, details below.
+
 ### Metrics
 
-Each [QCMetric](#qcmetric) is a single value or array of values that can be computed, or observed, about one modality in a data asset. These can have any type. Metrics should be significant: i.e. whether they pass or fail should matter for the modality. Metrics need to be human understandable. If you find yourself generating more than fifty metrics for a modality you should group them together (i.e. make the value a dictionary combining similar metrics and the rule an evaluation of multiple fields in the dictionary).
+Each [QCMetric](#qcmetric) is a single value or array of values that can be computed, or observed, about one modality in a data asset. These can have any type. Metrics should be significant: i.e. whether they pass or fail should matter for the modality. Metrics need to be human understandable. If you find yourself generating more metrics than a human can reasonably parse for a modality you should group them together (i.e. make the value a dictionary combining similar metrics).
 
-Each [QCMetric](#qcmetric) has a [Status](#status). The [Status](#status) should depend directly on the `QCMetric.value`, either by a simple function: "value>5", or by a qualitative rule: "Field of view includes visual areas". The `QCMetric.description` field should describe the rule used to set the status. Metrics can be evaluated multiple times, in which case the new status should be appended the `QCMetric.status_history`.
+Each [QCMetric](#qcmetric) has a [Status](#status). The [Status](#status) should depend directly on the `QCMetric.value`, either by a simple function: "value>5", or by a qualitative rule: "Field of view includes visual areas". The `QCMetric.description` field should describe the rule used to set the status. The status of a metric should be appended the `QCMetric.status_history`.
 
 Each [QCMetric](#qcmetric) is annotated with three pieces of additional metadata: the [Stage](#stage) during which it was evaluated, the [Modality](biodata_models/modalities.md#modality) of the evaluated data, and [tags](#tags).
 
-### Curations
-
-If you find yourself computing a value for something smaller than an entire modality of data in an asset you are performing *curation*, i.e. you are determining the status of a subset of a modality in the data asset. We provide the [CurationMetric](#curationmetric) for this purpose. You should put a dictionary in the `CurationMetric.value` field that contains a mapping between the subsets (usually neurons, ROIs, channels, etc) and their values.
-
 ### Tags
 
-`tags` are groups of descriptors that define how metrics are organized hierarchically, making it easier to visualize metrics. Good tag keys (groups) are things like "probe" and good tag values are things like "Probe A" or just "A".
+`tags` are groups of descriptors that define how metrics are grouped hierarchically, making it easier to visualize metrics. Good tag keys (groups) are things like "probe" and good tag values (group members) are things like "Probe A" or just "A".
 
 ```python
 # For an electrophysiology metric
@@ -39,7 +42,19 @@ tags = {
 }
 ```
 
-Use the `QualityControl.default_grouping` list to define how users should organize a visualization by default. In almost all cases *modality should be the top-level grouping*. For example, building on the example above you might group by: `["modality", ("probe", "video"), "shank"]` to get a tree split by modality first (which naturally splits ephys and behavior-videos tags into two groups), then by which probe or video a metric belongs to, and finally only for probes the individual shanks are split into groups.
+When multiple QC stages are selected, they split at the top of the hierarchy. Multiple modalities split at the next level, or at the top when only one stage is selected. These fixed levels are followed by the tag levels in `QualityControl.default_grouping`. For example, `["stage", "modality", ("probe", "video"), "shank"]` groups first by stage, then by modality, then by probe or video at the same level, and finally by shank.
+
+Use the builder to define tag keys and values, drag tag keys into level buckets, and preview the resulting hierarchy:
+
+```{raw} html
+<link rel="stylesheet" href="_static/qc-tree-app/qc-tree-app.css">
+<div class="qc-tree-app"></div>
+<script type="module" src="_static/qc-tree-app/qc-tree-app.js"></script>
+```
+
+### Curations
+
+If you find yourself computing a value for something that is smaller than an entire modality of data and is repeated (e.g. neurons) in an asset you are performing *curation*, i.e. you are determining the status of a subset of a modality in the data asset. We provide the [CurationMetric](#curationmetric) for this purpose. You should put a dictionary in the `CurationMetric.value` field that contains a mapping between the subsets (usually neurons, ROIs, channels, etc) and their values.
 
 ### QualityControl.evaluate_status()
 
@@ -52,6 +67,16 @@ Then, given the status of all the remaining metrics in the group:
 1. If any metric is still failing, the evaluation fails
 2. If any metric is pending and the rest pass the evaluation is pending
 3. If all metrics pass the evaluation passes
+
+### QualityControl.status
+
+The `QualityControl.status` field is a dictionary that maps individual tag `key:value` pairs to their status. For example a typical status dictionary might look like this:
+
+```
+{
+    "modality:behavior": "PASS",
+}
+```
 
 **Q: What is a metric reference?**
 
