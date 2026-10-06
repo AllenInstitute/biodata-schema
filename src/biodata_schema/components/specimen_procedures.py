@@ -40,7 +40,9 @@ class Section(DataModel):
     """Description of a single section of brain tissue. Slices should use PlanarSection."""
 
     output_specimen_name: str = Field(
-        ..., title="Specimen name", description="Output names should generally follow the format {input_specimen_name}_###"
+        ...,
+        title="Specimen name",
+        description="Output names should generally follow the format {input_specimen_name}_###",
     )
     targeted_structure: Optional[BrainStructureModel] = Field(default=None, title="Targeted structure")
     includes_surrounding_tissue: Optional[bool] = Field(

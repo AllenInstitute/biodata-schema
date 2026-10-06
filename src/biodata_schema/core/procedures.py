@@ -101,8 +101,7 @@ class Procedures(DataCoreModel):
                     specimen_names.append(specimen_name)
 
             if any(
-                not subject_specimen_name_compatibility(subject_name, specimen_name)
-                for specimen_name in specimen_names
+                not subject_specimen_name_compatibility(subject_name, specimen_name) for specimen_name in specimen_names
             ):
                 raise ValueError("specimen_name must be an extension of the subject_name.")
 
