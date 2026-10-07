@@ -54,7 +54,7 @@ surgery = Surgery(
 )
 
 p = Procedures(
-    subject_id="000000",
+    subject_name="000000",
     global_coordinate_system=procedures_coordinate_system,
     subject_procedures=[surgery],
 )

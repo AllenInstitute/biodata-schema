@@ -18,7 +18,7 @@ from biodata_schema.utils.inheritance import (
     _accumulate_processing,
     _accumulate_quality_control,
     _get_root_asset_name,
-    _get_unique_subject_ids,
+    _get_unique_subject_names,
     _inherit_instrument_and_acquisition,
     _inherit_subject_and_procedures,
     derive_data_description_analyzed,
@@ -39,13 +39,13 @@ example_code = Code(url="https://github.com/example", version="0.1")
 _counter = 0
 
 
-def _make_metadata(subject_id="123456"):
-    """Helper to create a Metadata object with a given subject ID and unique creation time"""
+def _make_metadata(subject_name="123456"):
+    """Helper to create a Metadata object with a given subject name and unique creation time"""
     global _counter
     _counter += 1
     dd = DataDescription(
         modalities=[Modality.ECEPHYS],
-        subject_id=subject_id,
+        subject_name=subject_name,
         creation_time=datetime(2022, 2, 21, 16, 30, _counter, tzinfo=timezone.utc),
         institution=Organization.AIND,
         investigators=[Person(name="Jane Smith")],
@@ -54,7 +54,7 @@ def _make_metadata(subject_id="123456"):
         data_level=DataLevel.RAW,
     )
     sub = Subject.model_validate(example_subject.model_dump())
-    sub.subject_id = subject_id
+    sub.subject_name = subject_name
     return Metadata(
         name=dd.name,
         location=f"s3://bucket/{dd.name}",
@@ -131,7 +131,7 @@ class TestFromMetadataSingleSource:
             location="s3://bucket/derived",
         )
         assert result.subject is not None
-        assert result.subject.subject_id == "123456"
+        assert result.subject.subject_name == "123456"
 
     def test_single_source_data_description_is_derived(self):
         """Data description should be updated to data level DERIVED and name should include process name"""
@@ -195,8 +195,8 @@ class TestFromMetadataMultipleSameSubject:
 
     def setup_method(self):
         """Create two metadata objects with same subject"""
-        self.source1 = _make_metadata(subject_id="123456")
-        self.source2 = _make_metadata(subject_id="123456")
+        self.source1 = _make_metadata(subject_name="123456")
+        self.source2 = _make_metadata(subject_name="123456")
 
     def test_same_subject_inherits_subject(self):
         """Subject should be inherited when all sources have the same subject"""
@@ -206,7 +206,7 @@ class TestFromMetadataMultipleSameSubject:
             location="s3://bucket/derived",
         )
         assert result.subject is not None
-        assert result.subject.subject_id == "123456"
+        assert result.subject.subject_name == "123456"
 
     def test_different_acquisitions_drops_instrument_and_acquisition(self):
         """Instrument and acquisition should be dropped when sources have different acquisitions"""
@@ -281,8 +281,8 @@ class TestFromMetadataDifferentSubjects:
 
     def setup_method(self):
         """Create two metadata objects with different subjects"""
-        self.source1 = _make_metadata(subject_id="123456")
-        self.source2 = _make_metadata(subject_id="789012")
+        self.source1 = _make_metadata(subject_name="123456")
+        self.source2 = _make_metadata(subject_name="789012")
 
     def test_different_subjects_drops_subject(self):
         """Subject should be dropped when sources have different subjects"""
@@ -382,11 +382,11 @@ class TestInternalHelpers:
         simulated_dd = self.source.data_description.model_copy(update={"data_level": DataLevel.SIMULATED})
         assert _get_root_asset_name(simulated_dd) is None
 
-    def test_get_unique_subject_ids_from_data_description(self):
-        """_get_unique_subject_ids should extract subject ID from data_description when subject is None"""
+    def test_get_unique_subject_names_from_data_description(self):
+        """_get_unique_subject_names should extract subject name from data_description when subject is None"""
         no_subject = self.source.model_copy(update={"subject": None})
-        ids = _get_unique_subject_ids([no_subject])
-        assert ids == ["123456"]
+        subject_names = _get_unique_subject_names([no_subject])
+        assert subject_names == ["123456"]
 
     def test_inherit_subject_and_procedures_returns_none_when_no_subject_or_procedures(self):
         """_inherit_subject_and_procedures should return None when source has neither subject nor procedures"""

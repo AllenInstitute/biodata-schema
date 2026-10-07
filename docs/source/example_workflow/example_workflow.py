@@ -56,13 +56,13 @@ BREGMA_ARI = CoordinateSystem(
 )
 
 
-def generate_data_description(subject_id: str, creation_time: datetime) -> DataDescription:
+def generate_data_description(subject_name: str, creation_time: datetime) -> DataDescription:
     """Create the DataDescription object
     our data always contains planar optical physiology and behavior videos
     """
     return DataDescription(
         modalities=[Modality.POPHYS, Modality.BEHAVIOR_VIDEOS],
-        subject_id=subject_id,
+        subject_name=subject_name,
         creation_time=creation_time,
         institution=Organization.AIND,
         funding_source=[Funding(funder=Organization.NIMH)],
@@ -73,27 +73,27 @@ def generate_data_description(subject_id: str, creation_time: datetime) -> DataD
 
 
 def generate_subject(
-    subject_id: str,
+    subject_name: str,
     sex: Sex,
     date_of_birth: date,
     genotype: str,
-    maternal_id: str,
+    maternal_name: str,
     maternal_genotype: str,
-    paternal_id: str,
+    paternal_name: str,
     paternal_genotype: str,
 ) -> Subject:
     """Create the subject object"""
     return Subject(
-        subject_id=subject_id,
+        subject_name=subject_name,
         subject_details=MouseSubject(
             species=Species.HOUSE_MOUSE,
             sex=sex,
             date_of_birth=date_of_birth,
             genotype=genotype,
             breeding_info=BreedingInfo(
-                maternal_id=maternal_id,
+                maternal_name=maternal_name,
                 maternal_genotype=maternal_genotype,
-                paternal_id=paternal_id,
+                paternal_name=paternal_name,
                 paternal_genotype=paternal_genotype,
             ),
             housing=Housing(
@@ -107,7 +107,7 @@ def generate_subject(
 
 
 def generate_procedures(
-    subject_id: str,
+    subject_name: str,
     protocol: str,
     virus_name: str,
     virus_titer: int,
@@ -176,12 +176,12 @@ def generate_procedures(
         experimenters=[experimenter.name],
         ethics_review_id=ethics_review_id,
         protocol_id=protocol,
-        procedures=[Perfusion(protocol_id=protocol, output_specimen_ids=["1"])],
+        procedures=[Perfusion(protocol_id=protocol, output_specimen_names=["1"])],
     )
 
     # Return the full Procedures object
     return Procedures(
-        subject_id=subject_id,
+        subject_name=subject_name,
         global_coordinate_system=BREGMA_ARI,
         subject_procedures=[
             brain_injection_surgery,
@@ -193,7 +193,7 @@ def generate_procedures(
 # loop through all of the sessions
 for _, row in sessions_df.iterrows():
     # Pull information from the session row
-    subject_id = row["mouse_id"]
+    subject_name = row["mouse_id"]
     start_time = row["start_time"].to_pydatetime()
     end_time = row["end_time"].to_pydatetime()
 
@@ -205,10 +205,10 @@ for _, row in sessions_df.iterrows():
         end_time = end_time.replace(tzinfo=pacific_tz)
 
     # Build the data_description
-    data_description = generate_data_description(str(subject_id), end_time)
+    data_description = generate_data_description(str(subject_name), end_time)
 
     # Get the mouse data for this session
-    mouse_df_row = mice_df[mice_df["id"] == subject_id].iloc[0]  # Gets all matching rows
+    mouse_df_row = mice_df[mice_df["id"] == subject_name].iloc[0]  # Gets all matching rows
     sex = Sex.MALE if mouse_df_row["sex"] == "M" else Sex.FEMALE
     genotype = mouse_df_row["genotype"]
     dob = mouse_df_row["dob"].to_pydatetime().date()
@@ -223,18 +223,18 @@ for _, row in sessions_df.iterrows():
 
     # Build the subject
     subject = generate_subject(
-        subject_id=str(subject_id),
+        subject_name=str(subject_name),
         sex=sex,
         date_of_birth=dob,
         genotype=genotype,
-        maternal_id=str(dam_id),
+        maternal_name=str(dam_id),
         maternal_genotype=dam_genotype,
-        paternal_id=str(sire_id),
+        paternal_name=str(sire_id),
         paternal_genotype=sire_genotype,
     )
 
     # Get the procedures information
-    proc_row = procedures_df[procedures_df["mouse_id"] == subject_id].iloc[0]
+    proc_row = procedures_df[procedures_df["mouse_id"] == subject_name].iloc[0]
 
     # First surgery
     injection_date = proc_row["injection_date"].to_pydatetime()
@@ -250,7 +250,7 @@ for _, row in sessions_df.iterrows():
     perfusion_date = proc_row["perfusion_date"].to_pydatetime()
 
     procedures = generate_procedures(
-        subject_id=str(subject_id),
+        subject_name=str(subject_name),
         protocol=protocol,
         virus_name=virus_name,
         virus_titer=virus_titer,

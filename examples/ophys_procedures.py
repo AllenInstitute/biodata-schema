@@ -81,7 +81,7 @@ config = ProbeConfig(
 
 
 p = Procedures(
-    subject_id="625100",
+    subject_name="625100",
     subject_procedures=[
         Surgery(
             start_date=t.date(),
@@ -158,14 +158,14 @@ p = Procedures(
             workstation_id="SWS 3",
             protocol_id="doi",
             procedures=[
-                Perfusion(protocol_id="dx.doi.org/10.17504/protocols.io.bg5vjy66", output_specimen_ids={"672640"})
+                Perfusion(protocol_id="dx.doi.org/10.17504/protocols.io.bg5vjy66", output_specimen_names={"672640"})
             ],
         ),
     ],
     specimen_procedures=[
         SpecimenProcedure(
             procedure_type="Immunolabeling",
-            specimen_id="625100_001",
+            specimen_name="625100_001",
             start_date="2023-06-09",
             end_date="2023-06-12",
             experimenters=["Scientist Smith"],
@@ -189,7 +189,7 @@ p = Procedures(
         ),
         SpecimenProcedure(
             procedure_type="Immunolabeling",
-            specimen_id="625100_001",
+            specimen_name="625100_001",
             start_date="2023-06-12",
             end_date="2023-06-13",
             experimenters=["Scientist Smith"],

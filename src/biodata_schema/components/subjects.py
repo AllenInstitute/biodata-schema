@@ -80,9 +80,9 @@ class Housing(DataModel):
 class BreedingInfo(DataModel):
     """Description of breeding info for subject"""
 
-    maternal_id: str = Field(..., title="Maternal specimen ID")
+    maternal_name: str = Field(..., title="Maternal subject name")
     maternal_genotype: str = Field(..., title="Maternal genotype")
-    paternal_id: str = Field(..., title="Paternal specimen ID")
+    paternal_name: str = Field(..., title="Paternal subject name")
     paternal_genotype: str = Field(..., title="Paternal genotype")
 
 

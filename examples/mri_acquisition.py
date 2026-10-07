@@ -87,14 +87,14 @@ stream = DataStream(
 )
 
 acquisition = Acquisition(
-    subject_id="123456",
+    subject_name="123456",
     acquisition_start_time=datetime(2024, 3, 12, 16, 27, 55, 584892, tzinfo=ZoneInfo("America/Los_Angeles")),
     acquisition_end_time=datetime(2024, 3, 12, 16, 27, 55, 584892, tzinfo=ZoneInfo("America/Los_Angeles")),
     experimenters=["John Smith"],
     protocol_id=["dx.doi.org/10.57824/protocols.io.bh7kl4n6"],
     ethics_review_id=["1234"],
     acquisition_type="3D MRI Volume",
-    instrument_id="NA",
+    instrument_name="NA",
     global_coordinate_system=MRI_LPS,
     subject_details=AcquisitionSubjectDetails(
         mouse_platform_name="cradle",

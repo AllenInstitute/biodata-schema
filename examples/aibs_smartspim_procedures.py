@@ -24,7 +24,7 @@ BREGMA_ARI = CoordinateSystem(
 )
 
 experimenters = ["John Smith"]
-specimen_id = "651286"
+specimen_name = "651286"
 
 # Reagents
 shield_buffer = Reagent(name="SHIELD Buffer", lot_number="1234", source=Organization.LIFECANVAS)
@@ -47,8 +47,8 @@ perfusion = procedures.Surgery(
     procedures=[
         Perfusion(
             protocol_id="dx.doi.org/10.17504/protocols.io.8epv51bejl1b/v6",
-            output_specimen_ids=[
-                specimen_id,
+            output_specimen_names=[
+                specimen_name,
             ],
         )
     ],
@@ -56,7 +56,7 @@ perfusion = procedures.Surgery(
 
 # perfused brain goes into SHIELD OFF solution
 delipidation_procedure = procedures.SpecimenProcedure(
-    specimen_id=specimen_id,
+    specimen_name=specimen_name,
     procedure_name="Delipidation",
     procedure_type="Delipidation",
     start_date=date(2023, 1, 13),
@@ -68,7 +68,7 @@ delipidation_procedure = procedures.SpecimenProcedure(
 
 # Now to 100% EasyIndex
 index2 = procedures.SpecimenProcedure(
-    specimen_id=specimen_id,
+    specimen_name=specimen_name,
     procedure_type="Refractive index matching",
     procedure_name="EasyIndex Index Matching",
     start_date=date(2023, 1, 31),
@@ -82,7 +82,7 @@ index2 = procedures.SpecimenProcedure(
 
 # Specimen embedded into 2% agarose, prepared with EasyIndex
 embedding = procedures.SpecimenProcedure(
-    specimen_id=specimen_id,
+    specimen_name=specimen_name,
     procedure_type="Embedding",
     start_date=date(2023, 1, 31),
     end_date=date(2023, 2, 2),
@@ -94,7 +94,7 @@ embedding = procedures.SpecimenProcedure(
 )
 
 all_procedures = procedures.Procedures(
-    subject_id=specimen_id,
+    subject_name=specimen_name,
     subject_procedures=[
         perfusion,
     ],

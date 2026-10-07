@@ -58,17 +58,17 @@ class TestAcquisition:
             MRIScan.model_validate(scan1_dict)
 
     def test_external_data_stream(self):
-        """Test ExternalDataStream: valid without instrument_id, and DataStream requires instrument_id"""
-        # Happy path: BARseq example uses ExternalDataStream and has no instrument_id
+        """Test ExternalDataStream: valid without instrument_name, and DataStream requires instrument_name"""
+        # Happy path: BARseq example uses ExternalDataStream and has no instrument_name
         assert barseq_acquisition is not None
-        assert barseq_acquisition.instrument_id is None
+        assert barseq_acquisition.instrument_name is None
 
-        # Guard: DataStream without instrument_id should fail
+        # Guard: DataStream without instrument_name should fail
         start = datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
         end = datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
         with pytest.raises(ValidationError) as context:
             Acquisition(
-                subject_id="123456",
+                subject_name="123456",
                 acquisition_start_time=start,
                 acquisition_end_time=end,
                 acquisition_type="Test",
@@ -82,38 +82,38 @@ class TestAcquisition:
                     )
                 ],
             )
-        assert "instrument_id is required" in str(context.value)
+        assert "instrument_name is required" in str(context.value)
 
-    def test_check_subject_specimen_id(self):
-        """Test that subject and specimen IDs match"""
+    def test_check_subject_specimen_names(self):
+        """Test that subject and specimen names match"""
         with pytest.raises(ValueError) as context:
             acq = exaspim_acquisition.model_copy()
-            acq.specimen_id = "654321"
+            acq.specimen_name = "654321"
 
             Acquisition.model_validate_json(acq.model_dump_json())
 
         assert "Expected 123456 to appear in 654321" in str(context.value)
 
-    def test_specimen_id_list_valid(self):
-        """Test that specimen_id accepts a list of strings when all contain subject_id"""
+    def test_specimen_name_list_valid(self):
+        """Test that specimen_name accepts a list of strings when all contain subject_name"""
         acq = exaspim_acquisition.model_copy()
-        acq.specimen_id = ["123456_slide1", "123456_slide2"]
+        acq.specimen_name = ["123456_slide1", "123456_slide2"]
         validated = Acquisition.model_validate_json(acq.model_dump_json())
-        assert validated.specimen_id == ["123456_slide1", "123456_slide2"]
+        assert validated.specimen_name == ["123456_slide1", "123456_slide2"]
 
-    def test_specimen_id_list_invalid(self):
-        """Test that specimen_id list raises ValueError if any entry does not contain subject_id"""
+    def test_specimen_name_list_invalid(self):
+        """Test that specimen_name list raises ValueError if any entry does not contain subject_name"""
         with pytest.raises(ValueError) as context:
             acq = exaspim_acquisition.model_copy()
-            acq.specimen_id = ["123456_slide1", "654321_slide2"]
+            acq.specimen_name = ["123456_slide1", "654321_slide2"]
             Acquisition.model_validate_json(acq.model_dump_json())
         assert "Expected 123456 to appear in 654321_slide2" in str(context.value)
 
     def test_specimen_required(self):
-        """Test that specimen ID is required for in vitro imaging modalities"""
+        """Test that specimen name is required for in vitro imaging modalities"""
         acq = exaspim_acquisition.model_copy()
-        acq.specimen_id = None
-        with pytest.raises(ValidationError, match="Specimen ID is required for modalities"):
+        acq.specimen_name = None
+        with pytest.raises(ValidationError, match="Specimen name is required for modalities"):
             Acquisition.model_validate_json(acq.model_dump_json())
 
     def test_check_modality_config_requirements(self):
@@ -142,17 +142,17 @@ class TestAcquisition:
         assert stream is not None
 
     def test_specimen_required_for_in_vitro_modalities(self):
-        """Test that specimen ID is required for in vitro imaging modalities"""
+        """Test that specimen name is required for in vitro imaging modalities"""
 
-        # Test case where specimen ID is missing for in vitro modality
+        # Test case where specimen name is missing for in vitro modality
         with pytest.raises(ValueError) as context:
             Acquisition(
                 experimenters=["Mam Moth"],
                 acquisition_start_time=datetime.now(),
                 acquisition_end_time=datetime.now(),
-                subject_id="123456",
+                subject_name="123456",
                 acquisition_type="Test",
-                instrument_id="1234",
+                instrument_name="1234",
                 subject_details=AcquisitionSubjectDetails(
                     mouse_platform_name="Running wheel",
                 ),
@@ -179,17 +179,17 @@ class TestAcquisition:
                     )
                 ],
             )
-        assert "Specimen ID is required for modalities" in str(context.value)
+        assert "Specimen name is required for modalities" in str(context.value)
 
-        # Test case where specimen ID is provided for in vitro modality
+        # Test case where specimen name is provided for in vitro modality
         acquisition = Acquisition(
             experimenters=["Mam Moth"],
             acquisition_start_time=datetime.now(),
             acquisition_end_time=datetime.now(),
-            subject_id="123456",
-            specimen_id="SP123456",
+            subject_name="123456",
+            specimen_name="SP123456",
             acquisition_type="Test",
-            instrument_id="1234",
+            instrument_name="1234",
             subject_details=AcquisitionSubjectDetails(
                 mouse_platform_name="Running wheel",
             ),
