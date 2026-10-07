@@ -8,6 +8,7 @@ from biodata_schema.base import DataCoreModel, Discriminated, DraftRequirement
 from biodata_schema.components.subjects import (
     CalibrationObject,
     CellLine,
+    FluorescentCellLine,
     HumanSubject,
     MouseSubject,
     NonHumanPrimateSubject,
@@ -27,7 +28,7 @@ class Subject(DataCoreModel):
     )
 
     subject_details: Discriminated[
-        MouseSubject | HumanSubject | NonHumanPrimateSubject | CellLine | CalibrationObject
+        MouseSubject | HumanSubject | NonHumanPrimateSubject | CellLine | FluorescentCellLine | CalibrationObject
     ] = Field(..., title="Subject Details")
 
     notes: Optional[str] = Field(default=None, title="Notes")

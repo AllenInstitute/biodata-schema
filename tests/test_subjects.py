@@ -13,6 +13,7 @@ from biodata_schema.components.subjects import (
     BreedingInfo,
     CalibrationObject,
     CellLine,
+    FluorescentCellLine,
     Housing,
     HumanSubject,
     LightCycle,
@@ -240,24 +241,20 @@ class TestCellLine:
     def test_cellline(self):
         """Test of cell line"""
 
-        subject = CellLine(
+        subject = FluorescentCellLineCellLine(
             cell_line_name="AICS-0005",
+            cell_line_id="AICS-0005",
             cell_line_type=CellLineModel(
                 name="Human induced pluripotent stem cell line cell",
                 registry=Registry.CLO,
                 registry_identifier="CLO:0037308",
             ),
+            source=Organization.AI,
             species=Species.HUMAN,
             protein=PIDName(
                 name="paxilin",
                 registry=Registry.UNIPROT,
                 registry_identifier="P49023",
-            ),
-            gene=PIDName(
-                name="paxilin",
-                abbreviation="PXN",
-                registry=Registry.NCBI,
-                registry_identifier="NM_0028593",
             ),
             cell_structure="cytoskeleton",
             fluorescent_protein=PIDName(
