@@ -135,7 +135,7 @@ ephys_assembly_b_config = EphysAssemblyConfig(
 
 acquisition = Acquisition(
     experimenters=["John Smith"],
-    subject_id="664484",
+    subject_name="664484",
     acquisition_start_time=datetime(
         year=2023, month=4, day=25, hour=2, minute=35, second=0, tzinfo=ZoneInfo("America/Los_Angeles")
     ),
@@ -143,7 +143,7 @@ acquisition = Acquisition(
         year=2023, month=4, day=25, hour=3, minute=16, second=0, tzinfo=ZoneInfo("America/Los_Angeles")
     ),
     acquisition_type="Receptive field mapping",
-    instrument_id="EPHYS1",
+    instrument_name="EPHYS1",
     ethics_review_id=["2109"],
     subject_details=AcquisitionSubjectDetails(
         mouse_platform_name="Running Wheel",

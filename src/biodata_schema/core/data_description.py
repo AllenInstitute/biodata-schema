@@ -37,11 +37,11 @@ class DataDescription(DataCoreModel):
     schema_version: SkipValidation[Literal["3.0.0"]] = Field(default="3.0.0")
     license: Annotated[License, DraftRequirement] = Field(default=License.CC_BY_40, title="License")
 
-    subject_id: Optional[str] = Field(
+    subject_name: Optional[str] = Field(
         default=None,
         pattern=DataRegex.NO_UNDERSCORES.value,
-        description="Unique identifier for the subject of data acquisition",
-        title="Subject ID",
+        description="Unique name for the subject of data acquisition",
+        title="Subject name",
     )
     creation_time: AwareDatetimeWithDefault = Field(
         ...,
@@ -56,7 +56,7 @@ class DataDescription(DataCoreModel):
     name: Optional[str] = Field(
         default=None,
         description=(
-            "When left blank, a name will be generated based on subject_id and creation_time. "
+            "When left blank, a name will be generated based on subject_name and creation_time. "
             "Conventionally also used as the name of the data folder."
         ),
         title="Data asset name",
@@ -147,17 +147,17 @@ class DataDescription(DataCoreModel):
             raise ValueError(f"DataLevel({data_level}) not supported")
 
     @model_validator(mode="after")
-    def subject_id_when_raw(self):
-        """Ensure that a subject_id is provided when data_level is RAW"""
-        if self.data_level == DataLevel.RAW and self.subject_id is None:
-            raise ValueError("subject_id must be set when data_level is RAW")
+    def subject_name_when_raw(self):
+        """Ensure that a subject_name is provided when data_level is RAW"""
+        if self.data_level == DataLevel.RAW and self.subject_name is None:
+            raise ValueError("subject_name must be set when data_level is RAW")
         return self
 
     @model_validator(mode="after")
     def build_name(self):
         """Set the name of data_description when data_level is RAW and the name is empty"""
         if self.name is None and self.data_level == DataLevel.RAW:
-            self.name = build_data_name(self.subject_id, creation_datetime=self.creation_time)
+            self.name = build_data_name(self.subject_name, creation_datetime=self.creation_time)
 
             # check that the name matches the name regex
             if not re.match(DataRegex.DATA.value, self.name):

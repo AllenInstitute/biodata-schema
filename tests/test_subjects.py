@@ -226,12 +226,12 @@ class TestBreedingInfo:
         """Test creating BreedingInfo"""
 
         breeding_info = BreedingInfo(
-            maternal_id="M001", maternal_genotype="wt/wt", paternal_id="P001", paternal_genotype="wt/wt"
+            maternal_name="M001", maternal_genotype="wt/wt", paternal_name="P001", paternal_genotype="wt/wt"
         )
 
-        assert breeding_info.maternal_id == "M001"
+        assert breeding_info.maternal_name == "M001"
         assert breeding_info.maternal_genotype == "wt/wt"
-        assert breeding_info.paternal_id == "P001"
+        assert breeding_info.paternal_name == "P001"
         assert breeding_info.paternal_genotype == "wt/wt"
 
 

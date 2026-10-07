@@ -147,10 +147,14 @@ examples/*.json
 !diagram-app/package.json
 !diagram-app/package-lock.json
 !diagram-app/tsconfig.json
+!qc-tree-app/package.json
+!qc-tree-app/package-lock.json
+!qc-tree-app/tsconfig.json
 
 # diagram-app (React Flow schema diagram embedded in the docs front page)
 diagram-app/node_modules/
 docs/source/_static/schema-diagram/
+docs/source/_static/qc-tree-app/
 docs/base/models/*
 .github/copilot-instructions.md
 schema_tree.md

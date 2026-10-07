@@ -46,7 +46,7 @@ BREGMA_ARI = CoordinateSystem(
 
 instrument = Instrument(
     location="429",
-    instrument_id="mesoscope",
+    instrument_name="mesoscope",
     modification_date=date(2024, 10, 16),
     global_coordinate_system=BREGMA_ARI,
     modalities=[Modality.POPHYS],

@@ -8,9 +8,9 @@ The `procedures.json` file contains anything done to the subject or specimen pri
 
 **Subject** procedures are performed on a live subject (e.g. injections, surgeries, implants, perfusions, etc.) whereas **specimen** procedures are performed on tissue extracted after perfusion (e.g. tissue processing, immunolabeling, sectioning, etc.).
 
-### SpecimenProcedure.specimen_id
+### SpecimenProcedure.specimen_name
 
-After perfusion or death we refer to specimens by the `specimen_id` field. When the tissue has not been sectioned in some way the `specimen_id` should be identical to the `subject_id`. Sectioned specimens should have a unique number appended as a suffix to the subject ID: `<subject_id>_<###>`. 
+After perfusion or death we refer to specimens by the `specimen_name` field. When the tissue has not been sectioned in some way the `specimen_name` should be identical to the `subject_name`. Sectioned specimens should have a unique number appended as a suffix to the subject name: `<subject_name>_<###>`.
 
 ## Examples
 
@@ -26,7 +26,7 @@ Description of all procedures performed on a subject, including surgeries, injec
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `subject_id` | `str` | Subject ID (Unique identifier for the subject of data acquisition) |
+| `subject_name` | `str` | Subject name (Unique name for the subject of data acquisition) |
 | `subject_procedures` | List[[Surgery](components/subject_procedures.md#surgery) or [Injection](components/injection_procedures.md#injection) or [NonSurgicalInjection](components/subject_procedures.md#nonsurgicalinjection) or [TrainingProtocol](components/subject_procedures.md#trainingprotocol) or [WaterRestriction](components/subject_procedures.md#waterrestriction) or [GenericSubjectProcedure](components/subject_procedures.md#genericsubjectprocedure)] | Subject Procedures (Procedures performed on a live subject) |
 | `specimen_procedures` | List[[SpecimenProcedure](components/specimen_procedures.md#specimenprocedure)] | Specimen Procedures (Procedures performed on tissue extracted after perfusion) |
 | `global_coordinate_system` | Optional[[CoordinateSystem](components/coordinates.md#coordinatesystem)] | Global Coordinate System (Origin and axis definitions for determining the configured position of devices implanted during procedures. Required when coordinates are provided within the Procedures) |

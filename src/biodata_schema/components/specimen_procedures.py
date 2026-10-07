@@ -39,8 +39,10 @@ class SectionOrientation(str, Enum):
 class Section(DataModel):
     """Description of a single section of brain tissue. Slices should use PlanarSection."""
 
-    output_specimen_id: str = Field(
-        ..., title="Specimen ID", description="Output IDs should generally follow the format {input_specimen_id}_###"
+    output_specimen_name: str = Field(
+        ...,
+        title="Specimen name",
+        description="Output names should generally follow the format {input_specimen_name}_###",
     )
     targeted_structure: Optional[BrainStructureModel] = Field(default=None, title="Targeted structure")
     includes_surrounding_tissue: Optional[bool] = Field(
@@ -126,7 +128,7 @@ class SpecimenProcedure(ProtocolListMixin, DataModel):
 
     procedure_type: SpecimenProcedureType = Field(..., title="Procedure type")
     procedure_name: Optional[str] = Field(default=None, title="Procedure name")
-    specimen_id: Union[str, List[str]] = Field(..., title="Specimen ID(s)")
+    specimen_name: Union[str, List[str]] = Field(..., title="Specimen name(s)")
     start_date: date = Field(..., title="Start date")
     end_date: date = Field(..., title="End date")
     experimenters: List[str] = Field(

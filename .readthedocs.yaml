@@ -10,6 +10,8 @@ build:
     pre_build:
       - npm --prefix diagram-app ci
       - npm --prefix diagram-app run build
+      - npm --prefix qc-tree-app ci
+      - npm --prefix qc-tree-app run build
 
 python:
   install:

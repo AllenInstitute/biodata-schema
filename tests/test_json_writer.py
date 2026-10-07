@@ -71,9 +71,9 @@ class TestSchemaWriter:
 
         expected_nested_fields = {
             "data_description": {"project_name", "license"},
-            "subject": {"subject_id"},
+            "subject": {"subject_name"},
             "acquisition": {"acquisition_start_time"},
-            "instrument": {"instrument_id"},
+            "instrument": {"instrument_name"},
         }
         for field_name, fields in expected_nested_fields.items():
             nested_schema = schema["properties"][field_name]

@@ -339,7 +339,7 @@ class TestInstrument:
             Instrument()
 
         assert ephys_instrument is not None
-        assert ephys_instrument.instrument_id in ephys_instrument.get_component_names()
+        assert ephys_instrument.instrument_name in ephys_instrument.get_component_names()
 
     def test_other_camera_target(self):
         """Test that the camera_target being set to Other throws a validation error without notes"""
@@ -349,7 +349,7 @@ class TestInstrument:
 
         with pytest.raises(ValidationError):
             Instrument(
-                instrument_id="123_EPHYS1-OPTO_20220101",
+                instrument_name="123_EPHYS1-OPTO_20220101",
                 modification_date=date(2020, 10, 10),
                 modalities=[Modality.ECEPHYS, Modality.FIB],
                 global_coordinate_system=BREGMA_ARI,
@@ -385,7 +385,7 @@ class TestInstrument:
             )
 
         inst = Instrument(
-            instrument_id="123_EPHYS1-OPTO_20220101",
+            instrument_name="123_EPHYS1-OPTO_20220101",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.ECEPHYS, Modality.FIB],
             global_coordinate_system=BREGMA_ARI,
@@ -426,7 +426,7 @@ class TestInstrument:
         """Validation error when connections are missing"""
         with pytest.raises(ValueError) as context:
             Instrument(
-                instrument_id="123_EPHYS1-OPTO_20220101",
+                instrument_name="123_EPHYS1-OPTO_20220101",
                 modification_date=date(2020, 10, 10),
                 modalities=[Modality.ECEPHYS, Modality.FIB],
                 global_coordinate_system=BREGMA_ARI,
@@ -466,7 +466,7 @@ class TestInstrument:
 
         with pytest.raises(ValueError) as context:
             Instrument(
-                instrument_id="123_EPHYS1-OPTO_20220101",
+                instrument_name="123_EPHYS1-OPTO_20220101",
                 modification_date=date(2020, 10, 10),
                 modalities=[Modality.ECEPHYS, Modality.FIB],
                 global_coordinate_system=BREGMA_ARI,
@@ -512,7 +512,7 @@ class TestInstrument:
             with pytest.raises(ValidationError):
                 Instrument(
                     modalities=[Modality.from_abbreviation(modality_abbreviation)],
-                    instrument_id="123_EPHYS1-OPTO_20220101",
+                    instrument_name="123_EPHYS1-OPTO_20220101",
                     global_coordinate_system=BREGMA_ARI,
                     modification_date=date(2020, 10, 10),
                     components=[],
@@ -526,7 +526,7 @@ class TestInstrument:
         for modality_abbreviation, _ in DEVICES_REQUIRED.items():
             inst = Instrument(
                 modalities=[Modality.from_abbreviation(modality_abbreviation)],
-                instrument_id="123_EPHYS1-OPTO_20220101",
+                instrument_name="123_EPHYS1-OPTO_20220101",
                 modification_date=date(2020, 10, 10),
                 global_coordinate_system=BREGMA_ARI,
                 components=[
@@ -553,7 +553,7 @@ class TestInstrument:
         expected_modalities = [{"name": "Extracellular electrophysiology", "abbreviation": "ecephys"}]
         # Case 1: Modality is a class instance
         instrument_instance_modality = Instrument.model_construct(
-            instrument_id="123_EPHYS1-OPTO_20220101",
+            instrument_name="123_EPHYS1-OPTO_20220101",
             modalities={Modality.ECEPHYS},  # Example with a valid Modality instance
             global_coordinate_system=BREGMA_ARI,
         )
@@ -593,7 +593,7 @@ class TestInstrument:
         )
 
         inst = Instrument(
-            instrument_id="123_EPHYS1-OPTO_20220101",
+            instrument_name="123_EPHYS1-OPTO_20220101",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.ECEPHYS, Modality.FIB],
             global_coordinate_system=BREGMA_ARI,  # order is AP, ML, SI
@@ -633,7 +633,7 @@ class TestInstrument:
         combined = inst1 + inst2
 
         # Verify the combined instrument has the expected properties
-        assert combined.instrument_id == inst1.instrument_id
+        assert combined.instrument_name == inst1.instrument_name
         assert combined.location == inst1.location
         assert combined.global_coordinate_system == inst1.global_coordinate_system
         assert combined.temperature_control == inst1.temperature_control
@@ -663,13 +663,13 @@ class TestInstrument:
         # Restore schema version for next tests
         inst1.schema_version = inst1_orig_schema_v
 
-        # Test that instrument_id differences are merged in alphabetical order
-        inst2.instrument_id = "different-instrument-id"
+        # Test that instrument_name differences are merged in alphabetical order
+        inst2.instrument_name = "different-instrument-id"
         inst3 = inst1 + inst2
-        assert inst3.instrument_id == "EPHYS1_different-instrument-id"
+        assert inst3.instrument_name == "EPHYS1_different-instrument-id"
 
         # Test incompatible locations
-        inst2.instrument_id = inst1.instrument_id  # Reset to same
+        inst2.instrument_name = inst1.instrument_name  # Reset to same
         inst2.location = "Different Location"
         with pytest.raises(ValueError) as context:
             inst1 + inst2
@@ -699,14 +699,14 @@ class TestInstrument:
         """Test that duplicate non-HarpDevice components log an error when combining instruments"""
 
         inst1 = Instrument(
-            instrument_id="test_inst",
+            instrument_name="test_inst",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.ECEPHYS],
             global_coordinate_system=BREGMA_ARI,
             components=[Computer(name="Computer1")],
         )
         inst2 = Instrument(
-            instrument_id="test_inst",
+            instrument_name="test_inst",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.ECEPHYS],
             global_coordinate_system=BREGMA_ARI,
@@ -734,14 +734,14 @@ class TestInstrument:
         )
 
         inst1 = Instrument(
-            instrument_id="test_inst",
+            instrument_name="test_inst",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.ECEPHYS],
             global_coordinate_system=BREGMA_ARI,
             components=[harp_clock_gen],
         )
         inst2 = Instrument(
-            instrument_id="test_inst",
+            instrument_name="test_inst",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.ECEPHYS],
             global_coordinate_system=BREGMA_ARI,
@@ -774,7 +774,7 @@ class TestInstrument:
         )
 
         inst1 = Instrument(
-            instrument_id="test_inst",
+            instrument_name="test_inst",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.BEHAVIOR],
             global_coordinate_system=BREGMA_ARI,
@@ -794,7 +794,7 @@ class TestInstrument:
             ],
         )
         inst2 = Instrument(
-            instrument_id="test_inst",
+            instrument_name="test_inst",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.BEHAVIOR],
             global_coordinate_system=BREGMA_ARI,
@@ -827,7 +827,7 @@ class TestInstrument:
         """Test that duplicate component names raise an error"""
         duplicate_component = ephys_instrument.components[0].model_copy(deep=True)
         inst_with_dup = Instrument.model_construct(
-            instrument_id=ephys_instrument.instrument_id,
+            instrument_name=ephys_instrument.instrument_name,
             modification_date=ephys_instrument.modification_date,
             modalities=ephys_instrument.modalities,
             global_coordinate_system=ephys_instrument.global_coordinate_system,
@@ -841,7 +841,7 @@ class TestInstrument:
         assert duplicate_component.name in str(context.value)
 
         inst_no_dup = Instrument.model_construct(
-            instrument_id=ephys_instrument.instrument_id,
+            instrument_name=ephys_instrument.instrument_name,
             modification_date=ephys_instrument.modification_date,
             modalities=ephys_instrument.modalities,
             global_coordinate_system=ephys_instrument.global_coordinate_system,
@@ -863,7 +863,7 @@ class TestInstrument:
             recording_software=Software(name="Bonsai", version="2.5"),
         )
         values = dict(
-            instrument_id="rig",
+            instrument_name="rig",
             modification_date=date(2026, 1, 1),
             modalities=[],
             global_coordinate_system=BREGMA_ARI,
@@ -904,7 +904,7 @@ class TestInstrument:
             )
 
         inst = Instrument.model_construct(
-            instrument_id=ephys_instrument.instrument_id,
+            instrument_name=ephys_instrument.instrument_name,
             modification_date=ephys_instrument.modification_date,
             modalities=ephys_instrument.modalities,
             global_coordinate_system=ephys_instrument.global_coordinate_system,
@@ -917,7 +917,7 @@ class TestInstrument:
     def test_coordinate_system_names_ignored(self):
         """Names on coordinate systems are not component collisions"""
         inst = Instrument.model_construct(
-            instrument_id=ephys_instrument.instrument_id,
+            instrument_name=ephys_instrument.instrument_name,
             modification_date=ephys_instrument.modification_date,
             modalities=ephys_instrument.modalities,
             global_coordinate_system=ephys_instrument.global_coordinate_system,
@@ -940,7 +940,7 @@ class TestInstrument:
     def test_distinct_objects_sharing_a_name_rejected(self):
         """Two different devices with the same name are still a collision"""
         inst = Instrument.model_construct(
-            instrument_id=ephys_instrument.instrument_id,
+            instrument_name=ephys_instrument.instrument_name,
             modification_date=ephys_instrument.modification_date,
             modalities=ephys_instrument.modalities,
             global_coordinate_system=ephys_instrument.global_coordinate_system,
@@ -992,7 +992,7 @@ class TestConnection:
 
         # Create an instrument with unsorted modalities
         inst = Instrument(
-            instrument_id="123_EPHYS1-OPTO_20220101",
+            instrument_name="123_EPHYS1-OPTO_20220101",
             modification_date=date(2020, 10, 10),
             modalities=unsorted_modalities,
             global_coordinate_system=BREGMA_ARI,

@@ -340,11 +340,11 @@ acquisition = Acquisition(
         "Bryan MacLennan",
         "Kenta Hagihara",
     ],
-    subject_id="687582",
+    subject_name="687582",
     acquisition_start_time=t_start,
     acquisition_end_time=t_end,
     acquisition_type="Pavlovian Conditioning",
-    instrument_id="1_FIP1",
+    instrument_name="1_FIP1",
     protocol_id=[""],
     ethics_review_id=["2115"],
     subject_details=AcquisitionSubjectDetails(

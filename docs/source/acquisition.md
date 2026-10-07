@@ -77,14 +77,14 @@ while the StimulusEpoch represents all stimuli being presented.
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `subject_id` | `str` | Subject ID (Unique identifier for the subject) |
-| `specimen_id` | `str or List[str] or NoneType` | Specimen ID (Required for in vitro modalities. Standard format is {subject_id} with a _### suffix, as needed) |
+| `subject_name` | `str` | Subject name (Unique name for the subject) |
+| `specimen_name` | `str or List[str] or NoneType` | Specimen name (Required for in vitro modalities. Standard format is {subject_name} with a _### suffix, as needed) |
 | `acquisition_start_time` | `datetime (timezone-aware)` | Acquisition start time (During validation, timezone information will be moved into the acquisition_start_tz field.) |
 | `acquisition_start_tz` | `int or pydantic_extra_types.timezone_name.TimeZoneName or NoneType` | Acquisition start timezone (Automatically populated by a validator based on acquisition_start_time. Will be a TimeZoneName (IANA name) when the datetime uses a ZoneInfo timezone, or an integer UTC offset in hours for fixed-offset timezones. Use ZoneInfo (from the zoneinfo standard library) to preserve the named timezone.) |
 | `acquisition_end_time` | `datetime (timezone-aware)` | Acquisition end time  |
 | `experimenters` | `List[str]` | experimenter(s)  |
 | `ethics_review_id` | `Optional[List[str]]` | Ethics review ID  |
-| `instrument_id` | `Optional[str]` | Instrument ID (Should match the Instrument.instrument_id. Required when instrument metadata is available.) |
+| `instrument_name` | `Optional[str]` | Instrument name (Should match the Instrument.instrument_name. Required when instrument metadata is available.) |
 | `acquisition_type` | `str` | Acquisition type (Descriptive string detailing the type of acquisition, should be consistent across similar acquisitions for the same experiment.) |
 | `notes` | `Optional[str]` | Notes  |
 | `global_coordinate_system` | Optional[[CoordinateSystem](components/coordinates.md#coordinatesystem)] | Global coordinate system (Origin and axis definitions for determining the configured position of devices during acquisition. Required when coordinates are provided within the Acquisition) |

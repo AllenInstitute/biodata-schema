@@ -8,7 +8,7 @@ If you are validating your `Instrument` and `Acquisition` on your rig, you may n
 
 The following consistency rules are enforced:
 
-- `Acquisition.instrument_id` must match `Instrument.instrument_id`
+- `Acquisition.instrument_name` must match `Instrument.instrument_name`
 - Device names in `DataStream.active_devices` must match device names in the `Instrument`
 - Device names in `StimulusEpoch.active_devices` must match device names in the `Instrument`
 

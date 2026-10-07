@@ -1248,6 +1248,29 @@
          "title": "AnatomicalRelative",
          "type": "string"
       },
+      "AnatomyModel": {
+         "description": "Shared model for anatomy terms from different ontologies.",
+         "properties": {
+            "name": {
+               "title": "Name",
+               "type": "string"
+            },
+            "registry": {
+               "$ref": "#/$defs/Registry"
+            },
+            "registry_identifier": {
+               "title": "Registry Identifier",
+               "type": "string"
+            }
+         },
+         "required": [
+            "name",
+            "registry",
+            "registry_identifier"
+         ],
+         "title": "AnatomyModel",
+         "type": "object"
+      },
       "AngleUnit": {
          "description": "Enumeration of Angle Measurements",
          "enum": [
@@ -3927,7 +3950,7 @@
                      "$ref": "#/$defs/Origin"
                   },
                   {
-                     "$ref": "#/$defs/MouseAnatomyModel"
+                     "$ref": "#/$defs/AnatomyModel"
                   }
                ],
                "description": "Defines the position of (0,0,0) in the coordinate system",
@@ -11504,6 +11527,7 @@
                      "Pluma": "#/$defs/_Pluma",
                      "Poke": "#/$defs/_Poke",
                      "PyControlAdapter": "#/$defs/_Pycontroladapter",
+                     "Quac": "#/$defs/_Quac",
                      "RfidReader": "#/$defs/_Rfidreader",
                      "RgbArray": "#/$defs/_Rgbarray",
                      "SimpleAnalogGenerator": "#/$defs/_Simpleanaloggenerator",
@@ -11602,6 +11626,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Pycontroladapter"
+                  },
+                  {
+                     "$ref": "#/$defs/_Quac"
                   },
                   {
                      "$ref": "#/$defs/_Rfidreader"
@@ -17553,29 +17580,6 @@
          "title": "MotorizedStage",
          "type": "object"
       },
-      "MouseAnatomyModel": {
-         "description": "Base model for mouse anatomy",
-         "properties": {
-            "name": {
-               "title": "Name",
-               "type": "string"
-            },
-            "registry": {
-               "$ref": "#/$defs/Registry"
-            },
-            "registry_identifier": {
-               "title": "Registry Identifier",
-               "type": "string"
-            }
-         },
-         "required": [
-            "name",
-            "registry",
-            "registry_identifier"
-         ],
-         "title": "MouseAnatomyModel",
-         "type": "object"
-      },
       "NeuropixelsBasestation": {
          "additionalProperties": false,
          "description": "PXI-based Neuropixels DAQ",
@@ -19521,6 +19525,7 @@
                      "Pluma": "#/$defs/_Pluma",
                      "Poke": "#/$defs/_Poke",
                      "PyControlAdapter": "#/$defs/_Pycontroladapter",
+                     "Quac": "#/$defs/_Quac",
                      "RfidReader": "#/$defs/_Rfidreader",
                      "RgbArray": "#/$defs/_Rgbarray",
                      "SimpleAnalogGenerator": "#/$defs/_Simpleanaloggenerator",
@@ -19619,6 +19624,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Pycontroladapter"
+                  },
+                  {
+                     "$ref": "#/$defs/_Quac"
                   },
                   {
                      "$ref": "#/$defs/_Rfidreader"
@@ -21985,10 +21993,13 @@
          "enum": [
             "Addgene (ADDGENE)",
             "C. elegans Development Ontology (WBLS)",
+            "Cell Line Ontology (CLO)",
             "Digital Object Identifier (DOI)",
             "Drosophila Development (FBDV)",
             "Edinburgh Mouse Atlas Project (EMAPA)",
+            "Foundational Model of Anatomy (FMA)",
             "Human Developmental Stages (HSAPDV)",
+            "Human Disease Ontology (DOID)",
             "Mouse Developmental Stages (MMUSDV)",
             "Mouse Genome Informatics (MGI)",
             "NCBI GenBank (GENBANK)",
@@ -21996,6 +22007,7 @@
             "Open Researcher and Contributor ID (ORCID)",
             "Research Organization Registry (ROR)",
             "Research Resource Identifiers (RRID)",
+            "The Fluorescent Protein Database (FPbase)",
             "Universal Protein Resource (UNIPROT)"
          ],
          "title": "Registry",
@@ -30948,6 +30960,25 @@
          "title": "_Pycontroladapter",
          "type": "object"
       },
+      "_Quac": {
+         "description": "Model Quac",
+         "properties": {
+            "whoami": {
+               "const": 1411,
+               "default": 1411,
+               "title": "Whoami",
+               "type": "integer"
+            },
+            "name": {
+               "const": "Quac",
+               "default": "Quac",
+               "title": "Name",
+               "type": "string"
+            }
+         },
+         "title": "_Quac",
+         "type": "object"
+      },
       "_Quantifi": {
          "description": "Model Quantifi",
          "properties": {
@@ -32811,9 +32842,9 @@
          "description": "Location of the instrument",
          "title": "Location"
       },
-      "instrument_id": {
-         "description": "Unique instrument identifier",
-         "title": "Instrument ID",
+      "instrument_name": {
+         "description": "Unique instrument name",
+         "title": "Instrument name",
          "type": "string"
       },
       "modification_date": {
@@ -33169,7 +33200,7 @@
       }
    },
    "required": [
-      "instrument_id",
+      "instrument_name",
       "modification_date",
       "modalities",
       "global_coordinate_system",

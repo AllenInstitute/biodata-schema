@@ -38,7 +38,7 @@ from biodata_schema.utils.validators import (
     recursive_coord_system_check,
     recursive_get_all_names,
     recursive_time_validation_check,
-    subject_specimen_id_compatibility,
+    subject_specimen_name_compatibility,
     validate_creation_time_after_midnight,
 )
 from tests.coordinate_systems import BREGMA_ARI
@@ -48,16 +48,16 @@ class TestCompatibilityCheck:
     """Tests compatibility checks"""
 
     def test_subj_spec_valid(self):
-        """Test subject_id specimen_id valid"""
-        subject_id = "123456"
-        specimen_id = "123456-valid"
-        assert subject_specimen_id_compatibility(subject_id, specimen_id)
+        """Test subject_name specimen_name valid"""
+        subject_name = "123456"
+        specimen_name = "123456-valid"
+        assert subject_specimen_name_compatibility(subject_name, specimen_name)
 
     def test_subj_spec_invalid(self):
-        """Test invalid subject_id specimen_id"""
-        subject_id = "123456"
-        specimen_id = "invalid"
-        assert not subject_specimen_id_compatibility(subject_id, specimen_id)
+        """Test invalid subject_name specimen_name"""
+        subject_name = "123456"
+        specimen_name = "invalid"
+        assert not subject_specimen_name_compatibility(subject_name, specimen_name)
 
 
 class TranslationWrapper(DataModel):
@@ -326,7 +326,7 @@ class TestRecursiveCoordSystemCheck:
 def test_section_requires_exact_system_name(system_name):
     """A substring of the coordinate system name is not a valid reference."""
     section = PlanarSection(
-        output_specimen_id="123456_001",
+        output_specimen_name="123456_001",
         coordinate_system_name=system_name,
         start_coordinate=Translation(translation=[0, 0, 0]),
         thickness=0.1,
@@ -340,7 +340,7 @@ def test_section_requires_exact_system_name(system_name):
 def test_section_checks_coordinate_dimensions(field_name):
     """Both endpoints use the containing coordinate system's dimensions."""
     values = dict(
-        output_specimen_id="123456_001",
+        output_specimen_name="123456_001",
         coordinate_system_name="BREGMA_ARI",
         start_coordinate=Translation(translation=[0, 0, 0]),
         end_coordinate=Translation(translation=[0, 0, 1]),

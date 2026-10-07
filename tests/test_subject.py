@@ -25,7 +25,7 @@ class TestSubject:
         now = datetime.datetime.now()
 
         s = Subject(
-            subject_id="123456",
+            subject_name="123456",
             subject_details=MouseSubject(
                 species=Species.HOUSE_MOUSE,
                 strain=Strain.C57BL_6J,
@@ -41,9 +41,9 @@ class TestSubject:
                     cage_id="543",
                 ),
                 breeding_info=BreedingInfo(
-                    maternal_id="546543",
+                    maternal_name="546543",
                     maternal_genotype="Emx1-IRES-Cre/wt; Camk2a-tTa/Camk2a-tTA",
-                    paternal_id="232323",
+                    paternal_name="232323",
                     paternal_genotype="Ai93(TITL-GCaMP6f)/wt",
                 ),
                 alleles=[PIDName(registry_identifier="12345", name="adsf", registry=Registry.MGI)],

@@ -15,8 +15,8 @@ from biodata_models.modalities import Modality
 from biodata_schema.core.acquisition import Acquisition, ExternalDataStream
 
 acquisition = Acquisition(
-    subject_id="123456",
-    specimen_id=["123456_bar001", "123456_bar002"],
+    subject_name="123456",
+    specimen_name=["123456_bar001", "123456_bar002"],
     acquisition_start_time=datetime(2025, 1, 1, 9, 0, 0, tzinfo=ZoneInfo("America/Los_Angeles")),
     acquisition_end_time=datetime(2025, 1, 31, 17, 0, 0, tzinfo=ZoneInfo("America/Los_Angeles")),
     acquisition_type="BarcodeSequencing",
