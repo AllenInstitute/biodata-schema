@@ -61,6 +61,24 @@ REQUIRED_FILE_SETS = {
 }
 
 
+def _validate_model_list(value, model_class, field_name: str):
+    """Validate a singleton or list of models, preserving permissive fallback behavior."""
+    if value is None:
+        return value
+    values = value if isinstance(value, list) else [value]
+    models = []
+    for model_value in values:
+        if isinstance(model_value, model_class):
+            models.append(model_value)
+            continue
+        try:
+            models.append(model_class.model_validate(model_value))
+        except ValidationError as e:
+            logger.warning(f"Error in validating {field_name}: {e}")
+            models.append(model_class.model_construct(**model_value))
+    return models
+
+
 class Metadata(DataCoreModel):
     """The records in the Data Asset Collection needs to contain certain fields
     to easily query and index the data."""
@@ -101,8 +119,8 @@ class Metadata(DataCoreModel):
     data_description: Optional[DataDescription] = Field(
         default=None, title="Data Description", description="A logical collection of data files."
     )
-    procedures: Optional[Procedures] = Field(
-        default=None, title="Procedures", description="All procedures performed on a subject."
+    procedures: Optional[List[Procedures]] = Field(
+        default=None, title="Procedures", description="Procedures performed on each subject in this asset."
     )
     instrument: Optional[Instrument] = Field(
         default=None, title="Instrument", description="Devices used to acquire data."
@@ -125,21 +143,9 @@ class Metadata(DataCoreModel):
 
         # extract field from Optional[<class>] annotation
         field_name = info.field_name
-        if field_name == "subjects":
-            if value is None:
-                return value
-            values = value if isinstance(value, list) else [value]
-            parsed_subjects = []
-            for subject_value in values:
-                if isinstance(subject_value, Subject):
-                    parsed_subjects.append(subject_value)
-                    continue
-                try:
-                    parsed_subjects.append(Subject.model_validate(subject_value))
-                except ValidationError as e:
-                    logger.warning(f"Error in validating subject: {e}")
-                    parsed_subjects.append(Subject.model_construct(**subject_value))
-            return parsed_subjects
+        collection_models = {"subjects": Subject, "procedures": Procedures}
+        if field_name in collection_models:
+            return _validate_model_list(value, collection_models[field_name], field_name[:-1])
 
         field_class = [f for f in get_args(cls.model_fields[field_name].annotation) if inspect.isclass(f)][0]
 
@@ -161,6 +167,9 @@ class Metadata(DataCoreModel):
             value = dict(value)
             subject = value.pop("subject")
             value.setdefault("subjects", subject if isinstance(subject, list) or subject is None else [subject])
+        if isinstance(value, dict) and value.get("procedures") is not None and not isinstance(value["procedures"], list):
+            value = dict(value)
+            value["procedures"] = [value["procedures"]]
         return value
 
     @model_validator(mode="after")
@@ -170,6 +179,19 @@ class Metadata(DataCoreModel):
             names = [subject.subject_name for subject in self.subjects]
             if len(names) != len(set(names)):
                 raise ValueError("subjects must have unique subject_name values")
+        return self
+
+    @model_validator(mode="after")
+    def validate_unique_procedure_subjects(self):
+        """Allow at most one Procedures object per subject."""
+        if self.procedures:
+            subject_names = [
+                procedures.subject_name
+                for procedures in self.procedures
+                if getattr(procedures, "subject_name", None) is not None
+            ]
+            if len(subject_names) != len(set(subject_names)):
+                raise ValueError("procedures must contain at most one object per subject_name")
         return self
 
     @model_validator(mode="after")
@@ -222,7 +244,8 @@ class Metadata(DataCoreModel):
             and self.procedures
             and any(
                 isinstance(surgery, Injection) and getattr(surgery, "injection_materials", None) is None
-                for subject_procedure in self.procedures.subject_procedures
+                for procedures in self.procedures
+                for subject_procedure in procedures.subject_procedures
                 if isinstance(subject_procedure, Surgery)
                 for surgery in subject_procedure.procedures
             )
@@ -240,7 +263,8 @@ class Metadata(DataCoreModel):
             and self.procedures
             and any(
                 isinstance(surgery, Injection) and getattr(surgery, "injection_materials", None) is None
-                for subject_procedure in self.procedures.subject_procedures
+                for procedures in self.procedures
+                for subject_procedure in procedures.subject_procedures
                 if isinstance(subject_procedure, Surgery)
                 for surgery in subject_procedure.procedures
             )
@@ -271,8 +295,8 @@ class Metadata(DataCoreModel):
 
         if self.instrument:
             device_names.extend(self.instrument.get_component_names())
-        if self.procedures:
-            device_names.extend(self.procedures.get_device_names())
+        for procedures in self.procedures or []:
+            device_names.extend(procedures.get_device_names())
 
         # Check if all active devices are in the available devices
         if not all(device in device_names for device in active_devices):
@@ -293,8 +317,8 @@ class Metadata(DataCoreModel):
 
         if self.instrument:
             device_names.extend(self.instrument.get_component_names())
-        if self.procedures:
-            device_names.extend(self.procedures.get_device_names())
+        for procedures in self.procedures or []:
+            device_names.extend(procedures.get_device_names())
 
         # Check if all connection devices are in the available devices
         if self.acquisition:
@@ -343,11 +367,15 @@ class Metadata(DataCoreModel):
 
         expected = {subject.subject_name for subject in self.subjects}
         mismatches = []
-        for field_name, core_model in (
-            ("procedures", self.procedures),
-            ("acquisition", self.acquisition),
-            ("data_description", self.data_description),
-        ):
+        procedure_subject_names = {
+            procedures.subject_name
+            for procedures in self.procedures or []
+            if getattr(procedures, "subject_name", None)
+        }
+        if not procedure_subject_names.issubset(expected):
+            mismatches.append(f"procedures.subject_name={procedure_subject_names}")
+
+        for field_name, core_model in (("acquisition", self.acquisition), ("data_description", self.data_description)):
             subject_names = getattr(core_model, "subject_names", None)
             if not subject_names:
                 subject_names = getattr(core_model, "subject_name", None)
@@ -370,9 +398,10 @@ class Metadata(DataCoreModel):
         if self.acquisition and self.procedures:
             # Get all training protocol names from procedures
             training_protocol_names = []
-            for procedure in self.procedures.subject_procedures:
-                if isinstance(procedure, TrainingProtocol):
-                    training_protocol_names.append(procedure.training_name)
+            for procedures in self.procedures:
+                for procedure in procedures.subject_procedures:
+                    if isinstance(procedure, TrainingProtocol):
+                        training_protocol_names.append(procedure.training_name)
 
             # Check each stimulus epoch's training_protocol_name
             for stimulus_epoch in self.acquisition.stimulus_epochs:
@@ -422,9 +451,9 @@ class Metadata(DataCoreModel):
                     acquisition_start_time=acquisition_start_time,
                     acquisition_end_time=acquisition_end_time,
                 )
-            if self.procedures:
+            for procedures in self.procedures or []:
                 recursive_time_validation_check(
-                    self.procedures,
+                    procedures,
                     acquisition_start_time=acquisition_start_time,
                     acquisition_end_time=acquisition_end_time,
                 )
@@ -475,6 +504,12 @@ class Metadata(DataCoreModel):
                     subject.write_standard_file(
                         output_directory=output_directory,
                         filename_suffix=subject.subject_name,
+                    )
+            elif field_name == "procedures":
+                for procedures in value:
+                    procedures.write_standard_file(
+                        output_directory=output_directory,
+                        filename_suffix=procedures.subject_name,
                     )
             else:
                 value.write_standard_file(output_directory=output_directory)

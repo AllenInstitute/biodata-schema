@@ -37368,15 +37368,10 @@
                "title": "Schema Version",
                "type": "string"
             },
-            "subject_names": {
-               "description": "Unique names for subjects associated with these procedures",
-               "items": {
-                  "type": "string"
-               },
-               "minItems": 1,
-               "title": "Subject names",
-               "type": "array",
-               "uniqueItems": true
+            "subject_name": {
+               "description": "Unique name for the subject associated with these procedures",
+               "title": "Subject name",
+               "type": "string"
             },
             "subject_procedures": {
                "default": [],
@@ -37453,7 +37448,7 @@
             }
          },
          "required": [
-            "subject_names"
+            "subject_name"
          ],
          "title": "Procedures",
          "type": "object"
@@ -51782,7 +51777,7 @@
             }
          ],
          "default": null,
-         "description": "Subjects represented in this data asset.",
+         "description": "Subject(s) of data collection.",
          "title": "Subjects"
       },
       "data_description": {
@@ -51801,14 +51796,17 @@
       "procedures": {
          "anyOf": [
             {
-               "$ref": "#/$defs/Procedures"
+               "items": {
+                  "$ref": "#/$defs/Procedures"
+               },
+               "type": "array"
             },
             {
                "type": "null"
             }
          ],
          "default": null,
-         "description": "All procedures performed on a subject.",
+         "description": "Procedures performed on each subject in this asset.",
          "title": "Procedures"
       },
       "instrument": {

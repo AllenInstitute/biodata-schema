@@ -266,7 +266,7 @@ class TestMetadata:
         assert self.sample_name == result["name"]
         assert self.sample_location == result["location"]
         assert [self.subject_json] == result["subjects"]
-        assert self.procedures_json == result["procedures"]
+        assert [self.procedures_json] == result["procedures"]
         assert self.processing_json == result["processing"]
         assert result["acquisition"] is None
         # also check the other fields
@@ -282,13 +282,13 @@ class TestMetadata:
             procedures=self.procedures,
             processing=self.processing,
         )
-        with pytest.raises(ValidationError, match="procedures.subject_names=.*999"):
+        with pytest.raises(ValidationError, match="procedures.subject_name=.*999"):
             Metadata(
                 name=self.sample_name,
                 location=self.sample_location,
                 data_description=self.dd,
                 subject=self.subject,
-                procedures=self.procedures.model_copy(update={"subject_names": {"999"}}),
+                procedures=Procedures(subject_name="999"),
                 processing=self.processing,
             )
         with pytest.raises(ValidationError, match="data_description.subject_names=.*999"):
@@ -942,7 +942,10 @@ class TestMetadata:
             location="s3://bucket/multi-subject-asset",
             subjects=[self.subject, second_subject],
             data_description=self.dd.model_copy(update={"subject_names": subject_names}),
-            procedures=self.procedures.model_copy(update={"subject_names": subject_names}),
+            procedures=[
+                self.procedures,
+                self.procedures.model_copy(update={"subject_name": "789012"}),
+            ],
             acquisition=Acquisition.model_construct(
                 subject_names=subject_names,
                 specimen_name="789012-001",
@@ -954,6 +957,7 @@ class TestMetadata:
         assert {subject.subject_name for subject in metadata.subjects} == subject_names
         assert set(metadata.model_dump()["data_description"]["subject_names"]) == subject_names
         assert len(metadata.model_dump()["subjects"]) == 2
+        assert {procedure.subject_name for procedure in metadata.procedures} == subject_names
 
         with pytest.raises(ValidationError, match="unique subject_name"):
             Metadata(
@@ -963,6 +967,13 @@ class TestMetadata:
             )
         with pytest.raises(ValidationError):
             Metadata(name="empty-subjects", location="s3://bucket/empty", subjects=[])
+        with pytest.raises(ValidationError, match="at most one object per subject_name"):
+            Metadata(
+                name="duplicate-procedures",
+                location="s3://bucket/duplicate-procedures",
+                subjects=[self.subject],
+                procedures=[self.procedures, self.procedures.model_copy()],
+            )
 
     def test_legacy_null_subject_is_accepted(self):
         """Old metadata payloads may serialize an absent singular subject as null."""
@@ -1039,6 +1050,10 @@ class TestWriteStandardFiles:
             name="test",
             location="s3://bucket/test",
             subjects=[subject],
+            procedures=[
+                Procedures.model_construct(subject_name="123456"),
+                Procedures.model_construct(subject_name="789012"),
+            ],
             data_description=data_description,
             processing=processing_example,
             quality_control=quality_control_example,
@@ -1047,10 +1062,12 @@ class TestWriteStandardFiles:
 
         opened_files = [call_args[0][0].name for call_args in mock_open_fn.call_args_list]
         assert "subject_123456.json" in opened_files
+        assert "procedures_123456.json" in opened_files
+        assert "procedures_789012.json" in opened_files
         assert "data_description.json" in opened_files
         assert "processing.json" in opened_files
         assert "quality_control.json" in opened_files
-        assert 4 == mock_open_fn.call_count
+        assert 6 == mock_open_fn.call_count
 
     @patch.object(Path, "open", autospec=True)
     @patch("biodata_schema.utils.validators.recursive_check_paths")

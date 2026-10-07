@@ -62,8 +62,8 @@ class TestProcedures:
         with pytest.raises(ValidationError):
             Procedures()
 
-        p = Procedures(subject_names={"12345"})
-        assert {"12345"} == p.subject_names
+        p = Procedures(subject_name="12345")
+        assert "12345" == p.subject_name
 
     def test_unwrapped_injection_rejected(self):
         """Unwrapped Injection in subject_procedures should raise"""
@@ -551,26 +551,13 @@ class TestProcedures:
                     )
                 ],
             )
-        expected_exception = "specimen_name must be an extension of one of the subject_names."
+        expected_exception = "specimen_name must be an extension of the subject_name."
         assert expected_exception in str(e.value)
 
-    def test_validate_subject_specimen_names_for_multiple_subjects(self):
-        """Specimen names may match any subject in the roster."""
-        procedures = Procedures(
-            subject_names={"12345", "67890"},
-            specimen_procedures=[
-                SpecimenProcedure(
-                    specimen_name=["12345_001", "67890_001"],
-                    procedure_type="Other",
-                    start_date=date.fromisoformat("2020-10-10"),
-                    end_date=date.fromisoformat("2020-10-11"),
-                    experimenters=["Mam Moth"],
-                    protocol_id=["10"],
-                    notes="some notes",
-                )
-            ],
-        )
-        assert procedures.subject_names == {"12345", "67890"}
+    def test_rejects_plural_subject_names_for_one_object(self):
+        """Each Procedures object is associated with exactly one subject."""
+        with pytest.raises(ValidationError, match="exactly one subject_name"):
+            Procedures(subject_names={"12345", "67890"})
 
     def test_validate_subject_specimen_name_list_valid(self):
         """Test that specimen_name accepts a list of strings when all contain subject_name"""

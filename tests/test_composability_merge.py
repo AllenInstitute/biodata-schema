@@ -235,7 +235,7 @@ class TestComposability:
 
         combined = p1 + p2
 
-        assert combined.subject_names == {"625100"}
+        assert combined.subject_name == "625100"
         assert len(combined.subject_procedures) == 4
         assert combined.subject_procedures[0].start_date == self.procedures_time0.date()
         assert combined.subject_procedures[1].start_date == self.procedures_time1.date()
@@ -243,7 +243,7 @@ class TestComposability:
         assert combined.subject_procedures[3].start_date == self.procedures_time1.date()
 
         # Test combining with different subject names raises ValueError
-        p3 = Procedures(subject_names={"different_name"})
+        p3 = Procedures(subject_name="different_name")
         with pytest.raises(ValueError):
             _ = p1 + p3
 

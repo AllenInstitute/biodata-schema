@@ -92,7 +92,7 @@ class TestSchemaWriter:
             other_identifiers=None,
             subjects=[subject],
             data_description=data_description,
-            procedures=procedures,
+            procedures=[procedures],
             instrument=instrument,
             processing=processing,
             acquisition=acquisition,
