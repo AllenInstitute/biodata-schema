@@ -38,10 +38,15 @@
                "description": "DOI for protocols.io",
                "title": "Protocol ID"
             },
-            "subject_name": {
-               "description": "Unique name for the subject",
-               "title": "Subject name",
-               "type": "string"
+            "subject_names": {
+               "description": "Unique names for the subjects included in the acquisition",
+               "items": {
+                  "type": "string"
+               },
+               "minItems": 1,
+               "title": "Subject names",
+               "type": "array",
+               "uniqueItems": true
             },
             "specimen_name": {
                "anyOf": [
@@ -847,7 +852,7 @@
             }
          },
          "required": [
-            "subject_name",
+            "subject_names",
             "acquisition_start_time",
             "acquisition_end_time",
             "acquisition_type",
@@ -8327,19 +8332,23 @@
                "$ref": "#/$defs/License",
                "default": "CC-BY-4.0"
             },
-            "subject_name": {
+            "subject_names": {
                "anyOf": [
                   {
-                     "pattern": "^[^_]+$",
-                     "type": "string"
+                     "items": {
+                        "pattern": "^[^_]+$",
+                        "type": "string"
+                     },
+                     "type": "array",
+                     "uniqueItems": true
                   },
                   {
                      "type": "null"
                   }
                ],
                "default": null,
-               "description": "Unique name for the subject of data acquisition",
-               "title": "Subject name"
+               "description": "Unique names for subjects associated with this data asset",
+               "title": "Subject names"
             },
             "creation_time": {
                "description": "Time that data files were created, used to uniquely identify the data",
@@ -37359,10 +37368,15 @@
                "title": "Schema Version",
                "type": "string"
             },
-            "subject_name": {
-               "description": "Unique name for the subject of data acquisition",
-               "title": "Subject name",
-               "type": "string"
+            "subject_names": {
+               "description": "Unique names for subjects associated with these procedures",
+               "items": {
+                  "type": "string"
+               },
+               "minItems": 1,
+               "title": "Subject names",
+               "type": "array",
+               "uniqueItems": true
             },
             "subject_procedures": {
                "default": [],
@@ -37439,7 +37453,7 @@
             }
          },
          "required": [
-            "subject_name"
+            "subject_names"
          ],
          "title": "Procedures",
          "type": "object"
@@ -51754,18 +51768,22 @@
          "description": "Links to the data asset on secondary platforms.",
          "title": "Other identifiers"
       },
-      "subject": {
+      "subjects": {
          "anyOf": [
             {
-               "$ref": "#/$defs/Subject"
+               "items": {
+                  "$ref": "#/$defs/Subject"
+               },
+               "minItems": 1,
+               "type": "array"
             },
             {
                "type": "null"
             }
          ],
          "default": null,
-         "description": "Subject of data collection.",
-         "title": "Subject"
+         "description": "Subjects represented in this data asset.",
+         "title": "Subjects"
       },
       "data_description": {
          "anyOf": [

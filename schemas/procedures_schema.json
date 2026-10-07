@@ -16843,10 +16843,15 @@
          "title": "Schema Version",
          "type": "string"
       },
-      "subject_name": {
-         "description": "Unique name for the subject of data acquisition",
-         "title": "Subject name",
-         "type": "string"
+      "subject_names": {
+         "description": "Unique names for subjects associated with these procedures",
+         "items": {
+            "type": "string"
+         },
+         "minItems": 1,
+         "title": "Subject names",
+         "type": "array",
+         "uniqueItems": true
       },
       "subject_procedures": {
          "default": [],
@@ -16923,7 +16928,7 @@
       }
    },
    "required": [
-      "subject_name"
+      "subject_names"
    ],
    "title": "Procedures",
    "type": "object"

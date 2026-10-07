@@ -2,7 +2,7 @@
 
 from typing import List, Literal, Optional
 
-from pydantic import Field, SkipValidation, model_validator
+from pydantic import Field, SkipValidation, field_validator, model_validator
 
 from biodata_schema.base import DataCoreModel, DiscriminatedList
 from biodata_schema.components.coordinates import CoordinateSystem
@@ -26,10 +26,11 @@ class Procedures(DataCoreModel):
     describedBy: str = Field(default=_DESCRIBED_BY_URL, json_schema_extra={"const": _DESCRIBED_BY_URL})
 
     schema_version: SkipValidation[Literal["3.0.2"]] = Field(default="3.0.2")
-    subject_name: str = Field(
+    subject_names: set[str] = Field(
         ...,
-        description="Unique name for the subject of data acquisition",
-        title="Subject name",
+        description="Unique names for subjects associated with these procedures",
+        title="Subject names",
+        min_length=1,
     )
     subject_procedures: DiscriminatedList[
         Surgery | Injection | NonSurgicalInjection | TrainingProtocol | WaterRestriction | GenericSubjectProcedure
@@ -49,6 +50,24 @@ class Procedures(DataCoreModel):
     )
 
     notes: Optional[str] = Field(default=None, title="Notes")
+
+    @field_validator("subject_names", mode="before")
+    @classmethod
+    def normalize_subject_names(cls, value):
+        """Accept a legacy single subject name while normalizing to a set."""
+        if isinstance(value, str):
+            return {value}
+        return value
+
+    @model_validator(mode="before")
+    @classmethod
+    def accept_legacy_subject_name(cls, value):
+        """Normalize legacy singular input without exposing it in JSON Schema."""
+        if isinstance(value, dict) and "subject_name" in value:
+            value = dict(value)
+            value.setdefault("subject_names", {value["subject_name"]})
+            value.pop("subject_name", None)
+        return value
 
     def get_device_names(self) -> List[str]:
         """Get all device names for implanted devices in the procedures"""
@@ -91,7 +110,6 @@ class Procedures(DataCoreModel):
 
         # Return if no specimen procedures
         if self.specimen_procedures:
-            subject_name = self.subject_name
             specimen_names = []
             for spec_proc in self.specimen_procedures:
                 specimen_name = spec_proc.specimen_name
@@ -101,9 +119,13 @@ class Procedures(DataCoreModel):
                     specimen_names.append(specimen_name)
 
             if any(
-                not subject_specimen_name_compatibility(subject_name, specimen_name) for specimen_name in specimen_names
+                not any(
+                    subject_specimen_name_compatibility(subject_name, specimen_name)
+                    for subject_name in self.subject_names
+                )
+                for specimen_name in specimen_names
             ):
-                raise ValueError("specimen_name must be an extension of the subject_name.")
+                raise ValueError("specimen_name must be an extension of one of the subject_names.")
 
         return self
 
@@ -113,13 +135,13 @@ class Procedures(DataCoreModel):
         if not self.schema_version == other.schema_version:
             raise ValueError("Schema versions must match to combine Procedures")
 
-        if not self.subject_name == other.subject_name:
+        if not self.subject_names == other.subject_names:
             raise ValueError("Subject names must match to combine Procedures objects.")
 
         coordinate_system = merge_coordinate_systems(self.global_coordinate_system, other.global_coordinate_system)
 
         return Procedures(
-            subject_name=self.subject_name,
+            subject_names=self.subject_names,
             subject_procedures=self.subject_procedures + other.subject_procedures,
             specimen_procedures=self.specimen_procedures + other.specimen_procedures,
             global_coordinate_system=coordinate_system,

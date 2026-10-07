@@ -62,6 +62,17 @@ def _field_schema(source_schema: dict, field_name: str, field_info: Any) -> dict
     return schema
 
 
+def _preserve_array_container(source: dict, item_schema: dict) -> dict:
+    """Keep a collection wrapper while replacing its nested item details."""
+    if source.get("type") == "array":
+        return {"type": "array", "items": item_schema}
+    if "anyOf" in source:
+        array_options = [option for option in source["anyOf"] if option.get("type") == "array"]
+        if array_options:
+            return _preserve_array_container(array_options[0], item_schema)
+    return item_schema
+
+
 def _project_model_schema(model: type[BaseModel], definitions: dict[str, dict]) -> dict:
     """Build a schema containing only draft-required fields from a model."""
     source_schema = model.model_json_schema()
@@ -91,6 +102,8 @@ def _project_model_schema(model: type[BaseModel], definitions: dict[str, dict]) 
             }
 
         source_field_schema = _field_schema(source_schema, field_name, field_info)
+        if source_field_schema.get("type") == "array" or "anyOf" in source_field_schema:
+            child_schema = _preserve_array_container(source_field_schema, child_schema)
         for metadata_name in ("title", "description"):
             if metadata_name in source_field_schema:
                 child_schema[metadata_name] = source_field_schema[metadata_name]

@@ -64,19 +64,22 @@ class TestSchemaWriter:
         """Tests that the draft schema contains only its required metadata fields."""
         schema = draft_metadata_schema()
 
-        assert set(schema["properties"]) == {"location", "data_description", "subject", "acquisition", "instrument"}
+        assert set(schema["properties"]) == {"location", "data_description", "subjects", "acquisition", "instrument"}
         assert set(schema["required"]) == set(schema["properties"])
         assert schema["additionalProperties"] is True
         assert set(schema["$defs"]) == {"License"}
 
         expected_nested_fields = {
             "data_description": {"project_name", "license"},
-            "subject": {"subject_name"},
+            "subjects": {"subject_name"},
             "acquisition": {"acquisition_start_time"},
             "instrument": {"instrument_name"},
         }
         for field_name, fields in expected_nested_fields.items():
             nested_schema = schema["properties"][field_name]
+            if field_name == "subjects":
+                assert nested_schema["type"] == "array"
+                nested_schema = nested_schema["items"]
             assert set(nested_schema["properties"]) == fields
             assert set(nested_schema["required"]) == fields
             assert nested_schema["additionalProperties"] is True
@@ -87,7 +90,7 @@ class TestSchemaWriter:
             name="full_metadata",
             location="s3://bucket/full_metadata",
             other_identifiers=None,
-            subject=subject,
+            subjects=[subject],
             data_description=data_description,
             procedures=procedures,
             instrument=instrument,

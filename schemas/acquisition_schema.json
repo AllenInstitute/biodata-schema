@@ -12584,10 +12584,15 @@
          "description": "DOI for protocols.io",
          "title": "Protocol ID"
       },
-      "subject_name": {
-         "description": "Unique name for the subject",
-         "title": "Subject name",
-         "type": "string"
+      "subject_names": {
+         "description": "Unique names for the subjects included in the acquisition",
+         "items": {
+            "type": "string"
+         },
+         "minItems": 1,
+         "title": "Subject names",
+         "type": "array",
+         "uniqueItems": true
       },
       "specimen_name": {
          "anyOf": [
@@ -13393,7 +13398,7 @@
       }
    },
    "required": [
-      "subject_name",
+      "subject_names",
       "acquisition_start_time",
       "acquisition_end_time",
       "acquisition_type",

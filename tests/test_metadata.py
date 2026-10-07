@@ -142,7 +142,7 @@ class TestMetadata:
                 data_description=DataDescription.model_construct(
                     creation_time=datetime(2020, 12, 12, 12, 12, 12),
                     modalities=[Modality.SPIM],
-                    subject_name="655019",
+                    subject_names={"655019"},
                     data_level="raw",
                 ),
                 subject=subject,
@@ -170,7 +170,7 @@ class TestMetadata:
                 data_description=DataDescription.model_construct(
                     creation_time=datetime(2020, 12, 12, 12, 12, 12),
                     modalities=modalities,
-                    subject_name="655019",
+                    subject_names={"655019"},
                     data_level="raw",
                 ),
                 subject=subject,
@@ -202,7 +202,7 @@ class TestMetadata:
                 data_description=DataDescription.model_construct(
                     creation_time=datetime(2020, 12, 12, 12, 12, 12),
                     modalities=modalities,
-                    subject_name="655019",
+                    subject_names={"655019"},
                     data_level="raw",
                 ),
                 subject=subject,
@@ -226,7 +226,7 @@ class TestMetadata:
             name="name",
             location="location",
             id="1",
-            subject=subject,
+            subjects=[subject],
         )
 
         m_dict = m.model_dump()
@@ -265,7 +265,7 @@ class TestMetadata:
         # check that metadata was created with expected values
         assert self.sample_name == result["name"]
         assert self.sample_location == result["location"]
-        assert self.subject_json == result["subject"]
+        assert [self.subject_json] == result["subjects"]
         assert self.procedures_json == result["procedures"]
         assert self.processing_json == result["processing"]
         assert result["acquisition"] is None
@@ -282,32 +282,32 @@ class TestMetadata:
             procedures=self.procedures,
             processing=self.processing,
         )
-        with pytest.raises(ValidationError, match="procedures.subject_name=999"):
+        with pytest.raises(ValidationError, match="procedures.subject_names=.*999"):
             Metadata(
                 name=self.sample_name,
                 location=self.sample_location,
                 data_description=self.dd,
                 subject=self.subject,
-                procedures=self.procedures.model_copy(update={"subject_name": "999"}),
+                procedures=self.procedures.model_copy(update={"subject_names": {"999"}}),
                 processing=self.processing,
             )
-        with pytest.raises(ValidationError, match="data_description.subject_name=999"):
+        with pytest.raises(ValidationError, match="data_description.subject_names=.*999"):
             Metadata(
                 name=self.sample_name,
                 location=self.sample_location,
-                data_description=self.dd.model_copy(update={"subject_name": "999"}),
+                data_description=self.dd.model_copy(update={"subject_names": {"999"}}),
                 subject=self.subject,
                 procedures=self.procedures,
                 processing=self.processing,
             )
-        with pytest.raises(ValidationError, match="acquisition.subject_name=999"):
+        with pytest.raises(ValidationError, match="acquisition.subject_names=.*999"):
             Metadata(
                 name=self.sample_name,
                 location=self.sample_location,
                 subject=self.subject,
                 acquisition=Acquisition.model_construct(
                     acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
-                    subject_name="999",
+                    subject_names={"999"},
                     subject_details=AcquisitionSubjectDetails.model_construct(),
                     data_streams=[],
                 ),
@@ -373,7 +373,7 @@ class TestMetadata:
                 location="bucket",
                 # No subject, processing, or model - should trigger validation error
             )
-        assert "Metadata must contain at least one of the following files: subject, processing, model" in str(
+        assert "Metadata must contain at least one of the following files: subjects, processing, model" in str(
             context.value
         )
 
@@ -929,9 +929,52 @@ class TestMetadata:
             name="Test Metadata",
             location="Test Location",
             subject=calibration_subject,
-            data_description=data_description.model_copy(update={"subject_name": "calibration"}),
+            data_description=data_description.model_copy(update={"subject_names": {"calibration"}}),
         )
         assert metadata is not None
+
+    def test_metadata_supports_multiple_subjects(self):
+        """Metadata serializes a unique subject roster and checks the data-description roster."""
+        second_subject = self.subject.model_copy(update={"subject_name": "789012"})
+        subject_names = {self.subject.subject_name, second_subject.subject_name}
+        metadata = Metadata(
+            name="multi-subject-asset",
+            location="s3://bucket/multi-subject-asset",
+            subjects=[self.subject, second_subject],
+            data_description=self.dd.model_copy(update={"subject_names": subject_names}),
+            procedures=self.procedures.model_copy(update={"subject_names": subject_names}),
+            acquisition=Acquisition.model_construct(
+                subject_names=subject_names,
+                specimen_name="789012-001",
+                acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
+                data_streams=[],
+            ),
+        )
+
+        assert {subject.subject_name for subject in metadata.subjects} == subject_names
+        assert set(metadata.model_dump()["data_description"]["subject_names"]) == subject_names
+        assert len(metadata.model_dump()["subjects"]) == 2
+
+        with pytest.raises(ValidationError, match="unique subject_name"):
+            Metadata(
+                name="duplicate-subjects",
+                location="s3://bucket/duplicate-subjects",
+                subjects=[self.subject, self.subject.model_copy()],
+            )
+        with pytest.raises(ValidationError):
+            Metadata(name="empty-subjects", location="s3://bucket/empty", subjects=[])
+
+    def test_legacy_null_subject_is_accepted(self):
+        """Old metadata payloads may serialize an absent singular subject as null."""
+        metadata = Metadata.model_validate(
+            {
+                "name": "legacy-no-subject",
+                "location": "s3://bucket/legacy-no-subject",
+                "subject": None,
+                "processing": self.processing,
+            }
+        )
+        assert metadata.subjects is None
 
     def test_validate_subject_details_if_not_specimen(self):
         """Tests that subject details are required if acquisition.specimen_name is not provided"""
@@ -940,7 +983,7 @@ class TestMetadata:
         acquisition_with_specimen = Acquisition.model_construct(
             instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
-            subject_name="123456",
+            subject_names={"123456"},
             specimen_name="123456-001",
             data_streams=[],
         )
@@ -956,7 +999,7 @@ class TestMetadata:
         acquisition_with_details = Acquisition.model_construct(
             instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
-            subject_name="123456",
+            subject_names={"123456"},
             data_streams=[],
             subject_details=AcquisitionSubjectDetails.model_construct(),
         )
@@ -970,7 +1013,7 @@ class TestMetadata:
 
         # Case where neither specimen_name nor subject_details is provided - should fail
         acquisition_missing_both = Acquisition.model_construct(
-            subject_name="123456",
+            subject_names={"123456"},
             instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             data_streams=[],
@@ -995,7 +1038,7 @@ class TestWriteStandardFiles:
         m = Metadata.model_construct(
             name="test",
             location="s3://bucket/test",
-            subject=subject,
+            subjects=[subject],
             data_description=data_description,
             processing=processing_example,
             quality_control=quality_control_example,
@@ -1003,7 +1046,7 @@ class TestWriteStandardFiles:
         m.write_standard_files()
 
         opened_files = [call_args[0][0].name for call_args in mock_open_fn.call_args_list]
-        assert "subject.json" in opened_files
+        assert "subject_123456.json" in opened_files
         assert "data_description.json" in opened_files
         assert "processing.json" in opened_files
         assert "quality_control.json" in opened_files
@@ -1031,11 +1074,11 @@ class TestWriteStandardFiles:
         m = Metadata.model_construct(
             name="test",
             location="s3://bucket/test",
-            subject=subject,
+            subjects=[subject],
             model=model_example,
         )
         m.write_standard_files(output_directory=Path("output_dir"))
 
         opened_files = [call_args[0][0] for call_args in mock_open_fn.call_args_list]
-        assert Path("output_dir/subject.json") in opened_files
+        assert Path("output_dir/subject_123456.json") in opened_files
         assert Path("output_dir/model.json") in opened_files

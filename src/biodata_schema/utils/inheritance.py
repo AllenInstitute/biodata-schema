@@ -69,7 +69,7 @@ def derive_data_description_from_raw(
         raise ValueError(f"Derived name({derived_name}) does not match allowed Regex pattern")
 
     return DataDescription(
-        subject_name=_get_or_default(data_description, "subject_name", kwargs),
+        subject_names=_get_or_default(data_description, "subject_names", kwargs),
         license=_get_or_default(data_description, "license", kwargs),
         creation_time=creation_time,
         tags=_get_or_default(data_description, "tags", kwargs),
@@ -134,7 +134,7 @@ def derive_data_description_from_derived(
         raise ValueError(f"Derived name({derived_name}) does not match allowed Regex pattern")
 
     return DataDescription(
-        subject_name=_get_or_default(data_description, "subject_name", kwargs),
+        subject_names=_get_or_default(data_description, "subject_names", kwargs),
         license=_get_or_default(data_description, "license", kwargs),
         creation_time=creation_time,
         tags=_get_or_default(data_description, "tags", kwargs),
@@ -233,7 +233,7 @@ def derive_data_description_analyzed(
         raise ValueError(f"Analyzed name({analyzed_name}) does not match allowed Regex pattern")
 
     return DataDescription(
-        subject_name=_get_or_default(data_description, "subject_name", kwargs),
+        subject_names=_get_or_default(data_description, "subject_names", kwargs),
         license=_get_or_default(data_description, "license", kwargs),
         creation_time=creation_time,
         tags=_get_or_default(data_description, "tags", kwargs),
@@ -265,10 +265,10 @@ def _get_unique_subject_names(metadata_list) -> List[str]:
     """Extract unique subject names from a list of Metadata objects"""
     subject_names = set()
     for m in metadata_list:
-        if m.subject:
-            subject_names.add(m.subject.subject_name)
-        elif m.data_description and m.data_description.subject_name:
-            subject_names.add(m.data_description.subject_name)
+        if m.subjects:
+            subject_names.update(subject.subject_name for subject in m.subjects)
+        elif m.data_description and m.data_description.subject_names:
+            subject_names.update(m.data_description.subject_names)
     return list(subject_names)
 
 
@@ -284,7 +284,7 @@ def _get_unique_acquisition_names(metadata_list) -> List[str]:
 
 
 def _is_single_subject(metadata_list) -> bool:
-    """Check whether all metadata objects refer to the same subject"""
+    """Check whether all metadata objects collectively refer to one subject."""
     return len(_get_unique_subject_names(metadata_list)) == 1
 
 
@@ -298,7 +298,7 @@ def _inherit_subject_and_procedures(metadata_list) -> Tuple:
     if not _is_single_subject(metadata_list):
         return None, None
     for m in metadata_list:
-        subject = m.subject
+        subject = m.subjects
         procedures = m.procedures
         if subject or procedures:
             return subject, procedures
