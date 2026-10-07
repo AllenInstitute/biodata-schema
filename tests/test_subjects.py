@@ -12,7 +12,6 @@ from biodata_models.species import Species, Strain
 from biodata_schema.components.subjects import (
     BreedingInfo,
     CalibrationObject,
-    CellLine,
     FluorescentCellLine,
     Housing,
     HumanSubject,
