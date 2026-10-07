@@ -241,7 +241,7 @@ class TestCellLine:
     def test_cellline(self):
         """Test of cell line"""
 
-        subject = FluorescentCellLineCellLine(
+        subject = FluorescentCellLine(
             cell_line_name="AICS-0005",
             cell_line_id="AICS-0005",
             cell_line_type=CellLineModel(
