@@ -32,12 +32,27 @@ Description of a cultured cell line
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `cell_line_name` | `str` | Cell line name  |
-| `cell_line_type` | `biodata_models.cell_line.CellLineModel` | Cell line type (Use CellLineLookup.get_by_name/search_by_name to populate) |
+| `cell_line_id` | `str` | Cell line ID  |
+| `source` | [Organization](../biodata_models/organizations.md#organization) | Source (Where the subject was acquired from.) |
+| `cell_line_type` | `biodata_models.cell_line.CellLineModel` | Cell line type  |
 | `species` | [Species](../biodata_models/species.md#species) | Species  |
+| `clone_number` | `Optional[int]` | Clone number  |
+
+
+### FluorescentCellLine
+
+Description of a cultured cell line with fluorescent label
+
+| Field | Type | Title (Description) |
+|-------|------|-------------|
 | `protein` | [PIDName](../biodata_models/pid_names.md#pidname) | Protein labeled (Protein uses UniProt registry) |
-| `gene` | [PIDName](../biodata_models/pid_names.md#pidname) | Gene targeted (Gene uses NCBI taxonomy) |
 | `cell_structure` | `str` | Cell structure protein found in  |
 | `fluorescent_protein` | [PIDName](../biodata_models/pid_names.md#pidname) | Fluorescent protein (Uses FPbase) |
+| `cell_line_name` | `str` | Cell line name  |
+| `cell_line_id` | `str` | Cell line ID  |
+| `source` | [Organization](../biodata_models/organizations.md#organization) | Source (Where the subject was acquired from.) |
+| `cell_line_type` | `biodata_models.cell_line.CellLineModel` | Cell line type  |
+| `species` | [Species](../biodata_models/species.md#species) | Species  |
 | `clone_number` | `Optional[int]` | Clone number  |
 
 
