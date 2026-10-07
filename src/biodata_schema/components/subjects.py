@@ -204,10 +204,10 @@ class CellLine(DataModel):
     cell_line_name: str = Field(..., title="Cell line name")
     cell_line_id: str = Field(..., title="Cell line ID")
     source: Organization.ONE_OF = Field(
-            ...,
-            description="Where the subject was acquired from.",
-            title="Source",
-        )
+        ...,
+        description="Where the subject was acquired from.",
+        title="Source",
+    )
     cell_line_type: CellLineModel = Field(..., title="Cell line type")
     species: Species.ONE_OF = Field(..., title="Species")
     clone_number: Optional[int] = Field(default=None, title="Clone number")
