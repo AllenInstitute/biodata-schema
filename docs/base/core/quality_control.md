@@ -12,10 +12,12 @@ Every [QCMetric](#qcmetric) has a `Status` which takes the value of the metric a
 
 The metrics defined during quality control should define whether or not an asset can be used for analysis and the properties of an asset that could influence how an analysis is performed. There are two levels of QC:
 
-- Quality control metrics that are **not allowed to fail** are metrics that at `stage:raw` would prevent an asset from being processed or that at `stage:processing` would prevent an asset from being analyzed. This is a very high bar. Another way of saying this is that if the goals of the data acquisition were met, then all metrics that are 'not allowed to fail' should be passing.
-- Quality control metrics that are **allowed to fail** are metrics that will influence the analysis of data, for example by indicating that one element of an asset cannot be used. These assets do not invalidate further analysis but they change how analysis should be performed.
+- Quality control metrics that are **not allowed to fail** are metrics that at `stage:raw` would prevent an asset from being processed or that at `stage:processing` would prevent an asset from being analyzed. This is a very high bar. If the goals of the data acquisition were met (regardless of whether *experimental* goals were met), then all metrics that are 'not allowed to fail' should be passing.
+- All other metrics should be **allowed to fail**.
 
-The second kind of metrics are identified by the `QualityControl.allow_tag_failures` field, details below.
+For example, if the goal of an acquisition was to collect behavior and fiber photometry, the 'not allowed to fail' metrics should define whether the behavior and fiber photometry data can be analyzed. Metrics that are allowed to fail could include whether the data meets various thresholds of behavior engagement, the signal to noise ratio of the data, and other potentially valuable (but not critical) metrics.
+
+Metrics that *can fail* are identified by the `QualityControl.allow_tag_failures` field, details below.
 
 ### Metrics
 
