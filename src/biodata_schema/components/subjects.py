@@ -202,7 +202,7 @@ class CellLine(DataModel):
     """Description of a cultured cell line"""
 
     cell_line_name: str = Field(..., title="Cell line name")
-    cell_line_id: Optional(str) = Field(default=None, title="Cell line ID")
+    cell_line_id: Optional[str] = Field(default=None, title="Cell line ID")
     source: Organization.ONE_OF = Field(
         ...,
         description="Where the subject was acquired from.",
