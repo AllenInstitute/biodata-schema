@@ -25,6 +25,37 @@ Description of a calibration object
 | `objects` | Optional[List[[Device](devices.md#device)]] | Objects (For calibration objects that are built up from one or more devices.) |
 
 
+### CellLine
+
+Description of a cultured cell line
+
+| Field | Type | Title (Description) |
+|-------|------|-------------|
+| `cell_line_name` | `str` | Cell line name  |
+| `cell_line_id` | `Optional[str]` | Cell line ID  |
+| `source` | [Organization](../biodata_models/organizations.md#organization) | Source (Where the subject was acquired from.) |
+| `cell_line_type` | `biodata_models.cell_line.CellLineModel` | Cell line type  |
+| `species` | [Species](../biodata_models/species.md#species) | Species  |
+| `clone_number` | `Optional[int]` | Clone number  |
+
+
+### FluorescentCellLine
+
+Description of a cultured cell line with fluorescent label
+
+| Field | Type | Title (Description) |
+|-------|------|-------------|
+| `protein` | [PIDName](../biodata_models/pid_names.md#pidname) | Protein labeled (Protein uses UniProt registry) |
+| `cell_structure` | `str` | Cell structure the protein is found in  |
+| `fluorescent_protein` | [PIDName](../biodata_models/pid_names.md#pidname) | Fluorescent protein (Uses FPbase) |
+| `cell_line_name` | `str` | Cell line name  |
+| `cell_line_id` | `Optional[str]` | Cell line ID  |
+| `source` | [Organization](../biodata_models/organizations.md#organization) | Source (Where the subject was acquired from.) |
+| `cell_line_type` | `biodata_models.cell_line.CellLineModel` | Cell line type  |
+| `species` | [Species](../biodata_models/species.md#species) | Species  |
+| `clone_number` | `Optional[int]` | Clone number  |
+
+
 ### HomeCageEnrichment
 
 Materials provided in animal home cage

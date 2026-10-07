@@ -3,6 +3,7 @@
 from datetime import datetime
 
 import pytest
+from biodata_models.cell_line import CellLineModel
 from biodata_models.organizations import Organization
 from biodata_models.pid_names import PIDName
 from biodata_models.registries import Registry
@@ -11,6 +12,7 @@ from biodata_models.species import Species, Strain
 from biodata_schema.components.subjects import (
     BreedingInfo,
     CalibrationObject,
+    FluorescentCellLine,
     Housing,
     HumanSubject,
     LightCycle,
@@ -230,3 +232,38 @@ class TestBreedingInfo:
         assert breeding_info.maternal_genotype == "wt/wt"
         assert breeding_info.paternal_name == "P001"
         assert breeding_info.paternal_genotype == "wt/wt"
+
+
+class TestCellLine:
+    """Test the Cell Line model"""
+
+    def test_cellline(self):
+        """Test of cell line"""
+
+        subject = FluorescentCellLine(
+            cell_line_name="AICS-0005",
+            cell_line_id="AICS-0005",
+            cell_line_type=CellLineModel(
+                name="Human induced pluripotent stem cell line cell",
+                registry=Registry.CLO,
+                registry_identifier="CLO:0037308",
+            ),
+            source=Organization.AI,
+            species=Species.HUMAN,
+            protein=PIDName(
+                name="paxilin",
+                registry=Registry.UNIPROT,
+                registry_identifier="P49023",
+            ),
+            cell_structure="cytoskeleton",
+            fluorescent_protein=PIDName(
+                name="enhanced GFP",
+                abbreviation="EGFP",
+                registry=Registry.FPbase,
+                registry_identifier="R9NL8",
+            ),
+            clone_number=1,
+        )
+
+        assert subject.cell_structure == "cytoskeleton"
+        assert subject.species == Species.HUMAN
