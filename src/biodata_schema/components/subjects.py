@@ -202,7 +202,7 @@ class CellLine(DataModel):
     """Description of a cultured cell line"""
 
     cell_line_name: str = Field(..., title="Cell line name")
-    cell_line_id: str = Field(..., title="Cell line ID")
+    cell_line_id: Optional(str) = Field(default=None, title="Cell line ID")
     source: Organization.ONE_OF = Field(
         ...,
         description="Where the subject was acquired from.",
@@ -217,5 +217,5 @@ class FluorescentCellLine(CellLine):
     """Description of a cultured cell line with fluorescent label"""
 
     protein: PIDName = Field(..., title="Protein labeled", description="Protein uses UniProt registry")
-    cell_structure: str = Field(..., title="Cell structure protein found in")  # TODO: ontology or enum in model?
+    cell_structure: str = Field(..., title="Cell structure the protein is found in")  # TODO: ontology/enum in model
     fluorescent_protein: PIDName = Field(..., title="Fluorescent protein", description="Uses FPbase")
