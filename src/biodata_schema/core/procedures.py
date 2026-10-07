@@ -50,24 +50,6 @@ class Procedures(DataCoreModel):
 
     notes: Optional[str] = Field(default=None, title="Notes")
 
-    @model_validator(mode="before")
-    @classmethod
-    def accept_legacy_subject_names(cls, value):
-        """Accept the interim plural field when it identifies exactly one subject."""
-        if isinstance(value, dict) and "subject_names" in value:
-            value = dict(value)
-            subject_names = value.pop("subject_names")
-            if "subject_name" not in value and subject_names is not None:
-                if isinstance(subject_names, str):
-                    subject_name = subject_names
-                else:
-                    subject_names = set(subject_names)
-                    if len(subject_names) != 1:
-                        raise ValueError("Each Procedures object must identify exactly one subject_name")
-                    subject_name = next(iter(subject_names))
-                value["subject_name"] = subject_name
-        return value
-
     def get_device_names(self) -> List[str]:
         """Get all device names for implanted devices in the procedures"""
         device_names = set()

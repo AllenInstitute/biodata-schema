@@ -68,7 +68,7 @@ class TestAcquisition:
         end = datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
         with pytest.raises(ValidationError) as context:
             Acquisition(
-                subject_name="123456",
+                subject_names={"123456"},
                 acquisition_start_time=start,
                 acquisition_end_time=end,
                 acquisition_type="Test",
@@ -150,7 +150,7 @@ class TestAcquisition:
                 experimenters=["Mam Moth"],
                 acquisition_start_time=datetime.now(),
                 acquisition_end_time=datetime.now(),
-                subject_name="123456",
+                subject_names={"123456"},
                 acquisition_type="Test",
                 instrument_name="1234",
                 subject_details=AcquisitionSubjectDetails(
@@ -186,7 +186,7 @@ class TestAcquisition:
             experimenters=["Mam Moth"],
             acquisition_start_time=datetime.now(),
             acquisition_end_time=datetime.now(),
-            subject_name="123456",
+            subject_names={"123456"},
             specimen_name="SP123456",
             acquisition_type="Test",
             instrument_name="1234",

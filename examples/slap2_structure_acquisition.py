@@ -142,7 +142,7 @@ sipm_config = {
 
 
 a = Acquisition(
-    subject_name=mouse_id,
+    subject_names={mouse_id},
     acquisition_start_time=harp_start_time,
     acquisition_end_time=harp_end_time,
     experimenters=["John Smith"],

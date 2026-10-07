@@ -555,8 +555,8 @@ class TestProcedures:
         assert expected_exception in str(e.value)
 
     def test_rejects_plural_subject_names_for_one_object(self):
-        """Each Procedures object is associated with exactly one subject."""
-        with pytest.raises(ValidationError, match="exactly one subject_name"):
+        """Procedures uses its canonical singular owner field only."""
+        with pytest.raises(ValidationError, match="subject_name"):
             Procedures(subject_names={"12345", "67890"})
 
     def test_validate_subject_specimen_name_list_valid(self):

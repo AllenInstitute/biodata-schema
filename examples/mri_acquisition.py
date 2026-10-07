@@ -87,7 +87,7 @@ stream = DataStream(
 )
 
 acquisition = Acquisition(
-    subject_name="123456",
+    subject_names={"123456"},
     acquisition_start_time=datetime(2024, 3, 12, 16, 27, 55, 584892, tzinfo=ZoneInfo("America/Los_Angeles")),
     acquisition_end_time=datetime(2024, 3, 12, 16, 27, 55, 584892, tzinfo=ZoneInfo("America/Los_Angeles")),
     experimenters=["John Smith"],

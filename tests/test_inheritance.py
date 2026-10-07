@@ -45,7 +45,7 @@ def _make_metadata(subject_name="123456"):
     _counter += 1
     dd = DataDescription(
         modalities=[Modality.ECEPHYS],
-        subject_name=subject_name,
+        subject_names={subject_name},
         creation_time=datetime(2022, 2, 21, 16, 30, _counter, tzinfo=timezone.utc),
         institution=Organization.AIND,
         investigators=[Person(name="Jane Smith")],
@@ -58,7 +58,7 @@ def _make_metadata(subject_name="123456"):
     return Metadata(
         name=dd.name,
         location=f"s3://bucket/{dd.name}",
-        subject=sub,
+        subjects=[sub],
         data_description=dd,
         processing=example_processing,
         quality_control=example_qc,
@@ -412,7 +412,7 @@ class TestInternalHelpers:
 
     def test_get_unique_subject_names_from_data_description(self):
         """_get_unique_subject_names should extract subject name from data_description when subject is None"""
-        no_subject = self.source.model_copy(update={"subject": None})
+        no_subject = self.source.model_copy(update={"subjects": None})
         subject_names = _get_unique_subject_names([no_subject])
         assert subject_names == ["123456"]
 

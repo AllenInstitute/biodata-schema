@@ -62,12 +62,13 @@ REQUIRED_FILE_SETS = {
 
 
 def _validate_model_list(value, model_class, field_name: str):
-    """Validate a singleton or list of models, preserving permissive fallback behavior."""
+    """Validate a list of models, preserving permissive fallback behavior for invalid items."""
     if value is None:
         return value
-    values = value if isinstance(value, list) else [value]
+    if not isinstance(value, list):
+        raise ValueError(f"{field_name}s must be provided as a list")
     models = []
-    for model_value in values:
+    for model_value in value:
         if isinstance(model_value, model_class):
             models.append(model_value)
             continue
@@ -158,19 +159,6 @@ class Metadata(DataCoreModel):
         else:
             core_model = value
         return core_model
-
-    @model_validator(mode="before")
-    @classmethod
-    def accept_legacy_subject(cls, value):
-        """Normalize a singular subject input to the canonical roster."""
-        if isinstance(value, dict) and "subject" in value:
-            value = dict(value)
-            subject = value.pop("subject")
-            value.setdefault("subjects", subject if isinstance(subject, list) or subject is None else [subject])
-        if isinstance(value, dict) and value.get("procedures") is not None and not isinstance(value["procedures"], list):
-            value = dict(value)
-            value["procedures"] = [value["procedures"]]
-        return value
 
     @model_validator(mode="after")
     def validate_unique_subjects(self):
@@ -379,8 +367,6 @@ class Metadata(DataCoreModel):
             subject_names = getattr(core_model, "subject_names", None)
             if not subject_names:
                 subject_names = getattr(core_model, "subject_name", None)
-            if isinstance(subject_names, str):
-                subject_names = {subject_names}
             elif subject_names is not None:
                 subject_names = set(subject_names)
             if subject_names is not None and subject_names != expected:
@@ -644,9 +630,8 @@ def create_metadata_json(
         params["other_identifiers"] = other_identifiers
     core_fields = dict()
     for key, value in core_jsons.items():
-        core_key = "subjects" if key == "subject" else key
-        if core_key in CORE_FILES and value is not None:
-            core_fields[core_key] = value
+        if key in CORE_FILES and value is not None:
+            core_fields[key] = value
     # Create Metadata object and convert to JSON
     # If there are any validation errors, still create it
     try:

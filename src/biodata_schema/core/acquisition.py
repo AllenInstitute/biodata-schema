@@ -497,24 +497,6 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
         default=None, title="Subject details", description="Required for in vivo acquisitions."
     )
 
-    @field_validator("subject_names", mode="before")
-    @classmethod
-    def normalize_subject_names(cls, value):
-        """Accept a legacy single subject name while normalizing to a set."""
-        if isinstance(value, str):
-            return {value}
-        return value
-
-    @model_validator(mode="before")
-    @classmethod
-    def accept_legacy_subject_name(cls, value):
-        """Normalize legacy singular input without exposing it in JSON Schema."""
-        if isinstance(value, dict) and "subject_name" in value:
-            value = dict(value)
-            value.setdefault("subject_names", {value["subject_name"]})
-            value.pop("subject_name", None)
-        return value
-
     @property
     def acquisition_start_time_local(self) -> datetime:
         """Return acquisition_start_time converted to the timezone stored in acquisition_start_tz.

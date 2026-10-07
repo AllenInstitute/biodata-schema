@@ -13,7 +13,7 @@ from biodata_models.data_name_patterns import (
 from biodata_models.licenses import License
 from biodata_models.modalities import Modality
 from biodata_models.organizations import Organization
-from pydantic import Field, SkipValidation, StringConstraints, field_validator, model_validator
+from pydantic import Field, SkipValidation, StringConstraints, model_validator
 
 from biodata_schema.base import AwareDatetimeWithDefault, DataCoreModel, DataModel, DraftRequirement
 from biodata_schema.components.identifiers import Person
@@ -114,24 +114,6 @@ class DataDescription(DataCoreModel):
         default=None, title="Data summary", description="Semantic summary of experimental goal"
     )
 
-    @field_validator("subject_names", mode="before")
-    @classmethod
-    def normalize_subject_names(cls, value):
-        """Accept a legacy single subject name while normalizing to a set."""
-        if isinstance(value, str):
-            return {value}
-        return value
-
-    @model_validator(mode="before")
-    @classmethod
-    def accept_legacy_subject_name(cls, value):
-        """Normalize legacy singular input without exposing it in JSON Schema."""
-        if isinstance(value, dict) and "subject_name" in value:
-            value = dict(value)
-            legacy_name = value.pop("subject_name")
-            value.setdefault("subject_names", {legacy_name} if legacy_name is not None else None)
-        return value
-
     @classmethod
     def parse_name(cls, name, data_level: DataLevel = DataLevel.RAW):
         """Decompose a DataDescription name string into component parts"""
@@ -175,8 +157,6 @@ class DataDescription(DataCoreModel):
         """Set the name for single-subject raw data when it is empty."""
         if self.name is None and self.data_level == DataLevel.RAW:
             subject_names = self.subject_names
-            if isinstance(subject_names, str):
-                subject_names = {subject_names}
             if not subject_names:
                 return self
             if len(subject_names) != 1:
