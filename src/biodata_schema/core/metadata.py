@@ -334,10 +334,7 @@ class Metadata(DataCoreModel):
     def validate_calibration_object_tags(self):
         """Validator to ensure a CalibrationObject subject has the expected subject name"""
 
-        if (
-            self.subjects
-            and any(isinstance(subject.subject_details, CalibrationObject) for subject in self.subjects)
-        ):
+        if self.subjects and any(isinstance(subject.subject_details, CalibrationObject) for subject in self.subjects):
             if any(
                 isinstance(subject.subject_details, CalibrationObject) and subject.subject_name != "calibration"
                 for subject in self.subjects
@@ -356,9 +353,7 @@ class Metadata(DataCoreModel):
         expected = {subject.subject_name for subject in self.subjects}
         mismatches = []
         procedure_subject_names = {
-            procedures.subject_name
-            for procedures in self.procedures or []
-            if getattr(procedures, "subject_name", None)
+            procedures.subject_name for procedures in self.procedures or [] if getattr(procedures, "subject_name", None)
         }
         if not procedure_subject_names.issubset(expected):
             mismatches.append(f"procedures.subject_name={procedure_subject_names}")
