@@ -6437,19 +6437,23 @@
          "$ref": "#/$defs/License",
          "default": "CC-BY-4.0"
       },
-      "subject_name": {
+      "subject_names": {
          "anyOf": [
             {
-               "pattern": "^[^_]+$",
-               "type": "string"
+               "items": {
+                  "pattern": "^[^_]+$",
+                  "type": "string"
+               },
+               "type": "array",
+               "uniqueItems": true
             },
             {
                "type": "null"
             }
          ],
          "default": null,
-         "description": "Unique name for the subject of data acquisition",
-         "title": "Subject name"
+         "description": "Unique names for subjects associated with this data asset",
+         "title": "Subject names"
       },
       "creation_time": {
          "description": "Time that data files were created, used to uniquely identify the data",

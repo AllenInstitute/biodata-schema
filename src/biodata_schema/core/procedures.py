@@ -28,7 +28,7 @@ class Procedures(DataCoreModel):
     schema_version: SkipValidation[Literal["3.0.2"]] = Field(default="3.0.2")
     subject_name: str = Field(
         ...,
-        description="Unique name for the subject of data acquisition",
+        description="Unique name for the subject associated with these procedures",
         title="Subject name",
     )
     subject_procedures: DiscriminatedList[
@@ -87,11 +87,10 @@ class Procedures(DataCoreModel):
 
     @model_validator(mode="after")
     def validate_subject_specimen_names(self):
-        """Validate that the subject_name and specimen_name match"""
+        """Validate that this subject_name and specimen_name match"""
 
         # Return if no specimen procedures
         if self.specimen_procedures:
-            subject_name = self.subject_name
             specimen_names = []
             for spec_proc in self.specimen_procedures:
                 specimen_name = spec_proc.specimen_name
@@ -101,7 +100,8 @@ class Procedures(DataCoreModel):
                     specimen_names.append(specimen_name)
 
             if any(
-                not subject_specimen_name_compatibility(subject_name, specimen_name) for specimen_name in specimen_names
+                not subject_specimen_name_compatibility(self.subject_name, specimen_name)
+                for specimen_name in specimen_names
             ):
                 raise ValueError("specimen_name must be an extension of the subject_name.")
 
@@ -113,7 +113,7 @@ class Procedures(DataCoreModel):
         if not self.schema_version == other.schema_version:
             raise ValueError("Schema versions must match to combine Procedures")
 
-        if not self.subject_name == other.subject_name:
+        if self.subject_name != other.subject_name:
             raise ValueError("Subject names must match to combine Procedures objects.")
 
         coordinate_system = merge_coordinate_systems(self.global_coordinate_system, other.global_coordinate_system)

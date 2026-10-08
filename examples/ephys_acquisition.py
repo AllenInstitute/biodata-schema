@@ -135,7 +135,7 @@ ephys_assembly_b_config = EphysAssemblyConfig(
 
 acquisition = Acquisition(
     experimenters=["John Smith"],
-    subject_name="664484",
+    subject_names={"664484"},
     acquisition_start_time=datetime(
         year=2023, month=4, day=25, hour=2, minute=35, second=0, tzinfo=ZoneInfo("America/Los_Angeles")
     ),

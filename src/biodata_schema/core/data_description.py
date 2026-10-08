@@ -13,7 +13,7 @@ from biodata_models.data_name_patterns import (
 from biodata_models.licenses import License
 from biodata_models.modalities import Modality
 from biodata_models.organizations import Organization
-from pydantic import Field, SkipValidation, model_validator
+from pydantic import Field, SkipValidation, StringConstraints, model_validator
 
 from biodata_schema.base import AwareDatetimeWithDefault, DataCoreModel, DataModel, DraftRequirement
 from biodata_schema.components.identifiers import Person
@@ -37,11 +37,10 @@ class DataDescription(DataCoreModel):
     schema_version: SkipValidation[Literal["3.0.0"]] = Field(default="3.0.0")
     license: Annotated[License, DraftRequirement] = Field(default=License.CC_BY_40, title="License")
 
-    subject_name: Optional[str] = Field(
+    subject_names: Optional[set[Annotated[str, StringConstraints(pattern=DataRegex.NO_UNDERSCORES.value)]]] = Field(
         default=None,
-        pattern=DataRegex.NO_UNDERSCORES.value,
-        description="Unique name for the subject of data acquisition",
-        title="Subject name",
+        description="Unique names for subjects associated with this data asset",
+        title="Subject names",
     )
     creation_time: AwareDatetimeWithDefault = Field(
         ...,
@@ -148,16 +147,21 @@ class DataDescription(DataCoreModel):
 
     @model_validator(mode="after")
     def subject_name_when_raw(self):
-        """Ensure that a subject_name is provided when data_level is RAW"""
-        if self.data_level == DataLevel.RAW and self.subject_name is None:
-            raise ValueError("subject_name must be set when data_level is RAW")
+        """Ensure that subject_names are provided when data_level is RAW."""
+        if self.data_level == DataLevel.RAW and not self.subject_names:
+            raise ValueError("subject_names must be set when data_level is RAW")
         return self
 
     @model_validator(mode="after")
     def build_name(self):
-        """Set the name of data_description when data_level is RAW and the name is empty"""
+        """Set the name for single-subject raw data when it is empty."""
         if self.name is None and self.data_level == DataLevel.RAW:
-            self.name = build_data_name(self.subject_name, creation_datetime=self.creation_time)
+            subject_names = self.subject_names
+            if not subject_names:
+                return self
+            if len(subject_names) != 1:
+                raise ValueError("name must be set explicitly when raw data includes multiple subjects")
+            self.name = build_data_name(next(iter(subject_names)), creation_datetime=self.creation_time)
 
             # check that the name matches the name regex
             if not re.match(DataRegex.DATA.value, self.name):

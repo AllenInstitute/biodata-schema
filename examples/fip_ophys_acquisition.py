@@ -340,7 +340,7 @@ acquisition = Acquisition(
         "Bryan MacLennan",
         "Kenta Hagihara",
     ],
-    subject_name="687582",
+    subject_names={"687582"},
     acquisition_start_time=t_start,
     acquisition_end_time=t_end,
     acquisition_type="Pavlovian Conditioning",

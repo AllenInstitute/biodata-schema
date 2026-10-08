@@ -554,6 +554,11 @@ class TestProcedures:
         expected_exception = "specimen_name must be an extension of the subject_name."
         assert expected_exception in str(e.value)
 
+    def test_rejects_plural_subject_names_for_one_object(self):
+        """Procedures uses its canonical singular owner field only."""
+        with pytest.raises(ValidationError, match="subject_name"):
+            Procedures(subject_names={"12345", "67890"})
+
     def test_validate_subject_specimen_name_list_valid(self):
         """Test that specimen_name accepts a list of strings when all contain subject_name"""
 

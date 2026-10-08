@@ -16844,7 +16844,7 @@
          "type": "string"
       },
       "subject_name": {
-         "description": "Unique name for the subject of data acquisition",
+         "description": "Unique name for the subject associated with these procedures",
          "title": "Subject name",
          "type": "string"
       },

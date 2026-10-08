@@ -16,9 +16,9 @@ to easily query and index the data.
 | `name` | `str` | Data Asset Name (Name of the data asset.) |
 | `location` | `str` | Location (Current location of the data asset.) |
 | `other_identifiers` | Optional[Dict[[Database](components/identifiers.md#database), List[str]]] | Other identifiers (Links to the data asset on secondary platforms.) |
-| `subject` | Optional[[Subject](subject.md#subject)] | Subject (Subject of data collection.) |
+| `subjects` | Optional[List[[Subject](subject.md#subject)]] | Subjects (Subject(s) of data collection.) |
 | `data_description` | Optional[[DataDescription](data_description.md#datadescription)] | Data Description (A logical collection of data files.) |
-| `procedures` | Optional[[Procedures](procedures.md#procedures)] | Procedures (All procedures performed on a subject.) |
+| `procedures` | Optional[List[[Procedures](procedures.md#procedures)]] | Procedures (Procedures performed on each subject in this asset.) |
 | `instrument` | Optional[[Instrument](instrument.md#instrument)] | Instrument (Devices used to acquire data.) |
 | `processing` | Optional[[Processing](processing.md#processing)] | Processing (All processes run on data.) |
 | `acquisition` | Optional[[Acquisition](acquisition.md#acquisition)] | Acquisition (Data acquisition) |

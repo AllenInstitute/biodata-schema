@@ -68,7 +68,7 @@ class TestAcquisition:
         end = datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
         with pytest.raises(ValidationError) as context:
             Acquisition(
-                subject_name="123456",
+                subject_names={"123456"},
                 acquisition_start_time=start,
                 acquisition_end_time=end,
                 acquisition_type="Test",
@@ -108,6 +108,14 @@ class TestAcquisition:
             acq.specimen_name = ["123456_slide1", "654321_slide2"]
             Acquisition.model_validate_json(acq.model_dump_json())
         assert "Expected 123456 to appear in 654321_slide2" in str(context.value)
+
+    def test_specimen_name_mismatch_for_multiple_subjects(self):
+        """Report the candidate roster when a specimen matches no subject."""
+        acquisition = exaspim_acquisition.model_copy(
+            update={"subject_names": {"123456", "789012"}, "specimen_name": "654321_slide1"}
+        )
+        with pytest.raises(ValueError, match="Expected one of .* to appear in 654321_slide1"):
+            Acquisition.model_validate_json(acquisition.model_dump_json())
 
     def test_specimen_required(self):
         """Test that specimen name is required for in vitro imaging modalities"""
@@ -150,7 +158,7 @@ class TestAcquisition:
                 experimenters=["Mam Moth"],
                 acquisition_start_time=datetime.now(),
                 acquisition_end_time=datetime.now(),
-                subject_name="123456",
+                subject_names={"123456"},
                 acquisition_type="Test",
                 instrument_name="1234",
                 subject_details=AcquisitionSubjectDetails(
@@ -186,7 +194,7 @@ class TestAcquisition:
             experimenters=["Mam Moth"],
             acquisition_start_time=datetime.now(),
             acquisition_end_time=datetime.now(),
-            subject_name="123456",
+            subject_names={"123456"},
             specimen_name="SP123456",
             acquisition_type="Test",
             instrument_name="1234",

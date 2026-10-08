@@ -45,7 +45,7 @@ def _make_metadata(subject_name="123456"):
     _counter += 1
     dd = DataDescription(
         modalities=[Modality.ECEPHYS],
-        subject_name=subject_name,
+        subject_names={subject_name},
         creation_time=datetime(2022, 2, 21, 16, 30, _counter, tzinfo=timezone.utc),
         institution=Organization.AIND,
         investigators=[Person(name="Jane Smith")],
@@ -58,7 +58,7 @@ def _make_metadata(subject_name="123456"):
     return Metadata(
         name=dd.name,
         location=f"s3://bucket/{dd.name}",
-        subject=sub,
+        subjects=[sub],
         data_description=dd,
         processing=example_processing,
         quality_control=example_qc,
@@ -130,8 +130,8 @@ class TestFromMetadataSingleSource:
             process_name="my-analysis",
             location="s3://bucket/derived",
         )
-        assert result.subject is not None
-        assert result.subject.subject_name == "123456"
+        assert result.subjects is not None
+        assert result.subjects[0].subject_name == "123456"
 
     def test_single_source_data_description_is_derived(self):
         """Data description should be updated to data level DERIVED and name should include process name"""
@@ -205,8 +205,8 @@ class TestFromMetadataMultipleSameSubject:
             process_name="merge",
             location="s3://bucket/derived",
         )
-        assert result.subject is not None
-        assert result.subject.subject_name == "123456"
+        assert result.subjects is not None
+        assert result.subjects[0].subject_name == "123456"
 
     def test_different_acquisitions_drops_instrument_and_acquisition(self):
         """Instrument and acquisition should be dropped when sources have different acquisitions"""
@@ -305,7 +305,8 @@ class TestFromMetadataDifferentSubjects:
             location="s3://bucket/derived",
             new_processing=new_proc,
         )
-        assert result.subject is None
+        assert result.subjects is None
+        assert result.data_description.subject_names is None
 
     def test_different_subjects_drops_procedures(self):
         """Procedures should be dropped when sources have different subjects"""
@@ -329,6 +330,33 @@ class TestFromMetadataDifferentSubjects:
             new_processing=new_proc,
         )
         assert result.procedures is None
+
+    def test_repeated_multi_subject_rosters_are_dropped_when_pooling(self):
+        """Pooling assets with the same multi-subject roster still drops subject metadata."""
+        subject2 = self.source1.subjects[0].model_copy(update={"subject_name": "789012"})
+        roster = [self.source1.subjects[0], subject2]
+        subject_names = {subject.subject_name for subject in roster}
+        sources = []
+        for source in (self.source1, self.source2):
+            description = source.data_description.model_copy(update={"subject_names": subject_names})
+            sources.append(
+                source.model_copy(
+                    update={
+                        "subjects": roster,
+                        "data_description": description,
+                    }
+                )
+            )
+
+        result = Metadata.from_metadata(
+            sources,
+            process_name="pool",
+            location="s3://bucket/pooled",
+            new_processing=example_processing,
+        )
+
+        assert result.subjects is None
+        assert result.data_description.subject_names is None
 
 
 class TestFromMetadataEdgeCases:
@@ -384,13 +412,13 @@ class TestInternalHelpers:
 
     def test_get_unique_subject_names_from_data_description(self):
         """_get_unique_subject_names should extract subject name from data_description when subject is None"""
-        no_subject = self.source.model_copy(update={"subject": None})
+        no_subject = self.source.model_copy(update={"subjects": None})
         subject_names = _get_unique_subject_names([no_subject])
         assert subject_names == ["123456"]
 
     def test_inherit_subject_and_procedures_returns_none_when_no_subject_or_procedures(self):
         """_inherit_subject_and_procedures should return None when source has neither subject nor procedures"""
-        no_subject = self.source.model_copy(update={"subject": None, "procedures": None})
+        no_subject = self.source.model_copy(update={"subjects": None, "procedures": None})
         subject, procedures = _inherit_subject_and_procedures([no_subject])
         assert subject is None
         assert procedures is None

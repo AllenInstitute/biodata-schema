@@ -44,7 +44,7 @@ class TestDataDescription:
             data_level=DataLevel.RAW,
             funding_source=[f],
             modalities=[Modality.ECEPHYS],
-            subject_name="12345",
+            subject_names={"12345"},
             investigators=[Person(name="Jane Smith")],
             project_name="Test",
         )
@@ -65,7 +65,7 @@ class TestDataDescription:
         with pytest.raises(ValueError):
             DataDescription(
                 modalities=[Modality.SPIM],
-                subject_name="1234",
+                subject_names={"1234"},
                 data_level=DataLevel.RAW,
                 creation_time=dt,
                 institution=Organization.AIND,
@@ -84,7 +84,7 @@ class TestDataDescription:
             data_level=DataLevel.RAW,
             funding_source=[f],
             modalities=[Modality.ECEPHYS],
-            subject_name="12345",
+            subject_names={"12345"},
             investigators=[Person(name="Jane Smith")],
             project_name="Test",
         )
@@ -101,7 +101,7 @@ class TestDataDescription:
             data_level=DataLevel.RAW,
             funding_source=[f],
             modalities=[Modality.ECEPHYS],
-            subject_name="12345",
+            subject_names={"12345"},
             investigators=[Person(name="Jane Smith")],
             project_name="Test",
         )
@@ -116,7 +116,7 @@ class TestDataDescription:
         f = Funding(funder=Organization.NINDS, grant_number="grant001")
         dd = DataDescription(
             modalities=[Modality.SPIM],
-            subject_name="1234",
+            subject_names={"1234"},
             data_level=DataLevel.RAW,
             creation_time=dt,
             institution=Organization.AIND,
@@ -126,6 +126,25 @@ class TestDataDescription:
         )
         assert dd is not None
 
+    def test_raw_name_requires_explicit_name_for_multiple_subjects(self):
+        """A raw asset with several subjects cannot derive one canonical asset name."""
+        with pytest.raises(ValueError, match="name must be set explicitly"):
+            DataDescription(
+                modalities=[Modality.SPIM],
+                subject_names={"1234", "5678"},
+                data_level=DataLevel.RAW,
+                creation_time=datetime.datetime(2022, 10, 12, 23, 23, 11),
+                institution=Organization.AIND,
+                funding_source=[Funding(funder=Organization.NINDS, grant_number="grant001")],
+                investigators=[Person(name="Jane Smith")],
+                project_name="Test",
+            )
+
+    def test_build_name_returns_when_constructed_without_subject_names(self):
+        """The name builder tolerates partially constructed raw descriptions."""
+        description = DataDescription.model_construct(name=None, data_level=DataLevel.RAW, subject_names=None)
+        assert description.build_name() is description
+
     def test_data_description_construction_failure(self):
         """Test DataDescription construction failure"""
         dt = datetime.datetime.now()
@@ -133,7 +152,7 @@ class TestDataDescription:
         with pytest.raises(ValidationError):
             DataDescription(
                 modalities=[Modality.SPIM],
-                subject_name="",
+                subject_names={""},
                 data_level=DataLevel.RAW,
                 creation_time=dt,
                 institution=Organization.AIND,
@@ -156,7 +175,7 @@ class TestDataDescription:
         f = Funding(funder=Organization.NINDS, grant_number="grant001")
         dr = DataDescription(
             modalities=[Modality.SPIM],
-            subject_name="1234",
+            subject_names={"1234"},
             data_level=DataLevel.RAW,
             creation_time=dt,
             institution=Organization.AIND,
@@ -166,7 +185,7 @@ class TestDataDescription:
         )
 
         # also over-write with a subject name
-        dd = derive_data_description_from_raw(dr, "process", subject_name="1234-56")
+        dd = derive_data_description_from_raw(dr, "process", subject_names={"1234-56"})
         assert dd is not None
 
     def test_raw_no_subject_name(self):
@@ -196,7 +215,7 @@ class TestDataDescription:
             data_level=DataLevel.RAW,
             funding_source=[Funding(funder=Organization.NINDS, grant_number="grant001")],
             modalities=[Modality.ECEPHYS],
-            subject_name="12345",
+            subject_names={"12345"},
             investigators=[Person(name="Jane Smith")],
             project_name="Test",
         )
@@ -216,7 +235,7 @@ class TestDataDescription:
         with pytest.raises(ValidationError) as e:
             DataDescription(
                 modalities=[Modality.SPIM],
-                subject_name="1234",
+                subject_names={"1234"},
                 data_level=DataLevel.RAW,
                 project_name="a_32r&!#R$&#",
                 creation_time=datetime.datetime(2020, 10, 10, 10, 10, 10),
@@ -245,7 +264,7 @@ class TestDataDescription:
             data_level=DataLevel.RAW,
             funding_source=[Funding(funder=Organization.NINDS, grant_number="grant001")],
             modalities=[Modality.SPIM],
-            subject_name="12345",
+            subject_names={"12345"},
             investigators=[Person(name="Jane Smith")],
             project_name="Test",
         )
@@ -289,7 +308,7 @@ class TestDataDescription:
         with pytest.raises(ValueError) as context:
             DataDescription(
                 modalities=[Modality.SPIM],
-                subject_name="1234",
+                subject_names={"1234"},
                 data_level=DataLevel.RAW,
                 creation_time=datetime.datetime.now(),
                 institution=Organization.AIND,
@@ -309,7 +328,7 @@ class TestDataDescription:
             data_level=DataLevel.RAW,
             funding_source=[f],
             modalities=[Modality.ECEPHYS],
-            subject_name="12345",
+            subject_names={"12345"},
             investigators=[Person(name="Jane Smith")],
             project_name="Test",
         )
@@ -330,7 +349,7 @@ class TestDataDescription:
             data_level=DataLevel.RAW,
             funding_source=[f],
             modalities=[Modality.ECEPHYS],
-            subject_name="12345",
+            subject_names={"12345"},
             investigators=[Person(name="Jane Smith")],
             project_name="Test",
         )
@@ -366,7 +385,7 @@ class TestDataDescription:
             data_level=DataLevel.RAW,
             funding_source=[f],
             modalities=[Modality.ECEPHYS],
-            subject_name="12345",
+            subject_names={"12345"},
             investigators=[Person(name="Jane Smith")],
             project_name="Test",
         )

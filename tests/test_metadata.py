@@ -84,7 +84,7 @@ class TestMetadata:
         )
         dd = DataDescription(
             modalities=[Modality.ECEPHYS],
-            subject_name="123456",
+            subject_names={"123456"},
             data_level="raw",
             creation_time=datetime(2022, 11, 22, 8, 43, 00, tzinfo=timezone.utc),
             institution=Organization.AIND,
@@ -142,11 +142,11 @@ class TestMetadata:
                 data_description=DataDescription.model_construct(
                     creation_time=datetime(2020, 12, 12, 12, 12, 12),
                     modalities=[Modality.SPIM],
-                    subject_name="655019",
+                    subject_names={"655019"},
                     data_level="raw",
                 ),
-                subject=subject,
-                procedures=Procedures.model_construct(subject_procedures=[surgery2]),
+                subjects=[subject],
+                procedures=[Procedures.model_construct(subject_procedures=[surgery2])],
                 acquisition=Acquisition.model_construct(
                     acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
                     subject_details=AcquisitionSubjectDetails.model_construct(),
@@ -170,11 +170,11 @@ class TestMetadata:
                 data_description=DataDescription.model_construct(
                     creation_time=datetime(2020, 12, 12, 12, 12, 12),
                     modalities=modalities,
-                    subject_name="655019",
+                    subject_names={"655019"},
                     data_level="raw",
                 ),
-                subject=subject,
-                procedures=Procedures.model_construct(subject_procedures=[surgery2]),
+                subjects=[subject],
+                procedures=[Procedures.model_construct(subject_procedures=[surgery2])],
                 instrument=ephys_inst,
                 processing=Processing.model_construct(),
                 acquisition=Acquisition.model_construct(
@@ -202,11 +202,11 @@ class TestMetadata:
                 data_description=DataDescription.model_construct(
                     creation_time=datetime(2020, 12, 12, 12, 12, 12),
                     modalities=modalities,
-                    subject_name="655019",
+                    subject_names={"655019"},
                     data_level="raw",
                 ),
-                subject=subject,
-                procedures=Procedures.model_construct(),
+                subjects=[subject],
+                procedures=[Procedures.model_construct()],
                 instrument=inst,
                 processing=Processing.model_construct(),
                 acquisition=Acquisition.model_construct(
@@ -226,7 +226,7 @@ class TestMetadata:
             name="name",
             location="location",
             id="1",
-            subject=subject,
+            subjects=[subject],
         )
 
         m_dict = m.model_dump()
@@ -240,9 +240,9 @@ class TestMetadata:
     def test_create_from_core_jsons(self):
         """Tests metadata json can be created with valid inputs"""
         core_jsons = {
-            "subject": self.subject_json,
+            "subjects": [self.subject_json],
             "data_description": self.dd_json,
-            "procedures": self.procedures_json,
+            "procedures": [self.procedures_json],
             "instrument": None,
             "processing": self.processing_json,
             "acquisition": None,
@@ -252,8 +252,8 @@ class TestMetadata:
             name=self.sample_name,
             location=self.sample_location,
             data_description=self.dd,
-            subject=self.subject,
-            procedures=self.procedures,
+            subjects=[self.subject],
+            procedures=[self.procedures],
             processing=self.processing,
         )
         expected_result = json.loads(expected_md.model_dump_json(by_alias=True))
@@ -265,8 +265,8 @@ class TestMetadata:
         # check that metadata was created with expected values
         assert self.sample_name == result["name"]
         assert self.sample_location == result["location"]
-        assert self.subject_json == result["subject"]
-        assert self.procedures_json == result["procedures"]
+        assert [self.subject_json] == result["subjects"]
+        assert [self.procedures_json] == result["procedures"]
         assert self.processing_json == result["processing"]
         assert result["acquisition"] is None
         # also check the other fields
@@ -278,36 +278,36 @@ class TestMetadata:
             name=self.sample_name,
             location=self.sample_location,
             data_description=self.dd,
-            subject=self.subject,
-            procedures=self.procedures,
+            subjects=[self.subject],
+            procedures=[self.procedures],
             processing=self.processing,
         )
-        with pytest.raises(ValidationError, match="procedures.subject_name=999"):
+        with pytest.raises(ValidationError, match="procedures.subject_name=.*999"):
             Metadata(
                 name=self.sample_name,
                 location=self.sample_location,
                 data_description=self.dd,
-                subject=self.subject,
-                procedures=self.procedures.model_copy(update={"subject_name": "999"}),
+                subjects=[self.subject],
+                procedures=[Procedures(subject_name="999")],
                 processing=self.processing,
             )
-        with pytest.raises(ValidationError, match="data_description.subject_name=999"):
+        with pytest.raises(ValidationError, match="data_description.subject_names=.*999"):
             Metadata(
                 name=self.sample_name,
                 location=self.sample_location,
-                data_description=self.dd.model_copy(update={"subject_name": "999"}),
-                subject=self.subject,
-                procedures=self.procedures,
+                data_description=self.dd.model_copy(update={"subject_names": {"999"}}),
+                subjects=[self.subject],
+                procedures=[self.procedures],
                 processing=self.processing,
             )
-        with pytest.raises(ValidationError, match="acquisition.subject_name=999"):
+        with pytest.raises(ValidationError, match="acquisition.subject_names=.*999"):
             Metadata(
                 name=self.sample_name,
                 location=self.sample_location,
-                subject=self.subject,
+                subjects=[self.subject],
                 acquisition=Acquisition.model_construct(
                     acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
-                    subject_name="999",
+                    subject_names={"999"},
                     subject_details=AcquisitionSubjectDetails.model_construct(),
                     data_streams=[],
                 ),
@@ -316,9 +316,9 @@ class TestMetadata:
     def test_create_from_core_jsons_invalid(self):
         """Tests metadata json creation with invalid inputs"""
         core_jsons = {
-            "subject": self.subject_json,
+            "subjects": [self.subject_json],
             "data_description": None,
-            "procedures": self.procedures_json,
+            "procedures": [self.procedures_json],
             "instrument": Instrument.model_construct().model_dump(),
             "processing": Processing.model_construct().model_dump(),
             "acquisition": None,
@@ -341,7 +341,7 @@ class TestMetadata:
             name=self.sample_name,
             location=self.sample_location,
             core_jsons={
-                "subject": self.subject_json,
+                "subjects": [self.subject_json],
             },
             other_identifiers=other_identifiers,
         )
@@ -356,7 +356,7 @@ class TestMetadata:
             Metadata(
                 name="655019_2023-04-03T181709",
                 location="bucket",
-                subject=self.subject,
+                subjects=[self.subject],
                 # Missing required files: data_description, procedures, instrument, acquisition
             )
 
@@ -373,7 +373,7 @@ class TestMetadata:
                 location="bucket",
                 # No subject, processing, or model - should trigger validation error
             )
-        assert "Metadata must contain at least one of the following files: subject, processing, model" in str(
+        assert "Metadata must contain at least one of the following files: subjects, processing, model" in str(
             context.value
         )
 
@@ -384,7 +384,7 @@ class TestMetadata:
             Metadata(
                 name="655019_2023-04-03T181709",
                 location="bucket",
-                subject=subject,
+                subjects=[subject],
                 acquisition=barseq_acquisition,
             )
         instrument_warnings = [str(warning.message) for warning in w if "instrument" in str(warning.message)]
@@ -412,7 +412,7 @@ class TestMetadata:
         metadata = Metadata(
             name="Test Metadata",
             location="Test Location",
-            subject=subject,
+            subjects=[subject],
             instrument=instrument,
             acquisition=acquisition,
         )
@@ -436,7 +436,7 @@ class TestMetadata:
             Metadata(
                 name="Test Metadata",
                 location="Test Location",
-                subject=subject,
+                subjects=[subject],
                 instrument=instrument,
                 acquisition=acquisition,
             )
@@ -460,7 +460,7 @@ class TestMetadata:
             Metadata(
                 name="Test Metadata",
                 location="Test Location",
-                subject=subject,
+                subjects=[subject],
                 instrument=instrument,
                 acquisition=acquisition_missing_source,
             )
@@ -488,7 +488,7 @@ class TestMetadata:
         metadata = Metadata(
             name="Test Metadata",
             location="Test Location",
-            subject=subject,
+            subjects=[subject],
             instrument=instrument,
             acquisition=acquisition,
         )
@@ -509,7 +509,7 @@ class TestMetadata:
             Metadata(
                 name="Test Metadata",
                 location="Test Location",
-                subject=subject,
+                subjects=[subject],
                 instrument=instrument,
                 acquisition=acquisition,
             )
@@ -536,8 +536,8 @@ class TestMetadata:
         metadata = Metadata(
             name="Test Metadata",
             location="Test Location",
-            subject=subject,
-            procedures=procedures,
+            subjects=[subject],
+            procedures=[procedures],
             acquisition=acquisition,
         )
         assert metadata is not None
@@ -556,8 +556,8 @@ class TestMetadata:
             metadata = Metadata(
                 name="Test Metadata",
                 location="Test Location",
-                subject=subject,
-                procedures=procedures,
+                subjects=[subject],
+                procedures=[procedures],
                 acquisition=acquisition_invalid,
             )
 
@@ -574,8 +574,8 @@ class TestMetadata:
             metadata = Metadata(
                 name="Test Metadata",
                 location="Test Location",
-                subject=subject,
-                procedures=procedures_empty,
+                subjects=[subject],
+                procedures=[procedures_empty],
                 acquisition=acquisition_invalid,
             )
 
@@ -598,8 +598,8 @@ class TestMetadata:
         metadata_none = Metadata(
             name="Test Metadata",
             location="Test Location",
-            subject=subject,
-            procedures=procedures,
+            subjects=[subject],
+            procedures=[procedures],
             acquisition=acquisition_none,
         )
         assert metadata_none is not None
@@ -608,8 +608,8 @@ class TestMetadata:
         metadata_no_acquisition = Metadata(
             name="Test Metadata",
             location="Test Location",
-            subject=subject,
-            procedures=procedures,
+            subjects=[subject],
+            procedures=[procedures],
         )
         assert metadata_no_acquisition is not None
 
@@ -617,7 +617,7 @@ class TestMetadata:
         metadata_no_procedures = Metadata(
             name="Test Metadata",
             location="Test Location",
-            subject=subject,
+            subjects=[subject],
             acquisition=acquisition,
         )
         assert metadata_no_procedures is not None
@@ -633,7 +633,7 @@ class TestMetadata:
         data_description = DataDescription(
             creation_time=test_datetime,
             modalities=[Modality.ECEPHYS],
-            subject_name="123456",
+            subject_names={"123456"},
             data_level=DataLevel.RAW,
             institution=Organization.AIND,
             funding_source=[Funding(funder=Organization.NINDS)],
@@ -654,7 +654,7 @@ class TestMetadata:
         metadata_matching = Metadata(
             name="Test Metadata",
             location="Test Location",
-            subject=subject,
+            subjects=[subject],
             data_description=data_description,
             acquisition=acquisition,
         )
@@ -665,7 +665,7 @@ class TestMetadata:
         data_description_later = DataDescription(
             creation_time=later_same_day,
             modalities=[Modality.ECEPHYS],
-            subject_name="123456",
+            subject_names={"123456"},
             data_level=DataLevel.RAW,
             institution=Organization.AIND,
             funding_source=[Funding(funder=Organization.NINDS)],
@@ -676,7 +676,7 @@ class TestMetadata:
         metadata_later_same_day = Metadata(
             name="Test Metadata",
             location="Test Location",
-            subject=subject,
+            subjects=[subject],
             data_description=data_description_later,
             acquisition=acquisition,
         )
@@ -687,7 +687,7 @@ class TestMetadata:
         data_description_next_day = DataDescription(
             creation_time=next_day,
             modalities=[Modality.ECEPHYS],
-            subject_name="123456",
+            subject_names={"123456"},
             data_level=DataLevel.RAW,
             institution=Organization.AIND,
             funding_source=[Funding(funder=Organization.NINDS)],
@@ -698,7 +698,7 @@ class TestMetadata:
         metadata_next_day = Metadata(
             name="Test Metadata",
             location="Test Location",
-            subject=subject,
+            subjects=[subject],
             data_description=data_description_next_day,
             acquisition=acquisition,
         )
@@ -709,7 +709,7 @@ class TestMetadata:
         data_description_before = DataDescription(
             creation_time=before_midnight,
             modalities=[Modality.ECEPHYS],
-            subject_name="123456",
+            subject_names={"123456"},
             data_level=DataLevel.RAW,
             institution=Organization.AIND,
             funding_source=[Funding(funder=Organization.NINDS)],
@@ -723,7 +723,7 @@ class TestMetadata:
             metadata_with_warning = Metadata(
                 name="Test Metadata",
                 location="Test Location",
-                subject=subject,
+                subjects=[subject],
                 data_description=data_description_before,
                 acquisition=acquisition,
             )
@@ -741,7 +741,7 @@ class TestMetadata:
         metadata_no_data_desc = Metadata(
             name="Test Metadata",
             location="Test Location",
-            subject=subject,
+            subjects=[subject],
             acquisition=acquisition,
         )
         assert metadata_no_data_desc is not None
@@ -750,7 +750,7 @@ class TestMetadata:
         metadata_no_acquisition = Metadata(
             name="Test Metadata",
             location="Test Location",
-            subject=subject,
+            subjects=[subject],
             data_description=data_description,
         )
         assert metadata_no_acquisition is not None
@@ -795,7 +795,7 @@ class TestMetadata:
         metadata_valid_birth = Metadata(
             name="Test Metadata",
             location="Test Location",
-            subject=valid_subject,
+            subjects=[valid_subject],
             acquisition=acquisition,
         )
         assert metadata_valid_birth is not None
@@ -826,7 +826,7 @@ class TestMetadata:
             Metadata(
                 name="Test Metadata",
                 location="Test Location",
-                subject=invalid_subject,
+                subjects=[invalid_subject],
                 acquisition=acquisition,
             )
         assert "must be before" in str(context.value)
@@ -920,7 +920,7 @@ class TestMetadata:
             Metadata(
                 name="Test Metadata",
                 location="Test Location",
-                subject=calibration_subject,
+                subjects=[calibration_subject],
                 data_description=data_description,
             )
 
@@ -928,10 +928,87 @@ class TestMetadata:
         metadata = Metadata(
             name="Test Metadata",
             location="Test Location",
-            subject=calibration_subject,
-            data_description=data_description.model_copy(update={"subject_name": "calibration"}),
+            subjects=[calibration_subject],
+            data_description=data_description.model_copy(update={"subject_names": {"calibration"}}),
         )
         assert metadata is not None
+
+    def test_metadata_supports_multiple_subjects(self):
+        """Metadata serializes a unique subject roster and checks the data-description roster."""
+        second_subject = self.subject.model_copy(update={"subject_name": "789012"})
+        subject_names = {self.subject.subject_name, second_subject.subject_name}
+        metadata = Metadata(
+            name="multi-subject-asset",
+            location="s3://bucket/multi-subject-asset",
+            subjects=[self.subject, second_subject],
+            data_description=self.dd.model_copy(update={"subject_names": subject_names}),
+            procedures=[
+                self.procedures,
+                self.procedures.model_copy(update={"subject_name": "789012"}),
+            ],
+            acquisition=Acquisition.model_construct(
+                subject_names=subject_names,
+                specimen_name="789012-001",
+                acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
+                data_streams=[],
+            ),
+        )
+
+        assert {subject.subject_name for subject in metadata.subjects} == subject_names
+        assert set(metadata.model_dump()["data_description"]["subject_names"]) == subject_names
+        assert len(metadata.model_dump()["subjects"]) == 2
+        assert {procedure.subject_name for procedure in metadata.procedures} == subject_names
+
+        with pytest.raises(ValidationError, match="unique subject_name"):
+            Metadata(
+                name="duplicate-subjects",
+                location="s3://bucket/duplicate-subjects",
+                subjects=[self.subject, self.subject.model_copy()],
+            )
+        with pytest.raises(ValidationError):
+            Metadata(name="empty-subjects", location="s3://bucket/empty", subjects=[])
+        with pytest.raises(ValidationError, match="at most one object per subject_name"):
+            Metadata(
+                name="duplicate-procedures",
+                location="s3://bucket/duplicate-procedures",
+                subjects=[self.subject],
+                procedures=[self.procedures, self.procedures.model_copy()],
+            )
+
+    def test_legacy_subject_is_not_normalized(self):
+        """A singular legacy subject field is not mapped into the current roster."""
+        metadata = Metadata.model_validate(
+            {
+                "name": "legacy-subject",
+                "location": "s3://bucket/legacy-subject",
+                "subject": self.subject_json,
+                "processing": self.processing,
+            }
+        )
+        assert metadata.subjects is None
+
+    def test_scalar_procedures_is_not_normalized(self):
+        """Procedures must be provided as a collection, even when there is one."""
+        with pytest.raises(ValidationError):
+            Metadata(
+                name="scalar-procedures",
+                location="s3://bucket/scalar-procedures",
+                processing=self.processing,
+                procedures=self.procedures,
+            )
+
+    def test_invalid_subject_item_uses_permissive_core_fallback(self, caplog):
+        """Keep partially valid core items available when nested validation fails."""
+        metadata = Metadata(
+            name="partial-subject",
+            location="s3://bucket/partial-subject",
+            subjects=[{"subject_name": "123456", "subject_details": {}}],
+            processing=self.processing,
+        )
+
+        assert metadata.subjects[0].subject_name == "123456"
+        assert metadata.subjects[0].subject_details == {}
+        assert "Error in validating subject" in caplog.text
 
     def test_validate_subject_details_if_not_specimen(self):
         """Tests that subject details are required if acquisition.specimen_name is not provided"""
@@ -940,14 +1017,14 @@ class TestMetadata:
         acquisition_with_specimen = Acquisition.model_construct(
             instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
-            subject_name="123456",
+            subject_names={"123456"},
             specimen_name="123456-001",
             data_streams=[],
         )
         metadata_with_specimen = Metadata(
             name="Test Metadata",
             location="Test Location",
-            subject=subject,
+            subjects=[subject],
             acquisition=acquisition_with_specimen,
         )
         assert metadata_with_specimen is not None
@@ -956,21 +1033,21 @@ class TestMetadata:
         acquisition_with_details = Acquisition.model_construct(
             instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
-            subject_name="123456",
+            subject_names={"123456"},
             data_streams=[],
             subject_details=AcquisitionSubjectDetails.model_construct(),
         )
         metadata_with_details = Metadata(
             name="Test Metadata",
             location="Test Location",
-            subject=subject,
+            subjects=[subject],
             acquisition=acquisition_with_details,
         )
         assert metadata_with_details is not None
 
         # Case where neither specimen_name nor subject_details is provided - should fail
         acquisition_missing_both = Acquisition.model_construct(
-            subject_name="123456",
+            subject_names={"123456"},
             instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             data_streams=[],
@@ -979,7 +1056,7 @@ class TestMetadata:
             Metadata(
                 name="Test Metadata",
                 location="Test Location",
-                subject=subject,
+                subjects=[subject],
                 acquisition=acquisition_missing_both,
             )
         assert "Acquisition.subject_details are required for in vivo experiments" in str(context.value)
@@ -995,7 +1072,11 @@ class TestWriteStandardFiles:
         m = Metadata.model_construct(
             name="test",
             location="s3://bucket/test",
-            subject=subject,
+            subjects=[subject],
+            procedures=[
+                Procedures.model_construct(subject_name="123456"),
+                Procedures.model_construct(subject_name="789012"),
+            ],
             data_description=data_description,
             processing=processing_example,
             quality_control=quality_control_example,
@@ -1003,11 +1084,13 @@ class TestWriteStandardFiles:
         m.write_standard_files()
 
         opened_files = [call_args[0][0].name for call_args in mock_open_fn.call_args_list]
-        assert "subject.json" in opened_files
+        assert "subject_123456.json" in opened_files
+        assert "procedures_123456.json" in opened_files
+        assert "procedures_789012.json" in opened_files
         assert "data_description.json" in opened_files
         assert "processing.json" in opened_files
         assert "quality_control.json" in opened_files
-        assert 4 == mock_open_fn.call_count
+        assert 6 == mock_open_fn.call_count
 
     @patch.object(Path, "open", autospec=True)
     @patch("biodata_schema.utils.validators.recursive_check_paths")
@@ -1031,11 +1114,11 @@ class TestWriteStandardFiles:
         m = Metadata.model_construct(
             name="test",
             location="s3://bucket/test",
-            subject=subject,
+            subjects=[subject],
             model=model_example,
         )
         m.write_standard_files(output_directory=Path("output_dir"))
 
         opened_files = [call_args[0][0] for call_args in mock_open_fn.call_args_list]
-        assert Path("output_dir/subject.json") in opened_files
+        assert Path("output_dir/subject_123456.json") in opened_files
         assert Path("output_dir/model.json") in opened_files
