@@ -74,18 +74,6 @@ class Procedures(DataCoreModel):
         return list(device_names)
 
     @model_validator(mode="after")
-    def reject_injections(self):
-        """Reject bare injections since they must be wrapped
-        in a Surgery or NonSurgicalInjection procedure
-        """
-
-        for procedure in self.subject_procedures:
-            if isinstance(procedure, Injection):
-                raise ValueError("Injection procedures must be wrapped in a Surgery or NonSurgicalInjection procedure.")
-
-        return self
-
-    @model_validator(mode="after")
     def validate_subject_specimen_names(self):
         """Validate that the subject_name and specimen_name match"""
 
