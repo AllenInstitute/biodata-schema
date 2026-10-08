@@ -1,11 +1,17 @@
-"""schema for mostly mouse metadata"""
+"""schema for subject metadata"""
 
-from typing import Literal, Optional
+from typing import Annotated, Literal, Optional
 
 from pydantic import Field, SkipValidation
 
-from biodata_schema.base import DataCoreModel, Discriminated
-from biodata_schema.components.subjects import CalibrationObject, HumanSubject, MouseSubject, NonHumanPrimateSubject
+from biodata_schema.base import DataCoreModel, Discriminated, DraftRequirement
+from biodata_schema.components.subjects import (
+    CalibrationObject,
+    CellLine,
+    HumanSubject,
+    MouseSubject,
+    NonHumanPrimateSubject,
+)
 
 
 class Subject(DataCoreModel):
@@ -14,14 +20,14 @@ class Subject(DataCoreModel):
     _DESCRIBED_BY_URL = DataCoreModel._DESCRIBED_BY_BASE_URL.default + "biodata_schema/core/subject.py"
     describedBy: str = Field(default=_DESCRIBED_BY_URL, json_schema_extra={"const": _DESCRIBED_BY_URL})
     schema_version: SkipValidation[Literal["3.0.2"]] = Field(default="3.0.2")
-    subject_id: str = Field(
+    subject_id: Annotated[str, DraftRequirement] = Field(
         ...,
         description="Unique identifier for the subject of data acquisition",
         title="Subject ID",
     )
 
-    subject_details: Discriminated[MouseSubject | HumanSubject | NonHumanPrimateSubject | CalibrationObject] = Field(
-        ..., title="Subject Details"
-    )
+    subject_details: Discriminated[
+        MouseSubject | HumanSubject | NonHumanPrimateSubject | CellLine | CalibrationObject
+    ] = Field(..., title="Subject Details")
 
     notes: Optional[str] = Field(default=None, title="Notes")

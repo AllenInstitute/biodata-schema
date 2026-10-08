@@ -5,7 +5,7 @@ import json
 import logging
 import warnings
 from pathlib import Path
-from typing import Dict, List, Literal, Optional, Union, get_args
+from typing import Annotated, Dict, List, Literal, Optional, Union, get_args
 
 from biodata_models.modalities import Modality
 from pydantic import (
@@ -19,7 +19,7 @@ from pydantic import (
     model_validator,
 )
 
-from biodata_schema.base import DataCoreModel
+from biodata_schema.base import DataCoreModel, DraftRequirement
 from biodata_schema.components.identifiers import DatabaseIdentifiers
 from biodata_schema.components.subject_procedures import TrainingProtocol
 from biodata_schema.components.subjects import CalibrationObject
@@ -80,7 +80,7 @@ class Metadata(DataCoreModel):
         description="Name of the data asset.",
         title="Data Asset Name",
     )
-    location: str = Field(
+    location: Annotated[str, DraftRequirement] = Field(
         ...,
         title="Location",
         description="Current location of the data asset.",
@@ -297,6 +297,31 @@ class Metadata(DataCoreModel):
         return self
 
     @model_validator(mode="after")
+    def validate_subject_id_consistency(self):
+        """Validator to ensure procedures, acquisition, and data_description subject_id match subject.subject_id"""
+
+        if not self.subject:
+            return self
+
+        expected = self.subject.subject_id
+        mismatches = []
+        # getattr guards against objects built with model_construct() that omit subject_id
+        procedures_subject_id = getattr(self.procedures, "subject_id", None)
+        if procedures_subject_id is not None and procedures_subject_id != expected:
+            mismatches.append(f"procedures.subject_id={procedures_subject_id}")
+        acquisition_subject_id = getattr(self.acquisition, "subject_id", None)
+        if acquisition_subject_id is not None and acquisition_subject_id != expected:
+            mismatches.append(f"acquisition.subject_id={acquisition_subject_id}")
+        data_description_subject_id = getattr(self.data_description, "subject_id", None)
+        if data_description_subject_id is not None and data_description_subject_id != expected:
+            mismatches.append(f"data_description.subject_id={data_description_subject_id}")
+
+        if mismatches:
+            raise ValueError(f"subject_id mismatch with subject.subject_id={expected}: {', '.join(mismatches)}")
+
+        return self
+
+    @model_validator(mode="after")
     def validate_training_protocol_references(self):
         """Validate that training_protocol_name in StimulusEpoch matches a TrainingProtocol in procedures"""
 
@@ -411,7 +436,7 @@ class Metadata(DataCoreModel):
         cls,
         metadata: "Union[Metadata, List[Metadata]]",
         process_name: str = "processed",
-        location: Optional[str] = None,
+        location: Optional[str] = "",
         new_processing: Optional[Processing] = None,
         new_quality_control: Optional[QualityControl] = None,
         **data_description_kwargs,
@@ -439,7 +464,8 @@ class Metadata(DataCoreModel):
             Shortened name for the process or pipeline that was run -
             used in creating name of derived asset. Defaults to 'processed'.
         location : Optional[str]
-            Location of the new derived data asset.
+            Location of the new derived data asset. Defaults to an empty string
+            when unknown.
         new_processing : Optional[Processing]
             New processing performed to create this derived asset.
         new_quality_control : Optional[QualityControl]
@@ -503,7 +529,7 @@ class Metadata(DataCoreModel):
 
         return cls(
             name=derived_dd.name,
-            location=location,
+            location="" if location is None else location,
             data_description=derived_dd,
             subject=subject,
             procedures=procedures,

@@ -1,9 +1,19 @@
 """test Device models"""
 
+from unittest.mock import call, patch
+
 import pytest
+from biodata_models.anatomy import (
+    AnatomyModel,
+    MouseAnatomyLookup,
+    MouseBodyParts,
+    MouseEmgMuscles,
+    MouseGroundWireLocations,
+)
 from biodata_models.coordinates import AnatomicalRelative
 from biodata_models.harp_types import HarpDeviceType
 from biodata_models.organizations import Organization
+from biodata_models.registries import Registry
 from biodata_models.units import UnitlessUnit
 from pydantic import ValidationError
 
@@ -21,6 +31,8 @@ from biodata_schema.components.devices import (
     ImagingDeviceType,
     ImmersionMedium,
     Monitor,
+    MyomatrixContact,
+    MyomatrixThread,
     Objective,
 )
 from tests.coordinate_systems import BREGMA_ARI
@@ -28,6 +40,36 @@ from tests.coordinate_systems import BREGMA_ARI
 
 class TestDevice:
     """tests device schemas"""
+
+    @patch("biodata_models.anatomy.MouseAnatomyLookup.get_by_name")
+    def test_myomatrix_anatomy_target_lookups(self, mock_get_by_name):
+        """Common mouse EMG, body-part, and ground-wire targets use the v2 enums."""
+        mock_get_by_name.return_value = AnatomyModel(
+            name="test anatomy target",
+            registry=Registry.EMAPA,
+            registry_identifier="EMAPA:TEST",
+        )
+
+        contact = MyomatrixContact(
+            body_part=MouseAnatomyLookup.get_by_name(MouseBodyParts.FORELIMB),
+            relative_position=AnatomicalRelative.LEFT,
+            muscle=MouseAnatomyLookup.get_by_name(MouseEmgMuscles.DELTOID),
+            in_muscle=True,
+        )
+        thread = MyomatrixThread(
+            ground_electrode_location=MouseAnatomyLookup.get_by_name(MouseGroundWireLocations.BRAIN),
+            contacts=[contact],
+        )
+
+        assert thread.contacts[0].muscle.name == "test anatomy target"
+        mock_get_by_name.assert_has_calls(
+            [
+                call(MouseBodyParts.FORELIMB),
+                call(MouseEmgMuscles.DELTOID),
+                call(MouseGroundWireLocations.BRAIN),
+            ]
+        )
+        assert mock_get_by_name.call_count == 3
 
     def test_other_validators(self):
         """tests validators which require notes when an instance of 'other' is used"""

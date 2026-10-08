@@ -3,9 +3,9 @@
 from enum import Enum
 from typing import List, Optional
 
+from biodata_models.anatomy import AnatomyModel
 from biodata_models.atlas import AtlasName
 from biodata_models.coordinates import AxisName, Direction, Origin
-from biodata_models.mouse_anatomy import MouseAnatomyModel
 from biodata_models.units import AngleUnit, SizeUnit
 from pydantic import Field, field_validator
 
@@ -134,7 +134,7 @@ class CoordinateSystem(DataModel):
         ..., title="Name", description="Convention is to use <Origin>_<POS_X_DIR><POS_Y_DIR><POS_Z_DIR> etc"
     )
 
-    origin: Origin | MouseAnatomyModel = Field(
+    origin: Origin | AnatomyModel = Field(
         ..., title="Origin", description="Defines the position of (0,0,0) in the coordinate system"
     )
     axes: List[Axis] = Field(..., title="Axis names", description="Axis names and directions")
