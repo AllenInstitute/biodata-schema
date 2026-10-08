@@ -997,6 +997,19 @@ class TestMetadata:
                 procedures=self.procedures,
             )
 
+    def test_invalid_subject_item_uses_permissive_core_fallback(self, caplog):
+        """Keep partially valid core items available when nested validation fails."""
+        metadata = Metadata(
+            name="partial-subject",
+            location="s3://bucket/partial-subject",
+            subjects=[{"subject_name": "123456", "subject_details": {}}],
+            processing=self.processing,
+        )
+
+        assert metadata.subjects[0].subject_name == "123456"
+        assert metadata.subjects[0].subject_details == {}
+        assert "Error in validating subject" in caplog.text
+
     def test_validate_subject_details_if_not_specimen(self):
         """Tests that subject details are required if acquisition.specimen_name is not provided"""
 

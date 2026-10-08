@@ -126,6 +126,25 @@ class TestDataDescription:
         )
         assert dd is not None
 
+    def test_raw_name_requires_explicit_name_for_multiple_subjects(self):
+        """A raw asset with several subjects cannot derive one canonical asset name."""
+        with pytest.raises(ValueError, match="name must be set explicitly"):
+            DataDescription(
+                modalities=[Modality.SPIM],
+                subject_names={"1234", "5678"},
+                data_level=DataLevel.RAW,
+                creation_time=datetime.datetime(2022, 10, 12, 23, 23, 11),
+                institution=Organization.AIND,
+                funding_source=[Funding(funder=Organization.NINDS, grant_number="grant001")],
+                investigators=[Person(name="Jane Smith")],
+                project_name="Test",
+            )
+
+    def test_build_name_returns_when_constructed_without_subject_names(self):
+        """The name builder tolerates partially constructed raw descriptions."""
+        description = DataDescription.model_construct(name=None, data_level=DataLevel.RAW, subject_names=None)
+        assert description.build_name() is description
+
     def test_data_description_construction_failure(self):
         """Test DataDescription construction failure"""
         dt = datetime.datetime.now()
