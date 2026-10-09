@@ -13,7 +13,7 @@ from biodata_models.units import FrequencyUnit, PowerUnit
 from pydantic import ValidationError
 
 from biodata_schema.components.connections import Connection
-from biodata_schema.components.coordinates import CoordinateSystem
+from biodata_schema.components.coordinates import CoordinateSystem, Translation
 from biodata_schema.components.devices import (
     Camera,
     CameraAssembly,
@@ -352,7 +352,7 @@ class TestInstrument:
                 instrument_name="123_EPHYS1-OPTO_20220101",
                 modification_date=date(2020, 10, 10),
                 modalities=[Modality.ECEPHYS, Modality.FIB],
-                global_coordinate_system=BREGMA_ARI,
+                global_coordinate_system=CoordinateSystem.NotApplicable,
                 components=[
                     *daqs,
                     camera_no_target,
@@ -388,7 +388,7 @@ class TestInstrument:
             instrument_name="123_EPHYS1-OPTO_20220101",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.ECEPHYS, Modality.FIB],
-            global_coordinate_system=BREGMA_ARI,
+            global_coordinate_system=CoordinateSystem.NotApplicable,
             components=[
                 *daqs,
                 camera_no_target,
@@ -429,7 +429,7 @@ class TestInstrument:
                 instrument_name="123_EPHYS1-OPTO_20220101",
                 modification_date=date(2020, 10, 10),
                 modalities=[Modality.ECEPHYS, Modality.FIB],
-                global_coordinate_system=BREGMA_ARI,
+                global_coordinate_system=CoordinateSystem.NotApplicable,
                 components=[
                     *daqs,
                     *cameras,
@@ -469,7 +469,7 @@ class TestInstrument:
                 instrument_name="123_EPHYS1-OPTO_20220101",
                 modification_date=date(2020, 10, 10),
                 modalities=[Modality.ECEPHYS, Modality.FIB],
-                global_coordinate_system=BREGMA_ARI,
+                global_coordinate_system=CoordinateSystem.NotApplicable,
                 components=[
                     *daqs,
                     *cameras,
@@ -513,7 +513,7 @@ class TestInstrument:
                 Instrument(
                     modalities=[Modality.from_abbreviation(modality_abbreviation)],
                     instrument_name="123_EPHYS1-OPTO_20220101",
-                    global_coordinate_system=BREGMA_ARI,
+                    global_coordinate_system=CoordinateSystem.NotApplicable,
                     modification_date=date(2020, 10, 10),
                     components=[],
                     calibrations=[],
@@ -528,7 +528,7 @@ class TestInstrument:
                 modalities=[Modality.from_abbreviation(modality_abbreviation)],
                 instrument_name="123_EPHYS1-OPTO_20220101",
                 modification_date=date(2020, 10, 10),
-                global_coordinate_system=BREGMA_ARI,
+                global_coordinate_system=CoordinateSystem.NotApplicable,
                 components=[
                     *daqs,
                     *cameras,
@@ -555,7 +555,7 @@ class TestInstrument:
         instrument_instance_modality = Instrument.model_construct(
             instrument_name="123_EPHYS1-OPTO_20220101",
             modalities={Modality.ECEPHYS},  # Example with a valid Modality instance
-            global_coordinate_system=BREGMA_ARI,
+            global_coordinate_system=CoordinateSystem.NotApplicable,
         )
         instrument_json = instrument_instance_modality.model_dump_json()
         instrument_data = json.loads(instrument_json)
@@ -589,6 +589,8 @@ class TestInstrument:
             camera=camera,
             target=CameraTarget.BRAIN,
             relative_position=[AnatomicalRelative.SUPERIOR],
+            local_coordinate_system=BREGMA_ARI,
+            transform=[Translation(translation=[0, 0, 1])],
             lens=Lens(name="Lens A", manufacturer=Organization.OTHER, notes="Manufacturer unknown"),
         )
 
@@ -702,14 +704,14 @@ class TestInstrument:
             instrument_name="test_inst",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.ECEPHYS],
-            global_coordinate_system=BREGMA_ARI,
+            global_coordinate_system=CoordinateSystem.NotApplicable,
             components=[Computer(name="Computer1")],
         )
         inst2 = Instrument(
             instrument_name="test_inst",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.ECEPHYS],
-            global_coordinate_system=BREGMA_ARI,
+            global_coordinate_system=CoordinateSystem.NotApplicable,
             components=[Computer(name="Computer1")],
         )
 
@@ -737,14 +739,14 @@ class TestInstrument:
             instrument_name="test_inst",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.ECEPHYS],
-            global_coordinate_system=BREGMA_ARI,
+            global_coordinate_system=CoordinateSystem.NotApplicable,
             components=[harp_clock_gen],
         )
         inst2 = Instrument(
             instrument_name="test_inst",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.ECEPHYS],
-            global_coordinate_system=BREGMA_ARI,
+            global_coordinate_system=CoordinateSystem.NotApplicable,
             components=[harp_clock_gen.model_copy(deep=True)],
         )
 
@@ -777,7 +779,7 @@ class TestInstrument:
             instrument_name="test_inst",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.BEHAVIOR],
-            global_coordinate_system=BREGMA_ARI,
+            global_coordinate_system=CoordinateSystem.NotApplicable,
             components=[
                 harp_clock_gen,
                 LickSpoutAssembly(
@@ -797,7 +799,7 @@ class TestInstrument:
             instrument_name="test_inst",
             modification_date=date(2020, 10, 10),
             modalities=[Modality.BEHAVIOR],
-            global_coordinate_system=BREGMA_ARI,
+            global_coordinate_system=CoordinateSystem.NotApplicable,
             components=[
                 harp_non_clock_gen,
                 LickSpoutAssembly(
@@ -866,7 +868,7 @@ class TestInstrument:
             instrument_name="rig",
             modification_date=date(2026, 1, 1),
             modalities=[],
-            global_coordinate_system=BREGMA_ARI,
+            global_coordinate_system=CoordinateSystem.NotApplicable,
             components=[camera],
         )
         instrument = Instrument(**values)
@@ -995,7 +997,7 @@ class TestConnection:
             instrument_name="123_EPHYS1-OPTO_20220101",
             modification_date=date(2020, 10, 10),
             modalities=unsorted_modalities,
-            global_coordinate_system=BREGMA_ARI,
+            global_coordinate_system=CoordinateSystem.NotApplicable,
             components=[
                 *daqs,
                 *cameras,

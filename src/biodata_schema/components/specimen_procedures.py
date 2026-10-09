@@ -15,7 +15,7 @@ from biodata_schema.base import (
     DataModel,
     DiscriminatedList,
 )
-from biodata_schema.components.coordinates import Atlas, CoordinateSystem, Translation
+from biodata_schema.components.coordinates import Atlas, CoordinateSystemOrNA, Translation
 from biodata_schema.components.identifiers import ProtocolListMixin
 from biodata_schema.components.reagent import (
     FluorescentReagent,
@@ -89,10 +89,13 @@ class Sectioning(DataModel):
 class PlanarSectioning(Sectioning):
     """Description of a sectioning procedure performed on the coronal, sagittal, or transverse/axial plane"""
 
-    global_coordinate_system: Optional[CoordinateSystem | Atlas] = Field(
+    global_coordinate_system: Optional[CoordinateSystemOrNA | Atlas] = Field(
         default=None,
         title="Sectioning global coordinate system",
-        description="Only required if different from the Procedures.global_coordinate_system",
+        description=(
+            "Only required if different from the Procedures.global_coordinate_system."
+            " Use 'Not applicable' to explicitly disable the inherited global frame."
+        ),
     )
 
     sections: List[Union[Section, PlanarSection]] = Field(

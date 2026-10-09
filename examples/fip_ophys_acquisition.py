@@ -19,6 +19,7 @@ from biodata_schema.components.configs import (
     TriggerType,
 )
 from biodata_schema.components.connections import Connection
+from biodata_schema.components.coordinates import CoordinateSystem
 from biodata_schema.components.identifiers import Code
 from biodata_schema.core.acquisition import (
     Acquisition,
@@ -336,6 +337,7 @@ stimulus_epoch = StimulusEpoch(
 
 # Create the acquisition object
 acquisition = Acquisition(
+    global_coordinate_system=CoordinateSystem.NotApplicable,
     experimenters=[
         "Bryan MacLennan",
         "Kenta Hagihara",

@@ -108,11 +108,20 @@ def merge_notes(notes1: Optional[str], notes2: Optional[str]) -> Optional[str]:
 
 
 def merge_coordinate_systems(cs1: Optional[Any], cs2: Optional[Any]) -> Optional[Any]:
-    """Merge two coordinate system strings"""
+    """Merge coordinate systems, preferring a real frame over not-applicable values."""
+
+    from biodata_schema.components.coordinates import CoordinateSystem
+
+    if cs1 == CoordinateSystem.NotApplicable and isinstance(cs2, CoordinateSystem):
+        return cs2
+    if cs2 == CoordinateSystem.NotApplicable and isinstance(cs1, CoordinateSystem):
+        return cs1
 
     if cs1 and cs2:
         if cs1 != cs2:
-            raise ValueError(f"Cannot merge differing coordinate systems: '{cs1.name}' and '{cs2.name}'")
+            name1 = getattr(cs1, "name", cs1)
+            name2 = getattr(cs2, "name", cs2)
+            raise ValueError(f"Cannot merge differing coordinate systems: '{name1}' and '{name2}'")
         return cs1
     else:
         return cs1 if cs1 else cs2

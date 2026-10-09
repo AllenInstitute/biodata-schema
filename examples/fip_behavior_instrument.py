@@ -5,13 +5,13 @@
 import argparse
 from datetime import date, datetime, timezone
 
-from biodata_models.coordinates import AnatomicalRelative, AxisName, Direction, Origin
+from biodata_models.coordinates import AnatomicalRelative
 from biodata_models.devices import CameraTarget
 from biodata_models.modalities import Modality
 from biodata_models.units import FrequencyUnit, PowerUnit, SizeUnit
 
 from biodata_schema.components.connections import Connection
-from biodata_schema.components.coordinates import Axis, CoordinateSystem
+from biodata_schema.components.coordinates import CoordinateSystem
 from biodata_schema.components.devices import (
     Camera,
     CameraAssembly,
@@ -37,17 +37,6 @@ from biodata_schema.components.devices import (
 from biodata_schema.components.identifiers import Software
 from biodata_schema.components.measurements import Calibration
 from biodata_schema.core.instrument import Instrument
-
-BREGMA_ARI = CoordinateSystem(
-    name="BREGMA_ARI",
-    origin=Origin.BREGMA,
-    axis_unit=SizeUnit.MM,
-    axes=[
-        Axis(name=AxisName.AP, direction=Direction.PA),
-        Axis(name=AxisName.ML, direction=Direction.LR),
-        Axis(name=AxisName.SI, direction=Direction.SI),
-    ],
-)
 
 bonsai_software = Software(name="Bonsai", version="2.5")
 
@@ -399,7 +388,7 @@ inst = Instrument(
     instrument_name="FIP-Behavior",
     modification_date=date(2000, 1, 1),
     modalities=[Modality.BEHAVIOR, Modality.FIB],
-    global_coordinate_system=BREGMA_ARI,
+    global_coordinate_system=CoordinateSystem.NotApplicable,
     components=[
         camera1,
         camera2,

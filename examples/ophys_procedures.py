@@ -82,6 +82,7 @@ config = ProbeConfig(
 
 p = Procedures(
     subject_name="625100",
+    global_coordinate_system=CoordinateSystem.NotApplicable,
     subject_procedures=[
         Surgery(
             start_date=t.date(),
@@ -152,6 +153,7 @@ p = Procedures(
         ),
         Surgery(
             start_date="2023-05-31",
+            global_coordinate_system=CoordinateSystem.NotApplicable,
             experimenters=["Scientist Smith"],
             ethics_review_id="2109",
             anaesthesia=Anaesthetic(anaesthetic_type="Isoflurane", duration=30, level=3),

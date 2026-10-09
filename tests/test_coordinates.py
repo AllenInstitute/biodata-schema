@@ -3,12 +3,14 @@
 import pytest
 from biodata_models.atlas import AtlasName
 from biodata_models.units import SizeUnit
+from pydantic import TypeAdapter, ValidationError
 
 from biodata_schema.components.coordinates import (
     Atlas,
     Axis,
     AxisName,
     CoordinateSystem,
+    CoordinateSystemOrNA,
     Direction,
     Handedness,
     Origin,
@@ -17,6 +19,99 @@ from biodata_schema.components.coordinates import (
     RotationDirection,
     Translation,
 )
+from biodata_schema.components.specimen_procedures import PlanarSectioning
+from biodata_schema.components.subject_procedures import Surgery
+from biodata_schema.core.acquisition import Acquisition
+from biodata_schema.core.instrument import Instrument
+from biodata_schema.core.procedures import Procedures
+from biodata_schema.utils.merge import merge_coordinate_systems
+from tests.coordinate_systems import BREGMA_ARI
+
+
+@pytest.mark.parametrize("model", [Instrument, Acquisition, Procedures, Surgery, PlanarSectioning])
+def test_not_applicable_global_coordinate_field(model):
+    """Every global frame accepts and round-trips only the explicit sentinel."""
+    adapter = TypeAdapter(model.model_fields["global_coordinate_system"].annotation)
+    value = adapter.validate_python(CoordinateSystem.NotApplicable)
+    assert value == "Not applicable"
+    assert adapter.validate_json(adapter.dump_json(value)) == value
+    with pytest.raises(ValidationError):
+        adapter.validate_python("unknown")
+    schema = model.model_json_schema()["properties"]["global_coordinate_system"]
+    assert {"const": "Not applicable", "type": "string"} in schema["anyOf"]
+    assert model.model_fields["global_coordinate_system"].is_required() == (model is Instrument)
+    if model is not Instrument:
+        assert adapter.validate_python(None) is None
+
+
+def test_not_applicable_is_not_a_coordinate_model_field():
+    """The class constant does not change real coordinate-system objects."""
+    assert "NotApplicable" not in CoordinateSystem.model_fields
+    assert "NotApplicable" not in BREGMA_ARI.model_dump()
+    adapter = TypeAdapter(CoordinateSystemOrNA)
+    assert adapter.validate_json(adapter.dump_json(BREGMA_ARI)) == BREGMA_ARI
+
+
+@pytest.mark.parametrize(
+    "first,second,expected",
+    [
+        (CoordinateSystem.NotApplicable, CoordinateSystem.NotApplicable, CoordinateSystem.NotApplicable),
+        (CoordinateSystem.NotApplicable, None, CoordinateSystem.NotApplicable),
+        (None, CoordinateSystem.NotApplicable, CoordinateSystem.NotApplicable),
+    ],
+)
+def test_merge_not_applicable_coordinate_systems(first, second, expected):
+    """Not-applicable frames merge like any other explicit frame."""
+    assert merge_coordinate_systems(first, second) == expected
+
+
+@pytest.mark.parametrize(
+    "first,second", [(CoordinateSystem.NotApplicable, BREGMA_ARI), (BREGMA_ARI, CoordinateSystem.NotApplicable)]
+)
+def test_merge_not_applicable_with_real_frame(first, second):
+    """A real frame overrides not-applicable in either operand order."""
+    assert merge_coordinate_systems(first, second) == BREGMA_ARI
+
+
+@pytest.mark.parametrize("model", [Instrument, Acquisition, Procedures])
+@pytest.mark.parametrize("real_first", [True, False])
+def test_core_merge_real_frame_overrides_not_applicable(model, real_first):
+    """Core-model addition keeps the real frame and validates in both operand orders."""
+    if model is Instrument:
+        from examples.ephys_instrument import inst as spatial
+
+        nonspatial = Instrument(
+            instrument_name=spatial.instrument_name,
+            modification_date=spatial.modification_date,
+            location=spatial.location,
+            temperature_control=spatial.temperature_control,
+            modalities=[],
+            components=[],
+            global_coordinate_system=CoordinateSystem.NotApplicable,
+        )
+    elif model is Acquisition:
+        from examples.ephys_acquisition import acquisition as spatial
+
+        nonspatial = Acquisition(
+            subject_name=spatial.subject_name,
+            instrument_name=spatial.instrument_name,
+            acquisition_start_time=spatial.acquisition_start_time,
+            acquisition_end_time=spatial.acquisition_end_time,
+            acquisition_type=spatial.acquisition_type,
+            data_streams=[],
+            global_coordinate_system=CoordinateSystem.NotApplicable,
+        )
+    else:
+        from examples.thermistor_procedures import p as spatial
+
+        nonspatial = Procedures(
+            subject_name=spatial.subject_name,
+            global_coordinate_system=CoordinateSystem.NotApplicable,
+        )
+    combined = spatial + nonspatial if real_first else nonspatial + spatial
+    assert combined.global_coordinate_system == spatial.global_coordinate_system
+    revalidated = model.model_validate_json(combined.model_dump_json())
+    assert revalidated.global_coordinate_system == spatial.global_coordinate_system
 
 
 class TestTranslationFrame:
