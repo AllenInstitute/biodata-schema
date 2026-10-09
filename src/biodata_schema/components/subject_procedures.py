@@ -8,7 +8,7 @@ from biodata_models.units import MassUnit, UnitlessUnit, VolumeUnit
 from pydantic import Field
 
 from biodata_schema.base import DataModel, DiscriminatedList
-from biodata_schema.components.coordinates import CoordinateSystem, Translation
+from biodata_schema.components.coordinates import CoordinateSystemOrNotApplicable, Translation
 from biodata_schema.components.identifiers import Code, ProtocolMixin
 from biodata_schema.components.injection_procedures import Injection
 from biodata_schema.components.surgery_procedures import (
@@ -122,12 +122,13 @@ class Surgery(ProtocolMixin, DataModel):
     workstation_id: Optional[str] = Field(default=None, title="Workstation ID")
 
     # Coordinate system
-    global_coordinate_system: Optional[CoordinateSystem] = Field(
+    global_coordinate_system: Optional[CoordinateSystemOrNotApplicable] = Field(
         default=None,
         title="Surgery global coordinate system",
         description=(
             "Only required when the Surgery.global_coordinate_system "
             "is different from the Procedures.global_coordinate_system"
+            ". Use 'Not applicable' to explicitly disable the inherited global frame."
         ),
     )
 

@@ -3,7 +3,7 @@
 import argparse
 from datetime import datetime
 
-from biodata_models.coordinates import AnatomicalRelative, AxisName, Direction, Origin
+from biodata_models.coordinates import AnatomicalRelative
 from biodata_models.devices import CameraTarget, DetectorType, FilterType
 from biodata_models.harp_types import HarpDeviceType
 from biodata_models.modalities import Modality
@@ -11,7 +11,7 @@ from biodata_models.organizations import Organization
 from biodata_models.units import SizeUnit, SpeedUnit
 
 from biodata_schema.components.connections import Connection
-from biodata_schema.components.coordinates import Axis, CoordinateSystem
+from biodata_schema.components.coordinates import CoordinateSystem
 from biodata_schema.components.devices import (
     Camera,
     CameraAssembly,
@@ -36,17 +36,6 @@ from biodata_schema.components.devices import (
     PolygonalScanner,
 )
 from biodata_schema.core.instrument import Instrument
-
-BREGMA_ARI = CoordinateSystem(
-    name="BREGMA_ARI",
-    origin=Origin.BREGMA,
-    axis_unit=SizeUnit.MM,
-    axes=[
-        Axis(name=AxisName.AP, direction=Direction.PA),
-        Axis(name=AxisName.ML, direction=Direction.LR),
-        Axis(name=AxisName.SI, direction=Direction.SI),
-    ],
-)
 
 computer_names = {
     "VCO": "w10dt714710",
@@ -358,7 +347,7 @@ instrument = Instrument(
     location="443",
     instrument_name="SLAP2_1_VCO_1",
     modification_date=datetime.now().date(),
-    global_coordinate_system=BREGMA_ARI,
+    global_coordinate_system=CoordinateSystem.NotApplicable,
     modalities=[Modality.SLAP2, Modality.BEHAVIOR, Modality.BEHAVIOR_VIDEOS],
     notes=(
         "Devices and connections not currently directly controlled or read out by"

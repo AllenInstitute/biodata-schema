@@ -162,6 +162,7 @@ surgery1 = Surgery(
 
 p = Procedures(
     subject_name="625100",
+    global_coordinate_system=CoordinateSystem.NotApplicable,
     subject_procedures=[
         surgery1,
         Surgery(
@@ -169,7 +170,7 @@ p = Procedures(
             experimenters=["Scientist Smith"],
             ethics_review_id="2109",
             protocol_id="doi",
-            global_coordinate_system=BREGMA_ARI,
+            global_coordinate_system=CoordinateSystem.NotApplicable,
             procedures=[
                 Perfusion(
                     protocol_id="doi_of_protocol",

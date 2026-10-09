@@ -21,6 +21,31 @@ def generated_examples(tmp_path_factory):
 class TestExamples:
     """tests for examples"""
 
+    @pytest.mark.parametrize(
+        "example_name",
+        [
+            "aibs_smartspim_instrument",
+            "aind_smartspim_instrument",
+            "barseq_instrument",
+            "exaspim_instrument",
+            "fip_behavior_instrument",
+            "fip_ophys_instrument",
+            "isi_instrument",
+            "slap2_instrument",
+            "barseq_acquisition",
+            "ophys_acquisition",
+            "fip_ophys_acquisition",
+            "aibs_smartspim_procedures",
+            "ophys_procedures",
+            "procedures",
+        ],
+    )
+    def test_position_free_global_frames_are_not_applicable(self, generated_examples, example_name):
+        """Examples without positions in their global scope explicitly mark it not applicable."""
+        with (generated_examples / f"{example_name}.json").open() as example_file:
+            data = json.load(example_file)
+        assert data["global_coordinate_system"] == "Not applicable"
+
     def test_examples_generated(self, generated_examples):
         """Test that each example file generates valid JSON."""
         example_files = [

@@ -26,6 +26,20 @@ CoordinateSystem(
 )
 ```
 
+### Not Applicable
+
+When no global coordinate system applies, set `global_coordinate_system=CoordinateSystem.NotApplicable`. Note that this is different from using `global_coordinate_system=None` which will inherit from any parent coordinate systems. `"Not applicable"` should be used in situations where no transforms are present in an object.
+
+```{code} python
+from biodata_schema.components.coordinates import CoordinateSystem
+from biodata_schema.core.procedures import Procedures
+
+procedures = Procedures(
+  subject_name="12345",
+  global_coordinate_system=CoordinateSystem.NotApplicable,
+)
+```
+
 ### Origin
 
 An [Origin](biodata_models/coordinates.md#origin) is a point in space, often relative to the mouse's anatomy but it can also be a point on a device. The Origin defines the (0, 0, 0) coordinate in a coordinate system. Standard anatomical references are positions like Bregma or Lambda

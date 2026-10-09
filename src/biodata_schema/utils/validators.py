@@ -157,6 +157,51 @@ def _iter_transforms(value):
             yield from _iter_transforms(item)
 
 
+def _has_position_information(data, *, root: bool = True) -> bool:
+    """Find spatial transforms without borrowing positions from independent frames."""
+    from biodata_schema.components.coordinates import (
+        Affine,
+        CoordinateSystem,
+        NonlinearTransform,
+        Rotation,
+        Scale,
+        Translation,
+    )
+
+    if isinstance(data, (CoordinateSystem, Enum)):
+        return False
+    if not root and (
+        getattr(data, "global_coordinate_system", None) is not None
+        or getattr(data, "coordinate_system", None) is not None
+    ):
+        return False
+    if isinstance(data, (Translation, Rotation, Scale, Affine, NonlinearTransform)):
+        return True
+    if isinstance(data, (list, tuple, dict)):
+        items = data.values() if isinstance(data, dict) else data
+        return any(_has_position_information(item, root=False) for item in items)
+    if not hasattr(data, "__dict__"):
+        return False
+    return any(
+        _has_position_information(value, root=False)
+        for name, value in vars(data).items()
+        if name != "dimensions" or not hasattr(data, "dimensions_unit")
+    )
+
+
+def _validate_coordinate_system_usage(data):
+    """Reject declared coordinate frames without any spatial position information."""
+    from biodata_schema.components.coordinates import CoordinateSystem
+
+    for field_name in ("global_coordinate_system", "local_coordinate_system", "coordinate_system"):
+        coordinate_system = getattr(data, field_name, None)
+        if isinstance(coordinate_system, CoordinateSystem) and not _has_position_information(data):
+            raise ValueError(
+                f"{field_name} is defined but no position information is present "
+                f"(object_type: {getattr(data, 'object_type', type(data).__name__)})"
+            )
+
+
 def _check_transform_dimensions(transform, axis_count: int):
     """Check the parameters of a transform against its coordinate frame."""
     from biodata_schema.components.coordinates import Affine, Rotation, Scale
@@ -222,7 +267,11 @@ def _system_check_helper(data, coordinate_system_name: Optional[str], axis_count
 
 
 def recursive_coord_system_check(
-    data, coordinate_system_name: Optional[str], axis_count: Optional[int], local_coordinate_system=None
+    data,
+    coordinate_system_name: Optional[str],
+    axis_count: Optional[int],
+    local_coordinate_system=None,
+    global_not_applicable: bool = False,
 ):
     """Recursively validate coordinate system requirements for objects with transforms.
 
@@ -250,19 +299,29 @@ def recursive_coord_system_check(
     Objects without transform components are not required to have coordinate systems.
     Nested global coordinate systems override the inherited global frame. Local frames
     apply to local-reference transforms; atlas coordinates carry their own frame.
+    NotApplicable clears the inherited global frame without skipping validation or
+    allowing a local frame to stand in for the explicitly absent global frame.
+    Declared frames require position information in their scope. Image dimensions
+    and positions in independent nested frames do not justify an unused frame.
     """
-    from biodata_schema.components.coordinates import Affine, Rotation, Scale, Translation
+    from biodata_schema.components.coordinates import Affine, CoordinateSystem, Rotation, Scale, Translation
 
     if data is None or isinstance(data, Enum):
         return
 
     _cs = getattr(data, "global_coordinate_system", None) or getattr(data, "coordinate_system", None)
-    if _cs:
+    if _cs == CoordinateSystem.NotApplicable:
+        coordinate_system_name = None
+        axis_count = None
+        local_coordinate_system = None
+        global_not_applicable = True
+    elif _cs:
         coordinate_system_name = _cs.name
         axis_count = len(_cs.axes)
         local_coordinate_system = None
+        global_not_applicable = False
     local_coordinate_system = getattr(data, "local_coordinate_system", None) or local_coordinate_system
-    if axis_count is None and local_coordinate_system is not None:
+    if axis_count is None and local_coordinate_system is not None and not global_not_applicable:
         coordinate_system_name = local_coordinate_system.name
         axis_count = len(local_coordinate_system.axes)
 
@@ -288,7 +347,9 @@ def recursive_coord_system_check(
         coordinate_system_name=coordinate_system_name,
         axis_count=axis_count,
         local_coordinate_system=local_coordinate_system,
+        global_not_applicable=global_not_applicable,
     )
+    _validate_coordinate_system_usage(data)
 
 
 def recursive_get_named_objects(obj: Any) -> List[tuple]:
