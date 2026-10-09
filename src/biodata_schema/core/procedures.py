@@ -6,7 +6,6 @@ from pydantic import Field, SkipValidation, model_validator
 
 from biodata_schema.base import DataCoreModel, DiscriminatedList
 from biodata_schema.components.coordinates import CoordinateSystem
-from biodata_schema.components.injection_procedures import Injection
 from biodata_schema.components.specimen_procedures import SpecimenProcedure
 from biodata_schema.components.subject_procedures import (
     GenericSubjectProcedure,
@@ -32,7 +31,7 @@ class Procedures(DataCoreModel):
         title="Subject name",
     )
     subject_procedures: DiscriminatedList[
-        Surgery | Injection | NonSurgicalInjection | TrainingProtocol | WaterRestriction | GenericSubjectProcedure
+        Surgery | NonSurgicalInjection | TrainingProtocol | WaterRestriction | GenericSubjectProcedure
     ] = Field(default=[], title="Subject Procedures", description="Procedures performed on a live subject")
     specimen_procedures: List[SpecimenProcedure] = Field(
         default=[], title="Specimen Procedures", description="Procedures performed on tissue extracted after perfusion"
@@ -72,18 +71,6 @@ class Procedures(DataCoreModel):
         #         device_names.add(spec_proc.implanted_device.name)
 
         return list(device_names)
-
-    @model_validator(mode="after")
-    def reject_injections(self):
-        """Reject bare injections since they must be wrapped
-        in a Surgery or NonSurgicalInjection procedure
-        """
-
-        for procedure in self.subject_procedures:
-            if isinstance(procedure, Injection):
-                raise ValueError("Injection procedures must be wrapped in a Surgery or NonSurgicalInjection procedure.")
-
-        return self
 
     @model_validator(mode="after")
     def validate_subject_specimen_names(self):
