@@ -6,7 +6,6 @@ from pydantic import Field, SkipValidation, model_validator
 
 from biodata_schema.base import DataCoreModel, DiscriminatedList
 from biodata_schema.components.coordinates import CoordinateSystem
-from biodata_schema.components.injection_procedures import Injection
 from biodata_schema.components.specimen_procedures import SpecimenProcedure
 from biodata_schema.components.subject_procedures import (
     GenericSubjectProcedure,
