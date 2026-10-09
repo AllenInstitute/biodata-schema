@@ -10,7 +10,7 @@ from biodata_schema.components.coordinates import (
     Axis,
     AxisName,
     CoordinateSystem,
-    CoordinateSystemOrNotApplicable,
+    CoordinateSystemOrNA,
     Direction,
     Handedness,
     Origin,
@@ -48,7 +48,7 @@ def test_not_applicable_is_not_a_coordinate_model_field():
     """The class constant does not change real coordinate-system objects."""
     assert "NotApplicable" not in CoordinateSystem.model_fields
     assert "NotApplicable" not in BREGMA_ARI.model_dump()
-    adapter = TypeAdapter(CoordinateSystemOrNotApplicable)
+    adapter = TypeAdapter(CoordinateSystemOrNA)
     assert adapter.validate_json(adapter.dump_json(BREGMA_ARI)) == BREGMA_ARI
 
 

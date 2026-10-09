@@ -148,7 +148,7 @@ class CoordinateSystem(DataModel):
     )
 
 
-CoordinateSystemOrNotApplicable = CoordinateSystem | Literal["Not applicable"]
+CoordinateSystemOrNA = CoordinateSystem | Literal["Not applicable"]
 
 
 class Atlas(CoordinateSystem):

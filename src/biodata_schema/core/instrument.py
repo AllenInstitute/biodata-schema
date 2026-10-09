@@ -9,7 +9,7 @@ from pydantic import Field, SkipValidation, field_validator, model_validator
 
 from biodata_schema.base import DataCoreModel, DiscriminatedList, DraftRequirement
 from biodata_schema.components.connections import Connection
-from biodata_schema.components.coordinates import CoordinateSystemOrNotApplicable
+from biodata_schema.components.coordinates import CoordinateSystemOrNA
 from biodata_schema.components.devices import (
     AdditionalImagingDevice,
     AirPuffDevice,
@@ -104,7 +104,7 @@ class Instrument(DataCoreModel):
     )
 
     # coordinate system
-    global_coordinate_system: CoordinateSystemOrNotApplicable = Field(
+    global_coordinate_system: CoordinateSystemOrNA = Field(
         ...,
         title="Global coordinate system",
         description=(

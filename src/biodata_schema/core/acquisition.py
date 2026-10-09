@@ -43,7 +43,7 @@ from biodata_schema.components.configs import (
     SpeakerConfig,
 )
 from biodata_schema.components.connections import Connection
-from biodata_schema.components.coordinates import CoordinateSystemOrNotApplicable
+from biodata_schema.components.coordinates import CoordinateSystemOrNA
 from biodata_schema.components.identifiers import Code, ProtocolListMixin
 from biodata_schema.components.measurements import CALIBRATIONS, Maintenance
 from biodata_schema.components.reagent import Reagent
@@ -448,7 +448,7 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
     notes: Optional[str] = Field(default=None, title="Notes")
 
     # Coordinate system
-    global_coordinate_system: Optional[CoordinateSystemOrNotApplicable] = Field(
+    global_coordinate_system: Optional[CoordinateSystemOrNA] = Field(
         default=None,
         title="Global coordinate system",
         description=(
