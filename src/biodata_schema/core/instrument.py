@@ -55,7 +55,12 @@ from biodata_schema.components.devices import (
     Wheel,
 )
 from biodata_schema.components.measurements import CALIBRATIONS
-from biodata_schema.utils.merge import merge_notes, merge_optional_list, merge_str_alphabetical
+from biodata_schema.utils.merge import (
+    merge_coordinate_systems,
+    merge_notes,
+    merge_optional_list,
+    merge_str_alphabetical,
+)
 from biodata_schema.utils.validators import recursive_get_device_names, recursive_get_named_objects
 
 logger = logging.getLogger(__name__)
@@ -362,16 +367,17 @@ class Instrument(DataCoreModel):
 
         # Check for incompatible key fields
         location_check = self.location != other.location
-        coord_sys_check = self.global_coordinate_system != other.global_coordinate_system
         temp_control_check = self.temperature_control != other.temperature_control
 
-        if any([location_check, coord_sys_check, temp_control_check]):
+        if any([location_check, temp_control_check]):
             raise ValueError(
                 "Cannot combine Instrument objects that differ in key fields:\n"
                 f"location: {self.location}/{other.location}\n"
                 f"global_coordinate_system: {self.global_coordinate_system}/{other.global_coordinate_system}\n"
                 f"temperature_control: {self.temperature_control}/{other.temperature_control}"
             )
+
+        coordinate_system = merge_coordinate_systems(self.global_coordinate_system, other.global_coordinate_system)
 
         # Combine instrument_name
         instrument_name = merge_str_alphabetical(self.instrument_name, other.instrument_name)
@@ -401,7 +407,7 @@ class Instrument(DataCoreModel):
             modification_date=latest_modification_date,
             modalities=combined_modalities,
             calibrations=combined_calibrations,
-            global_coordinate_system=self.global_coordinate_system,
+            global_coordinate_system=coordinate_system,
             temperature_control=self.temperature_control,
             notes=combined_notes,
             connections=combined_connections,

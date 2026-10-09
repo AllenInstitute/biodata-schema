@@ -108,7 +108,14 @@ def merge_notes(notes1: Optional[str], notes2: Optional[str]) -> Optional[str]:
 
 
 def merge_coordinate_systems(cs1: Optional[Any], cs2: Optional[Any]) -> Optional[Any]:
-    """Merge coordinate systems, including explicit not-applicable values."""
+    """Merge coordinate systems, preferring a real frame over not-applicable values."""
+
+    from biodata_schema.components.coordinates import CoordinateSystem
+
+    if cs1 == CoordinateSystem.NotApplicable and isinstance(cs2, CoordinateSystem):
+        return cs2
+    if cs2 == CoordinateSystem.NotApplicable and isinstance(cs1, CoordinateSystem):
+        return cs1
 
     if cs1 and cs2:
         if cs1 != cs2:

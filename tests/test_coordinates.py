@@ -68,10 +68,50 @@ def test_merge_not_applicable_coordinate_systems(first, second, expected):
 @pytest.mark.parametrize(
     "first,second", [(CoordinateSystem.NotApplicable, BREGMA_ARI), (BREGMA_ARI, CoordinateSystem.NotApplicable)]
 )
-def test_merge_not_applicable_with_real_frame_fails(first, second):
-    """Contradictory frames raise a validation error, not an attribute error."""
-    with pytest.raises(ValueError, match="Cannot merge differing coordinate systems"):
-        merge_coordinate_systems(first, second)
+def test_merge_not_applicable_with_real_frame(first, second):
+    """A real frame overrides not-applicable in either operand order."""
+    assert merge_coordinate_systems(first, second) == BREGMA_ARI
+
+
+@pytest.mark.parametrize("model", [Instrument, Acquisition, Procedures])
+@pytest.mark.parametrize("real_first", [True, False])
+def test_core_merge_real_frame_overrides_not_applicable(model, real_first):
+    """Core-model addition keeps the real frame and validates in both operand orders."""
+    if model is Instrument:
+        from examples.ephys_instrument import inst as spatial
+
+        nonspatial = Instrument(
+            instrument_name=spatial.instrument_name,
+            modification_date=spatial.modification_date,
+            location=spatial.location,
+            temperature_control=spatial.temperature_control,
+            modalities=[],
+            components=[],
+            global_coordinate_system=CoordinateSystem.NotApplicable,
+        )
+    elif model is Acquisition:
+        from examples.ephys_acquisition import acquisition as spatial
+
+        nonspatial = Acquisition(
+            subject_name=spatial.subject_name,
+            instrument_name=spatial.instrument_name,
+            acquisition_start_time=spatial.acquisition_start_time,
+            acquisition_end_time=spatial.acquisition_end_time,
+            acquisition_type=spatial.acquisition_type,
+            data_streams=[],
+            global_coordinate_system=CoordinateSystem.NotApplicable,
+        )
+    else:
+        from examples.thermistor_procedures import p as spatial
+
+        nonspatial = Procedures(
+            subject_name=spatial.subject_name,
+            global_coordinate_system=CoordinateSystem.NotApplicable,
+        )
+    combined = spatial + nonspatial if real_first else nonspatial + spatial
+    assert combined.global_coordinate_system == spatial.global_coordinate_system
+    revalidated = model.model_validate_json(combined.model_dump_json())
+    assert revalidated.global_coordinate_system == spatial.global_coordinate_system
 
 
 class TestTranslationFrame:
