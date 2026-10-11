@@ -5,6 +5,7 @@ from datetime import time
 from enum import Enum
 from typing import Annotated, List, Optional
 
+from biodata_models.cell_line import CellLineModel
 from biodata_models.organizations import Organization
 from biodata_models.pid_names import PIDName
 from biodata_models.species import Species, Strain
@@ -195,3 +196,26 @@ class CalibrationObject(DataModel):
     objects: Optional[list[Device]] = Field(
         default=None, title="Objects", description="For calibration objects that are built up from one or more devices."
     )
+
+
+class CellLine(DataModel):
+    """Description of a cultured cell line"""
+
+    cell_line_name: str = Field(..., title="Cell line name")
+    cell_line_id: Optional[str] = Field(default=None, title="Cell line ID")
+    source: Organization.ONE_OF = Field(
+        ...,
+        description="Where the subject was acquired from.",
+        title="Source",
+    )
+    cell_line_type: CellLineModel = Field(..., title="Cell line type")
+    species: Species.ONE_OF = Field(..., title="Species")
+    clone_number: Optional[int] = Field(default=None, title="Clone number")
+
+
+class FluorescentCellLine(CellLine):
+    """Description of a cultured cell line with fluorescent label"""
+
+    protein: PIDName = Field(..., title="Protein labeled", description="Protein uses UniProt registry")
+    cell_structure: str = Field(..., title="Cell structure the protein is found in")  # TODO: ontology/enum in model
+    fluorescent_protein: PIDName = Field(..., title="Fluorescent protein", description="Uses FPbase")

@@ -21,13 +21,14 @@ from pydantic import (
 
 from biodata_schema.base import DataCoreModel, DraftRequirement
 from biodata_schema.components.identifiers import DatabaseIdentifiers
+from biodata_schema.components.injection_procedures import Injection
 from biodata_schema.components.subject_procedures import TrainingProtocol
 from biodata_schema.components.subjects import CalibrationObject
 from biodata_schema.core.acquisition import Acquisition, DataStream, ExternalDataStream
 from biodata_schema.core.data_description import DataDescription
 from biodata_schema.core.instrument import Instrument
 from biodata_schema.core.model import Model
-from biodata_schema.core.procedures import Injection, Procedures, Surgery
+from biodata_schema.core.procedures import Procedures, Surgery
 from biodata_schema.core.processing import Processing
 from biodata_schema.core.quality_control import QualityControl
 from biodata_schema.core.subject import Subject

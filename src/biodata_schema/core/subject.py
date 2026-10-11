@@ -1,11 +1,18 @@
-"""schema for mostly mouse metadata"""
+"""schema for subject metadata"""
 
 from typing import Annotated, Literal, Optional
 
 from pydantic import Field, SkipValidation
 
 from biodata_schema.base import DataCoreModel, Discriminated, DraftRequirement
-from biodata_schema.components.subjects import CalibrationObject, HumanSubject, MouseSubject, NonHumanPrimateSubject
+from biodata_schema.components.subjects import (
+    CalibrationObject,
+    CellLine,
+    FluorescentCellLine,
+    HumanSubject,
+    MouseSubject,
+    NonHumanPrimateSubject,
+)
 
 
 class Subject(DataCoreModel):
@@ -20,8 +27,8 @@ class Subject(DataCoreModel):
         title="Subject name",
     )
 
-    subject_details: Discriminated[MouseSubject | HumanSubject | NonHumanPrimateSubject | CalibrationObject] = Field(
-        ..., title="Subject Details"
-    )
+    subject_details: Discriminated[
+        MouseSubject | HumanSubject | NonHumanPrimateSubject | CellLine | FluorescentCellLine | CalibrationObject
+    ] = Field(..., title="Subject Details")
 
     notes: Optional[str] = Field(default=None, title="Notes")
