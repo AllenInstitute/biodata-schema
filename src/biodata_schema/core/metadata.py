@@ -175,15 +175,19 @@ class Metadata(DataCoreModel):
         """Ensure there is exactly one Procedures object per subject"""
         subject_names = [subject.subject_name for subject in self.subjects] if self.subjects else []
         procedure_names = [procedures.subject_name for procedures in self.procedures] if self.procedures else []
-        
+
         missing_procedures = set(subject_names) - set(procedure_names)
         if missing_procedures:
-            raise ValueError(f"Each subject must have exactly one Procedures object. Missing for subjects: {', '.join(missing_procedures)}")
-        
+            raise ValueError(
+                f"Each subject must have exactly one Procedures object. Missing for subjects: {', '.join(missing_procedures)}"
+            )
+
         extra_procedures = set(procedure_names) - set(subject_names)
         if extra_procedures:
-            raise ValueError(f"Each subject must have exactly one Procedures object. Extra procedures found for subjects: {', '.join(extra_procedures)}")
-        
+            raise ValueError(
+                f"Each subject must have exactly one Procedures object. Extra procedures found for subjects: {', '.join(extra_procedures)}"
+            )
+
         return self
 
     @model_validator(mode="after")

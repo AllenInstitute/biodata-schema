@@ -162,7 +162,7 @@ class TestAcquisition:
             acquisition_start_time=datetime.now(),
             acquisition_end_time=datetime.now(),
             subject_names={"123456"},
-            specimen_names="SP123456",
+            specimen_names={"SP123456"},
             acquisition_type="Test",
             instrument_name="1234",
             subject_details=AcquisitionSubjectDetails(
