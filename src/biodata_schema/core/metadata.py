@@ -171,23 +171,26 @@ class Metadata(DataCoreModel):
         return self
 
     @model_validator(mode="after")
-    def validate_unique_procedure_subjects(self):
-        """Allow at most one Procedures object per subject."""
-        if self.procedures:
-            subject_names = [
-                procedures.subject_name
-                for procedures in self.procedures
-                if getattr(procedures, "subject_name", None) is not None
-            ]
-            if len(subject_names) != len(set(subject_names)):
-                raise ValueError("procedures must contain at most one object per subject_name")
+    def validate_unique_procedure_per_subject(self):
+        """Ensure there is exactly one Procedures object per subject"""
+        subject_names = [subject.subject_name for subject in self.subjects] if self.subjects else []
+        procedure_names = [procedures.subject_name for procedures in self.procedures] if self.procedures else []
+        
+        missing_procedures = set(subject_names) - set(procedure_names)
+        if missing_procedures:
+            raise ValueError(f"Each subject must have exactly one Procedures object. Missing for subjects: {', '.join(missing_procedures)}")
+        
+        extra_procedures = set(procedure_names) - set(subject_names)
+        if extra_procedures:
+            raise ValueError(f"Each subject must have exactly one Procedures object. Extra procedures found for subjects: {', '.join(extra_procedures)}")
+        
         return self
 
     @model_validator(mode="after")
     def validate_subject_details_if_not_specimen(self):
         """Check that subject details are present if an in vivo experiment"""
 
-        if self.acquisition and not self.acquisition.specimen_name:
+        if self.acquisition and not self.acquisition.specimen_names:
             if not self.acquisition.subject_details:
                 raise ValueError("Acquisition.subject_details are required for in vivo experiments")
 

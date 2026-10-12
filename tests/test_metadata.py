@@ -146,7 +146,9 @@ class TestMetadata:
                     data_level="raw",
                 ),
                 subjects=[subject],
-                procedures=[Procedures.model_construct(subject_procedures=[surgery2])],
+                procedures=[
+                    Procedures.model_construct(subject_name=subject.subject_name, subject_procedures=[surgery2])
+                ],
                 acquisition=Acquisition.model_construct(
                     acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
                     subject_details=AcquisitionSubjectDetails.model_construct(),
@@ -174,7 +176,9 @@ class TestMetadata:
                     data_level="raw",
                 ),
                 subjects=[subject],
-                procedures=[Procedures.model_construct(subject_procedures=[surgery2])],
+                procedures=[
+                    Procedures.model_construct(subject_name=subject.subject_name, subject_procedures=[surgery2])
+                ],
                 instrument=ephys_inst,
                 processing=Processing.model_construct(),
                 acquisition=Acquisition.model_construct(
@@ -206,7 +210,7 @@ class TestMetadata:
                     data_level="raw",
                 ),
                 subjects=[subject],
-                procedures=[Procedures.model_construct()],
+                procedures=[Procedures(subject_name=subject.subject_name)],
                 instrument=inst,
                 processing=Processing.model_construct(),
                 acquisition=Acquisition.model_construct(
@@ -227,6 +231,7 @@ class TestMetadata:
             location="location",
             id="1",
             subjects=[subject],
+            procedures=[Procedures(subject_name=subject.subject_name)],
         )
 
         m_dict = m.model_dump()
@@ -282,7 +287,7 @@ class TestMetadata:
             procedures=[self.procedures],
             processing=self.processing,
         )
-        with pytest.raises(ValidationError, match="procedures.subject_name=.*999"):
+        with pytest.raises(ValidationError, match="Missing for subjects: 123456"):
             Metadata(
                 name=self.sample_name,
                 location=self.sample_location,
@@ -305,6 +310,7 @@ class TestMetadata:
                 name=self.sample_name,
                 location=self.sample_location,
                 subjects=[self.subject],
+                procedures=[self.procedures],
                 acquisition=Acquisition.model_construct(
                     acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
                     subject_names={"999"},
@@ -357,12 +363,13 @@ class TestMetadata:
                 name="655019_2023-04-03T181709",
                 location="bucket",
                 subjects=[self.subject],
-                # Missing required files: data_description, procedures, instrument, acquisition
+                procedures=[self.procedures],
+                # Missing required files: data_description, instrument, acquisition
             )
 
         warning_messages = [str(warning.message) for warning in w]
         assert "Metadata missing required file: data_description" in warning_messages
-        assert "Metadata missing required file: procedures" in warning_messages
+        assert "Metadata missing required file: procedures" not in warning_messages
         assert "Metadata missing required file: instrument" in warning_messages
         assert "Metadata missing required file: acquisition" in warning_messages
 
@@ -385,6 +392,7 @@ class TestMetadata:
                 name="655019_2023-04-03T181709",
                 location="bucket",
                 subjects=[subject],
+                procedures=[Procedures(subject_name=subject.subject_name)],
                 acquisition=barseq_acquisition,
             )
         instrument_warnings = [str(warning.message) for warning in w if "instrument" in str(warning.message)]
@@ -413,6 +421,7 @@ class TestMetadata:
             name="Test Metadata",
             location="Test Location",
             subjects=[subject],
+            procedures=[Procedures(subject_name=subject.subject_name)],
             instrument=instrument,
             acquisition=acquisition,
         )
@@ -437,6 +446,7 @@ class TestMetadata:
                 name="Test Metadata",
                 location="Test Location",
                 subjects=[subject],
+                procedures=[Procedures(subject_name=subject.subject_name)],
                 instrument=instrument,
                 acquisition=acquisition,
             )
@@ -461,6 +471,7 @@ class TestMetadata:
                 name="Test Metadata",
                 location="Test Location",
                 subjects=[subject],
+                procedures=[Procedures(subject_name=subject.subject_name)],
                 instrument=instrument,
                 acquisition=acquisition_missing_source,
             )
@@ -489,6 +500,7 @@ class TestMetadata:
             name="Test Metadata",
             location="Test Location",
             subjects=[subject],
+            procedures=[Procedures(subject_name=subject.subject_name)],
             instrument=instrument,
             acquisition=acquisition,
         )
@@ -510,6 +522,7 @@ class TestMetadata:
                 name="Test Metadata",
                 location="Test Location",
                 subjects=[subject],
+                procedures=[Procedures(subject_name=subject.subject_name)],
                 instrument=instrument,
                 acquisition=acquisition,
             )
@@ -523,7 +536,9 @@ class TestMetadata:
 
         # Case where training protocol references match
         training_protocol = TrainingProtocol.model_construct(training_name="Protocol A")
-        procedures = Procedures.model_construct(subject_procedures=[training_protocol])
+        procedures = Procedures.model_construct(
+            subject_name=subject.subject_name, subject_procedures=[training_protocol]
+        )
         stimulus_epoch = StimulusEpoch.model_construct(training_protocol_name="Protocol A")
         acquisition = Acquisition.model_construct(
             instrument_name="Test",
@@ -569,7 +584,7 @@ class TestMetadata:
         assert metadata is not None
 
         # Case where no training protocols exist in procedures
-        procedures_empty = Procedures.model_construct(subject_procedures=[])
+        procedures_empty = Procedures(subject_name=subject.subject_name)
         with pytest.warns(UserWarning) as w:
             metadata = Metadata(
                 name="Test Metadata",
@@ -613,11 +628,11 @@ class TestMetadata:
         )
         assert metadata_no_acquisition is not None
 
-        # Case where procedures is None (should pass)
+        # Case where both subjects and procedures are absent (should pass)
         metadata_no_procedures = Metadata(
             name="Test Metadata",
             location="Test Location",
-            subjects=[subject],
+            processing=self.processing,
             acquisition=acquisition,
         )
         assert metadata_no_procedures is not None
@@ -655,6 +670,7 @@ class TestMetadata:
             name="Test Metadata",
             location="Test Location",
             subjects=[subject],
+            procedures=[Procedures(subject_name=subject.subject_name)],
             data_description=data_description,
             acquisition=acquisition,
         )
@@ -677,6 +693,7 @@ class TestMetadata:
             name="Test Metadata",
             location="Test Location",
             subjects=[subject],
+            procedures=[Procedures(subject_name=subject.subject_name)],
             data_description=data_description_later,
             acquisition=acquisition,
         )
@@ -699,6 +716,7 @@ class TestMetadata:
             name="Test Metadata",
             location="Test Location",
             subjects=[subject],
+            procedures=[Procedures(subject_name=subject.subject_name)],
             data_description=data_description_next_day,
             acquisition=acquisition,
         )
@@ -724,6 +742,7 @@ class TestMetadata:
                 name="Test Metadata",
                 location="Test Location",
                 subjects=[subject],
+                procedures=[Procedures(subject_name=subject.subject_name)],
                 data_description=data_description_before,
                 acquisition=acquisition,
             )
@@ -742,6 +761,7 @@ class TestMetadata:
             name="Test Metadata",
             location="Test Location",
             subjects=[subject],
+            procedures=[Procedures(subject_name=subject.subject_name)],
             acquisition=acquisition,
         )
         assert metadata_no_data_desc is not None
@@ -751,6 +771,7 @@ class TestMetadata:
             name="Test Metadata",
             location="Test Location",
             subjects=[subject],
+            procedures=[Procedures(subject_name=subject.subject_name)],
             data_description=data_description,
         )
         assert metadata_no_acquisition is not None
@@ -796,6 +817,7 @@ class TestMetadata:
             name="Test Metadata",
             location="Test Location",
             subjects=[valid_subject],
+            procedures=[Procedures(subject_name=valid_subject.subject_name)],
             acquisition=acquisition,
         )
         assert metadata_valid_birth is not None
@@ -827,6 +849,7 @@ class TestMetadata:
                 name="Test Metadata",
                 location="Test Location",
                 subjects=[invalid_subject],
+                procedures=[Procedures(subject_name=invalid_subject.subject_name)],
                 acquisition=acquisition,
             )
         assert "must be before" in str(context.value)
@@ -921,6 +944,7 @@ class TestMetadata:
                 name="Test Metadata",
                 location="Test Location",
                 subjects=[calibration_subject],
+                procedures=[Procedures(subject_name=calibration_subject.subject_name)],
                 data_description=data_description,
             )
 
@@ -929,6 +953,7 @@ class TestMetadata:
             name="Test Metadata",
             location="Test Location",
             subjects=[calibration_subject],
+            procedures=[Procedures(subject_name=calibration_subject.subject_name)],
             data_description=data_description.model_copy(update={"subject_names": {"calibration"}}),
         )
         assert metadata is not None
@@ -948,7 +973,7 @@ class TestMetadata:
             ],
             acquisition=Acquisition.model_construct(
                 subject_names=subject_names,
-                specimen_name="789012-001",
+                specimen_names={"789012-001"},
                 acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
                 data_streams=[],
             ),
@@ -967,13 +992,62 @@ class TestMetadata:
             )
         with pytest.raises(ValidationError):
             Metadata(name="empty-subjects", location="s3://bucket/empty", subjects=[])
-        with pytest.raises(ValidationError, match="at most one object per subject_name"):
+
+    @pytest.mark.parametrize("procedures", [None, []])
+    def test_validate_missing_procedures(self, procedures):
+        """Each subject requires procedures, even when the collection is absent or empty."""
+        with pytest.raises(ValidationError, match="Missing for subjects: 123456"):
             Metadata(
-                name="duplicate-procedures",
-                location="s3://bucket/duplicate-procedures",
+                name=self.sample_name,
+                location=self.sample_location,
+                subjects=[self.subject],
+                procedures=procedures,
+            )
+
+    def test_validate_missing_procedures_for_one_subject(self):
+        """A partially covered subject roster reports the subject without procedures."""
+        second_subject = self.subject.model_copy(update={"subject_name": "789012"})
+        with pytest.raises(ValidationError, match="Missing for subjects: 789012"):
+            Metadata(
+                name=self.sample_name,
+                location=self.sample_location,
+                subjects=[self.subject, second_subject],
+                procedures=[self.procedures],
+            )
+
+    @pytest.mark.parametrize("include_subject", [False, True])
+    def test_validate_extra_procedures(self, include_subject):
+        """Procedures cannot reference a subject outside the roster."""
+        with pytest.raises(ValidationError, match="Extra procedures found for subjects: 999"):
+            Metadata(
+                name=self.sample_name,
+                location=self.sample_location,
+                subjects=[self.subject] if include_subject else None,
+                procedures=([self.procedures] if include_subject else []) + [Procedures(subject_name="999")],
+                processing=self.processing,
+            )
+
+    def test_validate_duplicate_procedures(self):
+        """A subject must not have more than one Procedures object."""
+        with pytest.raises(ValidationError, match="Each subject must have exactly one Procedures object"):
+            Metadata(
+                name=self.sample_name,
+                location=self.sample_location,
                 subjects=[self.subject],
                 procedures=[self.procedures, self.procedures.model_copy()],
             )
+
+    @pytest.mark.parametrize("procedures", [None, []])
+    def test_validate_procedures_without_subjects(self, procedures):
+        """Subject-free assets may omit procedures or provide an empty collection."""
+        metadata = Metadata(
+            name=self.sample_name,
+            location=self.sample_location,
+            processing=self.processing,
+            procedures=procedures,
+        )
+        assert metadata.subjects is None
+        assert metadata.procedures == procedures
 
     def test_legacy_subject_is_not_normalized(self):
         """A singular legacy subject field is not mapped into the current roster."""
@@ -1003,6 +1077,7 @@ class TestMetadata:
             name="partial-subject",
             location="s3://bucket/partial-subject",
             subjects=[{"subject_name": "123456", "subject_details": {}}],
+            procedures=[self.procedures],
             processing=self.processing,
         )
 
@@ -1011,20 +1086,21 @@ class TestMetadata:
         assert "Error in validating subject" in caplog.text
 
     def test_validate_subject_details_if_not_specimen(self):
-        """Tests that subject details are required if acquisition.specimen_name is not provided"""
+        """Tests that subject details are required if acquisition.specimen_names is not provided"""
 
-        # Case where specimen_name is provided - should pass without subject_details
+        # Case where specimen_names is provided - should pass without subject_details
         acquisition_with_specimen = Acquisition.model_construct(
             instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             subject_names={"123456"},
-            specimen_name="123456-001",
+            specimen_names={"123456-001"},
             data_streams=[],
         )
         metadata_with_specimen = Metadata(
             name="Test Metadata",
             location="Test Location",
             subjects=[subject],
+            procedures=[Procedures(subject_name=subject.subject_name)],
             acquisition=acquisition_with_specimen,
         )
         assert metadata_with_specimen is not None
@@ -1041,6 +1117,7 @@ class TestMetadata:
             name="Test Metadata",
             location="Test Location",
             subjects=[subject],
+            procedures=[Procedures(subject_name=subject.subject_name)],
             acquisition=acquisition_with_details,
         )
         assert metadata_with_details is not None
@@ -1057,6 +1134,7 @@ class TestMetadata:
                 name="Test Metadata",
                 location="Test Location",
                 subjects=[subject],
+                procedures=[Procedures(subject_name=subject.subject_name)],
                 acquisition=acquisition_missing_both,
             )
         assert "Acquisition.subject_details are required for in vivo experiments" in str(context.value)

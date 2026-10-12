@@ -3,13 +3,7 @@
 import re
 from typing import Annotated, List, Literal, Optional
 
-from biodata_models.data_name_patterns import (
-    DataLevel,
-    DataRegex,
-    Group,
-    build_data_name,
-    datetime_from_name_string,
-)
+from biodata_models.data_name_patterns import DataLevel, Group
 from biodata_models.licenses import License
 from biodata_models.modalities import Modality
 from biodata_models.organizations import Organization
@@ -17,6 +11,7 @@ from pydantic import Field, SkipValidation, StringConstraints, model_validator
 
 from biodata_schema.base import AwareDatetimeWithDefault, DataCoreModel, DataModel, DraftRequirement
 from biodata_schema.components.identifiers import Person
+from biodata_schema.utils.data_name_patterns import DataRegex, build_data_name, datetime_from_name_string
 
 
 class Funding(DataModel):
@@ -55,7 +50,9 @@ class DataDescription(DataCoreModel):
     name: Optional[str] = Field(
         default=None,
         description=(
-            "When left blank, a name will be generated based on subject_name and creation_time. "
+            "Asset label followed by a folder-safe ISO creation timestamp (YYYYMMDDTHHMMSS+HHMM or -HHMM). "
+            "For single-subject raw data, a name is generated from the subject name when omitted. "
+            "For multi-subject raw data, an explicit name is required; the label need not encode subject names. "
             "Conventionally also used as the name of the data folder."
         ),
         title="Data asset name",

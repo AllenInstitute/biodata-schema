@@ -11,6 +11,7 @@ from biodata_models.organizations import Organization
 from biodata_schema.components.identifiers import Code, Person
 from biodata_schema.core.data_description import DataDescription, Funding
 from biodata_schema.core.metadata import Metadata
+from biodata_schema.core.procedures import Procedures
 from biodata_schema.core.processing import DataProcess, Processing, ProcessStage
 from biodata_schema.core.quality_control import QCMetric, QCStatus, QualityControl, Stage, Status
 from biodata_schema.core.subject import Subject
@@ -59,6 +60,7 @@ def _make_metadata(subject_name="123456"):
         name=dd.name,
         location=f"s3://bucket/{dd.name}",
         subjects=[sub],
+        procedures=[Procedures(subject_name=subject_name)],
         data_description=dd,
         processing=example_processing,
         quality_control=example_qc,
@@ -464,7 +466,7 @@ class TestInternalHelpers:
             creation_time=creation_time,
         )
         assert result.data_level == DataLevel.DERIVED
-        assert result.name == "Test project_merged-analysis_2022-05-01_10-00-00"
+        assert result.name == "Test project_merged-analysis_20220501T100000+0000"
         assert result.source_data == ["a", "b"]
 
     def test_derive_data_description_analyzed_invalid_creation_time(self):

@@ -127,7 +127,7 @@ chamber_config = SampleChamberConfig(
 
 acq = Acquisition(
     experimenters=["John Smith"],
-    specimen_name="123456-123",
+    specimen_names="123456-123",
     subject_names={"123456"},
     instrument_name="exaSPIM1",
     maintenance=[

@@ -4,12 +4,13 @@ import re
 from datetime import datetime, timezone
 from typing import Any, List, Optional, Tuple
 
-from biodata_models.data_name_patterns import DataLevel, DataRegex, datetime_to_name_string
+from biodata_models.data_name_patterns import DataLevel
 from pydantic_core import PydanticUndefined
 
 from biodata_schema.core.data_description import DataDescription
 from biodata_schema.core.processing import Processing
 from biodata_schema.core.quality_control import QualityControl
+from biodata_schema.utils.data_name_patterns import DataRegex, datetime_to_name_string
 
 
 def _get_or_default(data_description: DataDescription, field_name: str, kwargs: dict) -> Any:

@@ -26,8 +26,8 @@ class TestDataDescription:
     """test DataDescription"""
 
     BAD_NAME = "fizzbuzz"
-    BASIC_NAME = "1234_3033-12-21_04-22-11"
-    DERIVED_NAME = "1234_3033-12-21_04-22-11_spikesorted-ks25_2022-10-12_23-23-11"
+    BASIC_NAME = "1234_30331221T042211+0000"
+    DERIVED_NAME = "1234_30331221T042211+0000_spikesorted-ks25_20221012T232311+0000"
 
     def test_funding_construction(self):
         """Test Funding construction"""
@@ -52,9 +52,9 @@ class TestDataDescription:
 
     def test_build_name(self):
         """Test build_data_name function"""
-        dt = datetime.datetime(2022, 10, 12, 23, 23, 11)
+        dt = datetime.datetime(2022, 10, 12, 23, 23, 11, tzinfo=datetime.timezone.utc)
         name = build_data_name("project", dt)
-        assert name == "project_2022-10-12_23-23-11"
+        assert name == "project_20221012T232311+0000"
 
     @patch("biodata_schema.core.data_description.build_data_name")
     def test_build_name_validation_error(self, mock_build_data_name: MagicMock):
@@ -144,6 +144,23 @@ class TestDataDescription:
         """The name builder tolerates partially constructed raw descriptions."""
         description = DataDescription.model_construct(name=None, data_level=DataLevel.RAW, subject_names=None)
         assert description.build_name() is description
+
+    def test_multi_subject_asset_label(self):
+        """A multi-subject asset label does not encode or infer its subjects."""
+        creation_time = datetime.datetime(2022, 10, 12, 23, 23, 11, tzinfo=datetime.timezone.utc)
+        description = DataDescription(
+            name="batch-17_20221012T232311+0000",
+            subject_names={"1234", "5678"},
+            data_level=DataLevel.RAW,
+            creation_time=creation_time,
+            institution=Organization.AIND,
+            funding_source=[Funding(funder=Organization.NINDS, grant_number="grant001")],
+            modalities=[Modality.SPIM],
+            investigators=[Person(name="Jane Smith")],
+            project_name="Test",
+        )
+        assert description.subject_names == {"1234", "5678"}
+        assert DataDescription.parse_name(description.name) == {"label": "batch-17", "creation_time": creation_time}
 
     def test_data_description_construction_failure(self):
         """Test DataDescription construction failure"""
@@ -278,20 +295,20 @@ class TestDataDescription:
 
         toks = DataDescription.parse_name(self.BASIC_NAME, DataLevel.RAW)
         assert toks["label"] == "1234"
-        assert toks["creation_time"] == datetime.datetime(3033, 12, 21, 4, 22, 11)
+        assert toks["creation_time"] == datetime.datetime(3033, 12, 21, 4, 22, 11, tzinfo=datetime.timezone.utc)
 
         with pytest.raises(ValueError):
             DataDescription.parse_name(self.BAD_NAME, DataLevel.RAW)
 
         toks = DataDescription.parse_name(self.DERIVED_NAME, DataLevel.DERIVED)
-        assert toks["input"] == "1234_3033-12-21_04-22-11"
+        assert toks["input"] == "1234_30331221T042211+0000"
         assert toks["process_name"] == "spikesorted-ks25"
-        assert toks["creation_time"] == datetime.datetime(2022, 10, 12, 23, 23, 11)
+        assert toks["creation_time"] == datetime.datetime(2022, 10, 12, 23, 23, 11, tzinfo=datetime.timezone.utc)
 
-        toks = DataDescription.parse_name("Test-project_my-analysis_2022-10-12_23-23-11", DataLevel.DERIVED)
+        toks = DataDescription.parse_name("Test-project_my-analysis_20221012T232311+0000", DataLevel.DERIVED)
         assert toks["project_abbreviation"] == "Test-project"
         assert toks["analysis_name"] == "my-analysis"
-        assert toks["creation_time"] == datetime.datetime(2022, 10, 12, 23, 23, 11)
+        assert toks["creation_time"] == datetime.datetime(2022, 10, 12, 23, 23, 11, tzinfo=datetime.timezone.utc)
 
         with pytest.raises(ValueError):
             DataDescription.parse_name(self.BAD_NAME, DataLevel.DERIVED)

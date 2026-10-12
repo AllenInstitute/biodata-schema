@@ -21,11 +21,15 @@ Note that relying on aggregated reference data (such as the CCF template) in you
 
 For derived assets created from processing pipelines (i.e. one raw asset that was processed) or from analysis on a single derived asset we retain the *original* raw asset name and the process label:
 
-`<raw asset_name>_<process_label>_YYYY-MM-DD_hh-mm-ss`
+`<raw asset_name>_<process_label>_YYYYMMDDTHHMMSS+HHMM`
 
 For assets created during analysis that aggregate across multiple acquisitions or subjects we switch to using the project name and process label:
 
-`<project_name>_<process_label>_YYYY-MM-DD_hh-mm-ss`
+`<project_name>_<process_label>_YYYYMMDDTHHMMSS+HHMM`
+
+The timestamp includes a UTC offset without colons; negative offsets use `-HHMM`
+instead of `+HHMM`. For example, `batch-17_20221012T162311-0700` uses an asset
+label rather than a subject identifier.
 
 ## Example
 

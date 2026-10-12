@@ -88,7 +88,7 @@ class TestAcquisition:
         """Test that subject and specimen names match"""
         with pytest.raises(ValueError) as context:
             acq = exaspim_acquisition.model_copy()
-            acq.specimen_name = "654321"
+            acq.specimen_names = "654321"
 
             Acquisition.model_validate_json(acq.model_dump_json())
 
@@ -97,15 +97,15 @@ class TestAcquisition:
     def test_specimen_name_list_valid(self):
         """Test that specimen_name accepts a list of strings when all contain subject_name"""
         acq = exaspim_acquisition.model_copy()
-        acq.specimen_name = ["123456_slide1", "123456_slide2"]
+        acq.specimen_names = ["123456_slide1", "123456_slide2"]
         validated = Acquisition.model_validate_json(acq.model_dump_json())
-        assert validated.specimen_name == ["123456_slide1", "123456_slide2"]
+        assert validated.specimen_names == ["123456_slide1", "123456_slide2"]
 
     def test_specimen_name_list_invalid(self):
         """Test that specimen_name list raises ValueError if any entry does not contain subject_name"""
         with pytest.raises(ValueError) as context:
             acq = exaspim_acquisition.model_copy()
-            acq.specimen_name = ["123456_slide1", "654321_slide2"]
+            acq.specimen_names = ["123456_slide1", "654321_slide2"]
             Acquisition.model_validate_json(acq.model_dump_json())
         assert "Expected 123456 to appear in 654321_slide2" in str(context.value)
 
@@ -120,7 +120,7 @@ class TestAcquisition:
     def test_specimen_required(self):
         """Test that specimen name is required for in vitro imaging modalities"""
         acq = exaspim_acquisition.model_copy()
-        acq.specimen_name = None
+        acq.specimen_names = None
         with pytest.raises(ValidationError, match="Specimen name is required for modalities"):
             Acquisition.model_validate_json(acq.model_dump_json())
 
@@ -195,7 +195,7 @@ class TestAcquisition:
             acquisition_start_time=datetime.now(),
             acquisition_end_time=datetime.now(),
             subject_names={"123456"},
-            specimen_name="SP123456",
+            specimen_names="SP123456",
             acquisition_type="Test",
             instrument_name="1234",
             subject_details=AcquisitionSubjectDetails(

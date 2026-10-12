@@ -84,9 +84,10 @@ I want to...
 .. toctree::
    :caption: Philosophy
    :hidden:
-   :maxdepth: 1
+   :maxdepth: 2
 
    general
    coordinate_systems
    validation
    related_standards
+   migration-guides

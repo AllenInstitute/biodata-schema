@@ -388,10 +388,10 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
         description="Unique names for the subjects included in the acquisition",
         min_length=1,
     )
-    specimen_name: Optional[Union[str, List[str]]] = Field(
+    specimen_names: Optional[set[str]] = Field(
         default=None,
         title="Specimen name",
-        description="Required for in vitro modalities. Standard format is {subject_name} with a _### suffix, as needed",
+        description="Required for in vitro modalities.",
     )
 
     # Acquisition metadata
@@ -523,8 +523,8 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
     @model_validator(mode="after")
     def check_subject_specimen_names(self):
         """Check that the subject and specimen names match"""
-        if self.specimen_name and self.subject_names:
-            specimen_names = self.specimen_name if isinstance(self.specimen_name, list) else [self.specimen_name]
+        if self.specimen_names and self.subject_names:
+            specimen_names = self.specimen_names if isinstance(self.specimen_names, list) else [self.specimen_names]
             for specimen_name in specimen_names:
                 if not any(subject_specimen_name_compatibility(name, specimen_name) for name in self.subject_names):
                     if len(self.subject_names) == 1:
@@ -553,7 +553,7 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
 
         for stream in self.data_streams:
             if any([modality.abbreviation in SPECIMEN_MODALITIES for modality in stream.modalities]):
-                if not self.specimen_name:
+                if not self.specimen_names:
                     raise ValueError(f"Specimen name is required for modalities {stream.modalities}")
 
         return self
@@ -602,7 +602,7 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
 
         # Check for incompatible key fields
         subj_check = self.subject_names != other.subject_names
-        spec_check = self.specimen_name != other.specimen_name
+        spec_check = self.specimen_names != other.specimen_names
         exp_type_check = bool(self.acquisition_type and other.acquisition_type) and (
             self.acquisition_type != other.acquisition_type
         )
@@ -610,7 +610,7 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
             raise ValueError(
                 "Cannot combine Acquisition objects that differ in key fields:\n"
                 f"subject_names: {self.subject_names}/{other.subject_names}\n"
-                f"specimen_name: {self.specimen_name}/{other.specimen_name}\n"
+                f"specimen_name: {self.specimen_names}/{other.specimen_names}\n"
                 f"acquisition_type: {self.acquisition_type}/{other.acquisition_type}"
             )
 
@@ -650,7 +650,7 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
 
         return Acquisition(
             subject_names=self.subject_names,
-            specimen_name=self.specimen_name,
+            specimen_names=self.specimen_names,
             experimenters=experimenters,
             protocol_id=protocol_id,
             ethics_review_id=ethics_review_id,
