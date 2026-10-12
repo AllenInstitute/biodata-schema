@@ -27,7 +27,7 @@ Description of a logical collection of data files
 | `subject_names` | `Optional[set[typing.Annotated[str, StringConstraints(strip_whitespace=None, to_upper=None, to_lower=None, strict=None, min_length=None, max_length=None, pattern='^[^_]+$')]]]` | Subject names (Unique names for subjects associated with this data asset) |
 | `creation_time` | `datetime (timezone-aware)` | Creation Time (Time that data files were created, used to uniquely identify the data) |
 | `tags` | `Optional[List[str]]` | Tags (Descriptive strings to help categorize and search for data) |
-| `name` | `Optional[str]` | Data asset name (When left blank, a name will be generated based on subject_name and creation_time. Conventionally also used as the name of the data folder.) |
+| `name` | `Optional[str]` | Data asset name (Asset label followed by a folder-safe ISO creation timestamp (YYYYMMDDTHHMMSS+HHMM or -HHMM). For single-subject raw data, a name is generated from the subject name when omitted. For multi-subject raw data, an explicit name is required; the label need not encode subject names. Conventionally also used as the name of the data folder.) |
 | `institution` | [Organization](biodata_models/organizations.md#organization) | Institution (An established society, corporation, foundation or other organization that collected this data) |
 | `funding_source` | List[[Funding](data_description.md#funding)] | Funding source (Funding source. If internal funding, select 'Allen Institute') |
 | `data_level` | [DataLevel](biodata_models/data_name_patterns.md#datalevel) | Data Level (Level of processing that data has undergone) |
