@@ -19,7 +19,6 @@ from biodata_schema.utils.inheritance import (
     _accumulate_processing,
     _accumulate_quality_control,
     _get_root_asset_name,
-    _get_unique_subject_names,
     _inherit_instrument_and_acquisition,
     _inherit_subject_and_procedures,
     derive_data_description_analyzed,
@@ -82,6 +81,25 @@ def test_derivation_preserves_or_overrides_license(derive, override):
     assert result.license == (override or License.MIT)
 
 
+@pytest.mark.parametrize(
+    "name,data_level",
+    [
+        ("123456_2022-02-21_16-30-01", DataLevel.RAW),
+        ("123456_2022-02-21_16-30-01_first_2022-03-01_10-00-00", DataLevel.DERIVED),
+    ],
+)
+def test_derivation_preserves_historical_source_names(name, data_level):
+    """Processing historical assets keeps the real source and root asset names."""
+    source = _make_metadata()
+    source.data_description = DataDescription.model_validate(
+        source.data_description.model_dump() | {"name": name, "data_level": data_level}
+    )
+    result = Metadata.from_metadata(source, creation_time=t)
+    assert result.data_description.source_data == [name]
+    assert result.data_description.name == "123456_2022-02-21_16-30-01_processed_20221122T084300+0000"
+    assert _get_root_asset_name(result.data_description) == "123456_2022-02-21_16-30-01"
+
+
 class TestFromMetadataSingleSource:
     """Tests for Metadata.from_metadata with a single source"""
 
@@ -134,6 +152,25 @@ class TestFromMetadataSingleSource:
         )
         assert result.subjects is not None
         assert result.subjects[0].subject_name == "123456"
+
+    def test_single_multi_subject_source_keeps_roster(self):
+        """Processing one asset preserves every subject and its procedures."""
+        second_subject = self.source.subjects[0].model_copy(update={"subject_name": "789012"})
+        subject_names = {"123456", "789012"}
+        source = Metadata(
+            name=self.source.name,
+            location=self.source.location,
+            subjects=[self.source.subjects[0], second_subject],
+            procedures=[self.source.procedures[0], Procedures(subject_name="789012")],
+            data_description=self.source.data_description.model_copy(update={"subject_names": subject_names}),
+            processing=example_processing,
+        )
+
+        result = Metadata.from_metadata(source)
+
+        assert result.subjects == source.subjects
+        assert result.procedures == source.procedures
+        assert result.data_description.subject_names == subject_names
 
     def test_single_source_data_description_is_derived(self):
         """Data description should be updated to data level DERIVED and name should include process name"""
@@ -200,15 +237,33 @@ class TestFromMetadataMultipleSameSubject:
         self.source1 = _make_metadata(subject_name="123456")
         self.source2 = _make_metadata(subject_name="123456")
 
-    def test_same_subject_inherits_subject(self):
-        """Subject should be inherited when all sources have the same subject"""
+    def test_same_subject_keeps_subject_and_procedures(self):
+        """Different acquisitions with the same subject retain subject records."""
         result = Metadata.from_metadata(
             [self.source1, self.source2],
             process_name="merge",
             location="s3://bucket/derived",
+            new_processing=example_processing,
         )
-        assert result.subjects is not None
-        assert result.subjects[0].subject_name == "123456"
+        assert result.subjects == self.source1.subjects
+        assert result.procedures == self.source1.procedures
+        assert result.data_description.subject_names == {"123456"}
+
+    def test_matching_rosters_keep_subject_names(self):
+        """Combining sources with matching rosters keeps their identifiers."""
+        result = Metadata.from_metadata(
+            [self.source1, self.source2],
+            new_processing=example_processing,
+            subject_names={"123456"},
+        )
+        assert result.data_description.subject_names == {"123456"}
+
+    def test_same_acquisition_keeps_subject_records(self):
+        """Sources from the same acquisition retain their matching subject roster."""
+        result = Metadata.from_metadata([self.source1, self.source1.model_copy()])
+        assert result.subjects == self.source1.subjects
+        assert result.procedures == self.source1.procedures
+        assert result.data_description.subject_names == {"123456"}
 
     def test_different_acquisitions_drops_instrument_and_acquisition(self):
         """Instrument and acquisition should be dropped when sources have different acquisitions"""
@@ -216,6 +271,7 @@ class TestFromMetadataMultipleSameSubject:
             [self.source1, self.source2],
             process_name="merge",
             location="s3://bucket/derived",
+            new_processing=example_processing,
         )
         assert result.instrument is None
         assert result.acquisition is None
@@ -263,6 +319,7 @@ class TestFromMetadataMultipleSameSubject:
             [self.source1, self.source2],
             process_name="merge",
             location="s3://bucket/derived",
+            new_processing=example_processing,
             new_quality_control=new_qc,
         )
         assert len(result.quality_control.metrics) == 1
@@ -273,6 +330,7 @@ class TestFromMetadataMultipleSameSubject:
             [self.source1, self.source2],
             process_name="merge",
             location="s3://bucket/derived",
+            new_processing=example_processing,
         )
         assert result.data_description.source_data is not None
         assert len(result.data_description.source_data) == 2
@@ -333,8 +391,8 @@ class TestFromMetadataDifferentSubjects:
         )
         assert result.procedures is None
 
-    def test_repeated_multi_subject_rosters_are_dropped_when_pooling(self):
-        """Pooling assets with the same multi-subject roster still drops subject metadata."""
+    def test_repeated_multi_subject_rosters_are_kept(self):
+        """Matching multi-subject rosters keep their records regardless of ordering."""
         subject2 = self.source1.subjects[0].model_copy(update={"subject_name": "789012"})
         roster = [self.source1.subjects[0], subject2]
         subject_names = {subject.subject_name for subject in roster}
@@ -345,20 +403,71 @@ class TestFromMetadataDifferentSubjects:
                 source.model_copy(
                     update={
                         "subjects": roster,
+                        "procedures": [Procedures(subject_name=name) for name in sorted(subject_names)],
                         "data_description": description,
                     }
                 )
             )
 
         result = Metadata.from_metadata(
-            sources,
+            [sources[0], sources[1].model_copy(update={"subjects": list(reversed(roster))})],
             process_name="pool",
             location="s3://bucket/pooled",
             new_processing=example_processing,
         )
 
+        assert result.subjects == roster
+        assert result.procedures == sources[0].procedures
+        assert result.data_description.subject_names == subject_names
+
+    def test_partially_overlapping_rosters_are_dropped(self):
+        """A subset is not the same subject roster."""
+        source = Metadata(
+            name=self.source1.name,
+            location=self.source1.location,
+            subjects=[self.source1.subjects[0], self.source2.subjects[0]],
+            procedures=[*self.source1.procedures, *self.source2.procedures],
+            data_description=self.source1.data_description.model_copy(update={"subject_names": {"123456", "789012"}}),
+            processing=example_processing,
+        )
+        result = Metadata.from_metadata(
+            [source, self.source1], new_processing=example_processing, subject_names={"123456", "789012"}
+        )
         assert result.subjects is None
+        assert result.procedures is None
         assert result.data_description.subject_names is None
+
+    def test_unknown_roster_is_not_assumed_to_match(self):
+        """An asset without subject information cannot establish a matching roster."""
+        unknown = Metadata(
+            name="unknown",
+            location="",
+            data_description=self.source2.data_description.model_copy(
+                update={
+                    "data_level": DataLevel.DERIVED,
+                    "subject_names": None,
+                    "name": "Test project_unknown_20220221T163036+0000",
+                }
+            ),
+            processing=example_processing,
+        )
+        result = Metadata.from_metadata([self.source1, unknown], new_processing=example_processing)
+        assert result.subjects is None
+        assert result.procedures is None
+        assert result.data_description.subject_names is None
+
+    def test_matching_description_rosters_can_supply_missing_records(self):
+        """A matching data-description roster can identify a source without subject files."""
+        without_records = Metadata(
+            name=self.source1.name,
+            location=self.source1.location,
+            data_description=self.source1.data_description,
+            processing=example_processing,
+        )
+        result = Metadata.from_metadata([without_records, self.source1], new_processing=example_processing)
+        assert result.subjects == self.source1.subjects
+        assert result.procedures == self.source1.procedures
+        assert result.data_description.subject_names == {"123456"}
 
 
 class TestFromMetadataEdgeCases:
@@ -411,12 +520,6 @@ class TestInternalHelpers:
         """_get_root_asset_name should return None for non-raw, non-derived data levels"""
         simulated_dd = self.source.data_description.model_copy(update={"data_level": DataLevel.SIMULATED})
         assert _get_root_asset_name(simulated_dd) is None
-
-    def test_get_unique_subject_names_from_data_description(self):
-        """_get_unique_subject_names should extract subject name from data_description when subject is None"""
-        no_subject = self.source.model_copy(update={"subjects": None})
-        subject_names = _get_unique_subject_names([no_subject])
-        assert subject_names == ["123456"]
 
     def test_inherit_subject_and_procedures_returns_none_when_no_subject_or_procedures(self):
         """_inherit_subject_and_procedures should return None when source has neither subject nor procedures"""

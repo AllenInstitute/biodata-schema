@@ -113,7 +113,7 @@ Note that there is no separate depth axis. Insertion depth is recorded as a *loc
 
 ## Generating metadata
 
-Finally, we're ready to generate all the metadata files. We'll loop over the sessions listed in the excel spreadsheet and use our functions to build the JSON files. The `write_standard_file()` function will take care of writing the files to disk.
+Finally, we're ready to generate all the metadata files. We'll loop over the sessions listed in the excel spreadsheet and use our functions to build the JSON files. `Metadata.write_standard_files()` writes the assembled metadata to disk, including `subjects.json` and `procedures.json` as arrays.
 
 ```{literalinclude} example_workflow.py
 :language: python

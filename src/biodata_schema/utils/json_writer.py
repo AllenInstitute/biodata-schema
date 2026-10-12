@@ -10,11 +10,13 @@ import sys
 from pathlib import Path
 from typing import Any, Iterator, get_args
 
-from pydantic import BaseModel
+from pydantic import BaseModel, TypeAdapter
 
 from biodata_schema import core
 from biodata_schema.base import DataCoreModel, DraftRequirement
 from biodata_schema.core.metadata import Metadata
+from biodata_schema.core.procedures import Procedures
+from biodata_schema.core.subject import Subject
 
 # Import all modules in core package
 for mod in core.__loader__.get_resource_reader().contents():
@@ -220,7 +222,7 @@ class SchemaWriter:
         schemas_to_write = self.get_schemas()
         output_path = self.configs.output
         for schema in schemas_to_write:
-            filename = schema.default_filename()
+            filename = "subjects.json" if schema is Subject else schema.default_filename()
             file_extension = "".join(Path(filename).suffixes)
             schema_filename = filename.replace(file_extension, "_schema.json")
             if self.configs.attach_version:
@@ -235,7 +237,13 @@ class SchemaWriter:
                 os.makedirs(output_file.parent)
 
             with open(output_file, "w") as f:
-                schema_json: dict = schema.model_json_schema()
+                schema_json: dict = (
+                    TypeAdapter(list[schema]).json_schema()
+                    if schema in (Subject, Procedures)
+                    else schema.model_json_schema()
+                )
+                if schema is Subject:
+                    schema_json["minItems"] = 1
                 schema_json_str: str = json.dumps(schema_json, indent=3)
                 f.write(schema_json_str)
 

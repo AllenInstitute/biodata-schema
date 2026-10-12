@@ -262,17 +262,6 @@ def _get_root_asset_name(data_description: DataDescription) -> Optional[str]:
     return None
 
 
-def _get_unique_subject_names(metadata_list) -> List[str]:
-    """Extract unique subject names from a list of Metadata objects"""
-    subject_names = set()
-    for m in metadata_list:
-        if m.subjects:
-            subject_names.update(subject.subject_name for subject in m.subjects)
-        elif m.data_description and m.data_description.subject_names:
-            subject_names.update(m.data_description.subject_names)
-    return list(subject_names)
-
-
 def _get_unique_acquisition_names(metadata_list) -> List[str]:
     """Extract unique root raw asset names from a list of Metadata objects"""
     names = set()
@@ -284,25 +273,38 @@ def _get_unique_acquisition_names(metadata_list) -> List[str]:
     return list(names)
 
 
-def _is_single_subject(metadata_list) -> bool:
-    """Check whether all metadata objects collectively refer to one subject."""
-    return len(_get_unique_subject_names(metadata_list)) == 1
-
-
 def _is_single_acquisition(metadata_list) -> bool:
     """Check whether all metadata objects refer to the same acquisition"""
     return len(_get_unique_acquisition_names(metadata_list)) == 1
 
 
+def _get_shared_subject_names(metadata_list) -> Optional[set[str]]:
+    """Return the subject roster only when every source has the same known roster."""
+    shared_names = None
+    for metadata in metadata_list:
+        names = (
+            {subject.subject_name for subject in metadata.subjects}
+            if metadata.subjects
+            else metadata.data_description.subject_names
+            if metadata.data_description
+            else None
+        )
+        if not names:
+            return None
+        if shared_names is None:
+            shared_names = set(names)
+        elif shared_names != names:
+            return None
+    return shared_names
+
+
 def _inherit_subject_and_procedures(metadata_list) -> Tuple:
-    """Return (subject, procedures) from the first metadata that has them, or (None, None)"""
-    if not _is_single_subject(metadata_list):
+    """Keep records when deriving from one asset or sources with identical subject rosters."""
+    if len(metadata_list) != 1 and _get_shared_subject_names(metadata_list) is None:
         return None, None
-    for m in metadata_list:
-        subject = m.subjects
-        procedures = m.procedures
-        if subject or procedures:
-            return subject, procedures
+    for metadata in metadata_list:
+        if metadata.subjects or metadata.procedures:
+            return metadata.subjects, metadata.procedures
     return None, None
 
 

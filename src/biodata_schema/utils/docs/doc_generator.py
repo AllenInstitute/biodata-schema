@@ -257,7 +257,7 @@ def generate_all_core_documentation():
     Generate documentation for all core files defined in CORE_FILES.
     """
     for core_file in CORE_FILES:
-        process_core_file(core_file)
+        process_core_file("subject" if core_file == "subjects" else core_file)
 
     process_core_file("metadata")
 

@@ -74,23 +74,13 @@ class Procedures(DataCoreModel):
 
     @model_validator(mode="after")
     def validate_subject_specimen_names(self):
-        """Validate that this subject_name and specimen_name match"""
-
-        # Return if no specimen procedures
-        if self.specimen_procedures:
-            specimen_names = []
-            for spec_proc in self.specimen_procedures:
-                specimen_name = spec_proc.specimen_name
-                if isinstance(specimen_name, list):
-                    specimen_names.extend(specimen_name)
-                else:
-                    specimen_names.append(specimen_name)
-
-            if any(
-                not subject_specimen_name_compatibility(self.subject_name, specimen_name)
-                for specimen_name in specimen_names
-            ):
-                raise ValueError("specimen_name must be an extension of the subject_name.")
+        """Validate that every specimen name belongs to this subject."""
+        if any(
+            not subject_specimen_name_compatibility(self.subject_name, specimen_name)
+            for procedure in self.specimen_procedures
+            for specimen_name in procedure.specimen_names
+        ):
+            raise ValueError("specimen_names must be extensions of the subject_name.")
 
         return self
 

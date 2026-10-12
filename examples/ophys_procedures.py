@@ -165,7 +165,7 @@ p = Procedures(
     specimen_procedures=[
         SpecimenProcedure(
             procedure_type="Immunolabeling",
-            specimen_name="625100_001",
+            specimen_names={"625100_001"},
             start_date="2023-06-09",
             end_date="2023-06-12",
             experimenters=["Scientist Smith"],
@@ -189,7 +189,7 @@ p = Procedures(
         ),
         SpecimenProcedure(
             procedure_type="Immunolabeling",
-            specimen_name="625100_001",
+            specimen_names={"625100_001"},
             start_date="2023-06-12",
             end_date="2023-06-13",
             experimenters=["Scientist Smith"],

@@ -19,7 +19,7 @@ from pydantic import (
     model_validator,
 )
 
-from biodata_schema.base import DataCoreModel, DraftRequirement
+from biodata_schema.base import MAX_FILE_SIZE, DataCoreModel, DraftRequirement
 from biodata_schema.components.identifiers import DatabaseIdentifiers
 from biodata_schema.components.injection_procedures import Injection
 from biodata_schema.components.subject_procedures import TrainingProtocol
@@ -33,7 +33,11 @@ from biodata_schema.core.processing import Processing
 from biodata_schema.core.quality_control import QualityControl
 from biodata_schema.core.subject import Subject
 from biodata_schema.utils.compatibility_check import InstrumentAcquisitionCompatibility
-from biodata_schema.utils.validators import recursive_time_validation_check, validate_creation_time_after_midnight
+from biodata_schema.utils.validators import (
+    recursive_check_paths,
+    recursive_time_validation_check,
+    validate_creation_time_after_midnight,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -70,6 +74,14 @@ def _validate_model_list(value, model_class, field_name: str):
         raise ValueError(f"{field_name}s must be provided as a list")
     models = []
     for model_value in value:
+        if isinstance(model_value, dict):
+            subject_name = model_value.get("subject_name")
+        elif isinstance(model_value, model_class):
+            subject_name = getattr(model_value, "subject_name", None)
+        else:
+            raise ValueError(f"Each {field_name} must be a dictionary or {model_class.__name__} object")
+        if not isinstance(subject_name, str):
+            raise ValueError(f"Each {field_name} must have a string subject_name")
         if isinstance(model_value, model_class):
             models.append(model_value)
             continue
@@ -322,12 +334,12 @@ class Metadata(DataCoreModel):
     def validate_calibration_object_tags(self):
         """Validator to ensure a CalibrationObject subject has the expected subject name"""
 
-        if self.subjects and any(isinstance(subject.subject_details, CalibrationObject) for subject in self.subjects):
-            if any(
-                isinstance(subject.subject_details, CalibrationObject) and subject.subject_name != "calibration"
-                for subject in self.subjects
-            ):
-                raise ValueError("CalibrationObject subject_name must be 'calibration'.")
+        if any(
+            isinstance(getattr(subject, "subject_details", None), CalibrationObject)
+            and subject.subject_name != "calibration"
+            for subject in self.subjects or []
+        ):
+            raise ValueError("CalibrationObject subject_name must be 'calibration'.")
 
         return self
 
@@ -473,7 +485,7 @@ class Metadata(DataCoreModel):
         return self
 
     def write_standard_files(self, output_directory: Optional[Path] = None) -> None:
-        """Write all present core file objects to their standard JSON files.
+        """Write core files, with subjects and procedures stored as JSON arrays.
 
         Parameters
         ----------
@@ -484,18 +496,15 @@ class Metadata(DataCoreModel):
             value = getattr(self, field_name, None)
             if value is None:
                 continue
-            if field_name == "subjects":
-                for subject in value:
-                    subject.write_standard_file(
-                        output_directory=output_directory,
-                        filename_suffix=subject.subject_name,
-                    )
-            elif field_name == "procedures":
-                for procedures in value:
-                    procedures.write_standard_file(
-                        output_directory=output_directory,
-                        filename_suffix=procedures.subject_name,
-                    )
+            if field_name in ("subjects", "procedures"):
+                directory = Path.cwd() if output_directory is None else Path(output_directory)
+                recursive_check_paths(value, directory)
+                filename = directory / f"{field_name}.json"
+                serialized = json.dumps([record.model_dump(mode="json") for record in value], indent=3)
+                with filename.open("w") as output_file:
+                    output_file.write(serialized)
+                if len(serialized) > MAX_FILE_SIZE:
+                    logger.warning(f"File size exceeds {MAX_FILE_SIZE / 1024} KB: {filename}")
             else:
                 value.write_standard_file(output_directory=output_directory)
 
@@ -513,8 +522,9 @@ class Metadata(DataCoreModel):
 
         Applies four inheritance rules:
         1. All derived assets get an updated DataDescription (DERIVED level).
-        2. If all sources share a single subject, inherit Subject and Procedures.
-           Otherwise, drop them.
+          2. Inherit Subjects and Procedures when all sources have the same subject roster.
+              Otherwise, drop them and clear DataDescription.subject_names,
+              including explicitly supplied subject-name overrides.
         3. If all sources share a single acquisition, inherit Instrument and Acquisition.
            Otherwise, drop them.
         4. If all sources share a single acquisition, accumulate Processing and
@@ -549,6 +559,7 @@ class Metadata(DataCoreModel):
         from biodata_schema.utils.inheritance import (
             _accumulate_processing,
             _accumulate_quality_control,
+            _get_shared_subject_names,
             _inherit_instrument_and_acquisition,
             _inherit_subject_and_procedures,
             derive_data_description,
@@ -576,16 +587,13 @@ class Metadata(DataCoreModel):
         ]
 
         if len(metadata_list) > 1:
-            from biodata_schema.utils.inheritance import _is_single_subject
-
             derived_dd = derive_data_description_analyzed(
                 first_dd,
                 analysis_name=process_name,
                 source_data=source_names,
                 **data_description_kwargs,
             )
-            if not _is_single_subject(metadata_list):
-                derived_dd = derived_dd.model_copy(update={"subject_names": None})
+            derived_dd = derived_dd.model_copy(update={"subject_names": _get_shared_subject_names(metadata_list)})
         else:
             derived_dd = derive_data_description(
                 first_dd,

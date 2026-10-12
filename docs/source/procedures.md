@@ -2,15 +2,17 @@
 
 [Link to code](https://github.com/AllenNeuralDynamics/biodata-schema/blob/dev/src/biodata_schema/core/procedures.py)
 
-The `procedures.json` file contains anything done to the subject or specimen prior to data collection. This can include surgeries, injections, tissue processing, sectioning, immunolabeling, etc. The procedures metadata also contains implanted devices and their configurations, for example for chronic insertions.
+The `procedures.json` file contains a JSON array of procedure records, one for each subject. These records describe anything done to a subject or specimen prior to data collection, including surgeries, injections, tissue processing, sectioning, and immunolabeling. They also contain implanted devices and their configurations, for example for chronic insertions.
+
+Each `Procedures` object belongs to one subject. `Metadata.procedures` is a list with exactly one object per subject in `Metadata.subjects`. `Metadata.write_standard_files()` writes the whole list to one `procedures.json` file, including for single-subject assets.
 
 ## Subject procedure vs. specimen procedure
 
 **Subject** procedures are performed on a live subject (e.g. injections, surgeries, implants, perfusions, etc.) whereas **specimen** procedures are performed on tissue extracted after perfusion (e.g. tissue processing, immunolabeling, sectioning, etc.).
 
-### SpecimenProcedure.specimen_name
+### SpecimenProcedure.specimen_names
 
-After perfusion or death we refer to specimens by the `specimen_name` field. When the tissue has not been sectioned in some way the `specimen_name` should be identical to the `subject_name`. Sectioned specimens should have a unique number appended as a suffix to the subject name: `<subject_name>_<###>`.
+After perfusion or death, `specimen_names` lists the specimens used in a procedure. It is a nonempty set of names, written as an array in JSON. Whole-tissue specimens can use the subject name. Sectioned specimens should have a unique suffix, such as `<subject_name>_<###>`. Every specimen name must include the owning subject's name.
 
 ## Examples
 

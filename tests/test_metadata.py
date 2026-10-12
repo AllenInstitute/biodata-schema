@@ -667,6 +667,33 @@ class TestMetadata:
         )
         assert metadata_no_procedures is not None
 
+    @pytest.mark.parametrize(
+        "name,data_level",
+        [
+            ("123456_2023-04-03_18-17-09", DataLevel.RAW),
+            ("123456_2023-04-03_18-17-09_sorted_2023-04-03_19-00-00", DataLevel.DERIVED),
+        ],
+    )
+    def test_historical_names_with_acquisition(self, name, data_level):
+        """Historical names remain valid when metadata checks acquisition times."""
+        description = DataDescription.model_validate(self.dd.model_dump() | {"name": name, "data_level": data_level})
+        acquisition = Acquisition.model_construct(
+            subject_names={self.subject.subject_name},
+            acquisition_start_time=datetime(2023, 4, 3, 18, 0, tzinfo=timezone.utc),
+            acquisition_end_time=datetime(2023, 4, 3, 18, 17, 9, tzinfo=timezone.utc),
+            data_streams=[],
+            subject_details=AcquisitionSubjectDetails.model_construct(),
+        )
+        metadata = Metadata(
+            name=name,
+            location=self.sample_location,
+            subjects=[self.subject],
+            procedures=[self.procedures],
+            data_description=description,
+            acquisition=acquisition,
+        )
+        assert metadata.data_description.name == name
+
     def test_validate_data_description_name_time_consistency(self):
         """Tests that data_description.name creation_time is on or after midnight
         on the same day as acquisition.acquisition_end_time"""
@@ -1101,19 +1128,44 @@ class TestMetadata:
                 procedures=self.procedures,
             )
 
-    def test_invalid_subject_item_uses_permissive_core_fallback(self, caplog):
+    @pytest.mark.parametrize(
+        "subject_payload",
+        [{"subject_name": "123456", "subject_details": {}}, {"subject_name": "123456"}],
+    )
+    def test_invalid_subject_item_uses_permissive_core_fallback(self, caplog, subject_payload):
         """Keep partially valid core items available when nested validation fails."""
         metadata = Metadata(
             name="partial-subject",
             location="s3://bucket/partial-subject",
-            subjects=[{"subject_name": "123456", "subject_details": {}}],
+            subjects=[subject_payload],
             procedures=[self.procedures],
             processing=self.processing,
         )
 
         assert metadata.subjects[0].subject_name == "123456"
-        assert metadata.subjects[0].subject_details == {}
+        assert getattr(metadata.subjects[0], "subject_details", {}) == {}
         assert "Error in validating subject" in caplog.text
+
+    @pytest.mark.parametrize(
+        "field_name,item",
+        [
+            ("subjects", None),
+            ("subjects", {}),
+            ("subjects", {"subject_name": []}),
+            ("subjects", Subject.model_construct()),
+            ("procedures", 42),
+            ("procedures", {}),
+        ],
+    )
+    def test_malformed_roster_items_raise_validation_errors(self, field_name, item):
+        """Malformed items do not leak TypeError or AttributeError from the fallback."""
+        with pytest.raises(ValidationError, match=field_name):
+            Metadata(
+                name=self.sample_name,
+                location=self.sample_location,
+                processing=self.processing,
+                **{field_name: [item]},
+            )
 
     def test_validate_subject_details_if_not_specimen(self):
         """Tests that subject details are required if acquisition.specimen_names is not provided"""
@@ -1173,10 +1225,70 @@ class TestMetadata:
 class TestWriteStandardFiles:
     """Tests for Metadata.write_standard_files"""
 
+    @pytest.mark.parametrize("subject_name", ["a/../../escaped", "a\\b", "a:b", "a\x00b", "a\nb"])
+    @pytest.mark.parametrize("field_name", ["subjects", "procedures"])
+    def test_subject_names_are_data_not_filenames(self, tmp_path, field_name, subject_name):
+        """Names are serialized inside fixed collection files, never used as paths."""
+        record = (
+            subject.model_copy(update={"subject_name": subject_name})
+            if field_name == "subjects"
+            else Procedures(subject_name=subject_name)
+        )
+        metadata = Metadata.model_construct(
+            name="test",
+            location="s3://bucket/test",
+            **{field_name: [record]},
+        )
+        metadata.write_standard_files(output_directory=tmp_path)
+        filename = tmp_path / f"{field_name}.json"
+        assert list(tmp_path.iterdir()) == [filename]
+        assert json.loads(filename.read_text())[0]["subject_name"] == subject_name
+
+    @pytest.mark.parametrize("count", [1, 2])
+    def test_writes_collection_arrays(self, tmp_path, count):
+        """One file per collection contains all records, even for a single subject."""
+        subjects = [subject.model_copy(update={"subject_name": name}) for name in ["123456", "789012"][:count]]
+        procedures = [Procedures(subject_name=record.subject_name) for record in subjects]
+        metadata = Metadata.model_construct(name="test", location="", subjects=subjects, procedures=procedures)
+        metadata.write_standard_files(output_directory=str(tmp_path))
+
+        assert {filename.name for filename in tmp_path.iterdir()} == {"subjects.json", "procedures.json"}
+        subject_records = json.loads((tmp_path / "subjects.json").read_text())
+        procedure_records = json.loads((tmp_path / "procedures.json").read_text())
+        assert isinstance(subject_records, list)
+        assert isinstance(procedure_records, list)
+        assert [Subject.model_validate(record) for record in subject_records] == subjects
+        assert [Procedures.model_validate(record) for record in procedure_records] == procedures
+
+    def test_writes_empty_procedures_array(self, tmp_path):
+        """An explicitly empty collection is written as an empty JSON array."""
+        metadata = Metadata.model_construct(name="test", location="", procedures=[])
+        metadata.write_standard_files(output_directory=tmp_path)
+        assert json.loads((tmp_path / "procedures.json").read_text()) == []
+
+    def test_warns_for_large_collection_file(self, tmp_path, caplog):
+        """Collection files retain the standard file-size warning."""
+        metadata = Metadata.model_construct(name="test", location="", subjects=[subject])
+        with patch("biodata_schema.core.metadata.MAX_FILE_SIZE", 1):
+            metadata.write_standard_files(output_directory=tmp_path)
+        assert "File size exceeds" in caplog.text
+        assert "subjects.json" in caplog.text
+
+    @pytest.mark.parametrize("field_name", ["subjects", "procedures"])
+    @patch("biodata_schema.core.metadata.recursive_check_paths")
+    @patch.object(Path, "open", autospec=True)
+    def test_checks_collection_paths(self, mock_open_fn, mock_rcp, field_name):
+        """Collection path checks receive the normalized output directory."""
+        records = [subject] if field_name == "subjects" else [Procedures(subject_name="123456")]
+        metadata = Metadata.model_construct(name="test", location="", **{field_name: records})
+        metadata.write_standard_files(output_directory="output_dir")
+        mock_rcp.assert_called_once_with(records, Path("output_dir"))
+        mock_open_fn.assert_called_once_with(Path("output_dir") / f"{field_name}.json", "w")
+
     @patch.object(Path, "open", autospec=True)
     @patch("biodata_schema.utils.validators.recursive_check_paths")
     def test_writes_each_present_core_file(self, mock_rcp, mock_open_fn):
-        """write_standard_files calls write_standard_file for each non-None core field"""
+        """Write each present collection once and each other present core file once."""
         m = Metadata.model_construct(
             name="test",
             location="s3://bucket/test",
@@ -1192,13 +1304,12 @@ class TestWriteStandardFiles:
         m.write_standard_files()
 
         opened_files = [call_args[0][0].name for call_args in mock_open_fn.call_args_list]
-        assert "subject_123456.json" in opened_files
-        assert "procedures_123456.json" in opened_files
-        assert "procedures_789012.json" in opened_files
+        assert "subjects.json" in opened_files
+        assert "procedures.json" in opened_files
         assert "data_description.json" in opened_files
         assert "processing.json" in opened_files
         assert "quality_control.json" in opened_files
-        assert 6 == mock_open_fn.call_count
+        assert 5 == mock_open_fn.call_count
 
     @patch.object(Path, "open", autospec=True)
     @patch("biodata_schema.utils.validators.recursive_check_paths")
@@ -1228,5 +1339,5 @@ class TestWriteStandardFiles:
         m.write_standard_files(output_directory=Path("output_dir"))
 
         opened_files = [call_args[0][0] for call_args in mock_open_fn.call_args_list]
-        assert Path("output_dir/subject_123456.json") in opened_files
+        assert Path("output_dir/subjects.json") in opened_files
         assert Path("output_dir/model.json") in opened_files

@@ -73,6 +73,10 @@ class TestDataNamePatternsMethods(unittest.TestCase):
             datetime(2020, 12, 29, 1, 10, 50, tzinfo=timezone.utc), datetime_from_name_string("20201229T011050+0000")
         )
 
+    def test_historical_datetime_from_name_string(self):
+        """Historical timestamps keep their original timezone-naive representation."""
+        self.assertEqual(datetime(2020, 12, 29, 1, 10, 50), datetime_from_name_string("2020-12-29_01-10-50"))
+
     def test_offset_round_trip(self):
         """Test positive and negative offsets and second-level precision."""
         for offset, suffix in [(timedelta(hours=-7), "-0700"), (timedelta(hours=5, minutes=30), "+0530")]:
