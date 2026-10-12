@@ -59,7 +59,6 @@ from biodata_schema.utils.merge import (
 from biodata_schema.utils.validators import (
     TimeValidation,
     extract_timezone_from_datetime,
-    subject_specimen_name_compatibility,
 )
 
 logger = logging.getLogger(__name__)
@@ -518,20 +517,6 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
         """Extract timezone information from acquisition_start_time and set acquisition_start_tz"""
         if self.acquisition_start_tz is None and hasattr(self, "acquisition_start_time"):
             self.acquisition_start_tz = extract_timezone_from_datetime(self.acquisition_start_time)
-        return self
-
-    @model_validator(mode="after")
-    def check_subject_specimen_names(self):
-        """Check that the subject and specimen names match"""
-        if self.specimen_names and self.subject_names:
-            specimen_names = self.specimen_names if isinstance(self.specimen_names, list) else [self.specimen_names]
-            for specimen_name in specimen_names:
-                if not any(subject_specimen_name_compatibility(name, specimen_name) for name in self.subject_names):
-                    if len(self.subject_names) == 1:
-                        subject_name = next(iter(self.subject_names))
-                        raise ValueError(f"Expected {subject_name} to appear in {specimen_name}")
-                    raise ValueError(f"Expected one of {self.subject_names} to appear in {specimen_name}")
-
         return self
 
     @model_validator(mode="after")

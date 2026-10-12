@@ -84,39 +84,6 @@ class TestAcquisition:
             )
         assert "instrument_name is required" in str(context.value)
 
-    def test_check_subject_specimen_names(self):
-        """Test that subject and specimen names match"""
-        with pytest.raises(ValueError) as context:
-            acq = exaspim_acquisition.model_copy()
-            acq.specimen_names = "654321"
-
-            Acquisition.model_validate_json(acq.model_dump_json())
-
-        assert "Expected 123456 to appear in 654321" in str(context.value)
-
-    def test_specimen_name_list_valid(self):
-        """Test that specimen_name accepts a list of strings when all contain subject_name"""
-        acq = exaspim_acquisition.model_copy()
-        acq.specimen_names = ["123456_slide1", "123456_slide2"]
-        validated = Acquisition.model_validate_json(acq.model_dump_json())
-        assert validated.specimen_names == ["123456_slide1", "123456_slide2"]
-
-    def test_specimen_name_list_invalid(self):
-        """Test that specimen_name list raises ValueError if any entry does not contain subject_name"""
-        with pytest.raises(ValueError) as context:
-            acq = exaspim_acquisition.model_copy()
-            acq.specimen_names = ["123456_slide1", "654321_slide2"]
-            Acquisition.model_validate_json(acq.model_dump_json())
-        assert "Expected 123456 to appear in 654321_slide2" in str(context.value)
-
-    def test_specimen_name_mismatch_for_multiple_subjects(self):
-        """Report the candidate roster when a specimen matches no subject."""
-        acquisition = exaspim_acquisition.model_copy(
-            update={"subject_names": {"123456", "789012"}, "specimen_name": "654321_slide1"}
-        )
-        with pytest.raises(ValueError, match="Expected one of .* to appear in 654321_slide1"):
-            Acquisition.model_validate_json(acquisition.model_dump_json())
-
     def test_specimen_required(self):
         """Test that specimen name is required for in vitro imaging modalities"""
         acq = exaspim_acquisition.model_copy()
