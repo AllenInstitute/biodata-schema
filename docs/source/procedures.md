@@ -12,7 +12,7 @@ Each `Procedures` object belongs to one subject. `Metadata.procedures` is a list
 
 ### SpecimenProcedure.specimen_names
 
-After perfusion or death, `specimen_names` lists the specimens used in a procedure. It is a nonempty set of names, written as an array in JSON. Whole-tissue specimens can use the subject name. Sectioned specimens should have a unique suffix, such as `<subject_name>_<###>`. Every specimen name must include the owning subject's name.
+`specimen_names` lists the specimens that were used in a procedure. Whole-tissue specimens can use the subject name. There are no specific rules about specimen naming, but we recommend using the `subject_name` as a prefix and adding a unique suffix, such as `<subject_name>_<###>`.
 
 ## Examples
 
