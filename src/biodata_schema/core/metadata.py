@@ -349,12 +349,15 @@ class Metadata(DataCoreModel):
                 f"Each subject must have exactly one Procedures object. Extra procedures found for subjects: {', '.join(extra_procedures)}"
             )
 
+        if len(procedure_names) != len(set(procedure_names)):
+            raise ValueError("Each subject must have exactly one Procedures object. Duplicate procedures found.")
+
         return self
 
     @model_validator(mode="after")
     def validate_subject_name_consistency(self):
         """Ensure acquisition and data-description subject names match the subject roster.
-        
+
         Note: procedures is covered by validate_unique_procedure_per_subject
         """
 
