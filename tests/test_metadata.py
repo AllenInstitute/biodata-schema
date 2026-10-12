@@ -277,7 +277,8 @@ class TestMetadata:
         # also check the other fields
         assert expected_result == result
 
-    def test_validate_subject_name_consistency(self):
+    @pytest.mark.parametrize("subject_names", [{"999"}, {"123456", "999"}, set()])
+    def test_validate_subject_name_consistency(self, subject_names):
         """Tests that mismatched subject_name across core files raises an error"""
         Metadata(
             name=self.sample_name,
@@ -296,16 +297,18 @@ class TestMetadata:
                 procedures=[Procedures(subject_name="999")],
                 processing=self.processing,
             )
-        with pytest.raises(ValidationError, match="data_description.subject_names=.*999"):
+        with pytest.raises(ValidationError, match="data_description.subject_names="):
             Metadata(
                 name=self.sample_name,
                 location=self.sample_location,
-                data_description=self.dd.model_copy(update={"subject_names": {"999"}}),
+                data_description=self.dd.model_copy(
+                    update={"data_level": DataLevel.DERIVED, "subject_names": subject_names}
+                ),
                 subjects=[self.subject],
                 procedures=[self.procedures],
                 processing=self.processing,
             )
-        with pytest.raises(ValidationError, match="acquisition.subject_names=.*999"):
+        with pytest.raises(ValidationError, match="acquisition.subject_names="):
             Metadata(
                 name=self.sample_name,
                 location=self.sample_location,
@@ -313,8 +316,35 @@ class TestMetadata:
                 procedures=[self.procedures],
                 acquisition=Acquisition.model_construct(
                     acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
-                    subject_names={"999"},
+                    subject_names=subject_names,
                     subject_details=AcquisitionSubjectDetails.model_construct(),
+                    data_streams=[],
+                ),
+            )
+
+    def test_validate_subject_name_consistency_optional_names(self):
+        """A derived data description can omit its subject names."""
+        metadata = Metadata(
+            name=self.sample_name,
+            location=self.sample_location,
+            subjects=[self.subject],
+            procedures=[self.procedures],
+            data_description=self.dd.model_copy(update={"data_level": DataLevel.DERIVED, "subject_names": None}),
+        )
+        assert metadata.data_description.subject_names is None
+
+    def test_validate_subject_name_consistency_multiple_mismatches(self):
+        """Report both inconsistent core rosters in the same error."""
+        with pytest.raises(ValidationError, match="acquisition.subject_names=.*data_description.subject_names="):
+            Metadata(
+                name=self.sample_name,
+                location=self.sample_location,
+                subjects=[self.subject],
+                procedures=[self.procedures],
+                data_description=self.dd.model_copy(update={"subject_names": {"999"}}),
+                acquisition=Acquisition.model_construct(
+                    subject_names={"888"},
+                    specimen_names={"888-001"},
                     data_streams=[],
                 ),
             )

@@ -171,26 +171,6 @@ class Metadata(DataCoreModel):
         return self
 
     @model_validator(mode="after")
-    def validate_unique_procedure_per_subject(self):
-        """Ensure there is exactly one Procedures object per subject"""
-        subject_names = [subject.subject_name for subject in self.subjects] if self.subjects else []
-        procedure_names = [procedures.subject_name for procedures in self.procedures] if self.procedures else []
-
-        missing_procedures = set(subject_names) - set(procedure_names)
-        if missing_procedures:
-            raise ValueError(
-                f"Each subject must have exactly one Procedures object. Missing for subjects: {', '.join(missing_procedures)}"
-            )
-
-        extra_procedures = set(procedure_names) - set(subject_names)
-        if extra_procedures:
-            raise ValueError(
-                f"Each subject must have exactly one Procedures object. Extra procedures found for subjects: {', '.join(extra_procedures)}"
-            )
-
-        return self
-
-    @model_validator(mode="after")
     def validate_subject_details_if_not_specimen(self):
         """Check that subject details are present if an in vivo experiment"""
 
@@ -352,26 +332,39 @@ class Metadata(DataCoreModel):
         return self
 
     @model_validator(mode="after")
+    def validate_unique_procedure_per_subject(self):
+        """Ensure there is exactly one Procedures object per subject"""
+        subject_names = [subject.subject_name for subject in self.subjects] if self.subjects else []
+        procedure_names = [procedures.subject_name for procedures in self.procedures] if self.procedures else []
+
+        missing_procedures = set(subject_names) - set(procedure_names)
+        if missing_procedures:
+            raise ValueError(
+                f"Each subject must have exactly one Procedures object. Missing for subjects: {', '.join(missing_procedures)}"
+            )
+
+        extra_procedures = set(procedure_names) - set(subject_names)
+        if extra_procedures:
+            raise ValueError(
+                f"Each subject must have exactly one Procedures object. Extra procedures found for subjects: {', '.join(extra_procedures)}"
+            )
+
+        return self
+
+    @model_validator(mode="after")
     def validate_subject_name_consistency(self):
-        """Validator to ensure procedures, acquisition, and data_description subject_name match subject.subject_name"""
+        """Ensure acquisition and data-description subject names match the subject roster.
+        
+        Note: procedures is covered by validate_unique_procedure_per_subject
+        """
 
         if not self.subjects:
             return self
 
         expected = {subject.subject_name for subject in self.subjects}
         mismatches = []
-        procedure_subject_names = {
-            procedures.subject_name for procedures in self.procedures or [] if getattr(procedures, "subject_name", None)
-        }
-        if not procedure_subject_names.issubset(expected):
-            mismatches.append(f"procedures.subject_name={procedure_subject_names}")
-
         for field_name, core_model in (("acquisition", self.acquisition), ("data_description", self.data_description)):
             subject_names = getattr(core_model, "subject_names", None)
-            if not subject_names:
-                subject_names = getattr(core_model, "subject_name", None)
-            elif subject_names is not None:
-                subject_names = set(subject_names)
             if subject_names is not None and subject_names != expected:
                 mismatches.append(f"{field_name}.subject_names={subject_names}")
 
