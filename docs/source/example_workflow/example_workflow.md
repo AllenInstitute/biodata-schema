@@ -75,7 +75,7 @@ how was it funded, etc. We'll define a function to generate this, and re-use it 
 :lines: 59-72
 ```
 
-A few of the fields in the data description required us to use enumerated variables, like [DataLevel](../biodata_models/data_name_patterns.md#datalevel). Controlled vocabularies like this one are used to standardize the metadata and make it easier for people to search across assets from different experiments. We also use controlled vocabularies that are linked to external registries, like for [Organization](../biodata_models/organizations.md#organization)
+A few of the fields in the data description required us to use enumerated variables, like [DataLevel](../biodata_models/data_levels.md#datalevel). Controlled vocabularies like this one are used to standardize the metadata and make it easier for people to search across assets from different experiments. We also use controlled vocabularies that are linked to external registries, like for [Organization](../biodata_models/organizations.md#organization)
 
 ## Subject
 

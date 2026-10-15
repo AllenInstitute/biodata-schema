@@ -11,7 +11,7 @@ Registries are models that are linked to an external definition, like the NCBI s
    biodata_models/atlas
    biodata_models/brain_atlas
    biodata_models/coordinates
-   biodata_models/data_name_patterns
+   biodata_models/data_levels
    biodata_models/devices
    biodata_models/external
    biodata_models/harp_types

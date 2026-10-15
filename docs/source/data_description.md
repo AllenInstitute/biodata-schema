@@ -6,7 +6,7 @@ The `data_description.json` file tracks administrative information about a data 
 
 ## Uniqueness
 
-Every data asset is identified by its `DataDescription.name`. New names combine an asset label with `creation_time`. For single-subject raw data, the label defaults to the subject name. Raw assets with multiple subjects require an explicit name, such as a batch label followed by the timestamp. The subjects are listed in `subject_names`; they are not inferred from the label.
+`DataDescription.name` can be any string. If omitted for single-subject raw data, it is generated as `<subject_name>_<creation_time>`. For multi-subject raw data, supply a name; we suggest `<label>_<acquisition-start-time>`, for example `batch-17_20221012T232311+0000`. Subjects are listed in `subject_names`, not inferred from the name.
 
 You can group data assets together using `DataDescription.tags: List[str]`. Tags should be shared across assets within experiments. **Do not repeat information in the tags that already exists elsewhere in the metadata**, for example modalities should never be included in tags.
 
@@ -29,11 +29,10 @@ Description of a logical collection of data files
 | `subject_names` | `Optional[set[typing.Annotated[str, StringConstraints(strip_whitespace=None, to_upper=None, to_lower=None, strict=None, min_length=None, max_length=None, pattern='^[^_]+$')]]]` | Subject names (Unique names for subjects associated with this data asset) |
 | `creation_time` | `datetime (timezone-aware)` | Creation Time (Time that data files were created, used to uniquely identify the data) |
 | `tags` | `Optional[List[str]]` | Tags (Descriptive strings to help categorize and search for data) |
-| `name` | `Optional[str]` | Data asset name (Asset label followed by a folder-safe ISO creation timestamp (YYYYMMDDTHHMMSS+HHMM or -HHMM). For single-subject raw data, a name is generated from the subject name when omitted. For multi-subject raw data, an explicit name is required; the label need not encode subject names. Conventionally also used as the name of the data folder.) |
+| `name` | `Optional[str]` | Data asset name (Any string naming the data asset, conventionally also used as the data folder name. When omitted for single-subject raw data, generated from the subject name and creation time. Multi-subject raw data requires a name; consider `<label>_<acquisition-start-time>`, for example batch-17_20221012T232311+0000.) |
 | `institution` | [Organization](biodata_models/organizations.md#organization) | Institution (An established society, corporation, foundation or other organization that collected this data) |
 | `funding_source` | List[[Funding](data_description.md#funding)] | Funding source (Funding source. If internal funding, select 'Allen Institute') |
-| `data_level` | [DataLevel](biodata_models/data_name_patterns.md#datalevel) | Data Level (Level of processing that data has undergone) |
-| `group` | Optional[[Group](biodata_models/data_name_patterns.md#group)] | Group (A short name for the group of individuals that collected this data) |
+| `data_level` | [DataLevel](biodata_models/data_levels.md#datalevel) | Data Level (Level of processing that data has undergone) |
 | `investigators` | List[[Person](components/identifiers.md#person)] | Investigators (Full name(s) of key investigators (e.g. PI, lead scientist, contact person)) |
 | `project_name` | `str` | Project Name (A name for a set of coordinated activities intended to achieve one or more objectives.) |
 | `restrictions` | `Optional[str]` | Restrictions (Detail any restrictions on publishing or sharing these data) |

@@ -6,7 +6,7 @@ from zoneinfo import ZoneInfo
 import pandas as pd
 from biodata_models.brain_atlas import CCFv3
 from biodata_models.coordinates import AxisName, Direction, Origin
-from biodata_models.data_name_patterns import DataLevel
+from biodata_models.data_levels import DataLevel
 from biodata_models.modalities import Modality
 from biodata_models.organizations import Organization
 from biodata_models.species import Strain

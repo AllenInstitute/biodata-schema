@@ -15,7 +15,7 @@ from biodata_schema.components.subject_procedures import (
     WaterRestriction,
 )
 from biodata_schema.utils.merge import merge_coordinate_systems, merge_notes
-from biodata_schema.utils.validators import recursive_get_device_names, subject_specimen_name_compatibility
+from biodata_schema.utils.validators import recursive_get_device_names
 
 
 class Procedures(DataCoreModel):
@@ -71,18 +71,6 @@ class Procedures(DataCoreModel):
         #         device_names.add(spec_proc.implanted_device.name)
 
         return list(device_names)
-
-    @model_validator(mode="after")
-    def validate_subject_specimen_names(self):
-        """Validate that every specimen name belongs to this subject."""
-        if any(
-            not subject_specimen_name_compatibility(self.subject_name, specimen_name)
-            for procedure in self.specimen_procedures
-            for specimen_name in procedure.specimen_names
-        ):
-            raise ValueError("specimen_names must be extensions of the subject_name.")
-
-        return self
 
     def __add__(self, other: "Procedures") -> "Procedures":
         """Combine two Procedures objects"""

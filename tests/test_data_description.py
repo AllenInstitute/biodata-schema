@@ -5,7 +5,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-from biodata_models.data_name_patterns import DataLevel
+from biodata_models.data_levels import DataLevel
 from biodata_models.modalities import Modality
 from biodata_models.organizations import Organization
 from pydantic import ValidationError
@@ -57,22 +57,22 @@ class TestDataDescription:
         assert name == "project_20221012T232311+0000"
 
     @patch("biodata_schema.core.data_description.build_data_name")
-    def test_build_name_validation_error(self, mock_build_data_name: MagicMock):
-        """Test build_data_name function to trigger validation error"""
-        mock_build_data_name.return_value = "invalid"
+    def test_build_name_without_pattern_validation(self, mock_build_data_name: MagicMock):
+        """Generated names are not subject to pattern validation."""
+        mock_build_data_name.return_value = "custom name"
 
         dt = datetime.datetime(2022, 10, 12, 23, 23, 11)
-        with pytest.raises(ValueError):
-            DataDescription(
-                modalities=[Modality.SPIM],
-                subject_names={"1234"},
-                data_level=DataLevel.RAW,
-                creation_time=dt,
-                institution=Organization.AIND,
-                funding_source=[Funding(funder=Organization.NINDS, grant_number="grant001")],
-                investigators=[Person(name="Jane Smith")],
-                project_name="Test",
-            )
+        description = DataDescription(
+            modalities=[Modality.SPIM],
+            subject_names={"1234"},
+            data_level=DataLevel.RAW,
+            creation_time=dt,
+            institution=Organization.AIND,
+            funding_source=[Funding(funder=Organization.NINDS, grant_number="grant001")],
+            investigators=[Person(name="Jane Smith")],
+            project_name="Test",
+        )
+        assert description.name == "custom name"
 
     def test_derived_data_description_construction(self):
         """Test DataDescription.data_level == DERIVED construction"""
@@ -128,7 +128,7 @@ class TestDataDescription:
 
     def test_raw_name_requires_explicit_name_for_multiple_subjects(self):
         """A raw asset with several subjects cannot derive one canonical asset name."""
-        with pytest.raises(ValueError, match="name must be set explicitly"):
+        with pytest.raises(ValueError, match="name must be set explicitly") as error:
             DataDescription(
                 modalities=[Modality.SPIM],
                 subject_names={"1234", "5678"},
@@ -139,11 +139,39 @@ class TestDataDescription:
                 investigators=[Person(name="Jane Smith")],
                 project_name="Test",
             )
+        assert "<label>_<acquisition-start-time>" in str(error.value)
+        assert "batch-17_20221012T232311+0000" in str(error.value)
 
-    def test_build_name_returns_when_constructed_without_subject_names(self):
-        """The name builder tolerates partially constructed raw descriptions."""
+    @pytest.mark.parametrize("data_level", list(DataLevel))
+    @pytest.mark.parametrize("name", ["custom name", "", "folder/name_with:punctuation", "a\nname"])
+    def test_explicit_names_are_unrestricted(self, data_level, name):
+        """Explicit names are kept unchanged for raw and derived data."""
+        description = DataDescription.model_validate(
+            example_data_description.model_dump()
+            | {"name": name, "data_level": data_level, "subject_names": {"1234", "5678"}}
+        )
+        assert description.name == name
+
+    @pytest.mark.parametrize("data_level", [DataLevel.DERIVED, DataLevel.SIMULATED])
+    @pytest.mark.parametrize("name_kwargs", [{}, {"name": None}])
+    def test_missing_name_without_automatic_generation_raises(self, data_level, name_kwargs):
+        """A name is required when the description cannot generate one."""
+        data = example_data_description.model_dump(exclude={"name"})
+        with pytest.raises(ValidationError, match="name must be set explicitly"):
+            DataDescription.model_validate(data | {"data_level": data_level} | name_kwargs)
+
+    @pytest.mark.parametrize("name_kwargs", [{}, {"name": None}])
+    def test_missing_raw_name_is_generated(self, name_kwargs):
+        """Omitted and null raw names are generated for one subject."""
+        data = example_data_description.model_dump(exclude={"name"})
+        description = DataDescription.model_validate(data | name_kwargs)
+        assert description.name == build_data_name(next(iter(description.subject_names)), description.creation_time)
+
+    def test_build_name_without_subject_names_raises(self):
+        """The name builder rejects raw descriptions without a subject."""
         description = DataDescription.model_construct(name=None, data_level=DataLevel.RAW, subject_names=None)
-        assert description.build_name() is description
+        with pytest.raises(ValueError, match="subject_names must be set"):
+            description.build_name()
 
     def test_multi_subject_asset_label(self):
         """A multi-subject asset label does not encode or infer its subjects."""

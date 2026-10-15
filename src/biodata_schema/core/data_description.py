@@ -3,7 +3,7 @@
 import re
 from typing import Annotated, List, Literal, Optional
 
-from biodata_models.data_name_patterns import DataLevel, Group
+from biodata_models.data_levels import DataLevel
 from biodata_models.licenses import License
 from biodata_models.modalities import Modality
 from biodata_models.organizations import Organization
@@ -50,10 +50,7 @@ class DataDescription(DataCoreModel):
     name: Optional[str] = Field(
         default=None,
         description=(
-            "Asset label followed by a folder-safe ISO creation timestamp (YYYYMMDDTHHMMSS+HHMM or -HHMM). "
-            "For single-subject raw data, a name is generated from the subject name when omitted. "
-            "For multi-subject raw data, an explicit name is required; the label need not encode subject names. "
-            "Conventionally also used as the name of the data folder."
+            "Any string naming the data asset, conventionally also used as the data folder name."
         ),
         title="Data asset name",
         validate_default=True,
@@ -73,11 +70,6 @@ class DataDescription(DataCoreModel):
         ...,
         description="Level of processing that data has undergone",
         title="Data Level",
-    )
-    group: Optional[Group] = Field(
-        default=None,
-        description="A short name for the group of individuals that collected this data",
-        title="Group",
     )
     investigators: List[Person] = Field(
         ...,
@@ -113,7 +105,7 @@ class DataDescription(DataCoreModel):
 
     @classmethod
     def parse_name(cls, name, data_level: DataLevel = DataLevel.RAW):
-        """Decompose a DataDescription name string into component parts"""
+        """Parse a standard generated name; raise ValueError for other names."""
 
         if data_level == DataLevel.RAW:
             m = re.match(f"{DataRegex.DATA.value}", name)
@@ -151,18 +143,21 @@ class DataDescription(DataCoreModel):
 
     @model_validator(mode="after")
     def build_name(self):
-        """Set the name for single-subject raw data when it is empty."""
-        if self.name is None and self.data_level == DataLevel.RAW:
-            subject_names = self.subject_names
-            if not subject_names:
-                return self
-            if len(subject_names) != 1:
-                raise ValueError("name must be set explicitly when raw data includes multiple subjects")
-            self.name = build_data_name(next(iter(subject_names)), creation_datetime=self.creation_time)
-
-            # check that the name matches the name regex
-            if not re.match(DataRegex.DATA.value, self.name):
-                raise ValueError(f"Name({self.name}) does not match allowed Regex pattern")
+        """Generate a single-subject raw name or require an explicit name."""
+        if self.name is not None:
+            return self
+        if self.data_level != DataLevel.RAW:
+            raise ValueError("name must be set explicitly when it cannot be generated automatically")
+        subject_names = self.subject_names
+        if not subject_names:
+            raise ValueError("subject_names must be set to generate a name automatically")
+        if len(subject_names) != 1:
+            raise ValueError(
+                "name must be set explicitly when raw data includes multiple subjects. "
+                "Choose a name; we suggest <label>_<acquisition-start-time>, "
+                "for example batch-17_20221012T232311+0000."
+            )
+        self.name = build_data_name(next(iter(subject_names)), creation_datetime=self.creation_time)
 
         return self
 

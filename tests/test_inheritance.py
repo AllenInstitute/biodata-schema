@@ -3,7 +3,7 @@
 from datetime import datetime, timezone
 
 import pytest
-from biodata_models.data_name_patterns import DataLevel
+from biodata_models.data_levels import DataLevel
 from biodata_models.licenses import License
 from biodata_models.modalities import Modality
 from biodata_models.organizations import Organization
@@ -79,6 +79,53 @@ def test_derivation_preserves_or_overrides_license(derive, override):
     kwargs = {} if override is None else {"license": override}
     result = derive(source, "analysis", creation_time=t, **kwargs)
     assert result.license == (override or License.MIT)
+
+
+@pytest.mark.parametrize(
+    "derive",
+    [derive_data_description_from_raw, derive_data_description_from_derived, derive_data_description_analyzed],
+)
+@pytest.mark.parametrize("name", ["custom name", "", "folder/name_with:punctuation", "a\nname"])
+def test_derivation_accepts_explicit_names(derive, name):
+    """Every derivation path uses the supplied name unchanged."""
+    source = example_data_description.model_copy(
+        update={
+            "name": "arbitrary source",
+            "data_level": DataLevel.DERIVED if derive is derive_data_description_from_derived else DataLevel.RAW,
+        }
+    )
+    result = derive(source, "analysis", name=name, creation_time=t)
+    assert result.name == name
+
+
+@pytest.mark.parametrize("name", ["custom source", "project_analysis_20221122T084300+0000", "", "a\nname"])
+def test_derivation_appends_to_nonstandard_derived_names(name):
+    """Names without a recoverable raw root use the current name as the base."""
+    source = example_data_description.model_copy(update={"name": name, "data_level": DataLevel.DERIVED})
+    result = derive_data_description_from_derived(source, "next", creation_time=t)
+    assert result.name == f"{name}_next_20221122T084300+0000"
+    assert result.source_data == [name]
+
+
+def test_custom_named_asset_keeps_single_source_history():
+    """Processing and QC are retained when processing one custom-named derived asset."""
+    source = _make_metadata()
+    first = Metadata.from_metadata(source, name="custom result", creation_time=t)
+    second = Metadata.from_metadata(first, creation_time=t)
+    assert first.name == first.data_description.name == "custom result"
+    assert second.name == "custom result_processed_20221122T084300+0000"
+    assert second.data_description.source_data == ["custom result"]
+    assert second.processing == source.processing
+    assert second.quality_control == source.quality_control
+
+
+def test_multiple_sources_preserve_empty_names():
+    """An empty source name is still included in source_data."""
+    source = _make_metadata()
+    source.data_description = source.data_description.model_copy(update={"name": ""})
+    result = Metadata.from_metadata([source, _make_metadata()], name="merged", creation_time=t)
+    assert result.name == result.data_description.name == "merged"
+    assert result.data_description.source_data[0] == ""
 
 
 @pytest.mark.parametrize(

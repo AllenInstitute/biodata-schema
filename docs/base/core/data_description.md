@@ -6,7 +6,7 @@ The `data_description.json` file tracks administrative information about a data 
 
 ## Uniqueness
 
-Every data asset is identified by its `DataDescription.name`. New names combine an asset label with `creation_time`. For single-subject raw data, the label defaults to the subject name. Raw assets with multiple subjects require an explicit name, such as a batch label followed by the timestamp. The subjects are listed in `subject_names`; they are not inferred from the label.
+`DataDescription.name` can be any string. If omitted for single-subject raw data, it is generated as `<subject_name>_<creation_time>`. For multi-subject raw data, supply a name; we suggest `<label>_<acquisition-start-time>`, for example `batch-17_20221012T232311+0000`.
 
 You can group data assets together using `DataDescription.tags: List[str]`. Tags should be shared across assets within experiments. **Do not repeat information in the tags that already exists elsewhere in the metadata**, for example modalities should never be included in tags.
 

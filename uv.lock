@@ -95,16 +95,16 @@ wheels = [
 
 [[package]]
 name = "biodata-models"
-version = "2.0.2"
+version = "3.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "importlib-resources" },
     { name = "pydantic" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c4/4a/e31189ed13493fcaf98ce69980005637182a64e0d12c6735bb68367564a8/biodata_models-2.0.2.tar.gz", hash = "sha256:babdf2da0552e23ae702e08584ceec28b74b1396335ba53feb0df5112a41e8b6", size = 146594, upload-time = "2026-10-02T22:14:42.952Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a5/25/230707f26889c6177122095a8f8f8105c67c1ddffcac69e7eb8e766ffc61/biodata_models-3.0.0.tar.gz", hash = "sha256:5df535bd22c330dd33bfdbfcef68b45b8894162f908656021d7e60c768b67ca3", size = 145840, upload-time = "2026-10-15T00:50:19.768Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7f/18/ea6e82474610af0804df44f1c4971562f4fea595498d8c0c5761f487db40/biodata_models-2.0.2-py3-none-any.whl", hash = "sha256:d38fc817ed6e3b361f6279a65c8c5bcde136bd20b46848366f166fe2efba95ce", size = 113259, upload-time = "2026-10-02T22:14:41.262Z" },
+    { url = "https://files.pythonhosted.org/packages/fe/cf/fb74f099bb2c493cb878cf6b276ee1dd2943fc0c867b154a1632b675a1b7/biodata_models-3.0.0-py3-none-any.whl", hash = "sha256:3bbff9facc02a58433504478275f0ec7a4b67d1d4356b271377990a39a7da797", size = 113669, upload-time = "2026-10-15T00:50:18.179Z" },
 ]
 
 [[package]]
@@ -143,7 +143,7 @@ docs = [
 
 [package.metadata]
 requires-dist = [
-    { name = "biodata-models", specifier = ">=2.0.2,<3" },
+    { name = "biodata-models", specifier = ">=3.0.0,<4" },
     { name = "pydantic", marker = "python_full_version < '3.13'", specifier = ">=2.7,<3" },
     { name = "pydantic", marker = "python_full_version >= '3.13'", specifier = ">=2.10,<3" },
     { name = "pydantic-extra-types" },

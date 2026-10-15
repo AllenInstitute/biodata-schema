@@ -7,7 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-from biodata_models.data_name_patterns import DataLevel
+from biodata_models.data_levels import DataLevel
 from biodata_models.modalities import Modality
 from biodata_models.organizations import Organization
 from biodata_models.species import Strain
@@ -128,6 +128,16 @@ class TestMetadata:
     def test_default_file_extension(self):
         """Tests that the default file extension used is as expected."""
         assert ".nd.json" == Metadata._FILE_EXTENSION.default
+
+    def test_raw_description_generates_name_when_nested(self):
+        """A raw description can generate its name during metadata validation."""
+        metadata = Metadata(
+            name=self.sample_name,
+            location=self.sample_location,
+            data_description=self.dd.model_dump(exclude={"name"}),
+            processing=self.processing,
+        )
+        assert metadata.data_description.name == self.dd.name
 
     def test_injection_material_validator_spim(self):
         """Tests that the injection validator works for SPIM"""
@@ -694,15 +704,16 @@ class TestMetadata:
         )
         assert metadata.data_description.name == name
 
-    def test_validate_data_description_name_time_consistency(self):
-        """Tests that data_description.name creation_time is on or after midnight
-        on the same day as acquisition.acquisition_end_time"""
+    @pytest.mark.parametrize("name", ["custom name", "", "folder/name_with:punctuation", "a\nname"])
+    def test_validate_data_description_time_consistency(self, name):
+        """Time consistency uses creation_time independently of the asset name."""
 
         # Create a specific datetime for testing
         test_datetime = datetime(2023, 4, 3, 18, 17, 9, tzinfo=timezone.utc)
 
         # Create a data description with a name that should match the acquisition end time
         data_description = DataDescription(
+            name=name,
             creation_time=test_datetime,
             modalities=[Modality.ECEPHYS],
             subject_names={"123456"},
@@ -782,6 +793,7 @@ class TestMetadata:
         # Test with creation time before midnight of acquisition day - should fail
         before_midnight = datetime(2023, 4, 2, 23, 59, 59, tzinfo=timezone.utc)
         data_description_before = DataDescription(
+            name=name,
             creation_time=before_midnight,
             modalities=[Modality.ECEPHYS],
             subject_names={"123456"},

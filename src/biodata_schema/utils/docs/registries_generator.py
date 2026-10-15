@@ -12,7 +12,7 @@ from biodata_models.brain_atlas import BrainStructureModel, CCFv3
 from biodata_models.coordinates import AnatomicalRelative, AxisName, Direction, Origin
 
 # Name patterns
-from biodata_models.data_name_patterns import DataLevel, Group
+from biodata_models.data_levels import DataLevel
 
 # Devices models
 from biodata_models.devices import (
@@ -93,7 +93,6 @@ registries = [
     CCFv3,
     # Name patterns
     DataLevel,
-    Group,
     License,
     # Coordinates models
     Origin,

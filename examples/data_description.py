@@ -3,7 +3,7 @@
 import argparse
 from datetime import datetime, timezone
 
-from biodata_models.data_name_patterns import DataLevel
+from biodata_models.data_levels import DataLevel
 from biodata_models.modalities import Modality
 from biodata_models.organizations import Organization
 

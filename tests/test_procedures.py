@@ -533,33 +533,30 @@ class TestProcedures:
                 ),
             )
 
-    def test_validate_subject_specimen_names(self):
-        """Test that every specimen name matches the subject name."""
-
-        with pytest.raises(ValidationError) as e:
-            Procedures(
-                subject_name="12345",
-                specimen_procedures=[
-                    SpecimenProcedure(
-                        specimen_names={"12345_001", "9999_1000"},
-                        procedure_type="Other",
-                        start_date=date.fromisoformat("2020-10-10"),
-                        end_date=date.fromisoformat("2020-10-11"),
-                        experimenters=["Mam Moth"],
-                        protocol_id=["10"],
-                        notes="some notes",
-                    )
-                ],
-            )
-        expected_exception = "specimen_names must be extensions of the subject_name."
-        assert expected_exception in str(e.value)
+    def test_specimen_names_need_not_match_subject_name(self):
+        """Specimen names are not constrained by their subject name."""
+        procedure = Procedures(
+            subject_name="12345",
+            specimen_procedures=[
+                SpecimenProcedure(
+                    specimen_names={"sample-alpha", "unrelated-name"},
+                    procedure_type="Other",
+                    start_date=date.fromisoformat("2020-10-10"),
+                    end_date=date.fromisoformat("2020-10-11"),
+                    experimenters=["Mam Moth"],
+                    protocol_id=["10"],
+                    notes="some notes",
+                )
+            ],
+        )
+        assert procedure.specimen_procedures[0].specimen_names == {"sample-alpha", "unrelated-name"}
 
     def test_rejects_plural_subject_names_for_one_object(self):
         """Procedures uses its canonical singular owner field only."""
         with pytest.raises(ValidationError, match="subject_name"):
             Procedures(subject_names={"12345", "67890"})
 
-    def test_validate_subject_specimen_names_valid(self):
+    def test_specimen_names_accept_json_arrays(self):
         """Specimen names are stored as a set and accept JSON arrays."""
 
         valid_procedure = Procedures(

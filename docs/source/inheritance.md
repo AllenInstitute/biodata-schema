@@ -24,17 +24,13 @@ Note that relying on aggregated reference data (such as the CCF template) in you
 
 ## Naming
 
-For derived assets created from processing pipelines (i.e. one raw asset that was processed) or from analysis on a single derived asset we retain the *original* raw asset name and the process label:
+Pass `name="<asset-name>"` to `Metadata.from_metadata` or any derivation helper to use any string as the asset name. If omitted, a single source generates:
 
-`<raw asset_name>_<process_label>_YYYYMMDDTHHMMSS+HHMM`
+`<source_name>_<process_label>_YYYYMMDDTHHMMSS+HHMM`
 
-For assets created during analysis that aggregate across multiple acquisitions or subjects we switch to using the project name and process label:
+When a derived asset is used as source data, the helper tries to recover the raw asset name from the standard patter above. If that fails, it appends to the current name. For multiple input sources the default is:
 
 `<project_name>_<process_label>_YYYYMMDDTHHMMSS+HHMM`
-
-The timestamp includes a UTC offset without colons; negative offsets use `-HHMM`
-instead of `+HHMM`. For example, `batch-17_20221012T162311-0700` uses an asset
-label rather than a subject identifier.
 
 ## Example
 

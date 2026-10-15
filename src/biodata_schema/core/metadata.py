@@ -458,29 +458,19 @@ class Metadata(DataCoreModel):
         return self
 
     @model_validator(mode="after")
-    def validate_data_description_name_time_consistency(self):
-        """Validate that the creation_time from data_description.name is on or after midnight
-        on the same day as acquisition.acquisition_end_time"""
+    def validate_data_description_time_consistency(self):
+        """Check creation_time against the acquisition end date."""
         if self.data_description and self.acquisition:
-            if (
-                self.data_description.name
-                and hasattr(self.acquisition, "acquisition_end_time")
-                and self.acquisition.acquisition_end_time is not None
-            ):
-                # Parse the name to extract creation_time
-                parsed_name = DataDescription.parse_name(self.data_description.name, self.data_description.data_level)
-                name_creation_time = parsed_name.get("creation_time")
-
-                if name_creation_time:
-                    try:
-                        validate_creation_time_after_midnight(name_creation_time, self.acquisition.acquisition_end_time)
-                    except ValueError:
-                        # Issue a warning instead of raising an error
-                        warnings.warn(
-                            f"Creation time from data_description.name ({name_creation_time}) "
-                            f"should be close to the acquisition end time "
-                            f"({self.acquisition.acquisition_end_time})"
-                        )
+            if hasattr(self.acquisition, "acquisition_end_time") and self.acquisition.acquisition_end_time is not None:
+                creation_time = self.data_description.creation_time
+                try:
+                    validate_creation_time_after_midnight(creation_time, self.acquisition.acquisition_end_time)
+                except ValueError:
+                    warnings.warn(
+                        f"Creation time from data_description.creation_time ({creation_time}) "
+                        f"should be close to the acquisition end time "
+                        f"({self.acquisition.acquisition_end_time})"
+                    )
 
         return self
 
@@ -583,7 +573,7 @@ class Metadata(DataCoreModel):
             raise ValueError("At least one source Metadata must have a data_description.")
 
         source_names = [
-            m.data_description.name for m in metadata_list if m.data_description and m.data_description.name
+            m.data_description.name for m in metadata_list if m.data_description
         ]
 
         if len(metadata_list) > 1:

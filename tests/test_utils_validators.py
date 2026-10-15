@@ -38,26 +38,9 @@ from biodata_schema.utils.validators import (
     recursive_coord_system_check,
     recursive_get_all_names,
     recursive_time_validation_check,
-    subject_specimen_name_compatibility,
     validate_creation_time_after_midnight,
 )
 from tests.coordinate_systems import BREGMA_ARI
-
-
-class TestCompatibilityCheck:
-    """Tests compatibility checks"""
-
-    def test_subj_spec_valid(self):
-        """Test subject_name specimen_name valid"""
-        subject_name = "123456"
-        specimen_name = "123456-valid"
-        assert subject_specimen_name_compatibility(subject_name, specimen_name)
-
-    def test_subj_spec_invalid(self):
-        """Test invalid subject_name specimen_name"""
-        subject_name = "123456"
-        specimen_name = "invalid"
-        assert not subject_specimen_name_compatibility(subject_name, specimen_name)
 
 
 class TranslationWrapper(DataModel):
