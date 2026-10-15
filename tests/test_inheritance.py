@@ -439,7 +439,7 @@ class TestFromMetadataDifferentSubjects:
         assert result.procedures is None
 
     def test_repeated_multi_subject_rosters_are_kept(self):
-        """Matching multi-subject rosters keep their records regardless of ordering."""
+        """Matching multi-subject groups keep their records regardless of ordering."""
         subject2 = self.source1.subjects[0].model_copy(update={"subject_name": "789012"})
         roster = [self.source1.subjects[0], subject2]
         subject_names = {subject.subject_name for subject in roster}

@@ -1,24 +1,15 @@
 # Derived metadata
 
-Each `Subject` and `Procedures` object describes one subject. An asset stores its subject records in one `subjects.json` file and its procedure records in one `procedures.json` file, both as JSON arrays. `Metadata.from_metadata` keeps these records when the source assets describe the same set of subjects:
-
-| Subject rosters | Subjects and procedures | Data-description subject names |
-| --- | --- | --- |
-| All sources have the same set, such as `{A, B}` and `{A, B}` | Keep the full roster | Keep the shared set |
-| Sets differ, such as `{A, B}` and `{A}` | Drop | Clear, including explicit overrides |
-
-The number of source assets and the order of subjects do not affect this comparison. A single source keeps its records. For multiple sources, every source must have a known, matching roster, from its subject records or data description. When rosters match, the helper uses the first source that has subject and procedure records; it does not merge conflicting versions of those records.
-
-The four specific principles to follow are:
+The four principles to follow are:
 
 - All derived assets need an updated **Data Description**
-- If the sources have the same subject roster, inherit all **Subjects** and **Procedures** unchanged. Otherwise, drop these files and clear **Data Description** subject names.
+- If all source data share the same group of subjects, inherit all **Subjects** and **Procedures** unchanged. Otherwise, drop these files.
 - If a derived asset is related to a single acquisition, inherit the **Instrument** and **Acquisition** unchanged. Otherwise, drop these files.
 - If a derived asset is related to a single acquisition, *accumulate* **Processing** and **Quality Control**. Otherwise, start these files from scratch in the new asset.
 
-In practice this means that multi-session assets (from one or more subjects) generate a new data description, processing, and quality control from scratch.
+In practice these rules mean that single-subject and multi-subject assets that are analyzed in isolation inherit all the core files from asset to asset while analyses that combine multiple acquisitions drop the initial core files.
 
-Most users can rely on the `Metadata.from_metadata` function which implements all four of these rules for you. Load your core files and validate them as a `Metadata` object as well as any new `Processing` or `QualityControl` core data that was generated during your processing or analysis, then pass all three objects to the function. Then, call `metadata.write_standard_files()` to output your derived core files.
+Most users can rely on the `Metadata.from_metadata` function which implements all four of these rules for you. Load your core files and validate them as a `Metadata` object as well as any new `Processing` or `QualityControl` core data that was generated during your processing or analysis, then pass all three objects to the function. Call `metadata.write_standard_files()` to output your derived core files.
 
 Note that relying on aggregated reference data (such as the CCF template) in your processing pipeline or analysis code does not make your asset multi-subject.
 

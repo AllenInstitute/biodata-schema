@@ -51,7 +51,7 @@ In particular, the old `Metadata.subject` field is ignored, not moved into
 `Metadata.from_metadata` compares the subject sets in its sources:
 
 - **Same subjects in every source:** keep subjects and procedures, including
-	multi-subject rosters. Keep the shared set in `DataDescription.subject_names`.
+	multi-subject groups. Keep the shared set in `DataDescription.subject_names`.
 	This applies even when the source assets come from different acquisitions.
 - **Different subject sets:** drop subjects and procedures and clear
 	`DataDescription.subject_names`. A subset is not a match: `{A, B}` combined

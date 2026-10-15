@@ -300,7 +300,7 @@ def _get_shared_subject_names(metadata_list) -> Optional[set[str]]:
 
 
 def _inherit_subject_and_procedures(metadata_list) -> Tuple:
-    """Keep records when deriving from one asset or sources with identical subject rosters."""
+    """Keep records when deriving from one asset or sources with identical subject groups."""
     if len(metadata_list) != 1 and _get_shared_subject_names(metadata_list) is None:
         return None, None
     for metadata in metadata_list:
