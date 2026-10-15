@@ -7,7 +7,7 @@ from biodata_models.data_levels import DataLevel
 from biodata_models.licenses import License
 from biodata_models.modalities import Modality
 from biodata_models.organizations import Organization
-from pydantic import Field, SkipValidation, StringConstraints, model_validator
+from pydantic import Field, SkipValidation, model_validator
 
 from biodata_schema.base import AwareDatetimeWithDefault, DataCoreModel, DataModel, DraftRequirement
 from biodata_schema.components.identifiers import Person
@@ -32,7 +32,7 @@ class DataDescription(DataCoreModel):
     schema_version: SkipValidation[Literal["3.0.0"]] = Field(default="3.0.0")
     license: Annotated[License, DraftRequirement] = Field(default=License.CC_BY_40, title="License")
 
-    subject_names: Optional[set[Annotated[str, StringConstraints(pattern=DataRegex.NO_UNDERSCORES.value)]]] = Field(
+    subject_names: Optional[set[str]] = Field(
         default=None,
         description="Unique names for subjects associated with this data asset",
         title="Subject names",

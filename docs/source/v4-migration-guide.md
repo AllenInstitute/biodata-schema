@@ -23,8 +23,6 @@ Sets remove duplicate names and have no meaningful order.
 
 `Acquisition.subject_names` and `SpecimenProcedure.specimen_names` cannot be
 empty. Acquisition specimen names remain optional except for in vitro modalities.
-Raw data descriptions require subject names; derived data descriptions may omit
-them. Data-description subject names still cannot contain underscores.
 
 Each `Subject` and each `Procedures` object still belongs to one subject, so its
 `subject_name` stays singular. Per-image `specimen_name` and a section's

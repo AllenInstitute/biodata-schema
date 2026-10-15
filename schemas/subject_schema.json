@@ -8802,6 +8802,7 @@
       },
       "subject_name": {
          "description": "Unique name for the subject of data acquisition",
+         "pattern": "^[^_]+$",
          "title": "Subject name",
          "type": "string"
       },

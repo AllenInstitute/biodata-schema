@@ -1002,7 +1002,7 @@ class TestMetadata:
 
         # Create a subject with CalibrationObject
         calibration_subject = Subject(
-            subject_name="calibration_object_001",
+            subject_name="calibration-object-001",
             subject_details=CalibrationObject(
                 description="Test calibration object",
             ),

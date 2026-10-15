@@ -26,7 +26,7 @@ Description of a logical collection of data files
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `license` | [License](biodata_models/licenses.md#license) | License  |
-| `subject_names` | `Optional[set[typing.Annotated[str, StringConstraints(strip_whitespace=None, to_upper=None, to_lower=None, strict=None, min_length=None, max_length=None, pattern='^[^_]+$')]]]` | Subject names (Unique names for subjects associated with this data asset) |
+| `subject_names` | `Optional[set[str]]` | Subject names (Unique names for subjects associated with this data asset) |
 | `creation_time` | `datetime (timezone-aware)` | Creation Time (Time that data files were created, used to uniquely identify the data) |
 | `tags` | `Optional[List[str]]` | Tags (Descriptive strings to help categorize and search for data) |
 | `name` | `Optional[str]` | Data asset name (Any string naming the data asset, conventionally also used as the data folder name. When omitted for single-subject raw data, generated from the subject name and creation time. Multi-subject raw data requires a name; consider `<label>_<acquisition-start-time>`, for example batch-17_20221012T232311+0000.) |

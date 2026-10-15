@@ -190,21 +190,21 @@ class TestDataDescription:
         assert description.subject_names == {"1234", "5678"}
         assert DataDescription.parse_name(description.name) == {"label": "batch-17", "creation_time": creation_time}
 
-    def test_data_description_construction_failure(self):
-        """Test DataDescription construction failure"""
+    def test_subject_names_can_contain_underscores(self):
+        """DataDescription stores subject names without validating their format."""
         dt = datetime.datetime.now()
         f = Funding(funder=Organization.NINDS, grant_number="grant001")
-        with pytest.raises(ValidationError):
-            DataDescription(
-                modalities=[Modality.SPIM],
-                subject_names={""},
-                data_level=DataLevel.RAW,
-                creation_time=dt,
-                institution=Organization.AIND,
-                funding_source=[f],
-                investigators=[Person(name="Jane Smith")],
-                project_name="Test",
-            )
+        description = DataDescription(
+            modalities=[Modality.SPIM],
+            subject_names={"subject_123"},
+            data_level=DataLevel.RAW,
+            creation_time=dt,
+            institution=Organization.AIND,
+            funding_source=[f],
+            investigators=[Person(name="Jane Smith")],
+            project_name="Test",
+        )
+        assert description.subject_names == {"subject_123"}
 
     def test_parse_name_invalid(self):
         """Test DataDescription construction failure with invalid data level"""

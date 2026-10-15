@@ -2,9 +2,10 @@
 
 from typing import Annotated, Literal, Optional
 
-from pydantic import Field, SkipValidation
+from pydantic import Field, SkipValidation, StringConstraints
 
 from biodata_schema.base import DataCoreModel, Discriminated, DraftRequirement
+from biodata_schema.utils.data_name_patterns import DataRegex
 from biodata_schema.components.subjects import (
     CalibrationObject,
     CellLine,
@@ -21,7 +22,7 @@ class Subject(DataCoreModel):
     _DESCRIBED_BY_URL = DataCoreModel._DESCRIBED_BY_BASE_URL.default + "biodata_schema/core/subject.py"
     describedBy: str = Field(default=_DESCRIBED_BY_URL, json_schema_extra={"const": _DESCRIBED_BY_URL})
     schema_version: SkipValidation[Literal["3.0.2"]] = Field(default="3.0.2")
-    subject_name: Annotated[str, DraftRequirement] = Field(
+    subject_name: Annotated[str, DraftRequirement, StringConstraints(pattern=DataRegex.NO_UNDERSCORES.value)] = Field(
         ...,
         description="Unique name for the subject of data acquisition",
         title="Subject name",
