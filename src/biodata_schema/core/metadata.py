@@ -432,6 +432,8 @@ class Metadata(DataCoreModel):
             New quality control performed on this derived asset.
         **data_description_kwargs
             Additional keyword arguments passed to derive_data_description.
+            An explicit name bypasses naming requirements. If source acquisition
+            roots cannot be identified, treat them as unshared for inheritance.
 
         Returns
         -------
@@ -483,9 +485,14 @@ class Metadata(DataCoreModel):
             )
 
         subject, procedures = _inherit_subject_and_procedures(metadata_list)
-        instrument, acquisition = _inherit_instrument_and_acquisition(metadata_list)
-        processing = _accumulate_processing(metadata_list, new_processing)
-        quality_control = _accumulate_quality_control(metadata_list, new_quality_control)
+        allow_unknown_roots = data_description_kwargs.get("name") is not None
+        instrument, acquisition = _inherit_instrument_and_acquisition(
+            metadata_list, allow_unknown_roots=allow_unknown_roots
+        )
+        processing = _accumulate_processing(metadata_list, new_processing, allow_unknown_roots=allow_unknown_roots)
+        quality_control = _accumulate_quality_control(
+            metadata_list, new_quality_control, allow_unknown_roots=allow_unknown_roots
+        )
 
         return cls(
             name=derived_dd.name,

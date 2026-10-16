@@ -19,9 +19,17 @@ Pass `name="<asset-name>"` to `Metadata.from_metadata` or any derivation helper 
 
 `<source_name>_<process_label>_YYYYMMDDTHHMMSS`
 
-When a derived asset is used as source data, the helper tries to recover the raw asset name from the standard pattern above. If that fails, it raises an error. For multiple input sources the default is:
+Without an explicit output name, the helper tries to recover the raw asset name from a derived source's standard name. If that fails, it raises an error. For multiple input sources the default is:
 
 `<project_name>_<process_label>_YYYYMMDDTHHMMSS`
+
+An explicit `name` bypasses these naming requirements, including when combining
+custom-named derived sources. Shared acquisition roots are still used for
+inheritance when they can be identified. Otherwise, multiple sources are treated
+as not sharing an acquisition: instrument and acquisition records are dropped,
+and only newly supplied processing and QC records are used. Subject and procedure
+inheritance still follows the subject-roster rules. Normal metadata validation
+still applies.
 
 ## Example
 

@@ -139,6 +139,68 @@ def test_derivation_rejects_nonstandard_derived_names(name):
         derive_data_description_from_derived(source, "next", creation_time=t)
 
 
+@pytest.mark.parametrize("name", ["custom result", "", "folder/name_with:punctuation", "a\nname"])
+@pytest.mark.parametrize("new_records", [False, True])
+def test_multiple_custom_named_sources_accept_explicit_name(name, new_records):
+    """Unknown acquisition roots do not prevent an explicitly named combination."""
+    sources = [
+        Metadata(
+            name=source_name,
+            location="",
+            data_description=example_data_description.model_copy(
+                update={"name": source_name, "data_level": DataLevel.DERIVED}
+            ),
+            subjects=[example_subject],
+            procedures=[Procedures(subject_name=example_subject.subject_name)],
+            instrument=example_inst,
+            processing=example_processing,
+            quality_control=example_qc,
+        )
+        for source_name in ("custom source", "another custom source")
+    ]
+    result = Metadata.from_metadata(
+        sources,
+        name=name,
+        creation_time=t,
+        new_processing=example_processing if new_records else None,
+        new_quality_control=example_qc if new_records else None,
+    )
+
+    assert result.name == result.data_description.name == name
+    assert result.data_description.source_data == ["custom source", "another custom source"]
+    assert result.subjects == sources[0].subjects
+    assert result.procedures == sources[0].procedures
+    assert result.instrument is None
+    assert result.acquisition is None
+    if new_records:
+        assert result.processing.model_dump() == example_processing.model_dump()
+        assert result.quality_control.model_dump() == example_qc.model_dump()
+    else:
+        assert result.processing is None
+        assert result.quality_control is None
+
+
+def test_explicit_name_preserves_identifiable_shared_acquisition():
+    """An output-name override does not discard inheritance from known shared roots."""
+    source = Metadata(
+        name=example_data_description.name,
+        location="",
+        data_description=example_data_description,
+        subjects=[example_subject],
+        procedures=[Procedures(subject_name=example_subject.subject_name)],
+        instrument=example_inst,
+        processing=example_processing,
+        quality_control=example_qc,
+    )
+    derived = Metadata.from_metadata(source, process_name="first", creation_time=t)
+    result = Metadata.from_metadata([source, derived], name="custom merged result", creation_time=t)
+
+    assert result.name == result.data_description.name == "custom merged result"
+    assert result.instrument == source.instrument
+    assert len(result.processing.data_processes) == 2 * len(example_processing.data_processes)
+    assert len(result.quality_control.metrics) == 2 * len(example_qc.metrics)
+
+
 def test_custom_named_derived_asset_requires_identifiable_root():
     """A custom output name does not silently become a raw root on subsequent derivation."""
     source = _make_metadata()
@@ -593,12 +655,13 @@ class TestFromMetadataEdgeCases:
         with pytest.raises(ValueError):
             Metadata.from_metadata(m, process_name="x", location="s3://bucket/x")
 
-    def test_invalid_source_is_not_rebuilt(self):
+    @pytest.mark.parametrize("name_kwargs", [{}, {"name": "explicit result"}])
+    def test_invalid_source_is_not_rebuilt(self, name_kwargs):
         """Rebuilding validates the input even when an override could repair the output."""
         source = _make_metadata()
         source.data_description.funding_source = []
         with pytest.raises(ValidationError, match="funding_source"):
-            Metadata.from_metadata(source, funding_source=example_data_description.funding_source)
+            Metadata.from_metadata(source, funding_source=example_data_description.funding_source, **name_kwargs)
 
     def test_missing_description_in_multiple_sources_raises(self):
         """A source without a data description cannot establish its acquisition identity."""

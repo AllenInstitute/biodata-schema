@@ -103,11 +103,46 @@ The schema publishing action generates `subjects_schema.json` and
 `procedures_schema.json` for these arrays. The Python `Subject` and `Procedures`
 models still describe individual records.
 
+#### Writer API
+
+`write_standard_file` is now a class method on **all core models**, not an
+instance method. Pass the record or collection as its first argument. This
+also affects models whose files are still JSON objects, such as `Acquisition`
+and `DataDescription`.
+
+```python
+# Before
+subject.write_standard_file(output_directory=output_directory)
+acquisition.write_standard_file(output_directory=output_directory)
+
+# Now
+Subject.write_standard_file([subject], output_directory=output_directory)
+Acquisition.write_standard_file(acquisition, output_directory=output_directory)
+```
+
+`Subject.write_standard_file(subject, ...)` also accepts a single record, but
+still writes a JSON array. The same applies to `Procedures`. Write all records
+for a collection in one call; separate calls overwrite the same standard file.
+An empty subject list is rejected. An empty procedures list writes `[]`.
+Other core models accept a single record, not a list.
+
+The `output_directory`, `prefix`, `filename_suffix`, and `suffix` options
+remain available. `Metadata.write_standard_files()` is still an instance
+method and writes all present core files; its calling convention is unchanged.
+
 ## Data Asset Naming
 
 Asset names can now be any string; they no longer need to match a naming regex.
 `DataDescription.name` is required and is no longer generated automatically.
 Supply it explicitly, including for raw assets.
+
+Passing `name` to `Metadata.from_metadata` or a derivation helper bypasses
+name-generation requirements. When combining custom-named sources whose raw
+acquisition roots cannot be identified, the helper treats acquisitions as
+unshared: it drops instrument and acquisition records and uses only newly
+supplied processing and QC. Identifiable shared roots retain their usual
+inheritance behavior. Subject-roster checks and normal metadata validation
+still apply.
 
 ### Naming helper imports
 

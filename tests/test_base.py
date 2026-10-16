@@ -307,6 +307,14 @@ class TestDataCoreModel:
         Procedures.write_standard_file([], output_directory=tmp_path)
         assert json.loads((tmp_path / "procedures.json").read_text()) == []
 
+    def test_write_empty_subjects_collection_is_rejected(self, tmp_path):
+        """An empty subject collection must not create or overwrite a file."""
+        filename = tmp_path / "subjects.json"
+        filename.write_text("existing subjects")
+        with pytest.raises(ValueError, match="requires at least 1 record"):
+            Subject.write_standard_file([], output_directory=tmp_path)
+        assert filename.read_text() == "existing subjects"
+
     def test_non_collection_model_rejects_collection(self, tmp_path):
         """Object-file models cannot write collection-shaped standard files."""
         with pytest.raises(ValueError, match="does not use a collection file"):

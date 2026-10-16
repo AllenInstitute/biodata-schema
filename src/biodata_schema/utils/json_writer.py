@@ -226,8 +226,8 @@ class SchemaWriter:
     def model_schema(model: type[DataCoreModel]) -> dict:
         """Return the schema for a standard core file, including collection wrappers."""
         schema = TypeAdapter(list[model]).json_schema() if model in (Subject, Procedures) else model.model_json_schema()
-        if model is Subject:
-            schema["minItems"] = 1
+        if model._MIN_COLLECTION_LENGTH:
+            schema["minItems"] = model._MIN_COLLECTION_LENGTH
         return schema
 
     def write_to_json(self) -> None:

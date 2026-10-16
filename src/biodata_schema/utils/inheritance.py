@@ -265,8 +265,8 @@ def _get_root_asset_name(data_description: DataDescription) -> str:
     )
 
 
-def _is_single_acquisition(metadata_list) -> bool:
-    """Check whether all metadata objects refer to the same acquisition"""
+def _is_single_acquisition(metadata_list, *, allow_unknown_roots: bool = False) -> bool:
+    """Check for a shared acquisition, optionally treating unknown roots as unshared."""
     if len(metadata_list) == 1:
         return True
     roots = []
@@ -275,7 +275,13 @@ def _is_single_acquisition(metadata_list) -> bool:
             raise ValueError(
                 f"Cannot determine the raw asset name for asset {metadata.name!r}: missing data_description."
             )
-        roots.append(_get_root_asset_name(metadata.data_description))
+        try:
+            root = _get_root_asset_name(metadata.data_description)
+        except ValueError:
+            if allow_unknown_roots:
+                return False
+            raise
+        roots.append(root)
     return bool(roots) and len(set(roots)) == 1
 
 
@@ -309,9 +315,9 @@ def _inherit_subject_and_procedures(metadata_list) -> Tuple:
     return None, None
 
 
-def _inherit_instrument_and_acquisition(metadata_list) -> Tuple:
+def _inherit_instrument_and_acquisition(metadata_list, *, allow_unknown_roots: bool = False) -> Tuple:
     """Return (instrument, acquisition) from the first metadata that has them, or (None, None)"""
-    if not _is_single_acquisition(metadata_list):
+    if not _is_single_acquisition(metadata_list, allow_unknown_roots=allow_unknown_roots):
         return None, None
     for m in metadata_list:
         instrument = m.instrument
@@ -324,13 +330,15 @@ def _inherit_instrument_and_acquisition(metadata_list) -> Tuple:
 def _accumulate_processing(
     metadata_list,
     new_processing: Optional[Processing] = None,
+    *,
+    allow_unknown_roots: bool = False,
 ) -> Optional[Processing]:
     """Accumulate processing from source metadata and new processing.
 
     If single acquisition, combine all existing processing with the new one.
     If multiple acquisitions, only return the new processing.
     """
-    if not _is_single_acquisition(metadata_list):
+    if not _is_single_acquisition(metadata_list, allow_unknown_roots=allow_unknown_roots):
         return new_processing
 
     accumulated = None
@@ -353,13 +361,15 @@ def _accumulate_processing(
 def _accumulate_quality_control(
     metadata_list,
     new_quality_control: Optional[QualityControl] = None,
+    *,
+    allow_unknown_roots: bool = False,
 ) -> Optional[QualityControl]:
     """Accumulate quality control from source metadata and new QC.
 
     If single acquisition, combine all existing QC with the new one.
     If multiple acquisitions, only return the new QC.
     """
-    if not _is_single_acquisition(metadata_list):
+    if not _is_single_acquisition(metadata_list, allow_unknown_roots=allow_unknown_roots):
         return new_quality_control
 
     accumulated = None

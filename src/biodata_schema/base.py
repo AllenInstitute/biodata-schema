@@ -186,6 +186,7 @@ class DataCoreModel(DataModel):
     """Generic base class to hold common fields/validators/etc for all basic AIND schema"""
 
     _IS_COLLECTION: ClassVar[bool] = False
+    _MIN_COLLECTION_LENGTH: ClassVar[int] = 0
     _FILE_EXTENSION = PrivateAttr(default=".json")
     _DESCRIBED_BY_BASE_URL = PrivateAttr(
         default="https://raw.githubusercontent.com/AllenNeuralDynamics/biodata-schema/main/src/"
@@ -257,6 +258,10 @@ class DataCoreModel(DataModel):
         if isinstance(records, list) and not cls._IS_COLLECTION:
             raise ValueError(f"{cls.__name__} does not use a collection file.")
         items = records if isinstance(records, list) else [records]
+        if len(items) < cls._MIN_COLLECTION_LENGTH:
+            raise ValueError(
+                f"{cls.__name__}.write_standard_file requires at least {cls._MIN_COLLECTION_LENGTH} record."
+            )
         if any(not isinstance(record, cls) for record in items):
             raise TypeError(f"{cls.__name__}.write_standard_file requires {cls.__name__} records.")
         value: DataCoreModel | Sequence[DataCoreModel] = items if cls._IS_COLLECTION else items[0]
