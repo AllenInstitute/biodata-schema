@@ -31,16 +31,6 @@ You should use the `Code.parameters` field to store your stimulus properties for
 
 Procedures that occur during an acquisition (between the start_time and end_time) should be recorded in the `Acquisition.manipulations` using a [Manipulation](#manipulation). 
 
-Each manipulation identifies its target using `subject_name`, which must belong
-to `Acquisition.subject_names`.
-
-## Subject details
-
-`Acquisition.subject_details` is a list of records identified by `subject_name`.
-Names must belong to the acquisition roster and may not be repeated. For
-in-vivo metadata, provide one details record per acquired subject, including for
-single-subject acquisitions.
-
 ## FAQs
 
 ### When should a DataStream be split in two
@@ -115,7 +105,7 @@ Details about the subject during an acquisition
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `subject_name` | `str` | Subject name (Must be a member of Acquisition.subject_names.) |
+| `subject_name` | `str` | Subject name  |
 | `animal_weight_prior` | `Optional[decimal.Decimal]` | Animal weight (g) (Animal weight before procedure) |
 | `animal_weight_post` | `Optional[decimal.Decimal]` | Animal weight (g) (Animal weight after procedure) |
 | `weight_unit` | [MassUnit](biodata_models/units.md#massunit) | Weight unit  |
@@ -160,7 +150,7 @@ Description of procedures performed during an acquisition.
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `subject_name` | `str` | Subject name (Must be a member of Acquisition.subject_names.) |
+| `subject_name` | `str` | Subject name  |
 | `start_time` | `datetime (timezone-aware)` | Manipulation start time (Must be between the acquisition start and end times) |
 | `end_time` | `datetime (timezone-aware)` | Manipulation end time (Must be between the acquisition start and end times) |
 | `procedures` | Optional[List[[Injection](components/injection_procedures.md#injection) or [BrainInjection](components/surgery_procedures.md#braininjection) or [Reagent](components/reagent.md#reagent)]] | Procedures (Procedures performed during the manipulation) |
