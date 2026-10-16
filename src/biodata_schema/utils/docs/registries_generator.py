@@ -279,6 +279,8 @@ def create_table_structure(field_names, model_instances) -> str:
         row_data = []
         for field in field_names:
             field_value = getattr(attr_value, field, "N/A")
+            if isinstance(field_value, Enum):
+                field_value = field_value.value
             # Check if this is a registry value that needs to be remapped
             if field == "registry" and any(str(field_value) in key for key in special_cases.keys()):
                 # Map the registry value to its corresponding special case

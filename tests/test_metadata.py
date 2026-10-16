@@ -452,14 +452,14 @@ class TestMetadata:
                 location="bucket",
                 subjects=[self.subject],
                 procedures=[self.procedures],
-                # Missing required files: data_description, instrument, acquisition
+                # Missing required file: data_description
             )
 
         warning_messages = [str(warning.message) for warning in w]
         assert "Metadata missing required file: data_description" in warning_messages
         assert "Metadata missing required file: procedures" not in warning_messages
-        assert "Metadata missing required file: instrument" in warning_messages
-        assert "Metadata missing required file: acquisition" in warning_messages
+        assert "Metadata missing required file: instrument" not in warning_messages
+        assert "Metadata missing required file: acquisition" not in warning_messages
 
         # Test case where ALL required file set keys are missing (subject, processing, model)
         with pytest.raises(ValueError) as context:

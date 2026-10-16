@@ -18,7 +18,7 @@ from biodata_schema.base import DataCoreModel, DraftRequirement
 from biodata_schema.components.identifiers import DatabaseIdentifiers
 from biodata_schema.components.subject_procedures import TrainingProtocol
 from biodata_schema.components.subjects import CalibrationObject
-from biodata_schema.core.acquisition import Acquisition, DataStream, ExternalDataStream
+from biodata_schema.core.acquisition import Acquisition, DataStream
 from biodata_schema.core.data_description import DataDescription
 from biodata_schema.core.instrument import Instrument
 from biodata_schema.core.model import Model
@@ -148,13 +148,6 @@ class Metadata(DataCoreModel):
             if getattr(self, file):
                 for required_file in REQUIRED_FILE_SETS[file]:
                     if not getattr(self, required_file):
-                        # Skip instrument warning when acquisition only has ExternalDataStream
-                        if (
-                            required_file == "instrument"
-                            and self.acquisition
-                            and all(isinstance(s, ExternalDataStream) for s in self.acquisition.data_streams)
-                        ):
-                            continue
                         warnings.warn(f"Metadata missing required file: {required_file}")
 
         return self

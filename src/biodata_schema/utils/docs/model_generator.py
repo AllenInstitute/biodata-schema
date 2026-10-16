@@ -4,6 +4,7 @@ import importlib.util
 import inspect
 import json
 import os
+import pathlib
 import re
 from enum import Enum
 from typing import Dict, List, Optional, Type, get_args, get_origin
@@ -144,11 +145,8 @@ def _get_type_string_helper(tp, origin, args, **kwargs) -> str:
     # Handle Literal types - extract the string content directly if it's a string literal
     literal_type = getattr(__import__("typing"), "Literal", None)
     if origin is literal_type:
-        # If there's only one argument and it's a string, return just the string content
-        if len(args) == 1 and isinstance(args[0], str):
-            return f'"{args[0]}"'
-        # Otherwise return all literal values joined with 'or'
-        return " or ".join(f'"{arg}"' if isinstance(arg, str) else str(arg) for arg in args)
+        values = (arg.value if isinstance(arg, Enum) else arg for arg in args)
+        return " or ".join(f'"{value}"' if isinstance(value, str) else str(value) for value in values)
 
     # Check for annotated types and unions in the string representation
     str_rep = str(tp)
@@ -217,6 +215,16 @@ def get_type_string(tp) -> str:
         args = getattr(tp, "__args__", None)
 
     if origin is None:
+        if tp in (
+            pathlib.Path,
+            pathlib.PurePath,
+            pathlib.PosixPath,
+            pathlib.PurePosixPath,
+            pathlib.WindowsPath,
+            pathlib.PureWindowsPath,
+        ):
+            return f"pathlib.{tp.__name__}"
+
         # Try to handle class types
         class_result = _handle_class_types(tp)
         if class_result is not None:

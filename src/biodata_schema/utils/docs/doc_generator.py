@@ -61,6 +61,7 @@ def process_core_file(core_file):
 
     if not md_files:
         print(f"Warning: No markdown files found in: {model_docs_dir}")
+        return
 
     # Read and process all model content
     all_model_content = []
