@@ -56,11 +56,6 @@ details in a list even for one subject. Duplicate details for a subject are
 rejected, and in-vivo metadata requires one details record for every acquired
 subject.
 
-When acquisition metadata and specimen procedures are both present, every
-`SpecimenProcedure.specimen_names` input must belong to
-`Acquisition.specimen_names`. This check does not require specimen procedures,
-infer subject-to-specimen mappings, or validate perfusion and sectioning outputs.
-
 Old fields are not converted automatically. Rename them before validation.
 In particular, the old `Metadata.subject` field is ignored, not moved into
 `subjects`, and a single `Procedures` object is not converted into a list.

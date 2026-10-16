@@ -17,7 +17,6 @@ from biodata_schema.components.connections import Connection
 from biodata_schema.components.coordinates import CoordinateSystem
 from biodata_schema.components.devices import EphysAssembly, EphysProbe, Laser, Manipulator
 from biodata_schema.components.identifiers import Code, Database, Person
-from biodata_schema.components.specimen_procedures import SpecimenProcedure
 from biodata_schema.components.subject_procedures import TrainingProtocol
 from biodata_schema.components.subjects import BreedingInfo, CalibrationObject, Housing, MouseSubject, Sex, Species
 from biodata_schema.components.surgery_procedures import BrainInjection
@@ -174,37 +173,6 @@ class TestMetadata:
                 procedures=[self.procedures],
                 data_description=self.dd.model_dump() | {"subject_names": subject_names, "funding_source": []},
             )
-
-    @pytest.mark.parametrize("include_acquisition", [False, True])
-    @pytest.mark.parametrize("specimen_names", [{"123456_bar001"}, {"unknown"}, set()])
-    def test_specimen_procedure_inputs(self, include_acquisition, specimen_names):
-        """Only specimen-procedure inputs are checked against acquired specimens."""
-        procedures = Procedures(
-            subject_name="123456",
-            specimen_procedures=[
-                SpecimenProcedure(
-                    procedure_type="Other",
-                    specimen_names=specimen_names,
-                    start_date="2020-01-01",
-                    end_date="2020-01-01",
-                    notes="Example preparation",
-                )
-            ]
-            if specimen_names
-            else [],
-        )
-        kwargs = dict(
-            name="specimens",
-            location="",
-            subjects=[self.subject],
-            procedures=[procedures],
-            acquisition=barseq_acquisition if include_acquisition else None,
-        )
-        if include_acquisition and specimen_names == {"unknown"}:
-            with pytest.raises(ValidationError, match="not in acquisition.specimen_names"):
-                Metadata(**kwargs)
-        else:
-            assert Metadata(**kwargs)
 
     def test_in_vivo_subject_details_cover_roster(self):
         """Every in-vivo subject requires a details record, not just one subject in the group."""

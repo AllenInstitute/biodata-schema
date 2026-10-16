@@ -400,23 +400,6 @@ class Metadata(DataCoreModel):
         return self
 
     @model_validator(mode="after")
-    def validate_specimen_procedure_inputs(self):
-        """Check specimen-procedure inputs when an acquisition supplies specimen names."""
-        if not self.acquisition:
-            return self
-        acquired_names = TypeAdapter(set[str]).validate_python(self.acquisition.specimen_names or set())
-        for procedures in self.procedures or []:
-            for procedure in procedures.specimen_procedures:
-                names = procedure.get("specimen_names") if isinstance(procedure, dict) else procedure.specimen_names
-                unknown = TypeAdapter(set[str]).validate_python(names) - acquired_names
-                if unknown:
-                    raise ValueError(
-                        f"Specimen procedures for subject {procedures.subject_name} reference specimen_names "
-                        f"not in acquisition.specimen_names: {', '.join(sorted(unknown))}"
-                    )
-        return self
-
-    @model_validator(mode="after")
     def validate_training_protocol_references(self):
         """Validate that training_protocol_name in StimulusEpoch matches a TrainingProtocol in procedures"""
 
