@@ -5,13 +5,13 @@
 import argparse
 from datetime import date, datetime, timezone
 
-from biodata_models.coordinates import AnatomicalRelative
+from biodata_models.coordinates import AnatomicalRelative, AxisName, Direction, Origin
 from biodata_models.devices import CameraTarget
 from biodata_models.modalities import Modality
 from biodata_models.units import FrequencyUnit, PowerUnit, SizeUnit
 
 from biodata_schema.components.connections import Connection
-from biodata_schema.components.coordinates import CoordinateSystem
+from biodata_schema.components.coordinates import Axis, CoordinateSystem, Translation
 from biodata_schema.components.devices import (
     Camera,
     CameraAssembly,
@@ -38,6 +38,28 @@ from biodata_schema.components.identifiers import Software
 from biodata_schema.components.measurements import Calibration
 from biodata_schema.core.instrument import Instrument
 
+BREGMA_RAS = CoordinateSystem(
+    name="BREGMA_RAS",
+    origin=Origin.BREGMA,
+    axis_unit=SizeUnit.MM,
+    axes=[
+        Axis(name=AxisName.ML, direction=Direction.LR),
+        Axis(name=AxisName.AP, direction=Direction.PA),
+        Axis(name=AxisName.SI, direction=Direction.IS),
+    ],
+)
+
+CAMERA_CS = CoordinateSystem(
+    name="CAMERA_RBU",
+    origin=Origin.FRONT_CENTER,
+    axis_unit=SizeUnit.MM,
+    axes=[
+        Axis(name=AxisName.X, direction=Direction.LR),
+        Axis(name=AxisName.Y, direction=Direction.FB),
+        Axis(name=AxisName.Z, direction=Direction.DU)
+    ],
+)
+
 bonsai_software = Software(name="Bonsai", version="2.5")
 
 computer = Computer(
@@ -51,6 +73,9 @@ camera1 = CameraAssembly(
     name="BehaviorVideography_FaceSide",
     target=CameraTarget.FACE,
     relative_position=[AnatomicalRelative.LEFT],
+    local_coordinate_system=CAMERA_CS,
+    # Illustrative placement, 20 cm left of bregma, with axes aligned to BREGMA_RAS.
+    transform=[Translation(translation=[-200, 0, 0])],
     camera=Camera(
         name="Side face camera",
         detector_type="Camera",
@@ -79,6 +104,9 @@ camera2 = CameraAssembly(
     name="BehaviorVideography_FaceBottom",
     target=CameraTarget.FACE,
     relative_position=[AnatomicalRelative.INFERIOR],
+    local_coordinate_system=CAMERA_CSS,
+    # Illustrative placement, 20 cm below bregma, with axes aligned to BREGMA_RAS.
+    transform=[Translation(translation=[0, 0, -200])],
     camera=Camera(
         name="Bottom face camera",
         detector_type="Camera",
@@ -388,7 +416,7 @@ inst = Instrument(
     instrument_name="FIP-Behavior",
     modification_date=date(2000, 1, 1),
     modalities=[Modality.BEHAVIOR, Modality.FIB],
-    global_coordinate_system=CoordinateSystem.NotApplicable,
+    global_coordinate_system=BREGMA_RAS,
     components=[
         camera1,
         camera2,
