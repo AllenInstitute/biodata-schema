@@ -1,7 +1,7 @@
 """Classes to define device positions, orientations, and coordinates"""
 
 from enum import Enum
-from typing import List, Optional
+from typing import ClassVar, List, Literal, Optional
 
 from biodata_models.anatomy import AnatomyModel
 from biodata_models.atlas import AtlasName
@@ -130,6 +130,8 @@ TRANSFORM_TYPES_NONLINEAR = DiscriminatedList[Translation | Rotation | Scale | A
 class CoordinateSystem(DataModel):
     """Definition of a coordinate system"""
 
+    NotApplicable: ClassVar[Literal["Not applicable"]] = "Not applicable"
+
     name: str = Field(
         ..., title="Name", description="Convention is to use <Origin>_<POS_X_DIR><POS_Y_DIR><POS_Z_DIR> etc"
     )
@@ -144,6 +146,9 @@ class CoordinateSystem(DataModel):
         title="Handedness",
         description="Whether the coordinate system is right-handed or left-handed",
     )
+
+
+CoordinateSystemOrNA = CoordinateSystem | Literal["Not applicable"]
 
 
 class Atlas(CoordinateSystem):

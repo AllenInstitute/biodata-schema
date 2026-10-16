@@ -20,7 +20,7 @@ from biodata_models.units import ConcentrationUnit, CurrentUnit, SizeUnit, TimeU
 from pydantic import ValidationError
 
 from biodata_schema.components.configs import CatheterConfig
-from biodata_schema.components.coordinates import Origin, ReferenceCoordinateSystem, Translation
+from biodata_schema.components.coordinates import CoordinateSystem, Origin, ReferenceCoordinateSystem, Translation
 from biodata_schema.components.devices import Catheter, Device
 from biodata_schema.components.injection_procedures import (
     InjectionDynamics,
@@ -39,7 +39,13 @@ from biodata_schema.components.specimen_procedures import (
     SpecimenProcedure,
 )
 from biodata_schema.components.subject_procedures import BrainInjection, Injection, Surgery
-from biodata_schema.components.surgery_procedures import CatheterImplant, Craniotomy, CraniotomyType, GroundWireImplant
+from biodata_schema.components.surgery_procedures import (
+    CatheterImplant,
+    Craniotomy,
+    CraniotomyType,
+    GenericSurgeryProcedure,
+    GroundWireImplant,
+)
 from biodata_schema.core.procedures import Procedures
 from biodata_schema.utils.exceptions import OneOfError
 from tests.coordinate_systems import BREGMA_ARI, BREGMA_RAS
@@ -85,6 +91,61 @@ class TestProcedures:
                     )
                 ],
             )
+
+    @pytest.mark.parametrize(
+        "surgery_frame,valid",
+        [
+            (BREGMA_ARI, True),
+            (CoordinateSystem.NotApplicable, False),
+        ],
+    )
+    def test_not_applicable_measured_coordinates(self, surgery_frame, valid):
+        """Measured coordinates require the surgery's own frame."""
+        surgery = Surgery(
+            start_date=self.start_date,
+            global_coordinate_system=surgery_frame,
+            measured_coordinates={Origin.LAMBDA: Translation(translation=[-4.1, 0, 0])},
+            procedures=[GenericSurgeryProcedure(description="Non-coordinate procedure")],
+        )
+        values = dict(subject_name="12345", subject_procedures=[surgery])
+        if valid:
+            procedures = Procedures(**values)
+            assert Procedures.model_validate_json(procedures.model_dump_json()) == procedures
+        else:
+            with pytest.raises(ValidationError, match="CoordinateSystem is required"):
+                Procedures(**values)
+
+    def test_not_applicable_without_coordinates(self):
+        """A not-applicable frame is valid when there are no global coordinates."""
+        procedures = Procedures(
+            subject_name="12345",
+            subject_procedures=[
+                Surgery(
+                    start_date=self.start_date,
+                    global_coordinate_system=CoordinateSystem.NotApplicable,
+                    procedures=[GenericSurgeryProcedure(description="Non-coordinate procedure")],
+                )
+            ],
+        )
+        assert Procedures.model_validate_json(procedures.model_dump_json()) == procedures
+
+    def test_surgery_default_requires_frame_for_coordinates(self):
+        """Omitting the surgery frame does not resolve coordinates from elsewhere."""
+        surgery = Surgery(
+            start_date=self.start_date,
+            measured_coordinates={Origin.LAMBDA: Translation(translation=[-4.1, 0, 0])},
+            procedures=[GenericSurgeryProcedure(description="Non-coordinate procedure")],
+        )
+        assert surgery.global_coordinate_system == CoordinateSystem.NotApplicable
+        with pytest.raises(ValidationError, match="CoordinateSystem is required"):
+            Procedures(subject_name="12345", subject_procedures=[surgery])
+
+    def test_procedures_has_no_global_coordinate_system(self):
+        """The collection cannot supply a shared global frame."""
+        assert "global_coordinate_system" not in Procedures.model_fields
+        assert "global_coordinate_system" not in Procedures.model_json_schema()["properties"]
+        with pytest.raises(ValidationError, match="extra_forbidden"):
+            Procedures(subject_name="12345", global_coordinate_system=BREGMA_ARI)
 
     @patch("biodata_models.anatomy.MouseAnatomyLookup.get_by_name")
     def test_injection_material_check(self, mock_get_by_name):
@@ -168,14 +229,13 @@ class TestProcedures:
 
         p = Procedures(
             subject_name="12345",
-            global_coordinate_system=BREGMA_ARI,
             subject_procedures=[
                 Surgery(
+                    global_coordinate_system=BREGMA_ARI,
                     start_date=self.start_date,
                     experimenters=["Mam Moth"],
                     ethics_review_id="234",
                     protocol_id="123",
-                    global_coordinate_system=BREGMA_ARI,
                     measured_coordinates={
                         Origin.BREGMA: Translation(
                             translation=[0, 0, 0],
@@ -807,34 +867,23 @@ class TestProcedures:
         assert implant.ground_electrode_location.name == MouseGroundWireLocations.BRAIN.value
         mock_get_by_name.assert_called_once_with(MouseGroundWireLocations.BRAIN)
 
-    def test_procedures_addition_coordinate_system_validation(self):
-        """Test that Procedures addition raises error for different coordinate systems"""
-
-        # Create two procedures with different coordinate systems
-        p1 = Procedures(
-            subject_name="12345",
-            global_coordinate_system=BREGMA_ARI,
-        )
-
-        p2 = Procedures(
-            subject_name="12345",
-            global_coordinate_system=BREGMA_RAS,  # Different coordinate system
-        )
-
-        # Test that combining procedures with different coordinate systems raises ValueError
-        with pytest.raises(ValueError) as context:
-            _ = p1 + p2
-
-        assert "Cannot merge differing coordinate systems" in str(context.value)
-        assert "BREGMA_ARI" in str(context.value)
-        assert "BREGMA_RAS" in str(context.value)
-
-        # Test that combining procedures with same coordinate systems works
-        p3 = Procedures(
-            subject_name="12345",
-            global_coordinate_system=BREGMA_ARI,  # Same coordinate system as p1
-        )
-
-        combined = p1 + p3
-        assert combined.global_coordinate_system == BREGMA_ARI
-        assert len(combined.subject_procedures) == 0  # Both started with empty procedures
+    def test_procedures_addition_preserves_independent_coordinate_systems(self):
+        """Combining procedures preserves each surgery's frame without merging it."""
+        procedures = [
+            Procedures(
+                subject_name="12345",
+                subject_procedures=[
+                    Surgery(
+                        start_date=self.start_date,
+                        global_coordinate_system=frame,
+                        measured_coordinates={Origin.LAMBDA: Translation(translation=[-4.1, 0, 0])},
+                        procedures=[GenericSurgeryProcedure(description="Non-coordinate procedure")],
+                    )
+                ],
+            )
+            for frame in (BREGMA_ARI, BREGMA_RAS)
+        ]
+        combined = procedures[0] + procedures[1]
+        assert [surgery.global_coordinate_system for surgery in combined.subject_procedures] == [BREGMA_ARI, BREGMA_RAS]
+        assert "global_coordinate_system" not in combined.model_dump()
+        assert Procedures.model_validate_json(combined.model_dump_json()) == combined

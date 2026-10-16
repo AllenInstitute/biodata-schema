@@ -14,6 +14,7 @@ from biodata_models.species import Strain
 from pydantic import ValidationError
 
 from biodata_schema.components.connections import Connection
+from biodata_schema.components.coordinates import CoordinateSystem
 from biodata_schema.components.devices import EphysAssembly, EphysProbe, Laser, Manipulator
 from biodata_schema.components.identifiers import Code, Database, Person
 from biodata_schema.components.subject_procedures import TrainingProtocol
@@ -34,7 +35,6 @@ from examples.model import m as model_example
 from examples.processing import p as processing_example
 from examples.quality_control import q as quality_control_example
 from examples.subject import s as subject
-from tests.coordinate_systems import BREGMA_ARI
 
 ephys_assembly = EphysAssembly(
     probes=[EphysProbe(probe_model="Neuropixels 1.0", name="Probe A")],
@@ -193,7 +193,7 @@ class TestMetadata:
             instrument_name="123_EPHYS1_20220101",
             modalities=modalities,
             components=[ephys_assembly],
-            global_coordinate_system=BREGMA_ARI,
+            global_coordinate_system=CoordinateSystem.NotApplicable,
         )
         with pytest.raises(ValidationError) as context:
             Metadata(

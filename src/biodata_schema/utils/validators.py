@@ -222,7 +222,10 @@ def _system_check_helper(data, coordinate_system_name: Optional[str], axis_count
 
 
 def recursive_coord_system_check(
-    data, coordinate_system_name: Optional[str], axis_count: Optional[int], local_coordinate_system=None
+    data,
+    coordinate_system_name: Optional[str],
+    axis_count: Optional[int],
+    local_coordinate_system=None,
 ):
     """Recursively validate coordinate system requirements for objects with transforms.
 
@@ -248,23 +251,21 @@ def recursive_coord_system_check(
     Notes
     -----
     Objects without transform components are not required to have coordinate systems.
-    Nested global coordinate systems override the inherited global frame. Local frames
-    apply to local-reference transforms; atlas coordinates carry their own frame.
+    Each object with a global coordinate-system field starts an independent scope.
+    NotApplicable leaves that scope without a global frame. Local frames apply to
+    local-reference transforms; atlas coordinates carry their own frame.
     """
-    from biodata_schema.components.coordinates import Affine, Rotation, Scale, Translation
+    from biodata_schema.components.coordinates import Affine, CoordinateSystem, Rotation, Scale, Translation
 
     if data is None or isinstance(data, Enum):
         return
 
-    _cs = getattr(data, "global_coordinate_system", None) or getattr(data, "coordinate_system", None)
-    if _cs:
-        coordinate_system_name = _cs.name
-        axis_count = len(_cs.axes)
+    if hasattr(data, "global_coordinate_system") or hasattr(data, "coordinate_system"):
+        coordinate_system = getattr(data, "global_coordinate_system", None) or getattr(data, "coordinate_system", None)
+        coordinate_system_name = coordinate_system.name if isinstance(coordinate_system, CoordinateSystem) else None
+        axis_count = len(coordinate_system.axes) if isinstance(coordinate_system, CoordinateSystem) else None
         local_coordinate_system = None
     local_coordinate_system = getattr(data, "local_coordinate_system", None) or local_coordinate_system
-    if axis_count is None and local_coordinate_system is not None:
-        coordinate_system_name = local_coordinate_system.name
-        axis_count = len(local_coordinate_system.axes)
 
     if isinstance(data, (Translation, Rotation, Scale, Affine)):
         reference = getattr(data, "reference_coordinate_system", "global")

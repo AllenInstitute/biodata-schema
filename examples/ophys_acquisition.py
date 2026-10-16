@@ -8,6 +8,7 @@ from biodata_models.modalities import Modality
 
 from biodata_schema.components.configs import Channel, DetectorConfig, LaserConfig, PatchCordConfig
 from biodata_schema.components.connections import Connection
+from biodata_schema.components.coordinates import CoordinateSystem
 from biodata_schema.core.acquisition import (
     Acquisition,
     AcquisitionSubjectDetails,
@@ -39,6 +40,7 @@ connections = [
 
 a = Acquisition(
     experimenters=["Scientist Smith"],
+    global_coordinate_system=CoordinateSystem.NotApplicable,
     acquisition_start_time=t,
     acquisition_end_time=t,
     subject_name="652567",
