@@ -8,6 +8,7 @@ from semver import Version
 
 from biodata_schema.core.acquisition import Acquisition
 from biodata_schema.core.instrument import Instrument
+from biodata_schema.core.procedures import Procedures
 from biodata_schema.core.subject import Subject
 from biodata_schema.utils.json_writer import SchemaWriter
 from biodata_schema.utils.schema_version_bump import SchemaVersionHandler
@@ -15,6 +16,27 @@ from biodata_schema.utils.schema_version_bump import SchemaVersionHandler
 
 class TestSchemaVersion:
     """Tests the methods in the SchemaVersionHandler class."""
+
+    def test_generated_schemas_are_unchanged_and_have_versions(self, tmp_path):
+        """Version detection consumes the same collection schemas that publishing writes."""
+        SchemaWriter(["--output", str(tmp_path)]).write_to_json()
+        handler = SchemaVersionHandler(json_schemas_location=tmp_path)
+
+        assert handler._get_list_of_models_that_changed() == []
+        assert handler._get_incremented_versions_map([Subject, Procedures]) == {
+            model: str(Version.parse(model.model_fields["schema_version"].default).bump_patch())
+            for model in (Subject, Procedures)
+        }
+
+    def test_legacy_subject_schema_is_supported(self, tmp_path):
+        """The first collection release can still compare against a singular subject schema."""
+        import json
+
+        (tmp_path / "subject_schema.json").write_text(json.dumps(Subject.model_json_schema()))
+        handler = SchemaVersionHandler(json_schemas_location=tmp_path)
+
+        assert handler._get_schema_json(Subject) == Subject.model_json_schema()
+        assert Subject in handler._get_incremented_versions_map([Subject])
 
     @classmethod
     def setup_class(cls):

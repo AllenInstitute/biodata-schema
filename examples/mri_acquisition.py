@@ -87,7 +87,7 @@ stream = DataStream(
 )
 
 acquisition = Acquisition(
-    subject_name="123456",
+    subject_names={"123456"},
     acquisition_start_time=datetime(2024, 3, 12, 16, 27, 55, 584892, tzinfo=ZoneInfo("America/Los_Angeles")),
     acquisition_end_time=datetime(2024, 3, 12, 16, 27, 55, 584892, tzinfo=ZoneInfo("America/Los_Angeles")),
     experimenters=["John Smith"],
@@ -96,9 +96,7 @@ acquisition = Acquisition(
     acquisition_type="3D MRI Volume",
     instrument_name="NA",
     global_coordinate_system=MRI_LPS,
-    subject_details=AcquisitionSubjectDetails(
-        mouse_platform_name="cradle",
-    ),
+    subject_details=[AcquisitionSubjectDetails(subject_name="123456", mouse_platform_name="cradle")],
     data_streams=[stream],
     notes="There was some information about this scan acquisition",
 )
@@ -110,4 +108,4 @@ if __name__ == "__main__":
 
     serialized = acquisition.model_dump_json()
     deserialized = Acquisition.model_validate_json(serialized)
-    deserialized.write_standard_file(prefix="mri", output_directory=args.output_dir)
+    Acquisition.write_standard_file(deserialized, prefix="mri", output_directory=args.output_dir)

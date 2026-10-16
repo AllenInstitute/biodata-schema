@@ -1,31 +1,35 @@
 # Derived metadata
 
-The subject and procedures core files are tied to a single subject, while the rest of the core files are related to an individual acquisition of data. Because of this, metadata inheritance for derived assets depends on how you combine assets across subjects. The following table demonstrates the basic principle, and a helper function `Metadata.from_metadata` exists to make it easy to inherit the correct metadata in your derived assets.
-
-![Metadata inheritance](_static/MetadataIO.drawio.svg)
-
-The four specific principles to follow are:
+The four principles to follow are:
 
 - All derived assets need an updated **Data Description**
-- If a derived asset is related to a single subject, inherit the **Subject** and **Procedures** unchanged. Otherwise, drop these files.
+- If all source data share the same group of subjects, inherit all **Subjects** and **Procedures** unchanged. Otherwise, drop these files.
 - If a derived asset is related to a single acquisition, inherit the **Instrument** and **Acquisition** unchanged. Otherwise, drop these files.
 - If a derived asset is related to a single acquisition, *accumulate* **Processing** and **Quality Control**. Otherwise, start these files from scratch in the new asset.
 
-In practice this means that multi-session assets (from one or more subjects) generate a new data description, processing, and quality control from scratch.
+In practice these rules mean that single-subject and multi-subject assets that are analyzed in isolation inherit all the core files from asset to asset while analyses that combine multiple acquisitions from different subjects (or different groups of subjects) drop the initial core files.
 
-Most users can rely on the `Metadata.from_metadata` function which implements all four of these rules for you. Load your core files and validate them as a `Metadata` object as well as any new `Processing` or `QualityControl` core data that was generated during your processing or analysis, then pass all three objects to the function. Then, call `metadata.write_standard_files()` to output your derived core files.
+Most users can rely on the `Metadata.from_metadata` function which implements all four of these rules for you. Load your core files and validate them as a `Metadata` object as well as any new `Processing` or `QualityControl` core data that was generated during your processing or analysis, then pass all three objects to the function. Call `metadata.write_standard_files()` to output your derived core files.
 
 Note that relying on aggregated reference data (such as the CCF template) in your processing pipeline or analysis code does not make your asset multi-subject.
 
 ## Naming
 
-For derived assets created from processing pipelines (i.e. one raw asset that was processed) or from analysis on a single derived asset we retain the *original* raw asset name and the process label:
+Pass `name="<asset-name>"` to `Metadata.from_metadata` or any derivation helper to use any string as the asset name. If omitted, a single source generates:
 
-`<raw asset_name>_<process_label>_YYYY-MM-DD_hh-mm-ss`
+`<source_name>_<process_label>_YYYYMMDDTHHMMSS`
 
-For assets created during analysis that aggregate across multiple acquisitions or subjects we switch to using the project name and process label:
+Without an explicit output name, the helper tries to recover the raw asset name from a derived source's standard name. If that fails, it raises an error. For multiple input sources the default is:
 
-`<project_name>_<process_label>_YYYY-MM-DD_hh-mm-ss`
+`<project_name>_<process_label>_YYYYMMDDTHHMMSS`
+
+An explicit `name` bypasses these naming requirements, including when combining
+custom-named derived sources. Shared acquisition roots are still used for
+inheritance when they can be identified. Otherwise, multiple sources are treated
+as not sharing an acquisition: instrument and acquisition records are dropped,
+and only newly supplied processing and QC records are used. Subject and procedure
+inheritance still follows the subject-roster rules. Normal metadata validation
+still applies.
 
 ## Example
 

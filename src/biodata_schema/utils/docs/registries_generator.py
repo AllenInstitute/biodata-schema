@@ -12,7 +12,7 @@ from biodata_models.brain_atlas import BrainStructureModel, CCFv3
 from biodata_models.coordinates import AnatomicalRelative, AxisName, Direction, Origin
 
 # Name patterns
-from biodata_models.data_name_patterns import DataLevel, Group
+from biodata_models.data_levels import DataLevel
 
 # Devices models
 from biodata_models.devices import (
@@ -93,7 +93,6 @@ registries = [
     CCFv3,
     # Name patterns
     DataLevel,
-    Group,
     License,
     # Coordinates models
     Origin,
@@ -280,6 +279,8 @@ def create_table_structure(field_names, model_instances) -> str:
         row_data = []
         for field in field_names:
             field_value = getattr(attr_value, field, "N/A")
+            if isinstance(field_value, Enum):
+                field_value = field_value.value
             # Check if this is a registry value that needs to be remapped
             if field == "registry" and any(str(field_value) in key for key in special_cases.keys()):
                 # Map the registry value to its corresponding special case

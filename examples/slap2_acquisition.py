@@ -281,7 +281,7 @@ sipm_config = {
 
 
 a = Acquisition(
-    subject_name=mouse_id,
+    subject_names={mouse_id},
     acquisition_start_time=harp_start_time,
     acquisition_end_time=harp_end_time,
     experimenters=["John Smith"],
@@ -420,4 +420,4 @@ if __name__ == "__main__":
 
     serialized = a.model_dump_json()
     deserialized = Acquisition.model_validate_json(serialized)
-    deserialized.write_standard_file(prefix="slap2", output_directory=args.output_dir)
+    Acquisition.write_standard_file(deserialized, prefix="slap2", output_directory=args.output_dir)

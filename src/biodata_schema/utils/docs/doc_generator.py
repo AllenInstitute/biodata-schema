@@ -3,6 +3,7 @@
 Script to generate documentation for AIND data schema.
 """
 
+import importlib.util
 import json
 import os
 
@@ -60,6 +61,7 @@ def process_core_file(core_file):
 
     if not md_files:
         print(f"Warning: No markdown files found in: {model_docs_dir}")
+        return
 
     # Read and process all model content
     all_model_content = []
@@ -182,7 +184,7 @@ def generate_all_component_documentation():
 
 
 def process_registry(registry_folder, output_rel_path):
-    """Process a registry folder and generate a markdown file with all models in that folder.
+    """Generate a registry page, removing it if its source module no longer exists.
 
     Args:
         registry_folder: Name of the registry folder to process
@@ -193,6 +195,14 @@ def process_registry(registry_folder, output_rel_path):
     registry_docs_dir = os.path.join(base_dir, "docs", "base", "models", "biodata_models", registry_folder)
     output_dir = os.path.join(base_dir, output_rel_path)
     output_file_path = os.path.join(output_dir, f"{registry_folder}.md")
+
+    if importlib.util.find_spec(f"biodata_models.{registry_folder}") is None:
+        if os.path.exists(output_file_path):
+            os.remove(output_file_path)
+            print(f"Removed obsolete registry documentation: {output_file_path}")
+        else:
+            print(f"Skipping registry module that no longer exists: {registry_folder}")
+        return
 
     # Check if directory exists
     if not os.path.exists(registry_docs_dir):
@@ -238,17 +248,24 @@ def process_registry(registry_folder, output_rel_path):
 
 
 def generate_all_registry_documentation():
-    """Generate documentation for registries folders"""
+    """Generate current registry pages and remove pages for deleted modules."""
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
     registries_dir = os.path.join(base_dir, "docs", "base", "models", "biodata_models")
+    output_dir = os.path.join(base_dir, "docs", "source", "biodata_models")
+    registry_folders = set()
 
-    if not os.path.exists(registries_dir):
+    if os.path.exists(registries_dir):
+        registry_folders.update(d for d in os.listdir(registries_dir) if os.path.isdir(os.path.join(registries_dir, d)))
+    else:
         print(f"Warning: Registry directory not found: {registries_dir}")
-        return
 
-    registry_folders = [d for d in os.listdir(registries_dir) if os.path.isdir(os.path.join(registries_dir, d))]
+    if os.path.exists(output_dir):
+        registry_folders.update(os.path.splitext(f)[0] for f in os.listdir(output_dir) if f.endswith(".md"))
 
-    for registry_folder in registry_folders:
+    # This page is hand-written and does not correspond to a package module.
+    registry_folders.discard("external")
+
+    for registry_folder in sorted(registry_folders):
         process_registry(registry_folder, os.path.join("docs", "source", "biodata_models"))
 
 
@@ -257,7 +274,7 @@ def generate_all_core_documentation():
     Generate documentation for all core files defined in CORE_FILES.
     """
     for core_file in CORE_FILES:
-        process_core_file(core_file)
+        process_core_file("subject" if core_file == "subjects" else core_file)
 
     process_core_file("metadata")
 

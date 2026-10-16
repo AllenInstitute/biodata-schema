@@ -2,7 +2,7 @@
 
 from typing import List, Literal, Optional
 
-from pydantic import Field, SkipValidation, model_validator
+from pydantic import Field, SkipValidation
 
 from biodata_schema.base import DataCoreModel, DiscriminatedList
 from biodata_schema.components.specimen_procedures import SpecimenProcedure
@@ -14,19 +14,20 @@ from biodata_schema.components.subject_procedures import (
     WaterRestriction,
 )
 from biodata_schema.utils.merge import merge_notes
-from biodata_schema.utils.validators import recursive_get_device_names, subject_specimen_name_compatibility
+from biodata_schema.utils.validators import recursive_get_device_names
 
 
 class Procedures(DataCoreModel):
     """Description of all procedures performed on a subject, including surgeries, injections, and tissue processing"""
 
+    _IS_COLLECTION = True
     _DESCRIBED_BY_URL = DataCoreModel._DESCRIBED_BY_BASE_URL.default + "biodata_schema/core/procedures.py"
     describedBy: str = Field(default=_DESCRIBED_BY_URL, json_schema_extra={"const": _DESCRIBED_BY_URL})
 
     schema_version: SkipValidation[Literal["3.0.2"]] = Field(default="3.0.2")
     subject_name: str = Field(
         ...,
-        description="Unique name for the subject of data acquisition",
+        description="Unique name for the subject associated with these procedures",
         title="Subject name",
     )
     subject_procedures: DiscriminatedList[
@@ -61,35 +62,13 @@ class Procedures(DataCoreModel):
 
         return list(device_names)
 
-    @model_validator(mode="after")
-    def validate_subject_specimen_names(self):
-        """Validate that the subject_name and specimen_name match"""
-
-        # Return if no specimen procedures
-        if self.specimen_procedures:
-            subject_name = self.subject_name
-            specimen_names = []
-            for spec_proc in self.specimen_procedures:
-                specimen_name = spec_proc.specimen_name
-                if isinstance(specimen_name, list):
-                    specimen_names.extend(specimen_name)
-                else:
-                    specimen_names.append(specimen_name)
-
-            if any(
-                not subject_specimen_name_compatibility(subject_name, specimen_name) for specimen_name in specimen_names
-            ):
-                raise ValueError("specimen_name must be an extension of the subject_name.")
-
-        return self
-
     def __add__(self, other: "Procedures") -> "Procedures":
         """Combine two Procedures objects"""
 
         if not self.schema_version == other.schema_version:
             raise ValueError("Schema versions must match to combine Procedures")
 
-        if not self.subject_name == other.subject_name:
+        if self.subject_name != other.subject_name:
             raise ValueError("Subject names must match to combine Procedures objects.")
 
         return Procedures(

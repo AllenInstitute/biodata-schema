@@ -3,14 +3,16 @@
 from datetime import datetime, timezone
 
 import pytest
-from biodata_models.data_name_patterns import DataLevel
+from biodata_models.data_levels import DataLevel
 from biodata_models.licenses import License
 from biodata_models.modalities import Modality
 from biodata_models.organizations import Organization
+from pydantic import ValidationError
 
 from biodata_schema.components.identifiers import Code, Person
 from biodata_schema.core.data_description import DataDescription, Funding
 from biodata_schema.core.metadata import Metadata
+from biodata_schema.core.procedures import Procedures
 from biodata_schema.core.processing import DataProcess, Processing, ProcessStage
 from biodata_schema.core.quality_control import QCMetric, QCStatus, QualityControl, Stage, Status
 from biodata_schema.core.subject import Subject
@@ -18,7 +20,6 @@ from biodata_schema.utils.inheritance import (
     _accumulate_processing,
     _accumulate_quality_control,
     _get_root_asset_name,
-    _get_unique_subject_names,
     _inherit_instrument_and_acquisition,
     _inherit_subject_and_procedures,
     derive_data_description_analyzed,
@@ -29,7 +30,7 @@ from examples.data_description import d as example_data_description
 from examples.ephys_instrument import inst as example_inst
 from examples.processing import p as example_processing
 from examples.quality_control import q as example_qc
-from examples.subject import s as example_subject
+from examples.subjects import s as example_subject
 
 t = datetime(2022, 11, 22, 8, 43, 00, tzinfo=timezone.utc)
 
@@ -44,8 +45,9 @@ def _make_metadata(subject_name="123456"):
     global _counter
     _counter += 1
     dd = DataDescription(
+        name=f"{subject_name}_20220221T1630{_counter:02d}",
         modalities=[Modality.ECEPHYS],
-        subject_name=subject_name,
+        subject_names={subject_name},
         creation_time=datetime(2022, 2, 21, 16, 30, _counter, tzinfo=timezone.utc),
         institution=Organization.AIND,
         investigators=[Person(name="Jane Smith")],
@@ -58,7 +60,8 @@ def _make_metadata(subject_name="123456"):
     return Metadata(
         name=dd.name,
         location=f"s3://bucket/{dd.name}",
-        subject=sub,
+        subjects=[sub],
+        procedures=[Procedures(subject_name=subject_name)],
         data_description=dd,
         processing=example_processing,
         quality_control=example_qc,
@@ -78,6 +81,192 @@ def test_derivation_preserves_or_overrides_license(derive, override):
     kwargs = {} if override is None else {"license": override}
     result = derive(source, "analysis", creation_time=t, **kwargs)
     assert result.license == (override or License.MIT)
+
+
+@pytest.mark.parametrize(
+    "derive",
+    [derive_data_description_from_raw, derive_data_description_from_derived, derive_data_description_analyzed],
+)
+@pytest.mark.parametrize("name", ["custom name", "", "folder/name_with:punctuation", "a\nname"])
+def test_derivation_accepts_explicit_names(derive, name):
+    """Every derivation path uses the supplied name unchanged."""
+    source = example_data_description.model_copy(
+        update={
+            "name": "arbitrary source",
+            "data_level": DataLevel.DERIVED if derive is derive_data_description_from_derived else DataLevel.RAW,
+        }
+    )
+    result = derive(source, "analysis", name=name, creation_time=t)
+    assert result.name == name
+
+
+@pytest.mark.parametrize("data_level", [DataLevel.RAW, DataLevel.DERIVED])
+@pytest.mark.parametrize("name", ["custom name", "", "folder/name_with:punctuation", "a\nname"])
+@pytest.mark.parametrize("as_list", [False, True])
+def test_from_metadata_accepts_explicit_names(data_level, name, as_list):
+    """An explicit output name needs no parseable source name for a single source."""
+    description = DataDescription.model_validate(
+        example_data_description.model_dump() | {"name": "custom source", "data_level": data_level}
+    )
+    source = Metadata(
+        name=description.name,
+        location="s3://bucket/source",
+        data_description=description,
+        subjects=[example_subject],
+        procedures=[Procedures(subject_name=example_subject.subject_name)],
+        instrument=example_inst,
+        processing=example_processing,
+        quality_control=example_qc,
+    )
+
+    result = Metadata.from_metadata([source] if as_list else source, name=name, creation_time=t)
+
+    assert result.name == result.data_description.name == name
+    assert result.data_description.source_data == ["custom source"]
+    assert result.subjects == source.subjects
+    assert result.procedures == source.procedures
+    assert result.instrument == source.instrument
+    assert result.processing == source.processing
+    assert result.quality_control == source.quality_control
+    assert source.name == source.data_description.name == "custom source"
+
+
+@pytest.mark.parametrize("name", ["custom source", "project_analysis_20221122T084300", "", "a\nname"])
+def test_derivation_rejects_nonstandard_derived_names(name):
+    """Generating a name requires an identifiable raw asset."""
+    source = example_data_description.model_copy(update={"name": name, "data_level": DataLevel.DERIVED})
+    with pytest.raises(ValueError, match="Cannot determine the raw asset name"):
+        derive_data_description_from_derived(source, "next", creation_time=t)
+
+
+@pytest.mark.parametrize("name", ["custom result", "", "folder/name_with:punctuation", "a\nname"])
+@pytest.mark.parametrize("new_records", [False, True])
+def test_multiple_custom_named_sources_accept_explicit_name(name, new_records):
+    """Unknown acquisition roots do not prevent an explicitly named combination."""
+    sources = [
+        Metadata(
+            name=source_name,
+            location="",
+            data_description=example_data_description.model_copy(
+                update={"name": source_name, "data_level": DataLevel.DERIVED}
+            ),
+            subjects=[example_subject],
+            procedures=[Procedures(subject_name=example_subject.subject_name)],
+            instrument=example_inst,
+            processing=example_processing,
+            quality_control=example_qc,
+        )
+        for source_name in ("custom source", "another custom source")
+    ]
+    result = Metadata.from_metadata(
+        sources,
+        name=name,
+        creation_time=t,
+        new_processing=example_processing if new_records else None,
+        new_quality_control=example_qc if new_records else None,
+    )
+
+    assert result.name == result.data_description.name == name
+    assert result.data_description.source_data == ["custom source", "another custom source"]
+    assert result.subjects == sources[0].subjects
+    assert result.procedures == sources[0].procedures
+    assert result.instrument is None
+    assert result.acquisition is None
+    if new_records:
+        assert result.processing.model_dump() == example_processing.model_dump()
+        assert result.quality_control.model_dump() == example_qc.model_dump()
+    else:
+        assert result.processing is None
+        assert result.quality_control is None
+
+
+def test_explicit_name_preserves_identifiable_shared_acquisition():
+    """An output-name override does not discard inheritance from known shared roots."""
+    source = Metadata(
+        name=example_data_description.name,
+        location="",
+        data_description=example_data_description,
+        subjects=[example_subject],
+        procedures=[Procedures(subject_name=example_subject.subject_name)],
+        instrument=example_inst,
+        processing=example_processing,
+        quality_control=example_qc,
+    )
+    derived = Metadata.from_metadata(source, process_name="first", creation_time=t)
+    result = Metadata.from_metadata([source, derived], name="custom merged result", creation_time=t)
+
+    assert result.name == result.data_description.name == "custom merged result"
+    assert result.instrument == source.instrument
+    assert len(result.processing.data_processes) == 2 * len(example_processing.data_processes)
+    assert len(result.quality_control.metrics) == 2 * len(example_qc.metrics)
+
+
+def test_custom_named_derived_asset_requires_identifiable_root():
+    """A custom output name does not silently become a raw root on subsequent derivation."""
+    source = _make_metadata()
+    first = Metadata.from_metadata(source, name="custom result", creation_time=t)
+    assert first.name == first.data_description.name == "custom result"
+    assert first.processing == source.processing
+    assert first.quality_control == source.quality_control
+    with pytest.raises(ValueError, match="Cannot determine the raw asset name"):
+        Metadata.from_metadata(first, creation_time=t)
+
+
+def test_arbitrary_raw_name_is_not_misidentified_after_derivation():
+    """A derived name without an encoded raw root is rejected before another generation is built."""
+    source = _make_metadata()
+    source.data_description.name = source.name = "custom raw"
+    first = Metadata.from_metadata(source, process_name="pipelineA", creation_time=t)
+    with pytest.raises(ValueError, match="Cannot determine the raw asset name"):
+        Metadata.from_metadata(first, process_name="next", creation_time=t)
+
+
+@pytest.mark.parametrize("name", ["custom result", "project_analysis_20221122T084300"])
+@pytest.mark.parametrize(
+    "source_data",
+    [
+        None,
+        [],
+        ["123456_20221122T084300"],
+        ["123456_20221122T084300", "654321_20221122T084300"],
+    ],
+)
+def test_root_asset_name_does_not_guess_from_source_data(name, source_data):
+    """Immediate parents alone cannot establish the original raw asset."""
+    source = DataDescription.model_validate(
+        example_data_description.model_dump()
+        | {"name": name, "data_level": DataLevel.DERIVED, "source_data": source_data}
+    )
+    with pytest.raises(ValueError, match="Cannot determine the raw asset name"):
+        _get_root_asset_name(source)
+
+
+def test_multiple_sources_preserve_empty_names():
+    """An empty source name is still included in source_data."""
+    source = _make_metadata()
+    source.data_description = source.data_description.model_copy(update={"name": ""})
+    result = Metadata.from_metadata([source, _make_metadata()], name="merged", creation_time=t)
+    assert result.name == result.data_description.name == "merged"
+    assert result.data_description.source_data[0] == ""
+
+
+@pytest.mark.parametrize(
+    "name,data_level",
+    [
+        ("123456_2022-02-21_16-30-01", DataLevel.RAW),
+        ("123456_2022-02-21_16-30-01_first_2022-03-01_10-00-00", DataLevel.DERIVED),
+    ],
+)
+def test_derivation_preserves_historical_source_names(name, data_level):
+    """Processing historical assets keeps the real source and root asset names."""
+    source = _make_metadata()
+    source.data_description = DataDescription.model_validate(
+        source.data_description.model_dump() | {"name": name, "data_level": data_level}
+    )
+    result = Metadata.from_metadata(source, creation_time=t)
+    assert result.data_description.source_data == [name]
+    assert result.data_description.name == "123456_2022-02-21_16-30-01_processed_20221122T084300"
+    assert _get_root_asset_name(result.data_description) == "123456_2022-02-21_16-30-01"
 
 
 class TestFromMetadataSingleSource:
@@ -130,8 +319,27 @@ class TestFromMetadataSingleSource:
             process_name="my-analysis",
             location="s3://bucket/derived",
         )
-        assert result.subject is not None
-        assert result.subject.subject_name == "123456"
+        assert result.subjects is not None
+        assert result.subjects[0].subject_name == "123456"
+
+    def test_single_multi_subject_source_keeps_roster(self):
+        """Processing one asset preserves every subject and its procedures."""
+        second_subject = self.source.subjects[0].model_copy(update={"subject_name": "789012"})
+        subject_names = {"123456", "789012"}
+        source = Metadata(
+            name=self.source.name,
+            location=self.source.location,
+            subjects=[self.source.subjects[0], second_subject],
+            procedures=[self.source.procedures[0], Procedures(subject_name="789012")],
+            data_description=self.source.data_description.model_copy(update={"subject_names": subject_names}),
+            processing=example_processing,
+        )
+
+        result = Metadata.from_metadata(source)
+
+        assert result.subjects == source.subjects
+        assert result.procedures == source.procedures
+        assert result.data_description.subject_names == subject_names
 
     def test_single_source_data_description_is_derived(self):
         """Data description should be updated to data level DERIVED and name should include process name"""
@@ -198,15 +406,33 @@ class TestFromMetadataMultipleSameSubject:
         self.source1 = _make_metadata(subject_name="123456")
         self.source2 = _make_metadata(subject_name="123456")
 
-    def test_same_subject_inherits_subject(self):
-        """Subject should be inherited when all sources have the same subject"""
+    def test_same_subject_keeps_subject_and_procedures(self):
+        """Different acquisitions with the same subject retain subject records."""
         result = Metadata.from_metadata(
             [self.source1, self.source2],
             process_name="merge",
             location="s3://bucket/derived",
+            new_processing=example_processing,
         )
-        assert result.subject is not None
-        assert result.subject.subject_name == "123456"
+        assert result.subjects == self.source1.subjects
+        assert result.procedures == self.source1.procedures
+        assert result.data_description.subject_names == {"123456"}
+
+    def test_matching_rosters_keep_subject_names(self):
+        """Combining sources with matching rosters keeps their identifiers."""
+        result = Metadata.from_metadata(
+            [self.source1, self.source2],
+            new_processing=example_processing,
+            subject_names={"123456"},
+        )
+        assert result.data_description.subject_names == {"123456"}
+
+    def test_same_acquisition_keeps_subject_records(self):
+        """Sources from the same acquisition retain their matching subject roster."""
+        result = Metadata.from_metadata([self.source1, self.source1.model_copy()])
+        assert result.subjects == self.source1.subjects
+        assert result.procedures == self.source1.procedures
+        assert result.data_description.subject_names == {"123456"}
 
     def test_different_acquisitions_drops_instrument_and_acquisition(self):
         """Instrument and acquisition should be dropped when sources have different acquisitions"""
@@ -214,6 +440,7 @@ class TestFromMetadataMultipleSameSubject:
             [self.source1, self.source2],
             process_name="merge",
             location="s3://bucket/derived",
+            new_processing=example_processing,
         )
         assert result.instrument is None
         assert result.acquisition is None
@@ -261,6 +488,7 @@ class TestFromMetadataMultipleSameSubject:
             [self.source1, self.source2],
             process_name="merge",
             location="s3://bucket/derived",
+            new_processing=example_processing,
             new_quality_control=new_qc,
         )
         assert len(result.quality_control.metrics) == 1
@@ -271,6 +499,7 @@ class TestFromMetadataMultipleSameSubject:
             [self.source1, self.source2],
             process_name="merge",
             location="s3://bucket/derived",
+            new_processing=example_processing,
         )
         assert result.data_description.source_data is not None
         assert len(result.data_description.source_data) == 2
@@ -305,7 +534,8 @@ class TestFromMetadataDifferentSubjects:
             location="s3://bucket/derived",
             new_processing=new_proc,
         )
-        assert result.subject is None
+        assert result.subjects is None
+        assert result.data_description.subject_names is None
 
     def test_different_subjects_drops_procedures(self):
         """Procedures should be dropped when sources have different subjects"""
@@ -330,6 +560,82 @@ class TestFromMetadataDifferentSubjects:
         )
         assert result.procedures is None
 
+    def test_repeated_multi_subject_rosters_are_kept(self):
+        """Matching multi-subject groups keep their records regardless of ordering."""
+        subject2 = self.source1.subjects[0].model_copy(update={"subject_name": "789012"})
+        roster = [self.source1.subjects[0], subject2]
+        subject_names = {subject.subject_name for subject in roster}
+        sources = []
+        for source in (self.source1, self.source2):
+            description = source.data_description.model_copy(update={"subject_names": subject_names})
+            sources.append(
+                source.model_copy(
+                    update={
+                        "subjects": roster,
+                        "procedures": [Procedures(subject_name=name) for name in sorted(subject_names)],
+                        "data_description": description,
+                    }
+                )
+            )
+
+        result = Metadata.from_metadata(
+            [sources[0], sources[1].model_copy(update={"subjects": list(reversed(roster))})],
+            process_name="pool",
+            location="s3://bucket/pooled",
+            new_processing=example_processing,
+        )
+
+        assert result.subjects == roster
+        assert result.procedures == sources[0].procedures
+        assert result.data_description.subject_names == subject_names
+
+    def test_partially_overlapping_rosters_are_dropped(self):
+        """A subset is not the same subject roster."""
+        source = Metadata(
+            name=self.source1.name,
+            location=self.source1.location,
+            subjects=[self.source1.subjects[0], self.source2.subjects[0]],
+            procedures=[*self.source1.procedures, *self.source2.procedures],
+            data_description=self.source1.data_description.model_copy(update={"subject_names": {"123456", "789012"}}),
+            processing=example_processing,
+        )
+        result = Metadata.from_metadata(
+            [source, self.source1], new_processing=example_processing, subject_names={"123456", "789012"}
+        )
+        assert result.subjects is None
+        assert result.procedures is None
+        assert result.data_description.subject_names is None
+
+    def test_unknown_roster_is_not_assumed_to_match(self):
+        """An asset without subject information cannot establish a matching roster."""
+        unknown = Metadata(
+            name="unknown",
+            location="",
+            data_description=self.source2.data_description.model_copy(
+                update={
+                    "data_level": DataLevel.DERIVED,
+                    "subject_names": None,
+                    "name": "Test project_unknown_20220221T163036",
+                }
+            ),
+            processing=example_processing,
+        )
+        with pytest.raises(ValueError, match="Cannot determine the raw asset name"):
+            Metadata.from_metadata([self.source1, unknown], new_processing=example_processing)
+
+    def test_matching_description_rosters_can_supply_missing_records(self):
+        """A matching data-description roster can identify a source without subject files."""
+        without_records = Metadata(
+            name=self.source1.name,
+            location=self.source1.location,
+            data_description=self.source1.data_description,
+            processing=example_processing,
+        )
+        result = Metadata.from_metadata([without_records, self.source1], new_processing=example_processing)
+        assert result.subjects == self.source1.subjects
+        assert result.procedures == self.source1.procedures
+        assert result.data_description.subject_names == {"123456"}
+
 
 class TestFromMetadataEdgeCases:
     """Tests for edge cases"""
@@ -348,6 +654,20 @@ class TestFromMetadataEdgeCases:
         )
         with pytest.raises(ValueError):
             Metadata.from_metadata(m, process_name="x", location="s3://bucket/x")
+
+    @pytest.mark.parametrize("name_kwargs", [{}, {"name": "explicit result"}])
+    def test_invalid_source_is_not_rebuilt(self, name_kwargs):
+        """Rebuilding validates the input even when an override could repair the output."""
+        source = _make_metadata()
+        source.data_description.funding_source = []
+        with pytest.raises(ValidationError, match="funding_source"):
+            Metadata.from_metadata(source, funding_source=example_data_description.funding_source, **name_kwargs)
+
+    def test_missing_description_in_multiple_sources_raises(self):
+        """A source without a data description cannot establish its acquisition identity."""
+        missing = Metadata(name="missing", location="", processing=example_processing)
+        with pytest.raises(ValueError, match="missing data_description"):
+            Metadata.from_metadata([_make_metadata(), missing], new_processing=example_processing)
 
     def test_result_name_matches_data_description(self):
         """Result name should match its data_description name"""
@@ -377,20 +697,15 @@ class TestInternalHelpers:
         root = _get_root_asset_name(self.derived.data_description)
         assert root == self.source.data_description.name
 
-    def test_get_root_asset_name_returns_none_for_non_raw_non_derived(self):
-        """_get_root_asset_name should return None for non-raw, non-derived data levels"""
+    def test_get_root_asset_name_rejects_non_raw_non_derived(self):
+        """Non-acquired data cannot establish a raw acquisition identity."""
         simulated_dd = self.source.data_description.model_copy(update={"data_level": DataLevel.SIMULATED})
-        assert _get_root_asset_name(simulated_dd) is None
-
-    def test_get_unique_subject_names_from_data_description(self):
-        """_get_unique_subject_names should extract subject name from data_description when subject is None"""
-        no_subject = self.source.model_copy(update={"subject": None})
-        subject_names = _get_unique_subject_names([no_subject])
-        assert subject_names == ["123456"]
+        with pytest.raises(ValueError, match="Cannot determine the raw asset name"):
+            _get_root_asset_name(simulated_dd)
 
     def test_inherit_subject_and_procedures_returns_none_when_no_subject_or_procedures(self):
         """_inherit_subject_and_procedures should return None when source has neither subject nor procedures"""
-        no_subject = self.source.model_copy(update={"subject": None, "procedures": None})
+        no_subject = self.source.model_copy(update={"subjects": None, "procedures": None})
         subject, procedures = _inherit_subject_and_procedures([no_subject])
         assert subject is None
         assert procedures is None
@@ -436,7 +751,7 @@ class TestInternalHelpers:
             creation_time=creation_time,
         )
         assert result.data_level == DataLevel.DERIVED
-        assert result.name == "Test project_merged-analysis_2022-05-01_10-00-00"
+        assert result.name == "Test project_merged-analysis_20220501T100000"
         assert result.source_data == ["a", "b"]
 
     def test_derive_data_description_analyzed_invalid_creation_time(self):

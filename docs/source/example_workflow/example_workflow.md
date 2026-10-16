@@ -75,7 +75,7 @@ how was it funded, etc. We'll define a function to generate this, and re-use it 
 :lines: 59-72
 ```
 
-A few of the fields in the data description required us to use enumerated variables, like [DataLevel](../biodata_models/data_name_patterns.md#datalevel). Controlled vocabularies like this one are used to standardize the metadata and make it easier for people to search across assets from different experiments. We also use controlled vocabularies that are linked to external registries, like for [Organization](../biodata_models/organizations.md#organization)
+A few of the fields in the data description required us to use enumerated variables, like [DataLevel](../biodata_models/data_levels.md#datalevel). Controlled vocabularies like this one are used to standardize the metadata and make it easier for people to search across assets from different experiments. We also use controlled vocabularies that are linked to external registries, like for [Organization](../biodata_models/organizations.md#organization)
 
 ## Subject
 
@@ -113,7 +113,7 @@ Note that there is no separate depth axis. Insertion depth is recorded as a *loc
 
 ## Generating metadata
 
-Finally, we're ready to generate all the metadata files. We'll loop over the sessions listed in the excel spreadsheet and use our functions to build the JSON files. The `write_standard_file()` function will take care of writing the files to disk.
+Finally, we're ready to generate all the metadata files. We'll loop over the sessions listed in the excel spreadsheet and use our functions to build the JSON files. `Metadata.write_standard_files()` writes the assembled metadata to disk, including `subjects.json` and `procedures.json` as arrays.
 
 ```{literalinclude} example_workflow.py
 :language: python

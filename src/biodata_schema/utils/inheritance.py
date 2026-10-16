@@ -1,15 +1,15 @@
 """Helper functions for metadata inheritance in derived assets"""
 
-import re
 from datetime import datetime, timezone
 from typing import Any, List, Optional, Tuple
 
-from biodata_models.data_name_patterns import DataLevel, DataRegex, datetime_to_name_string
+from biodata_models.data_levels import DataLevel
 from pydantic_core import PydanticUndefined
 
 from biodata_schema.core.data_description import DataDescription
 from biodata_schema.core.processing import Processing
 from biodata_schema.core.quality_control import QualityControl
+from biodata_schema.utils.data_name_patterns import build_data_name
 
 
 def _get_or_default(data_description: DataDescription, field_name: str, kwargs: dict) -> Any:
@@ -64,12 +64,12 @@ def derive_data_description_from_raw(
         raise ValueError(f"creation_time({creation_time}) must be a datetime object")
 
     original_name = data_description.name
-    derived_name = f"{original_name}_{process_name}_{datetime_to_name_string(creation_time)}"
-    if not re.match(DataRegex.DERIVED.value, derived_name):  # pragma: no cover
-        raise ValueError(f"Derived name({derived_name}) does not match allowed Regex pattern")
+    derived_name = kwargs.get("name")
+    if derived_name is None:
+        derived_name = build_data_name(f"{original_name}_{process_name}", creation_time)
 
     return DataDescription(
-        subject_name=_get_or_default(data_description, "subject_name", kwargs),
+        subject_names=_get_or_default(data_description, "subject_names", kwargs),
         license=_get_or_default(data_description, "license", kwargs),
         creation_time=creation_time,
         tags=_get_or_default(data_description, "tags", kwargs),
@@ -77,7 +77,6 @@ def derive_data_description_from_raw(
         institution=_get_or_default(data_description, "institution", kwargs),
         funding_source=_get_or_default(data_description, "funding_source", kwargs),
         data_level=DataLevel.DERIVED,
-        group=_get_or_default(data_description, "group", kwargs),
         investigators=_get_or_default(data_description, "investigators", kwargs),
         project_name=_get_or_default(data_description, "project_name", kwargs),
         restrictions=_get_or_default(data_description, "restrictions", kwargs),
@@ -96,9 +95,8 @@ def derive_data_description_from_derived(
     """
     Create a DataLevel.DERIVED DataDescription from another DataLevel.DERIVED DataDescription object.
 
-    This function extracts the original input name from the existing derived data description
-    and uses it as the base for creating a new derived data description, rather than
-    chaining derived names.
+    Use an explicit name when supplied. Otherwise, append the process and timestamp
+    to the original raw name, raising if it cannot be recovered from the derived name.
 
     Parameters
     ----------
@@ -115,7 +113,7 @@ def derive_data_description_from_derived(
     Returns
     -------
     DataDescription
-        New DERIVED DataDescription with name based on the original input, not the full derived name
+        New DERIVED DataDescription
 
     """
     if data_description.data_level != DataLevel.DERIVED:
@@ -126,15 +124,13 @@ def derive_data_description_from_derived(
     if not isinstance(creation_time, datetime):
         raise ValueError(f"creation_time({creation_time}) must be a datetime object")
 
-    parsed_name = DataDescription.parse_name(data_description.name, DataLevel.DERIVED)
-    original_input = parsed_name["input"]
-
-    derived_name = f"{original_input}_{process_name}_{datetime_to_name_string(creation_time)}"
-    if not re.match(DataRegex.DERIVED.value, derived_name):  # pragma: no cover
-        raise ValueError(f"Derived name({derived_name}) does not match allowed Regex pattern")
+    derived_name = kwargs.get("name")
+    if derived_name is None:
+        original_input = _get_root_asset_name(data_description)
+        derived_name = build_data_name(f"{original_input}_{process_name}", creation_time)
 
     return DataDescription(
-        subject_name=_get_or_default(data_description, "subject_name", kwargs),
+        subject_names=_get_or_default(data_description, "subject_names", kwargs),
         license=_get_or_default(data_description, "license", kwargs),
         creation_time=creation_time,
         tags=_get_or_default(data_description, "tags", kwargs),
@@ -142,7 +138,6 @@ def derive_data_description_from_derived(
         institution=_get_or_default(data_description, "institution", kwargs),
         funding_source=_get_or_default(data_description, "funding_source", kwargs),
         data_level=DataLevel.DERIVED,
-        group=_get_or_default(data_description, "group", kwargs),
         investigators=_get_or_default(data_description, "investigators", kwargs),
         project_name=_get_or_default(data_description, "project_name", kwargs),
         restrictions=_get_or_default(data_description, "restrictions", kwargs),
@@ -228,12 +223,12 @@ def derive_data_description_analyzed(
 
     project_abbreviation = _get_or_default(data_description, "project_name", kwargs)
 
-    analyzed_name = f"{project_abbreviation}_{analysis_name}_{datetime_to_name_string(creation_time)}"
-    if not re.match(DataRegex.ANALYZED.value, analyzed_name):  # pragma: no cover
-        raise ValueError(f"Analyzed name({analyzed_name}) does not match allowed Regex pattern")
+    analyzed_name = kwargs.get("name")
+    if analyzed_name is None:
+        analyzed_name = build_data_name(f"{project_abbreviation}_{analysis_name}", creation_time)
 
     return DataDescription(
-        subject_name=_get_or_default(data_description, "subject_name", kwargs),
+        subject_names=_get_or_default(data_description, "subject_names", kwargs),
         license=_get_or_default(data_description, "license", kwargs),
         creation_time=creation_time,
         tags=_get_or_default(data_description, "tags", kwargs),
@@ -241,7 +236,6 @@ def derive_data_description_analyzed(
         institution=_get_or_default(data_description, "institution", kwargs),
         funding_source=_get_or_default(data_description, "funding_source", kwargs),
         data_level=DataLevel.DERIVED,
-        group=_get_or_default(data_description, "group", kwargs),
         investigators=_get_or_default(data_description, "investigators", kwargs),
         project_name=project_abbreviation,
         restrictions=_get_or_default(data_description, "restrictions", kwargs),
@@ -251,63 +245,79 @@ def derive_data_description_analyzed(
     )
 
 
-def _get_root_asset_name(data_description: DataDescription) -> Optional[str]:
+def _get_root_asset_name(data_description: DataDescription) -> str:
     """Return the original raw asset name that this data description traces back to"""
     if data_description.data_level == DataLevel.RAW:
         return data_description.name
     if data_description.data_level == DataLevel.DERIVED and data_description.name:
-        parsed = DataDescription.parse_name(data_description.name, DataLevel.DERIVED)
-        return parsed.get("input")
-    return None
+        try:
+            parsed = DataDescription.parse_name(data_description.name, DataLevel.DERIVED)
+        except ValueError as exc:
+            raise ValueError(
+                f"Cannot determine the raw asset name from derived asset {data_description.name!r}. "
+                "Use a standard derived name that includes the raw asset name."
+            ) from exc
+        if parsed.get("input"):
+            return parsed["input"]
+    raise ValueError(
+        f"Cannot determine the raw asset name for asset {data_description.name!r} "
+        f"with data_level={data_description.data_level!r}."
+    )
 
 
-def _get_unique_subject_names(metadata_list) -> List[str]:
-    """Extract unique subject names from a list of Metadata objects"""
-    subject_names = set()
-    for m in metadata_list:
-        if m.subject:
-            subject_names.add(m.subject.subject_name)
-        elif m.data_description and m.data_description.subject_name:
-            subject_names.add(m.data_description.subject_name)
-    return list(subject_names)
+def _is_single_acquisition(metadata_list, *, allow_unknown_roots: bool = False) -> bool:
+    """Check for a shared acquisition, optionally treating unknown roots as unshared."""
+    if len(metadata_list) == 1:
+        return True
+    roots = []
+    for metadata in metadata_list:
+        if metadata.data_description is None:
+            raise ValueError(
+                f"Cannot determine the raw asset name for asset {metadata.name!r}: missing data_description."
+            )
+        try:
+            root = _get_root_asset_name(metadata.data_description)
+        except ValueError:
+            if allow_unknown_roots:
+                return False
+            raise
+        roots.append(root)
+    return bool(roots) and len(set(roots)) == 1
 
 
-def _get_unique_acquisition_names(metadata_list) -> List[str]:
-    """Extract unique root raw asset names from a list of Metadata objects"""
-    names = set()
-    for m in metadata_list:
-        if m.data_description:
-            root = _get_root_asset_name(m.data_description)
-            if root:
-                names.add(root)
-    return list(names)
-
-
-def _is_single_subject(metadata_list) -> bool:
-    """Check whether all metadata objects refer to the same subject"""
-    return len(_get_unique_subject_names(metadata_list)) == 1
-
-
-def _is_single_acquisition(metadata_list) -> bool:
-    """Check whether all metadata objects refer to the same acquisition"""
-    return len(_get_unique_acquisition_names(metadata_list)) == 1
+def _get_shared_subject_names(metadata_list) -> Optional[set[str]]:
+    """Return the subject roster only when every source has the same known roster."""
+    shared_names = None
+    for metadata in metadata_list:
+        names = (
+            {subject.subject_name for subject in metadata.subjects}
+            if metadata.subjects
+            else metadata.data_description.subject_names
+            if metadata.data_description
+            else None
+        )
+        if not names:
+            return None
+        if shared_names is None:
+            shared_names = set(names)
+        elif shared_names != names:
+            return None
+    return shared_names
 
 
 def _inherit_subject_and_procedures(metadata_list) -> Tuple:
-    """Return (subject, procedures) from the first metadata that has them, or (None, None)"""
-    if not _is_single_subject(metadata_list):
+    """Keep records when deriving from one asset or sources with identical subject groups."""
+    if len(metadata_list) != 1 and _get_shared_subject_names(metadata_list) is None:
         return None, None
-    for m in metadata_list:
-        subject = m.subject
-        procedures = m.procedures
-        if subject or procedures:
-            return subject, procedures
+    for metadata in metadata_list:
+        if metadata.subjects or metadata.procedures:
+            return metadata.subjects, metadata.procedures
     return None, None
 
 
-def _inherit_instrument_and_acquisition(metadata_list) -> Tuple:
+def _inherit_instrument_and_acquisition(metadata_list, *, allow_unknown_roots: bool = False) -> Tuple:
     """Return (instrument, acquisition) from the first metadata that has them, or (None, None)"""
-    if not _is_single_acquisition(metadata_list):
+    if not _is_single_acquisition(metadata_list, allow_unknown_roots=allow_unknown_roots):
         return None, None
     for m in metadata_list:
         instrument = m.instrument
@@ -320,13 +330,15 @@ def _inherit_instrument_and_acquisition(metadata_list) -> Tuple:
 def _accumulate_processing(
     metadata_list,
     new_processing: Optional[Processing] = None,
+    *,
+    allow_unknown_roots: bool = False,
 ) -> Optional[Processing]:
     """Accumulate processing from source metadata and new processing.
 
     If single acquisition, combine all existing processing with the new one.
     If multiple acquisitions, only return the new processing.
     """
-    if not _is_single_acquisition(metadata_list):
+    if not _is_single_acquisition(metadata_list, allow_unknown_roots=allow_unknown_roots):
         return new_processing
 
     accumulated = None
@@ -349,13 +361,15 @@ def _accumulate_processing(
 def _accumulate_quality_control(
     metadata_list,
     new_quality_control: Optional[QualityControl] = None,
+    *,
+    allow_unknown_roots: bool = False,
 ) -> Optional[QualityControl]:
     """Accumulate quality control from source metadata and new QC.
 
     If single acquisition, combine all existing QC with the new one.
     If multiple acquisitions, only return the new QC.
     """
-    if not _is_single_acquisition(metadata_list):
+    if not _is_single_acquisition(metadata_list, allow_unknown_roots=allow_unknown_roots):
         return new_quality_control
 
     accumulated = None

@@ -202,13 +202,13 @@ class TestComposability:
         acq1.schema_version = acq1_orig_schema_v
 
         # Test incompatible subject names
-        acq2.subject_name = "different_name"
+        acq2.subject_names = {"different_name"}
         with pytest.raises(ValueError) as context:
             acq1 + acq2
         assert "Cannot combine Acquisition objects that differ in key fields" in repr(context.value)
 
         # Test instrument_name merging
-        acq2.subject_name = acq1.subject_name
+        acq2.subject_names = acq1.subject_names
         acq1.instrument_name = "instrument_zebra"
         acq2.instrument_name = "instrument_apple"
         merged_acq_instruments = acq1 + acq2
@@ -218,10 +218,11 @@ class TestComposability:
         acq1 = self.exaspim_acquisition.model_copy()
         acq2 = self.exaspim_acquisition.model_copy()
         subject_details = AcquisitionSubjectDetails(
+            subject_name=next(iter(acq1.subject_names)),
             mouse_platform_name="mouse_platform_name",
         )
-        acq1.subject_details = subject_details
-        acq2.subject_details = subject_details
+        acq1.subject_details = [subject_details]
+        acq2.subject_details = [subject_details]
 
         with pytest.raises(ValueError) as context:
             acq1 + acq2

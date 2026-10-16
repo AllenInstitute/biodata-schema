@@ -6,7 +6,11 @@ The `data_description.json` file tracks administrative information about a data 
 
 ## Uniqueness
 
-Every data asset is uniquely identified by its `DataDescription.name` field, which combines the `subject_name` and acquisition `session_end_time`. You can group data assets together using the `DataDescription.tags: List[str]`. Tags should be shared across assets within experiments. **Do not repeat information in the tags that already exists elsewhere in the metadata**, for example modalities should never be included in tags.
+`DataDescription.name` is required and can be any string. It is not generated automatically.
+
+We recommend using the pattern `<subject_name>_<acquisition-start-time>` for single-subject raw data or `<label>_<acquisition-start-time>` for multi-subject raw data. We recommend using ISO format datetimes in the *local time zone* of the acquisition, e.g. `123456_20260101T123500` or `group-5_20260101T123500`.
+
+You can group data assets together using `DataDescription.tags: List[str]`. Tags should be shared across assets within experiments. **Do not repeat information in the tags that already exists elsewhere in the metadata**, for example modalities should never be included in tags.
 
 ## Example
 
@@ -24,14 +28,13 @@ Description of a logical collection of data files
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `license` | [License](biodata_models/licenses.md#license) | License  |
-| `subject_name` | `Optional[str]` | Subject name (Unique name for the subject of data acquisition) |
+| `subject_names` | `Optional[set[str]]` | Subject names (Unique names for subjects associated with this data asset) |
 | `creation_time` | `datetime (timezone-aware)` | Creation Time (Time that data files were created, used to uniquely identify the data) |
 | `tags` | `Optional[List[str]]` | Tags (Descriptive strings to help categorize and search for data) |
-| `name` | `Optional[str]` | Data asset name (When left blank, a name will be generated based on subject_name and creation_time. Conventionally also used as the name of the data folder.) |
+| `name` | `str` | Data asset name (Any string naming the data asset, conventionally also used as the data folder name.) |
 | `institution` | [Organization](biodata_models/organizations.md#organization) | Institution (An established society, corporation, foundation or other organization that collected this data) |
 | `funding_source` | List[[Funding](data_description.md#funding)] | Funding source (Funding source. If internal funding, select 'Allen Institute') |
-| `data_level` | [DataLevel](biodata_models/data_name_patterns.md#datalevel) | Data Level (Level of processing that data has undergone) |
-| `group` | Optional[[Group](biodata_models/data_name_patterns.md#group)] | Group (A short name for the group of individuals that collected this data) |
+| `data_level` | [DataLevel](biodata_models/data_levels.md#datalevel) | Data Level (Level of processing that data has undergone) |
 | `investigators` | List[[Person](components/identifiers.md#person)] | Investigators (Full name(s) of key investigators (e.g. PI, lead scientist, contact person)) |
 | `project_name` | `str` | Project Name (A name for a set of coordinated activities intended to achieve one or more objectives.) |
 | `restrictions` | `Optional[str]` | Restrictions (Detail any restrictions on publishing or sharing these data) |

@@ -38,11 +38,7 @@ to share with the public.
 Files, particularly in cloud storage, are reliable and more persistent. By storing metadata 
 essential to interpreting an acquisition session alongside the acquisition in a human- and machine-readable 
 format, there will always be an interpretable record of what happened even if e.g. the 
-database stops working. 
-
-## Data organization
-
-Learn more about about [AIND data organization](https://docs.allenneuraldynamics.org/en/latest/metadata/philosophy.html) philosophy and the rules we use to standardize asset naming.
+database stops working.
 
 ## FAQs
 

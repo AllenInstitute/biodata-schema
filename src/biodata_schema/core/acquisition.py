@@ -10,7 +10,7 @@ from zoneinfo import ZoneInfo
 from biodata_models.modalities import Modality
 from biodata_models.stimulus_modality import StimulusModality
 from biodata_models.units import MassUnit, VolumeUnit
-from pydantic import Field, SkipValidation, field_validator, model_validator
+from pydantic import Field, SkipValidation, TypeAdapter, field_validator, model_validator
 from pydantic_extra_types.timezone_name import TimeZoneName
 
 from biodata_schema.base import (
@@ -59,7 +59,6 @@ from biodata_schema.utils.merge import (
 from biodata_schema.utils.validators import (
     TimeValidation,
     extract_timezone_from_datetime,
-    subject_specimen_name_compatibility,
 )
 
 logger = logging.getLogger(__name__)
@@ -93,6 +92,7 @@ def _drop_non_iana_timezones(schema: dict) -> None:
 class AcquisitionSubjectDetails(DataModel):
     """Details about the subject during an acquisition"""
 
+    subject_name: str = Field(..., title="Subject name")
     animal_weight_prior: Optional[Decimal] = Field(
         default=None,
         title="Animal weight (g)",
@@ -296,8 +296,8 @@ class ExternalDataStream(DataModel):
 
 
 class StimulusEpoch(DataModel):
-    """All stimuli being presented to the subject. starting and stopping at approximately the
-    same time. Not all acquisitions have StimulusEpochs.
+    """All stimuli being presented to all subjects in Acquisition.subject_names, starting and stopping at
+    approximately the same time. Epochs do not target a subset of subjects. Not all acquisitions have StimulusEpochs.
     """
 
     stimulus_start_time: Annotated[AwareDatetimeWithDefault, TimeValidation.BETWEEN] = Field(
@@ -356,6 +356,7 @@ class StimulusEpoch(DataModel):
 class Manipulation(ProtocolListMixin, DataModel):
     """Description of procedures performed during an acquisition."""
 
+    subject_name: str = Field(..., title="Subject name")
     start_time: Annotated[AwareDatetimeWithDefault, TimeValidation.BETWEEN] = Field(
         ..., title="Manipulation start time", description="Must be between the acquisition start and end times"
     )
@@ -382,11 +383,16 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
     schema_version: SkipValidation[Literal["3.0.0"]] = Field(default="3.0.0")
 
     # Names
-    subject_name: str = Field(default=..., title="Subject name", description="Unique name for the subject")
-    specimen_name: Optional[Union[str, List[str]]] = Field(
+    subject_names: set[str] = Field(
+        default=...,
+        title="Subject names",
+        description="Unique names for the subjects included in the acquisition",
+        min_length=1,
+    )
+    specimen_names: Optional[set[str]] = Field(
         default=None,
         title="Specimen name",
-        description="Required for in vitro modalities. Standard format is {subject_name} with a _### suffix, as needed",
+        description="Required for in vitro modalities.",
     )
 
     # Acquisition metadata
@@ -489,8 +495,10 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
     manipulations: List[Manipulation] = Field(
         default=[], title="Manipulations", description="Procedures performed during the acquisition."
     )
-    subject_details: Optional[AcquisitionSubjectDetails] = Field(
-        default=None, title="Subject details", description="Required for in vivo acquisitions."
+    subject_details: Optional[List[AcquisitionSubjectDetails]] = Field(
+        default=None,
+        title="Subject details",
+        description="One record per subject, identified by subject_name. Required for every subject in vivo.",
     )
 
     @property
@@ -512,26 +520,30 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
     @model_validator(mode="after")
     def extract_timezone(self):
         """Extract timezone information from acquisition_start_time and set acquisition_start_tz"""
-        if self.acquisition_start_tz is None and hasattr(self, "acquisition_start_time"):
+        if self.acquisition_start_tz is None:
             self.acquisition_start_tz = extract_timezone_from_datetime(self.acquisition_start_time)
         return self
 
     @model_validator(mode="after")
-    def check_subject_specimen_names(self):
-        """Check that the subject and specimen names match"""
-        if self.specimen_name and self.subject_name:
-            specimen_names = self.specimen_name if isinstance(self.specimen_name, list) else [self.specimen_name]
-            for specimen_name in specimen_names:
-                if not subject_specimen_name_compatibility(self.subject_name, specimen_name):
-                    raise ValueError(f"Expected {self.subject_name} to appear in {specimen_name}")
-
+    def validate_subject_references(self):
+        """Check subject-specific records against the acquisition roster."""
+        for field_name, records in (("subject_details", self.subject_details), ("manipulations", self.manipulations)):
+            names = TypeAdapter(list[str]).validate_python(
+                [
+                    record.get("subject_name") if isinstance(record, dict) else record.subject_name
+                    for record in records or []
+                ]
+            )
+            if field_name == "subject_details" and len(names) != len(set(names)):
+                raise ValueError("subject_details must have unique subject_name values")
+            unknown = set(names) - set(self.subject_names)
+            if unknown:
+                raise ValueError(f"{field_name}.subject_name not in subject_names: {', '.join(sorted(unknown))}")
         return self
 
     @model_validator(mode="after")
     def instrument_name_required_for_data_streams(self):
         """Require instrument_name when any standard DataStream is present"""
-        if not hasattr(self, "data_streams"):
-            return self
         if any(isinstance(stream, DataStream) for stream in self.data_streams):
             if not self.instrument_name:
                 raise ValueError("instrument_name is required when data_streams contains a DataStream")
@@ -541,12 +553,9 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
     def specimen_required(self):
         """Check if specimen name is required for in vitro imaging modalities"""
 
-        if not hasattr(self, "data_streams"):  # bypass for testing
-            return self
-
         for stream in self.data_streams:
             if any([modality.abbreviation in SPECIMEN_MODALITIES for modality in stream.modalities]):
-                if not self.specimen_name:
+                if not self.specimen_names:
                     raise ValueError(f"Specimen name is required for modalities {stream.modalities}")
 
         return self
@@ -594,27 +603,26 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
         coordinate_system = merge_coordinate_systems(self.global_coordinate_system, other.global_coordinate_system)
 
         # Check for incompatible key fields
-        subj_check = self.subject_name != other.subject_name
-        spec_check = self.specimen_name != other.specimen_name
+        subj_check = self.subject_names != other.subject_names
+        spec_check = self.specimen_names != other.specimen_names
         exp_type_check = bool(self.acquisition_type and other.acquisition_type) and (
             self.acquisition_type != other.acquisition_type
         )
         if any([subj_check, spec_check, exp_type_check]):
             raise ValueError(
                 "Cannot combine Acquisition objects that differ in key fields:\n"
-                f"subject_name: {self.subject_name}/{other.subject_name}\n"
-                f"specimen_name: {self.specimen_name}/{other.specimen_name}\n"
+                f"subject_names: {self.subject_names}/{other.subject_names}\n"
+                f"specimen_name: {self.specimen_names}/{other.specimen_names}\n"
                 f"acquisition_type: {self.acquisition_type}/{other.acquisition_type}"
             )
 
         # Combine instrument_name
         instrument_name = merge_str_alphabetical(self.instrument_name, other.instrument_name)
 
-        details_check = self.subject_details and other.subject_details
-        if details_check:
-            raise ValueError(
-                "SubjectDetails cannot be combined in Acquisition. Only a single set of details is allowed."
-            )
+        subject_details = (self.subject_details or []) + (other.subject_details or [])
+        detail_names = [details.subject_name for details in subject_details]
+        if len(detail_names) != len(set(detail_names)):
+            raise ValueError("SubjectDetails cannot be combined in Acquisition for the same subject.")
 
         # Combine
         experimenters = self.experimenters + other.experimenters
@@ -642,8 +650,8 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
         acquisition_type = self.acquisition_type or other.acquisition_type
 
         return Acquisition(
-            subject_name=self.subject_name,
-            specimen_name=self.specimen_name,
+            subject_names=self.subject_names,
+            specimen_names=self.specimen_names,
             experimenters=experimenters,
             protocol_id=protocol_id,
             ethics_review_id=ethics_review_id,
@@ -657,5 +665,6 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
             notes=notes,
             data_streams=data_streams,
             stimulus_epochs=stimulus_epochs,
-            subject_details=self.subject_details if self.subject_details else other.subject_details,
+            subject_details=subject_details if subject_details else None,
+            manipulations=self.manipulations + other.manipulations,
         )

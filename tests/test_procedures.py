@@ -21,7 +21,7 @@ from pydantic import ValidationError
 
 from biodata_schema.components.configs import CatheterConfig
 from biodata_schema.components.coordinates import CoordinateSystem, Origin, ReferenceCoordinateSystem, Translation
-from biodata_schema.components.devices import Catheter, Device
+from biodata_schema.components.devices import Catheter
 from biodata_schema.components.injection_procedures import (
     InjectionDynamics,
     InjectionProfile,
@@ -344,7 +344,7 @@ class TestProcedures:
 
         with pytest.raises(ValidationError) as e:
             SpecimenProcedure(
-                specimen_name="1000",
+                specimen_names={"1000"},
                 procedure_type="Other",
                 start_date=self.start_date,
                 end_date=date.fromisoformat("2020-10-11"),
@@ -356,7 +356,7 @@ class TestProcedures:
 
         with pytest.raises(ValidationError) as e:
             SpecimenProcedure(
-                specimen_name="1000",
+                specimen_names={"1000"},
                 procedure_type="Immunolabeling",
                 start_date=self.start_date,
                 end_date=date.fromisoformat("2020-10-11"),
@@ -368,7 +368,7 @@ class TestProcedures:
 
         with pytest.raises(ValidationError) as e:
             SpecimenProcedure(
-                specimen_name="1000",
+                specimen_names={"1000"},
                 procedure_type="Hybridization Chain Reaction",
                 start_date=date.fromisoformat("2020-10-10"),
                 end_date=date.fromisoformat("2020-10-11"),
@@ -380,7 +380,7 @@ class TestProcedures:
 
         with pytest.raises(ValidationError) as e:
             SpecimenProcedure(
-                specimen_name="1000",
+                specimen_names={"1000"},
                 procedure_type="Sectioning",
                 start_date=date.fromisoformat("2020-10-10"),
                 end_date=date.fromisoformat("2020-10-11"),
@@ -392,7 +392,7 @@ class TestProcedures:
 
         with pytest.raises(ValidationError) as e:
             SpecimenProcedure(
-                specimen_name="1000",
+                specimen_names={"1000"},
                 procedure_type=SpecimenProcedureType.BARSEQ,
                 start_date=date.fromisoformat("2020-10-10"),
                 end_date=date.fromisoformat("2020-10-11"),
@@ -404,7 +404,7 @@ class TestProcedures:
 
         assert (
             SpecimenProcedure(
-                specimen_name="1000",
+                specimen_names={"1000"},
                 procedure_type="Other",
                 start_date=date.fromisoformat("2020-10-10"),
                 end_date=date.fromisoformat("2020-10-11"),
@@ -416,7 +416,7 @@ class TestProcedures:
 
         assert (
             SpecimenProcedure(
-                specimen_name="1000",
+                specimen_names={"1000"},
                 procedure_type="Sectioning",
                 start_date=date.fromisoformat("2020-10-10"),
                 end_date=date.fromisoformat("2020-10-11"),
@@ -432,7 +432,7 @@ class TestProcedures:
 
         with pytest.raises(ValidationError) as e:
             SpecimenProcedure(
-                specimen_name="1000",
+                specimen_names={"1000"},
                 procedure_type="Other",
                 start_date=date.fromisoformat("2020-10-10"),
                 end_date=date.fromisoformat("2020-10-11"),
@@ -440,8 +440,8 @@ class TestProcedures:
                 protocol_id=["10"],
                 notes="some extra information",
                 procedure_details=[
-                    HCRSeries.model_construct(),
-                    PlanarSectioning.model_construct(),
+                    HCRSeries(codebook_name="test", number_of_rounds=0, hcr_rounds=[], strip_qc_compatible=False),
+                    PlanarSectioning(sections=[], section_orientation=SectionOrientation.CORONAL),
                 ],
             )
         assert "SpecimenProcedure.procedure_details should only contain one type of model" in repr(e.value)
@@ -593,35 +593,37 @@ class TestProcedures:
                 ),
             )
 
-    def test_validate_subject_specimen_names(self):
-        """Test that the subject_name and specimen_name match"""
+    def test_specimen_names_need_not_match_subject_name(self):
+        """Specimen names are not constrained by their subject name."""
+        procedure = Procedures(
+            subject_name="12345",
+            specimen_procedures=[
+                SpecimenProcedure(
+                    specimen_names={"sample-alpha", "unrelated-name"},
+                    procedure_type="Other",
+                    start_date=date.fromisoformat("2020-10-10"),
+                    end_date=date.fromisoformat("2020-10-11"),
+                    experimenters=["Mam Moth"],
+                    protocol_id=["10"],
+                    notes="some notes",
+                )
+            ],
+        )
+        assert procedure.specimen_procedures[0].specimen_names == {"sample-alpha", "unrelated-name"}
 
-        with pytest.raises(ValidationError) as e:
-            Procedures(
-                subject_name="12345",
-                specimen_procedures=[
-                    SpecimenProcedure(
-                        specimen_name="9999_1000",
-                        procedure_type="Other",
-                        start_date=date.fromisoformat("2020-10-10"),
-                        end_date=date.fromisoformat("2020-10-11"),
-                        experimenters=["Mam Moth"],
-                        protocol_id=["10"],
-                        notes="some notes",
-                    )
-                ],
-            )
-        expected_exception = "specimen_name must be an extension of the subject_name."
-        assert expected_exception in str(e.value)
+    def test_rejects_plural_subject_names_for_one_object(self):
+        """Procedures uses its canonical singular owner field only."""
+        with pytest.raises(ValidationError, match="subject_name"):
+            Procedures(subject_names={"12345", "67890"})
 
-    def test_validate_subject_specimen_name_list_valid(self):
-        """Test that specimen_name accepts a list of strings when all contain subject_name"""
+    def test_specimen_names_accept_json_arrays(self):
+        """Specimen names are stored as a set and accept JSON arrays."""
 
         valid_procedure = Procedures(
             subject_name="12345",
             specimen_procedures=[
                 SpecimenProcedure(
-                    specimen_name=["12345_001", "12345_002"],
+                    specimen_names=["12345_001", "12345_002", "12345_001"],
                     procedure_type="Other",
                     start_date=date.fromisoformat("2020-10-10"),
                     end_date=date.fromisoformat("2020-10-11"),
@@ -632,6 +634,20 @@ class TestProcedures:
             ],
         )
         assert valid_procedure is not None
+        assert valid_procedure.specimen_procedures[0].specimen_names == {"12345_001", "12345_002"}
+        assert Procedures.model_validate_json(valid_procedure.model_dump_json()) == valid_procedure
+
+    @pytest.mark.parametrize("names", ["12345_001", set()])
+    def test_rejects_scalar_or_empty_specimen_names(self, names):
+        """A specimen procedure requires a nonempty collection of names."""
+        with pytest.raises(ValidationError, match="specimen_names"):
+            SpecimenProcedure(
+                specimen_names=names,
+                procedure_type="Other",
+                start_date=self.start_date,
+                end_date=self.start_date,
+                notes="Test procedure",
+            )
 
     def test_craniotomy_position_validation(self):
         """Test validation for craniotomy position"""
@@ -791,17 +807,6 @@ class TestProcedures:
         # Test with no devices
         procedures = Procedures(subject_name="12345")
         assert procedures.get_device_names() == []
-
-    def test_get_device_names_with_constructed_surgery_procedure(self):
-        """Test device-name traversal without requiring external anatomy lookups."""
-        device = Device.model_construct(name="Catheter")
-        surgery_procedure = CatheterImplant.model_construct(implanted_device=device)
-        procedures = Procedures.model_construct(
-            subject_name="12345",
-            subject_procedures=[Surgery.model_construct(procedures=[surgery_procedure])],
-        )
-
-        assert procedures.get_device_names() == ["Catheter"]
 
     @patch("biodata_models.anatomy.MouseAnatomyLookup.get_by_name")
     def test_get_device_names_with_surgery_procedures(self, mock_get_by_name):

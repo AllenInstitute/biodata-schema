@@ -24,10 +24,12 @@ from biodata_schema.core.acquisition import (
     Acquisition,
     AcquisitionSubjectDetails,
     DataStream,
+    Manipulation,
     StimulusEpoch,
 )
 from examples.barseq_acquisition import acquisition as barseq_acquisition
 from examples.ephys_acquisition import acquisition as ephys_acquisition
+from examples.ephys_acquisition import ephys_assembly_a_config
 from examples.exaspim_acquisition import acq as exaspim_acquisition
 from examples.mri_acquisition import acquisition as mri_acquisition
 from examples.mri_acquisition import scan1
@@ -35,6 +37,53 @@ from examples.mri_acquisition import scan1
 
 class TestAcquisition:
     """Group of tests for the Acquisition class"""
+
+    @pytest.mark.parametrize("field_name", ["subject_details", "manipulations"])
+    def test_subject_references(self, field_name):
+        """Subject-specific records must reference an acquired subject."""
+        if field_name == "subject_details":
+            record = AcquisitionSubjectDetails(subject_name="123456", mouse_platform_name="platform")
+        else:
+            record = Manipulation(
+                subject_name="123456",
+                start_time=barseq_acquisition.acquisition_start_time,
+                end_time=barseq_acquisition.acquisition_end_time,
+            )
+        payload = barseq_acquisition.model_dump() | {field_name: [record]}
+        assert Acquisition.model_validate(payload)
+
+        record = record.model_copy(update={"subject_name": "unknown"})
+        with pytest.raises(ValidationError, match=f"{field_name}.subject_name not in subject_names"):
+            Acquisition.model_validate(payload | {field_name: [record]})
+
+    def test_duplicate_subject_details(self):
+        """There can be only one details record per subject."""
+        details = AcquisitionSubjectDetails(subject_name="123456", mouse_platform_name="platform")
+        with pytest.raises(ValidationError, match="unique subject_name"):
+            Acquisition.model_validate(barseq_acquisition.model_dump() | {"subject_details": [details, details]})
+
+    def test_merge_disjoint_subject_details_and_manipulations(self):
+        """Combining acquisitions retains per-subject details and manipulations."""
+        payload = barseq_acquisition.model_dump() | {"subject_names": {"123456", "789012"}}
+        sources = [
+            Acquisition.model_validate(
+                payload
+                | {
+                    "subject_details": [AcquisitionSubjectDetails(subject_name=name, mouse_platform_name="platform")],
+                    "manipulations": [
+                        Manipulation(
+                            subject_name=name,
+                            start_time=barseq_acquisition.acquisition_start_time,
+                            end_time=barseq_acquisition.acquisition_end_time,
+                        )
+                    ],
+                }
+            )
+            for name in sorted(payload["subject_names"])
+        ]
+        combined = sources[0] + sources[1]
+        assert {details.subject_name for details in combined.subject_details} == payload["subject_names"]
+        assert {record.subject_name for record in combined.manipulations} == payload["subject_names"]
 
     def test_constructors(self):
         """Test constructing acquisition files"""
@@ -68,7 +117,7 @@ class TestAcquisition:
         end = datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
         with pytest.raises(ValidationError) as context:
             Acquisition(
-                subject_name="123456",
+                subject_names={"123456"},
                 acquisition_start_time=start,
                 acquisition_end_time=end,
                 acquisition_type="Test",
@@ -84,35 +133,10 @@ class TestAcquisition:
             )
         assert "instrument_name is required" in str(context.value)
 
-    def test_check_subject_specimen_names(self):
-        """Test that subject and specimen names match"""
-        with pytest.raises(ValueError) as context:
-            acq = exaspim_acquisition.model_copy()
-            acq.specimen_name = "654321"
-
-            Acquisition.model_validate_json(acq.model_dump_json())
-
-        assert "Expected 123456 to appear in 654321" in str(context.value)
-
-    def test_specimen_name_list_valid(self):
-        """Test that specimen_name accepts a list of strings when all contain subject_name"""
-        acq = exaspim_acquisition.model_copy()
-        acq.specimen_name = ["123456_slide1", "123456_slide2"]
-        validated = Acquisition.model_validate_json(acq.model_dump_json())
-        assert validated.specimen_name == ["123456_slide1", "123456_slide2"]
-
-    def test_specimen_name_list_invalid(self):
-        """Test that specimen_name list raises ValueError if any entry does not contain subject_name"""
-        with pytest.raises(ValueError) as context:
-            acq = exaspim_acquisition.model_copy()
-            acq.specimen_name = ["123456_slide1", "654321_slide2"]
-            Acquisition.model_validate_json(acq.model_dump_json())
-        assert "Expected 123456 to appear in 654321_slide2" in str(context.value)
-
     def test_specimen_required(self):
         """Test that specimen name is required for in vitro imaging modalities"""
         acq = exaspim_acquisition.model_copy()
-        acq.specimen_name = None
+        acq.specimen_names = None
         with pytest.raises(ValidationError, match="Specimen name is required for modalities"):
             Acquisition.model_validate_json(acq.model_dump_json())
 
@@ -136,7 +160,7 @@ class TestAcquisition:
             modalities=[Modality.ECEPHYS],
             active_devices=["Stick_assembly", "Ephys_assemblyA"],
             configurations=[
-                EphysAssemblyConfig.model_construct(),
+                EphysAssemblyConfig.model_validate(ephys_assembly_a_config.model_dump()),
             ],
         )
         assert stream is not None
@@ -150,12 +174,15 @@ class TestAcquisition:
                 experimenters=["Mam Moth"],
                 acquisition_start_time=datetime.now(),
                 acquisition_end_time=datetime.now(),
-                subject_name="123456",
+                subject_names={"123456"},
                 acquisition_type="Test",
                 instrument_name="1234",
-                subject_details=AcquisitionSubjectDetails(
-                    mouse_platform_name="Running wheel",
-                ),
+                subject_details=[
+                    AcquisitionSubjectDetails(
+                        subject_name="123456",
+                        mouse_platform_name="Running wheel",
+                    )
+                ],
                 data_streams=[
                     DataStream(
                         stream_start_time=datetime.now(),
@@ -186,13 +213,16 @@ class TestAcquisition:
             experimenters=["Mam Moth"],
             acquisition_start_time=datetime.now(),
             acquisition_end_time=datetime.now(),
-            subject_name="123456",
-            specimen_name="SP123456",
+            subject_names={"123456"},
+            specimen_names={"SP123456"},
             acquisition_type="Test",
             instrument_name="1234",
-            subject_details=AcquisitionSubjectDetails(
-                mouse_platform_name="Running wheel",
-            ),
+            subject_details=[
+                AcquisitionSubjectDetails(
+                    subject_name="123456",
+                    mouse_platform_name="Running wheel",
+                )
+            ],
             data_streams=[
                 DataStream(
                     stream_start_time=datetime.now(),
@@ -507,7 +537,11 @@ class TestAcquisition:
         from pydantic_extra_types.timezone_name import TimeZoneName
 
         dt = datetime(2023, 6, 15, 20, 0, 0, tzinfo=timezone.utc)
-        acq = Acquisition.model_construct(
+        acq = Acquisition(
+            subject_names={"123456"},
+            acquisition_type="Test",
+            acquisition_end_time=dt,
+            data_streams=[],
             acquisition_start_time=dt,
             acquisition_start_tz=TimeZoneName("America/Los_Angeles"),
         )
@@ -518,7 +552,11 @@ class TestAcquisition:
     def test_acquisition_start_time_local_with_int_offset(self):
         """acquisition_start_time_local converts correctly using an integer UTC offset in hours"""
         dt = datetime(2023, 6, 15, 20, 0, 0, tzinfo=timezone.utc)
-        acq = Acquisition.model_construct(
+        acq = Acquisition(
+            subject_names={"123456"},
+            acquisition_type="Test",
+            acquisition_end_time=dt,
+            data_streams=[],
             acquisition_start_time=dt,
             acquisition_start_tz=-7,
         )
@@ -529,10 +567,15 @@ class TestAcquisition:
     def test_acquisition_start_time_local_with_no_tz(self):
         """acquisition_start_time_local returns acquisition_start_time unchanged when tz is None"""
         dt = datetime(2023, 6, 15, 20, 0, 0, tzinfo=timezone.utc)
-        acq = Acquisition.model_construct(
+        acq = Acquisition(
+            subject_names={"123456"},
+            acquisition_type="Test",
+            acquisition_end_time=dt,
+            data_streams=[],
             acquisition_start_time=dt,
             acquisition_start_tz=None,
         )
+        acq.acquisition_start_tz = None
         assert acq.acquisition_start_time_local == dt
 
     def test_acquisition_start_time_local_round_trip(self):

@@ -144,4 +144,4 @@ if __name__ == "__main__":
 
     serialized = quality_control.model_dump_json()
     deserialized = QualityControl.model_validate_json(serialized)
-    quality_control.write_standard_file(prefix="exaspim", output_directory=args.output_dir)
+    QualityControl.write_standard_file(deserialized, prefix="exaspim", output_directory=args.output_dir)

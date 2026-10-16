@@ -7,7 +7,7 @@ An acquisition is single episode of data collection that creates one data asset.
 The acquisition metadata is split into two parallel pieces the `DataStream` and the `StimulusEpoch`. At any given moment in time the active `DataStream`(s) represents all modalities of data being acquired, while the `StimulusEpoch` represents all stimuli being presented.
 
 - `DataStream`: A set of devices that are acquiring data and their configurations.
-- `StimulusEpoch`: All stimuli being presented to the subject. Not all acquisitions have StimulusEpochs.
+- `StimulusEpoch`: All stimuli being presented to subjects. Not all acquisitions have StimulusEpochs.
 
 A single DataStream should capture all the modalities of data acquired as a group, even when their start/stop times differ by a small amount.
 
@@ -77,8 +77,8 @@ while the StimulusEpoch represents all stimuli being presented.
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `subject_name` | `str` | Subject name (Unique name for the subject) |
-| `specimen_name` | `str or List[str] or NoneType` | Specimen name (Required for in vitro modalities. Standard format is {subject_name} with a _### suffix, as needed) |
+| `subject_names` | `set[str]` | Subject names (Unique names for the subjects included in the acquisition) |
+| `specimen_names` | `Optional[set[str]]` | Specimen name (Required for in vitro modalities.) |
 | `acquisition_start_time` | `datetime (timezone-aware)` | Acquisition start time (During validation, timezone information will be moved into the acquisition_start_tz field.) |
 | `acquisition_start_tz` | `int or pydantic_extra_types.timezone_name.TimeZoneName or NoneType` | Acquisition start timezone (Automatically populated by a validator based on acquisition_start_time. Will be a TimeZoneName (IANA name) when the datetime uses a ZoneInfo timezone, or an integer UTC offset in hours for fixed-offset timezones. Use ZoneInfo (from the zoneinfo standard library) to preserve the named timezone.) |
 | `acquisition_end_time` | `datetime (timezone-aware)` | Acquisition end time  |
@@ -93,7 +93,7 @@ while the StimulusEpoch represents all stimuli being presented.
 | `data_streams` | List[[DataStream](acquisition.md#datastream) or [ExternalDataStream](acquisition.md#externaldatastream)] | Data streams (A data stream is a collection of devices that are acquiring data simultaneously. Each acquisition can include multiple streams. Streams should be split when configurations are changed. Use ExternalDataStream for acquisitions where instrument metadata is unavailable.) |
 | `stimulus_epochs` | List[[StimulusEpoch](acquisition.md#stimulusepoch)] | Stimulus (A stimulus epoch captures all stimuli being presented during an acquisition. Epochs should be split when the purpose of the stimulus changes.) |
 | `manipulations` | List[[Manipulation](acquisition.md#manipulation)] | Manipulations (Procedures performed during the acquisition.) |
-| `subject_details` | Optional[[AcquisitionSubjectDetails](acquisition.md#acquisitionsubjectdetails)] | Subject details (Required for in vivo acquisitions.) |
+| `subject_details` | Optional[List[[AcquisitionSubjectDetails](acquisition.md#acquisitionsubjectdetails)]] | Subject details (One record per subject, identified by subject_name. Required for every subject in vivo.) |
 | `protocol_id` | `Optional[List[str]]` | Protocol ID (DOI for protocols.io) |
 
 
@@ -105,6 +105,7 @@ Details about the subject during an acquisition
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
+| `subject_name` | `str` | Subject name  |
 | `animal_weight_prior` | `Optional[decimal.Decimal]` | Animal weight (g) (Animal weight before procedure) |
 | `animal_weight_post` | `Optional[decimal.Decimal]` | Animal weight (g) (Animal weight after procedure) |
 | `weight_unit` | [MassUnit](biodata_models/units.md#massunit) | Weight unit  |
@@ -149,6 +150,7 @@ Description of procedures performed during an acquisition.
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
+| `subject_name` | `str` | Subject name  |
 | `start_time` | `datetime (timezone-aware)` | Manipulation start time (Must be between the acquisition start and end times) |
 | `end_time` | `datetime (timezone-aware)` | Manipulation end time (Must be between the acquisition start and end times) |
 | `procedures` | Optional[List[[Injection](components/injection_procedures.md#injection) or [BrainInjection](components/surgery_procedures.md#braininjection) or [Reagent](components/reagent.md#reagent)]] | Procedures (Procedures performed during the manipulation) |
@@ -173,8 +175,8 @@ Summary of a StimulusEpoch
 
 ### StimulusEpoch
 
-All stimuli being presented to the subject. starting and stopping at approximately the
-same time. Not all acquisitions have StimulusEpochs.
+All stimuli being presented to all subjects in Acquisition.subject_names, starting and stopping at
+approximately the same time. Epochs do not target a subset of subjects. Not all acquisitions have StimulusEpochs.
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|

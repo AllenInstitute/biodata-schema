@@ -131,7 +131,7 @@ def test_core_merge_real_frame_overrides_not_applicable(model, real_first):
         from examples.ephys_acquisition import acquisition as spatial
 
         nonspatial = Acquisition(
-            subject_name=spatial.subject_name,
+            subject_names=spatial.subject_names,
             instrument_name=spatial.instrument_name,
             acquisition_start_time=spatial.acquisition_start_time,
             acquisition_end_time=spatial.acquisition_end_time,

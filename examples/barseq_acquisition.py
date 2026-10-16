@@ -16,9 +16,9 @@ from biodata_schema.components.coordinates import CoordinateSystem
 from biodata_schema.core.acquisition import Acquisition, ExternalDataStream
 
 acquisition = Acquisition(
-    subject_name="123456",
+    subject_names={"123456"},
     global_coordinate_system=CoordinateSystem.NotApplicable,
-    specimen_name=["123456_bar001", "123456_bar002"],
+    specimen_names={"123456_bar001", "123456_bar002"},
     acquisition_start_time=datetime(2025, 1, 1, 9, 0, 0, tzinfo=ZoneInfo("America/Los_Angeles")),
     acquisition_end_time=datetime(2025, 1, 31, 17, 0, 0, tzinfo=ZoneInfo("America/Los_Angeles")),
     acquisition_type="BarcodeSequencing",
@@ -39,4 +39,4 @@ if __name__ == "__main__":
 
     serialized = acquisition.model_dump_json()
     deserialized = Acquisition.model_validate_json(serialized)
-    deserialized.write_standard_file(prefix="barseq", output_directory=args.output_dir)
+    Acquisition.write_standard_file(deserialized, prefix="barseq", output_directory=args.output_dir)

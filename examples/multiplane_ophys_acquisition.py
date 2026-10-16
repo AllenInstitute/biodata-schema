@@ -55,13 +55,11 @@ a = Acquisition(
     experimenters=["John Smith"],
     acquisition_start_time=t,
     acquisition_end_time=t,
-    subject_name="12345",
+    subject_names={"12345"},
     acquisition_type="Mesoscope",
     instrument_name="MESO.1",
     ethics_review_id=["1234"],
-    subject_details=AcquisitionSubjectDetails(
-        mouse_platform_name="disc",
-    ),
+    subject_details=[AcquisitionSubjectDetails(subject_name="12345", mouse_platform_name="disc")],
     global_coordinate_system=BREGMA_RAS,
     data_streams=[
         DataStream(
@@ -238,4 +236,4 @@ if __name__ == "__main__":
 
     serialized = a.model_dump_json()
     deserialized = Acquisition.model_validate_json(serialized)
-    deserialized.write_standard_file(prefix="multiplane_ophys", output_directory=args.output_dir)
+    Acquisition.write_standard_file(deserialized, prefix="multiplane_ophys", output_directory=args.output_dir)

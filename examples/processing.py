@@ -154,4 +154,4 @@ if __name__ == "__main__":
 
     serialized = p.model_dump_json()
     deserialized = Processing.model_validate_json(serialized)
-    p.write_standard_file(output_directory=args.output_dir)
+    Processing.write_standard_file(deserialized, output_directory=args.output_dir)

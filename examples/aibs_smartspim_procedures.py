@@ -43,7 +43,7 @@ perfusion = procedures.Surgery(
 
 # perfused brain goes into SHIELD OFF solution
 delipidation_procedure = procedures.SpecimenProcedure(
-    specimen_name=specimen_name,
+    specimen_names={specimen_name},
     procedure_name="Delipidation",
     procedure_type="Delipidation",
     start_date=date(2023, 1, 13),
@@ -55,7 +55,7 @@ delipidation_procedure = procedures.SpecimenProcedure(
 
 # Now to 100% EasyIndex
 index2 = procedures.SpecimenProcedure(
-    specimen_name=specimen_name,
+    specimen_names={specimen_name},
     procedure_type="Refractive index matching",
     procedure_name="EasyIndex Index Matching",
     start_date=date(2023, 1, 31),
@@ -69,7 +69,7 @@ index2 = procedures.SpecimenProcedure(
 
 # Specimen embedded into 2% agarose, prepared with EasyIndex
 embedding = procedures.SpecimenProcedure(
-    specimen_name=specimen_name,
+    specimen_names={specimen_name},
     procedure_type="Embedding",
     start_date=date(2023, 1, 31),
     end_date=date(2023, 2, 2),
@@ -99,4 +99,4 @@ if __name__ == "__main__":
 
     serialized = all_procedures.model_dump_json()
     deserialized = procedures.Procedures.model_validate_json(serialized)
-    deserialized.write_standard_file(prefix="aibs_smartspim", output_directory=args.output_dir)
+    procedures.Procedures.write_standard_file(deserialized, prefix="aibs_smartspim", output_directory=args.output_dir)

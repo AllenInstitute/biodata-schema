@@ -6,7 +6,7 @@ from zoneinfo import ZoneInfo
 import pandas as pd
 from biodata_models.brain_atlas import CCFv3
 from biodata_models.coordinates import AxisName, Direction, Origin
-from biodata_models.data_name_patterns import DataLevel
+from biodata_models.data_levels import DataLevel
 from biodata_models.modalities import Modality
 from biodata_models.organizations import Organization
 from biodata_models.species import Strain
@@ -24,6 +24,7 @@ from biodata_schema.components.injection_procedures import InjectionDynamics, In
 from biodata_schema.components.subject_procedures import BrainInjection, Perfusion
 from biodata_schema.components.subjects import BreedingInfo, HomeCageEnrichment, Housing, MouseSubject, Sex, Species
 from biodata_schema.core.data_description import DataDescription, Funding
+from biodata_schema.core.metadata import Metadata
 from biodata_schema.core.procedures import Procedures, Surgery
 from biodata_schema.core.subject import Subject
 
@@ -61,8 +62,9 @@ def generate_data_description(subject_name: str, creation_time: datetime) -> Dat
     our data always contains planar optical physiology and behavior videos
     """
     return DataDescription(
+        name=f"{subject_name}_{creation_time:%Y%m%dT%H%M%S}",
         modalities=[Modality.POPHYS, Modality.BEHAVIOR_VIDEOS],
-        subject_name=subject_name,
+        subject_names={subject_name},
         creation_time=creation_time,
         institution=Organization.AIND,
         funding_source=[Funding(funder=Organization.NIMH)],
@@ -267,6 +269,11 @@ for _, row in sessions_df.iterrows():
     os.makedirs(data_description.name, exist_ok=True)
 
     # Save the metadata files
-    data_description.write_standard_file(output_directory=data_description.name)
-    subject.write_standard_file(output_directory=data_description.name)
-    procedures.write_standard_file(output_directory=data_description.name)
+    metadata = Metadata(
+        name=data_description.name,
+        location="",
+        data_description=data_description,
+        subjects=[subject],
+        procedures=[procedures],
+    )
+    metadata.write_standard_files(output_directory=data_description.name)

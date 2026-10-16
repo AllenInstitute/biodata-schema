@@ -10,11 +10,13 @@ import sys
 from pathlib import Path
 from typing import Any, Iterator, get_args
 
-from pydantic import BaseModel
+from pydantic import BaseModel, TypeAdapter
 
 from biodata_schema import core
 from biodata_schema.base import DataCoreModel, DraftRequirement
 from biodata_schema.core.metadata import Metadata
+from biodata_schema.core.procedures import Procedures
+from biodata_schema.core.subject import Subject
 
 # Import all modules in core package
 for mod in core.__loader__.get_resource_reader().contents():
@@ -62,6 +64,17 @@ def _field_schema(source_schema: dict, field_name: str, field_info: Any) -> dict
     return schema
 
 
+def _preserve_array_container(source: dict, item_schema: dict) -> dict:
+    """Keep a collection wrapper while replacing its nested item details."""
+    if source.get("type") == "array":
+        return {**copy.deepcopy(source), "items": item_schema}
+    if "anyOf" in source:
+        array_options = [option for option in source["anyOf"] if option.get("type") == "array"]
+        if array_options:
+            return _preserve_array_container(array_options[0], item_schema)
+    return item_schema
+
+
 def _project_model_schema(model: type[BaseModel], definitions: dict[str, dict]) -> dict:
     """Build a schema containing only draft-required fields from a model."""
     source_schema = model.model_json_schema()
@@ -91,6 +104,8 @@ def _project_model_schema(model: type[BaseModel], definitions: dict[str, dict]) 
             }
 
         source_field_schema = _field_schema(source_schema, field_name, field_info)
+        if source_field_schema.get("type") == "array" or "anyOf" in source_field_schema:
+            child_schema = _preserve_array_container(source_field_schema, child_schema)
         for metadata_name in ("title", "description"):
             if metadata_name in source_field_schema:
                 child_schema[metadata_name] = source_field_schema[metadata_name]
@@ -192,13 +207,29 @@ class SchemaWriter:
         return optional_args
 
     @staticmethod
-    def get_schemas() -> Iterator[DataCoreModel]:
+    def get_schemas() -> Iterator[type[DataCoreModel]]:
         """
-        Returns Iterator of DataCoreModel classes
+        Yield DataCoreModel classes defined in the core schema package.
         """
 
         for model in DataCoreModel.__subclasses__():
-            yield model
+            if model.__module__.startswith(f"{core.__name__}."):
+                yield model
+
+    @staticmethod
+    def schema_filename(model: type[DataCoreModel]) -> str:
+        """Return the published filename for a core schema."""
+        filename = model.default_filename()
+        file_extension = "".join(Path(filename).suffixes)
+        return filename.replace(file_extension, "_schema.json")
+
+    @staticmethod
+    def model_schema(model: type[DataCoreModel]) -> dict:
+        """Return the schema for a standard core file, including collection wrappers."""
+        schema = TypeAdapter(list[model]).json_schema() if model in (Subject, Procedures) else model.model_json_schema()
+        if model._MIN_COLLECTION_LENGTH:
+            schema["minItems"] = model._MIN_COLLECTION_LENGTH
+        return schema
 
     def write_to_json(self) -> None:
         """
@@ -207,11 +238,9 @@ class SchemaWriter:
         schemas_to_write = self.get_schemas()
         output_path = self.configs.output
         for schema in schemas_to_write:
-            filename = schema.default_filename()
-            file_extension = "".join(Path(filename).suffixes)
-            schema_filename = filename.replace(file_extension, "_schema.json")
+            schema_filename = self.schema_filename(schema)
             if self.configs.attach_version:
-                schema_version = schema.model_construct().schema_version
+                schema_version = schema.model_fields["schema_version"].default
                 model_directory_name = schema_filename.replace("_schema.json", "")
                 sub_directory = Path(output_path) / model_directory_name / schema_version
                 output_file = sub_directory / schema_filename
@@ -222,7 +251,7 @@ class SchemaWriter:
                 os.makedirs(output_file.parent)
 
             with open(output_file, "w") as f:
-                schema_json: dict = schema.model_json_schema()
+                schema_json = self.model_schema(schema)
                 schema_json_str: str = json.dumps(schema_json, indent=3)
                 f.write(schema_json_str)
 

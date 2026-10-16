@@ -96,7 +96,7 @@ Description of surgical or other procedure performed on a specimen
 |-------|------|-------------|
 | `procedure_type` | [SpecimenProcedureType](../biodata_models/specimen_procedure_types.md#specimenproceduretype) | Procedure type  |
 | `procedure_name` | `Optional[str]` | Procedure name  |
-| `specimen_name` | `str or List[str]` | Specimen name(s)  |
+| `specimen_names` | `set[str]` | Specimen names  |
 | `start_date` | `datetime.date` | Start date  |
 | `end_date` | `datetime.date` | End date  |
 | `experimenters` | `List[str]` | experimenter(s)  |

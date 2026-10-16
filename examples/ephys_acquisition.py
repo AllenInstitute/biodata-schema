@@ -135,7 +135,7 @@ ephys_assembly_b_config = EphysAssemblyConfig(
 
 acquisition = Acquisition(
     experimenters=["John Smith"],
-    subject_name="664484",
+    subject_names={"664484"},
     acquisition_start_time=datetime(
         year=2023, month=4, day=25, hour=2, minute=35, second=0, tzinfo=ZoneInfo("America/Los_Angeles")
     ),
@@ -145,9 +145,7 @@ acquisition = Acquisition(
     acquisition_type="Receptive field mapping",
     instrument_name="EPHYS1",
     ethics_review_id=["2109"],
-    subject_details=AcquisitionSubjectDetails(
-        mouse_platform_name="Running Wheel",
-    ),
+    subject_details=[AcquisitionSubjectDetails(subject_name="664484", mouse_platform_name="Running Wheel")],
     global_coordinate_system=BREGMA_ARI,
     stimulus_epochs=[
         StimulusEpoch(
@@ -248,4 +246,4 @@ if __name__ == "__main__":
 
     serialized = acquisition.model_dump_json()
     deserialized = Acquisition.model_validate_json(serialized)
-    deserialized.write_standard_file(prefix="ephys", output_directory=args.output_dir)
+    Acquisition.write_standard_file(deserialized, prefix="ephys", output_directory=args.output_dir)

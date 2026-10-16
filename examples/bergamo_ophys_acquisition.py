@@ -86,13 +86,11 @@ a = Acquisition(
     experimenters=["John Smith"],
     acquisition_start_time=t,
     acquisition_end_time=t,
-    subject_name="652567",
+    subject_names={"652567"},
     acquisition_type="BCI Photometry",
     instrument_name="322_bergamo_20220705",
     ethics_review_id=["2115"],
-    subject_details=AcquisitionSubjectDetails(
-        mouse_platform_name="Mouse tube",
-    ),
+    subject_details=[AcquisitionSubjectDetails(subject_name="652567", mouse_platform_name="Mouse tube")],
     global_coordinate_system=BREGMA_ARI,
     data_streams=[
         DataStream(
@@ -171,4 +169,4 @@ if __name__ == "__main__":
 
     serialized = a.model_dump_json()
     deserialized = Acquisition.model_validate_json(serialized)
-    deserialized.write_standard_file(prefix="bergamo_ophys", output_directory=args.output_dir)
+    Acquisition.write_standard_file(deserialized, prefix="bergamo_ophys", output_directory=args.output_dir)

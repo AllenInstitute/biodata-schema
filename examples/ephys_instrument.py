@@ -426,4 +426,4 @@ if __name__ == "__main__":
 
     serialized = inst.model_dump_json()
     deserialized = Instrument.model_validate_json(serialized)
-    deserialized.write_standard_file(prefix="ephys", output_directory=args.output_dir)
+    Instrument.write_standard_file(deserialized, prefix="ephys", output_directory=args.output_dir)

@@ -19,7 +19,9 @@ from biodata_schema.base import (
     GenericModel,
     is_dict_corrupt,
 )
+from biodata_schema.core.procedures import Procedures
 from biodata_schema.core.subject import Subject
+from examples.subjects import s as example_subject
 
 
 class TestBase:
@@ -28,7 +30,7 @@ class TestBase:
     def test_described_by(self):
         """test that described by works"""
 
-        s = Subject.model_construct()
+        s = Subject.model_validate(example_subject.model_dump())
 
         assert s.describedBy == (
             "https://raw.githubusercontent.com/AllenNeuralDynamics/"
@@ -39,8 +41,8 @@ class TestBase:
     def test_write_standard_file(self, mock_open: MagicMock):
         """Tests writer with suffix and output directory defined"""
 
-        s = Subject.model_construct()
-        s.write_standard_file(output_directory=Path("dir"), suffix=".foo.bar")
+        s = Subject.model_validate(example_subject.model_dump())
+        Subject.write_standard_file(s, output_directory=Path("dir"), suffix=".foo.bar")
         mock_open.assert_called_once_with("w")
         assert 1 == 1
 
@@ -218,12 +220,14 @@ class TestBase:
     def test_write_standard_file_size_warning(self, mock_logger: MagicMock, mock_open: MagicMock):
         """Tests that a warning is logged if the file size exceeds MAX_FILE_SIZE"""
 
-        s = Subject.model_construct()
+        s = Subject.model_validate(example_subject.model_dump())
         s.subject_name = "s" * (MAX_FILE_SIZE + 1000)
-        s.write_standard_file(output_directory=Path("dir"), suffix=".foo.bar")
+        Subject.write_standard_file(s, output_directory=Path("dir"), suffix=".foo.bar")
 
         mock_open.assert_called_once_with("w")
-        mock_logger.warning.assert_called_once_with(f"File size exceeds {MAX_FILE_SIZE / 1024} KB: dir/subject.foo.bar")
+        mock_logger.warning.assert_called_once_with(
+            f"File size exceeds {MAX_FILE_SIZE / 1024} KB: dir/subjects.foo.bar"
+        )
 
 
 class TestDataModel:
@@ -273,6 +277,57 @@ class TestDataModel:
 class TestDataCoreModel:
     """Tests for DataCoreModel"""
 
+    @pytest.mark.parametrize("record", [example_subject, Procedures(subject_name="123456")])
+    @pytest.mark.parametrize("prefix", [None, "example"])
+    def test_single_record_collection_file(self, tmp_path, record, prefix):
+        """Single records use the standard collection filename and array shape."""
+        type(record).write_standard_file(record, output_directory=tmp_path, prefix=prefix)
+        filename = ("subjects" if isinstance(record, Subject) else "procedures") + ".json"
+        if prefix:
+            filename = prefix + "_" + filename
+        assert json.loads((tmp_path / filename).read_text()) == [record.model_dump(mode="json")]
+
+    @pytest.mark.parametrize("record", [example_subject, Procedures(subject_name="123456")])
+    def test_write_standard_file_with_collection(self, tmp_path, record):
+        """Collections share the normal prefix, filename suffix, and extension handling."""
+        other = type(record).model_validate(record.model_dump() | {"subject_name": "789012"})
+        type(record).write_standard_file(
+            [record, other],
+            output_directory=str(tmp_path),
+            prefix="example",
+            filename_suffix="export",
+            suffix=".custom.json",
+        )
+        name = "subjects" if isinstance(record, Subject) else "procedures"
+        contents = json.loads((tmp_path / f"example_{name}_export.custom.json").read_text())
+        assert contents == [record.model_dump(mode="json"), other.model_dump(mode="json")]
+
+    def test_write_empty_procedures_collection(self, tmp_path):
+        """Empty procedures still produce an empty standard array."""
+        Procedures.write_standard_file([], output_directory=tmp_path)
+        assert json.loads((tmp_path / "procedures.json").read_text()) == []
+
+    def test_write_empty_subjects_collection_is_rejected(self, tmp_path):
+        """An empty subject collection must not create or overwrite a file."""
+        filename = tmp_path / "subjects.json"
+        filename.write_text("existing subjects")
+        with pytest.raises(ValueError, match="requires at least 1 record"):
+            Subject.write_standard_file([], output_directory=tmp_path)
+        assert filename.read_text() == "existing subjects"
+
+    def test_non_collection_model_rejects_collection(self, tmp_path):
+        """Object-file models cannot write collection-shaped standard files."""
+        with pytest.raises(ValueError, match="does not use a collection file"):
+            DataCoreModel.write_standard_file([], output_directory=tmp_path)
+        assert not list(tmp_path.iterdir())
+
+    @pytest.mark.parametrize("records", [example_subject, [example_subject]])
+    def test_write_standard_file_rejects_wrong_model(self, tmp_path, records):
+        """Records must match the model class used to write them."""
+        with pytest.raises(TypeError, match="requires Procedures records"):
+            Procedures.write_standard_file(records, output_directory=tmp_path)
+        assert not list(tmp_path.iterdir())
+
     def test_default_filename(self):
         """Test that default_filename generates the correct filename"""
 
@@ -312,8 +367,8 @@ class TestDataCoreModel:
             schema_version: str = "1.0.0"
 
         model_instance = TestModel()
-        model_instance.write_standard_file(
-            output_directory=Path("dir"), prefix="prefix", filename_suffix="fsuffix", suffix=".suffix"
+        TestModel.write_standard_file(
+            model_instance, output_directory=Path("dir"), prefix="prefix", filename_suffix="fsuffix", suffix=".suffix"
         )
 
         mock_open.assert_called_once_with("w")
@@ -334,7 +389,7 @@ class TestDataCoreModel:
 
         model_instance = TestModel()
         model_instance.schema_version = "1" * (MAX_FILE_SIZE + 1000)
-        model_instance.write_standard_file(output_directory=Path("dir"), suffix=".foo.bar")
+        TestModel.write_standard_file(model_instance, output_directory=Path("dir"), suffix=".foo.bar")
 
         mock_open.assert_called_once_with("w")
         mock_logger.warning.assert_called_once_with(
@@ -355,7 +410,7 @@ class TestDataCoreModel:
             schema_version: str = "1.0.0"
 
         model_instance = TestModel()
-        model_instance.write_standard_file(output_directory="dir")
+        TestModel.write_standard_file(model_instance, output_directory="dir")
         mock_open.assert_called_once_with("w")
 
     @patch("pathlib.Path.open", new_callable=mock_open)
@@ -370,5 +425,5 @@ class TestDataCoreModel:
             schema_version: str = "1.0.0"
 
         model_instance = TestModel()
-        model_instance.write_standard_file()
+        TestModel.write_standard_file(model_instance)
         mock_open.assert_called_once_with("w")

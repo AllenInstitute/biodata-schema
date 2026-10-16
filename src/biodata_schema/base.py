@@ -5,7 +5,7 @@ import logging
 import re
 import warnings
 from pathlib import Path
-from typing import Annotated, Any, ClassVar, List, Literal, Optional, TypeVar, get_args
+from typing import Annotated, Any, ClassVar, List, Literal, Optional, Sequence, TypeVar, get_args
 
 from pydantic import (
     AwareDatetime,
@@ -100,6 +100,7 @@ class _GenericModel(BaseModel, extra="allow"):
 GenericModel = SerializeAsAny[_GenericModel]
 
 T = TypeVar("T")
+CoreModelT = TypeVar("CoreModelT", bound="DataCoreModel")
 Discriminated = Annotated[T, Field(discriminator="object_type")]
 DiscriminatedList = List[Discriminated[T]]
 
@@ -127,7 +128,7 @@ class DataModel(BaseModel):
         This ensures that subclasses/parent classes can be deserialized correctly
         """
         cls_object_type = cls._object_type_from_name()
-        if values and "object_type" in values and values["object_type"] != cls_object_type:
+        if isinstance(values, dict) and "object_type" in values and values["object_type"] != cls_object_type:
             values["object_type"] = cls_object_type
         return values
 
@@ -184,6 +185,8 @@ class DataModel(BaseModel):
 class DataCoreModel(DataModel):
     """Generic base class to hold common fields/validators/etc for all basic AIND schema"""
 
+    _IS_COLLECTION: ClassVar[bool] = False
+    _MIN_COLLECTION_LENGTH: ClassVar[int] = 0
     _FILE_EXTENSION = PrivateAttr(default=".json")
     _DESCRIBED_BY_BASE_URL = PrivateAttr(
         default="https://raw.githubusercontent.com/AllenNeuralDynamics/biodata-schema/main/src/"
@@ -218,18 +221,25 @@ class DataCoreModel(DataModel):
 
         return re.sub(r"(?<!^)(?=[A-Z])", "_", name).lower() + cls._FILE_EXTENSION.default
 
+    @classmethod
     def write_standard_file(
-        self,
-        output_directory: Optional[Path] = None,
+        cls: type[CoreModelT],
+        records: CoreModelT | List[CoreModelT],
+        output_directory: Path | str | None = None,
         prefix: Optional[str] = None,
         filename_suffix: Optional[str] = None,
         suffix: Optional[str] = None,
-    ):
+    ) -> None:
         """
-        Writes schema to standard json file
+        Writes schema to standard json file.
+        Subjects and procedures accept one record or a list and are always written as arrays.
+        Other core models accept a single record and are written as objects.
         Parameters
         ----------
-        output_directory: Optional[Path]
+        records: DataCoreModel or List[DataCoreModel]
+            Validated record(s) of the model class being written.
+
+        output_directory: Path or str, optional
             optional Path object for output directory.
             Default: None
 
@@ -245,29 +255,40 @@ class DataCoreModel(DataModel):
             optional str for replacing the file extension
             Default: None
         """
-        if type(output_directory) is str:
-            output_directory = Path(output_directory)
-        # Go through the subfields recursively and check whether paths exist
-        recursive_check_paths(self, output_directory)
+        if isinstance(records, list) and not cls._IS_COLLECTION:
+            raise ValueError(f"{cls.__name__} does not use a collection file.")
+        items = records if isinstance(records, list) else [records]
+        if len(items) < cls._MIN_COLLECTION_LENGTH:
+            raise ValueError(
+                f"{cls.__name__}.write_standard_file requires at least {cls._MIN_COLLECTION_LENGTH} record."
+            )
+        if any(not isinstance(record, cls) for record in items):
+            raise TypeError(f"{cls.__name__}.write_standard_file requires {cls.__name__} records.")
+        value: DataCoreModel | Sequence[DataCoreModel] = items if cls._IS_COLLECTION else items[0]
 
-        filename = self.default_filename()
+        directory = Path.cwd() if output_directory is None else Path(output_directory)
+        recursive_check_paths(value, directory)
+
+        filename = cls.default_filename()
+        extension = cls._FILE_EXTENSION.default
         if prefix:
             filename = str(prefix) + "_" + filename
         if filename_suffix:
-            filename_without_ext = filename.rsplit(self._FILE_EXTENSION, 1)[0]
-            filename = filename_without_ext + "_" + filename_suffix + self._FILE_EXTENSION
+            filename_without_ext = filename.rsplit(extension, 1)[0]
+            filename = filename_without_ext + "_" + filename_suffix + extension
         if suffix:
-            filename = filename.replace(self._FILE_EXTENSION, suffix)
+            filename = filename.replace(extension, suffix)
+        filename = directory / filename
 
-        if output_directory is None:
-            output_directory = Path.cwd()
-        filename = output_directory / filename
-
+        serialized = (
+            value.model_dump_json(indent=3)
+            if isinstance(value, DataCoreModel)
+            else json.dumps([record.model_dump(mode="json") for record in value], indent=3)
+        )
         with filename.open("w") as f:
-            f.write(self.model_dump_json(indent=3))
+            f.write(serialized)
 
-        # Check that size doesn't exceed the maximum
-        if len(self.model_dump_json(indent=3)) > MAX_FILE_SIZE:
+        if len(serialized) > MAX_FILE_SIZE:
             logger.warning(f"File size exceeds {MAX_FILE_SIZE / 1024} KB: {filename}")
 
     @model_validator(mode="after")

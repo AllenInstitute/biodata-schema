@@ -342,20 +342,23 @@ acquisition = Acquisition(
         "Bryan MacLennan",
         "Kenta Hagihara",
     ],
-    subject_name="687582",
+    subject_names={"687582"},
     acquisition_start_time=t_start,
     acquisition_end_time=t_end,
     acquisition_type="Pavlovian Conditioning",
     instrument_name="1_FIP1",
     protocol_id=[""],
     ethics_review_id=["2115"],
-    subject_details=AcquisitionSubjectDetails(
-        animal_weight_prior=None,
-        animal_weight_post=None,
-        mouse_platform_name="mouse_tube_foraging",
-        reward_consumed_total=None,
-        reward_consumed_unit=None,
-    ),
+    subject_details=[
+        AcquisitionSubjectDetails(
+            subject_name="687582",
+            animal_weight_prior=None,
+            animal_weight_post=None,
+            mouse_platform_name="mouse_tube_foraging",
+            reward_consumed_total=None,
+            reward_consumed_unit=None,
+        )
+    ],
     data_streams=[data_stream],
     stimulus_epochs=[stimulus_epoch],
     notes="",
@@ -369,4 +372,4 @@ if __name__ == "__main__":
 
     serialized = acquisition.model_dump_json()
     deserialized = Acquisition.model_validate_json(serialized)
-    deserialized.write_standard_file(prefix="fip_ophys", output_directory=args.output_dir)
+    Acquisition.write_standard_file(deserialized, prefix="fip_ophys", output_directory=args.output_dir)

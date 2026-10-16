@@ -128,8 +128,8 @@ chamber_config = SampleChamberConfig(
 acq = Acquisition(
     experimenters=["John Smith"],
     global_coordinate_system=SPIM_RPI,
-    specimen_name="123456-123",
-    subject_name="123456",
+    specimen_names={"123456-123"},
+    subject_names={"123456"},
     instrument_name="exaSPIM1",
     maintenance=[
         Maintenance(
@@ -188,4 +188,4 @@ if __name__ == "__main__":
 
     serialized = acq.model_dump_json()
     deserialized = Acquisition.model_validate_json(serialized)
-    deserialized.write_standard_file(prefix="exaspim", output_directory=args.output_dir)
+    Acquisition.write_standard_file(deserialized, prefix="exaspim", output_directory=args.output_dir)
