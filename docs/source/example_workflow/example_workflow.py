@@ -62,6 +62,7 @@ def generate_data_description(subject_name: str, creation_time: datetime) -> Dat
     our data always contains planar optical physiology and behavior videos
     """
     return DataDescription(
+        name=f"{subject_name}_{creation_time:%Y%m%dT%H%M%S}",
         modalities=[Modality.POPHYS, Modality.BEHAVIOR_VIDEOS],
         subject_names={subject_name},
         creation_time=creation_time,

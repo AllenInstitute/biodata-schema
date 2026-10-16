@@ -127,13 +127,12 @@ def derive_data_description_from_derived(
     derived_name = kwargs.get("name")
     if derived_name is None:
         original_input = data_description.name
-        if original_input is not None:
-            try:
-                parsed_name = DataDescription.parse_name(original_input, DataLevel.DERIVED)
-            except ValueError:
-                pass
-            else:
-                original_input = parsed_name.get("input", original_input)
+        try:
+            parsed_name = DataDescription.parse_name(original_input, DataLevel.DERIVED)
+        except ValueError:
+            pass
+        else:
+            original_input = parsed_name.get("input", original_input)
         derived_name = build_data_name(f"{original_input}_{process_name}", creation_time)
 
     return DataDescription(

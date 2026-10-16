@@ -11,6 +11,7 @@ from biodata_schema.components.identifiers import Person
 from biodata_schema.core.data_description import DataDescription, Funding
 
 d = DataDescription(
+    name="123456_20220221T163001",
     modalities=[Modality.ECEPHYS, Modality.BEHAVIOR_VIDEOS],
     subject_names={"123456"},
     creation_time=datetime(2022, 2, 21, 16, 30, 1, tzinfo=timezone.utc),

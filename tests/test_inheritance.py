@@ -44,6 +44,7 @@ def _make_metadata(subject_name="123456"):
     global _counter
     _counter += 1
     dd = DataDescription(
+        name=f"{subject_name}_20220221T1630{_counter:02d}",
         modalities=[Modality.ECEPHYS],
         subject_names={subject_name},
         creation_time=datetime(2022, 2, 21, 16, 30, _counter, tzinfo=timezone.utc),
@@ -98,12 +99,12 @@ def test_derivation_accepts_explicit_names(derive, name):
     assert result.name == name
 
 
-@pytest.mark.parametrize("name", ["custom source", "project_analysis_20221122T084300+0000", "", "a\nname"])
+@pytest.mark.parametrize("name", ["custom source", "project_analysis_20221122T084300", "", "a\nname"])
 def test_derivation_appends_to_nonstandard_derived_names(name):
     """Names without a recoverable raw root use the current name as the base."""
     source = example_data_description.model_copy(update={"name": name, "data_level": DataLevel.DERIVED})
     result = derive_data_description_from_derived(source, "next", creation_time=t)
-    assert result.name == f"{name}_next_20221122T084300+0000"
+    assert result.name == f"{name}_next_20221122T084300"
     assert result.source_data == [name]
 
 
@@ -113,7 +114,7 @@ def test_custom_named_asset_keeps_single_source_history():
     first = Metadata.from_metadata(source, name="custom result", creation_time=t)
     second = Metadata.from_metadata(first, creation_time=t)
     assert first.name == first.data_description.name == "custom result"
-    assert second.name == "custom result_processed_20221122T084300+0000"
+    assert second.name == "custom result_processed_20221122T084300"
     assert second.data_description.source_data == ["custom result"]
     assert second.processing == source.processing
     assert second.quality_control == source.quality_control
@@ -143,7 +144,7 @@ def test_derivation_preserves_historical_source_names(name, data_level):
     )
     result = Metadata.from_metadata(source, creation_time=t)
     assert result.data_description.source_data == [name]
-    assert result.data_description.name == "123456_2022-02-21_16-30-01_processed_20221122T084300+0000"
+    assert result.data_description.name == "123456_2022-02-21_16-30-01_processed_20221122T084300"
     assert _get_root_asset_name(result.data_description) == "123456_2022-02-21_16-30-01"
 
 
@@ -493,7 +494,7 @@ class TestFromMetadataDifferentSubjects:
                 update={
                     "data_level": DataLevel.DERIVED,
                     "subject_names": None,
-                    "name": "Test project_unknown_20220221T163036+0000",
+                    "name": "Test project_unknown_20220221T163036",
                 }
             ),
             processing=example_processing,
@@ -616,7 +617,7 @@ class TestInternalHelpers:
             creation_time=creation_time,
         )
         assert result.data_level == DataLevel.DERIVED
-        assert result.name == "Test project_merged-analysis_20220501T100000+0000"
+        assert result.name == "Test project_merged-analysis_20220501T100000"
         assert result.source_data == ["a", "b"]
 
     def test_derive_data_description_analyzed_invalid_creation_time(self):

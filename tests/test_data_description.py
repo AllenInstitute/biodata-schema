@@ -2,7 +2,6 @@
 
 import datetime
 from pathlib import Path
-from unittest.mock import MagicMock, patch
 
 import pytest
 from biodata_models.data_levels import DataLevel
@@ -11,7 +10,7 @@ from biodata_models.organizations import Organization
 from pydantic import ValidationError
 
 from biodata_schema.components.identifiers import Person
-from biodata_schema.core.data_description import DataDescription, Funding, build_data_name
+from biodata_schema.core.data_description import DataDescription, Funding
 from biodata_schema.utils.inheritance import (
     derive_data_description,
     derive_data_description_from_derived,
@@ -26,8 +25,8 @@ class TestDataDescription:
     """test DataDescription"""
 
     BAD_NAME = "fizzbuzz"
-    BASIC_NAME = "1234_30331221T042211+0000"
-    DERIVED_NAME = "1234_30331221T042211+0000_spikesorted-ks25_20221012T232311+0000"
+    BASIC_NAME = "1234_30331221T042211"
+    DERIVED_NAME = "1234_30331221T042211_spikesorted-ks25_20221012T232311"
 
     def test_funding_construction(self):
         """Test Funding construction"""
@@ -39,6 +38,7 @@ class TestDataDescription:
         dt = datetime.datetime.now()
         f = Funding(funder=Organization.NINDS, grant_number="grant001")
         da = DataDescription(
+            name=self.BASIC_NAME,
             creation_time=dt,
             institution=Organization.AIND,
             data_level=DataLevel.RAW,
@@ -50,35 +50,12 @@ class TestDataDescription:
         )
         assert da is not None
 
-    def test_build_name(self):
-        """Test build_data_name function"""
-        dt = datetime.datetime(2022, 10, 12, 23, 23, 11, tzinfo=datetime.timezone.utc)
-        name = build_data_name("project", dt)
-        assert name == "project_20221012T232311+0000"
-
-    @patch("biodata_schema.core.data_description.build_data_name")
-    def test_build_name_without_pattern_validation(self, mock_build_data_name: MagicMock):
-        """Generated names are not subject to pattern validation."""
-        mock_build_data_name.return_value = "custom name"
-
-        dt = datetime.datetime(2022, 10, 12, 23, 23, 11)
-        description = DataDescription(
-            modalities=[Modality.SPIM],
-            subject_names={"1234"},
-            data_level=DataLevel.RAW,
-            creation_time=dt,
-            institution=Organization.AIND,
-            funding_source=[Funding(funder=Organization.NINDS, grant_number="grant001")],
-            investigators=[Person(name="Jane Smith")],
-            project_name="Test",
-        )
-        assert description.name == "custom name"
-
     def test_derived_data_description_construction(self):
         """Test DataDescription.data_level == DERIVED construction"""
         dt = datetime.datetime.now()
         f = Funding(funder=Organization.NINDS, grant_number="grant001")
         da = DataDescription(
+            name=self.BASIC_NAME,
             creation_time=dt,
             institution=Organization.AIND,
             data_level=DataLevel.RAW,
@@ -96,6 +73,7 @@ class TestDataDescription:
         dt = datetime.datetime.now()
         f = Funding(funder=Organization.NINDS, grant_number="grant001")
         da = DataDescription(
+            name=self.BASIC_NAME,
             creation_time=dt,
             institution=Organization.AIND,
             data_level=DataLevel.RAW,
@@ -115,6 +93,7 @@ class TestDataDescription:
         dt = datetime.datetime.now()
         f = Funding(funder=Organization.NINDS, grant_number="grant001")
         dd = DataDescription(
+            name=self.BASIC_NAME,
             modalities=[Modality.SPIM],
             subject_names={"1234"},
             data_level=DataLevel.RAW,
@@ -126,22 +105,6 @@ class TestDataDescription:
         )
         assert dd is not None
 
-    def test_raw_name_requires_explicit_name_for_multiple_subjects(self):
-        """A raw asset with several subjects cannot derive one canonical asset name."""
-        with pytest.raises(ValueError, match="name must be set explicitly") as error:
-            DataDescription(
-                modalities=[Modality.SPIM],
-                subject_names={"1234", "5678"},
-                data_level=DataLevel.RAW,
-                creation_time=datetime.datetime(2022, 10, 12, 23, 23, 11),
-                institution=Organization.AIND,
-                funding_source=[Funding(funder=Organization.NINDS, grant_number="grant001")],
-                investigators=[Person(name="Jane Smith")],
-                project_name="Test",
-            )
-        assert "<label>_<acquisition-start-time>" in str(error.value)
-        assert "batch-17_20221012T232311+0000" in str(error.value)
-
     @pytest.mark.parametrize("data_level", list(DataLevel))
     @pytest.mark.parametrize("name", ["custom name", "", "folder/name_with:punctuation", "a\nname"])
     def test_explicit_names_are_unrestricted(self, data_level, name):
@@ -152,32 +115,31 @@ class TestDataDescription:
         )
         assert description.name == name
 
-    @pytest.mark.parametrize("data_level", [DataLevel.DERIVED, DataLevel.SIMULATED])
+    @pytest.mark.parametrize("data_level", list(DataLevel))
+    @pytest.mark.parametrize("subject_names", [{"1234"}, {"1234", "5678"}])
     @pytest.mark.parametrize("name_kwargs", [{}, {"name": None}])
-    def test_missing_name_without_automatic_generation_raises(self, data_level, name_kwargs):
-        """A name is required when the description cannot generate one."""
+    def test_name_is_required(self, data_level, subject_names, name_kwargs):
+        """Every data level requires an explicit, non-null name."""
         data = example_data_description.model_dump(exclude={"name"})
-        with pytest.raises(ValidationError, match="name must be set explicitly"):
-            DataDescription.model_validate(data | {"data_level": data_level} | name_kwargs)
+        with pytest.raises(ValidationError) as error:
+            DataDescription.model_validate(
+                data | {"data_level": data_level, "subject_names": subject_names} | name_kwargs
+            )
+        assert error.value.errors()[0]["loc"] == ("name",)
+        assert error.value.errors()[0]["type"] == ("string_type" if name_kwargs else "missing")
 
-    @pytest.mark.parametrize("name_kwargs", [{}, {"name": None}])
-    def test_missing_raw_name_is_generated(self, name_kwargs):
-        """Omitted and null raw names are generated for one subject."""
-        data = example_data_description.model_dump(exclude={"name"})
-        description = DataDescription.model_validate(data | name_kwargs)
-        assert description.name == build_data_name(next(iter(description.subject_names)), description.creation_time)
-
-    def test_build_name_without_subject_names_raises(self):
-        """The name builder rejects raw descriptions without a subject."""
-        description = DataDescription.model_construct(name=None, data_level=DataLevel.RAW, subject_names=None)
-        with pytest.raises(ValueError, match="subject_names must be set"):
-            description.build_name()
+    def test_name_schema(self):
+        """The JSON schema requires a non-null string name without a pattern."""
+        schema = DataDescription.model_json_schema()
+        assert "name" in schema["required"]
+        assert schema["properties"]["name"]["type"] == "string"
+        assert "pattern" not in schema["properties"]["name"]
 
     def test_multi_subject_asset_label(self):
         """A multi-subject asset label does not encode or infer its subjects."""
-        creation_time = datetime.datetime(2022, 10, 12, 23, 23, 11, tzinfo=datetime.timezone.utc)
+        creation_time = datetime.datetime(2022, 10, 12, 23, 23, 11)
         description = DataDescription(
-            name="batch-17_20221012T232311+0000",
+            name="batch-17_20221012T232311",
             subject_names={"1234", "5678"},
             data_level=DataLevel.RAW,
             creation_time=creation_time,
@@ -195,6 +157,7 @@ class TestDataDescription:
         dt = datetime.datetime.now()
         f = Funding(funder=Organization.NINDS, grant_number="grant001")
         description = DataDescription(
+            name="subject_123_20221012T232311",
             modalities=[Modality.SPIM],
             subject_names={"subject_123"},
             data_level=DataLevel.RAW,
@@ -219,6 +182,7 @@ class TestDataDescription:
         dt = datetime.datetime.now()
         f = Funding(funder=Organization.NINDS, grant_number="grant001")
         dr = DataDescription(
+            name=self.BASIC_NAME,
             modalities=[Modality.SPIM],
             subject_names={"1234"},
             data_level=DataLevel.RAW,
@@ -239,6 +203,7 @@ class TestDataDescription:
 
         with pytest.raises(ValueError) as context:
             DataDescription(
+                name=self.BASIC_NAME,
                 creation_time=dt,
                 institution=Organization.AIND,
                 data_level=DataLevel.RAW,
@@ -255,6 +220,7 @@ class TestDataDescription:
         dt = datetime.datetime.now()
 
         da = DataDescription(
+            name=self.BASIC_NAME,
             creation_time=dt,
             institution=Organization.AIND,
             data_level=DataLevel.RAW,
@@ -279,6 +245,7 @@ class TestDataDescription:
         """Tests that errors are raised if malformed strings are input"""
         with pytest.raises(ValidationError) as e:
             DataDescription(
+                name=self.BASIC_NAME,
                 modalities=[Modality.SPIM],
                 subject_names={"1234"},
                 data_level=DataLevel.RAW,
@@ -304,6 +271,7 @@ class TestDataDescription:
         dt = datetime.datetime.now()
 
         da1 = DataDescription(
+            name=self.BASIC_NAME,
             creation_time=dt,
             institution=Organization.AIND,
             data_level=DataLevel.RAW,
@@ -323,20 +291,20 @@ class TestDataDescription:
 
         toks = DataDescription.parse_name(self.BASIC_NAME, DataLevel.RAW)
         assert toks["label"] == "1234"
-        assert toks["creation_time"] == datetime.datetime(3033, 12, 21, 4, 22, 11, tzinfo=datetime.timezone.utc)
+        assert toks["creation_time"] == datetime.datetime(3033, 12, 21, 4, 22, 11)
 
         with pytest.raises(ValueError):
             DataDescription.parse_name(self.BAD_NAME, DataLevel.RAW)
 
         toks = DataDescription.parse_name(self.DERIVED_NAME, DataLevel.DERIVED)
-        assert toks["input"] == "1234_30331221T042211+0000"
+        assert toks["input"] == "1234_30331221T042211"
         assert toks["process_name"] == "spikesorted-ks25"
-        assert toks["creation_time"] == datetime.datetime(2022, 10, 12, 23, 23, 11, tzinfo=datetime.timezone.utc)
+        assert toks["creation_time"] == datetime.datetime(2022, 10, 12, 23, 23, 11)
 
-        toks = DataDescription.parse_name("Test-project_my-analysis_20221012T232311+0000", DataLevel.DERIVED)
+        toks = DataDescription.parse_name("Test-project_my-analysis_20221012T232311", DataLevel.DERIVED)
         assert toks["project_abbreviation"] == "Test-project"
         assert toks["analysis_name"] == "my-analysis"
-        assert toks["creation_time"] == datetime.datetime(2022, 10, 12, 23, 23, 11, tzinfo=datetime.timezone.utc)
+        assert toks["creation_time"] == datetime.datetime(2022, 10, 12, 23, 23, 11)
 
         with pytest.raises(ValueError):
             DataDescription.parse_name(self.BAD_NAME, DataLevel.DERIVED)
@@ -352,6 +320,7 @@ class TestDataDescription:
         # source_data should not be set for raw data
         with pytest.raises(ValueError) as context:
             DataDescription(
+                name=self.BASIC_NAME,
                 modalities=[Modality.SPIM],
                 subject_names={"1234"},
                 data_level=DataLevel.RAW,
@@ -368,6 +337,7 @@ class TestDataDescription:
         dt = datetime.datetime.now()
         f = Funding(funder=Organization.NINDS, grant_number="grant001")
         da = DataDescription(
+            name=self.BASIC_NAME,
             creation_time=dt,
             institution=Organization.AIND,
             data_level=DataLevel.RAW,
@@ -389,6 +359,7 @@ class TestDataDescription:
 
         # Create a raw DataDescription
         da = DataDescription(
+            name=self.BASIC_NAME,
             creation_time=dt,
             institution=Organization.AIND,
             data_level=DataLevel.RAW,
@@ -425,6 +396,7 @@ class TestDataDescription:
 
         # Create a raw DataDescription
         da = DataDescription(
+            name=self.BASIC_NAME,
             creation_time=dt,
             institution=Organization.AIND,
             data_level=DataLevel.RAW,
@@ -528,6 +500,21 @@ class TestDataDescription:
         assert derived1.source_data == [example_data_description.name]
         assert derived2.source_data == [derived1.name]
         assert derived3.source_data == [derived2.name]
+
+    @pytest.mark.parametrize("offset_hours", [-7, 0, 5])
+    def test_recommended_names_replace_derived_suffix(self, offset_hours):
+        """Repeated derivation preserves the raw label and uses offset-free local timestamps."""
+        source = example_data_description.model_copy(update={"name": "group_5_20260101T123500"})
+        tz = datetime.timezone(datetime.timedelta(hours=offset_hours))
+        first = derive_data_description_from_raw(
+            source, "first_process", creation_time=datetime.datetime(2026, 1, 2, 10, 30, tzinfo=tz)
+        )
+        second = derive_data_description_from_derived(
+            first, "next_process", creation_time=datetime.datetime(2026, 1, 3, 11, 45, tzinfo=tz)
+        )
+        assert first.name == "group_5_20260101T123500_first_process_20260102T103000"
+        assert second.name == "group_5_20260101T123500_next_process_20260103T114500"
+        assert second.source_data == [first.name]
 
     def test_from_derived_name_parsing(self):
         """Test from_derived correctly parses complex derived names"""

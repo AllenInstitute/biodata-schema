@@ -9,7 +9,7 @@ class RegexParts(str, Enum):
 
     DATE = r"\d{8}"
     TIME = r"\d{6}"
-    DATETIME = r"\d{8}T\d{6}[+-]\d{4}"
+    DATETIME = r"\d{8}T\d{6}"
     LEGACY_DATETIME = r"\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}"
 
 
@@ -27,20 +27,14 @@ class DataRegex(str, Enum):
 
 
 def datetime_to_name_string(dt: datetime) -> str:
-    """Format a folder-safe ISO timestamp; naive datetimes use the local timezone."""
-    if dt.utcoffset() is None:
-        dt = dt.astimezone()
-    offset = dt.utcoffset()
-    if offset is not None and offset.total_seconds() % 60:
-        raise ValueError("Data asset timestamps require a timezone offset in whole minutes")
-    date, time = dt.isoformat(timespec="seconds").split("T")
-    return f"{date.replace('-', '')}T{time.replace(':', '')}"
+    """Format a folder-safe ISO timestamp in the supplied local time, without an offset."""
+    return dt.strftime("%Y%m%dT%H%M%S")
 
 
 def datetime_from_name_string(dt: str) -> datetime:
     """Parse current timestamps or timezone-naive historical asset timestamps."""
     try:
-        return datetime.strptime(dt, "%Y%m%dT%H%M%S%z")
+        return datetime.strptime(dt, "%Y%m%dT%H%M%S")
     except ValueError:
         return datetime.strptime(dt, "%Y-%m-%d_%H-%M-%S")
 

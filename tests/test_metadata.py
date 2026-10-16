@@ -83,6 +83,7 @@ class TestMetadata:
             ),
         )
         dd = DataDescription(
+            name="123456_20221122T084300",
             modalities=[Modality.ECEPHYS],
             subject_names={"123456"},
             data_level="raw",
@@ -129,15 +130,17 @@ class TestMetadata:
         """Tests that the default file extension used is as expected."""
         assert ".nd.json" == Metadata._FILE_EXTENSION.default
 
-    def test_raw_description_generates_name_when_nested(self):
-        """A raw description can generate its name during metadata validation."""
+    def test_raw_description_missing_name_when_nested(self, caplog):
+        """An incomplete nested description logs validation failure without generating a name."""
         metadata = Metadata(
             name=self.sample_name,
             location=self.sample_location,
             data_description=self.dd.model_dump(exclude={"name"}),
             processing=self.processing,
         )
-        assert metadata.data_description.name == self.dd.name
+        assert "name" not in metadata.data_description.model_dump()
+        assert "Error in validating data_description" in caplog.text
+        assert "name\n  Field required" in caplog.text
 
     def test_injection_material_validator_spim(self):
         """Tests that the injection validator works for SPIM"""
@@ -747,6 +750,7 @@ class TestMetadata:
         # Test with creation time later on the same day - should pass
         later_same_day = datetime(2023, 4, 3, 23, 59, 59, tzinfo=timezone.utc)
         data_description_later = DataDescription(
+            name=name,
             creation_time=later_same_day,
             modalities=[Modality.ECEPHYS],
             subject_names={"123456"},
@@ -770,6 +774,7 @@ class TestMetadata:
         # Test with creation time on the next day - should pass
         next_day = datetime(2023, 4, 4, 0, 0, 1, tzinfo=timezone.utc)
         data_description_next_day = DataDescription(
+            name=name,
             creation_time=next_day,
             modalities=[Modality.ECEPHYS],
             subject_names={"123456"},
