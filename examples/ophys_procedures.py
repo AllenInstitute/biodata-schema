@@ -24,7 +24,6 @@ from biodata_schema.components.surgery_procedures import (
     Perfusion,
     ProbeImplant,
 )
-from biodata_schema.core.metadata import Metadata
 from biodata_schema.core.procedures import (
     Procedures,
     SpecimenProcedure,
@@ -233,6 +232,4 @@ if __name__ == "__main__":
 
     serialized = p.model_dump_json()
     deserialized = Procedures.model_validate_json(serialized)
-    Metadata.model_construct(procedures=[deserialized]).write_standard_files(
-        prefix="ophys", output_directory=args.output_dir
-    )
+    Procedures.write_standard_file(deserialized, prefix="ophys", output_directory=args.output_dir)

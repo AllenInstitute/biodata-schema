@@ -90,4 +90,4 @@ if __name__ == "__main__":
 
     serialized = m.model_dump_json()
     deserialized = Model.model_validate_json(serialized)
-    deserialized.write_standard_file(prefix="", output_directory=args.output_dir)
+    Model.write_standard_file(deserialized, prefix="", output_directory=args.output_dir)

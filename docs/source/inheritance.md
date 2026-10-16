@@ -19,7 +19,7 @@ Pass `name="<asset-name>"` to `Metadata.from_metadata` or any derivation helper 
 
 `<source_name>_<process_label>_YYYYMMDDTHHMMSS`
 
-When a derived asset is used as source data, the helper tries to recover the raw asset name from the standard patter above. If that fails, it appends to the current name. For multiple input sources the default is:
+When a derived asset is used as source data, the helper tries to recover the raw asset name from the standard pattern above. If that fails, it raises an error. For multiple input sources the default is:
 
 `<project_name>_<process_label>_YYYYMMDDTHHMMSS`
 

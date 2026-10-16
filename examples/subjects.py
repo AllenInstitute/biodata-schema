@@ -7,7 +7,6 @@ from biodata_models.organizations import Organization
 from biodata_models.species import Species, Strain
 
 from biodata_schema.components.subjects import BreedingInfo, Housing, MouseSubject, Sex
-from biodata_schema.core.metadata import Metadata
 from biodata_schema.core.subject import Subject
 
 # If a timezone isn't specified, the timezone of the computer running this
@@ -54,4 +53,4 @@ if __name__ == "__main__":
     parser.add_argument("--output-dir", default=None, help="Output directory for generated JSON file")
     args = parser.parse_args()
 
-    Metadata.model_construct(subjects=subjects).write_standard_files(output_directory=args.output_dir)
+    Subject.write_standard_file(subjects, output_directory=args.output_dir)

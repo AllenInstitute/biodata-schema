@@ -29,6 +29,7 @@ from biodata_schema.core.acquisition import (
 )
 from examples.barseq_acquisition import acquisition as barseq_acquisition
 from examples.ephys_acquisition import acquisition as ephys_acquisition
+from examples.ephys_acquisition import ephys_assembly_a_config
 from examples.exaspim_acquisition import acq as exaspim_acquisition
 from examples.mri_acquisition import acquisition as mri_acquisition
 from examples.mri_acquisition import scan1
@@ -159,7 +160,7 @@ class TestAcquisition:
             modalities=[Modality.ECEPHYS],
             active_devices=["Stick_assembly", "Ephys_assemblyA"],
             configurations=[
-                EphysAssemblyConfig.model_construct(),
+                EphysAssemblyConfig.model_validate(ephys_assembly_a_config.model_dump()),
             ],
         )
         assert stream is not None
@@ -536,7 +537,11 @@ class TestAcquisition:
         from pydantic_extra_types.timezone_name import TimeZoneName
 
         dt = datetime(2023, 6, 15, 20, 0, 0, tzinfo=timezone.utc)
-        acq = Acquisition.model_construct(
+        acq = Acquisition(
+            subject_names={"123456"},
+            acquisition_type="Test",
+            acquisition_end_time=dt,
+            data_streams=[],
             acquisition_start_time=dt,
             acquisition_start_tz=TimeZoneName("America/Los_Angeles"),
         )
@@ -547,7 +552,11 @@ class TestAcquisition:
     def test_acquisition_start_time_local_with_int_offset(self):
         """acquisition_start_time_local converts correctly using an integer UTC offset in hours"""
         dt = datetime(2023, 6, 15, 20, 0, 0, tzinfo=timezone.utc)
-        acq = Acquisition.model_construct(
+        acq = Acquisition(
+            subject_names={"123456"},
+            acquisition_type="Test",
+            acquisition_end_time=dt,
+            data_streams=[],
             acquisition_start_time=dt,
             acquisition_start_tz=-7,
         )
@@ -558,10 +567,15 @@ class TestAcquisition:
     def test_acquisition_start_time_local_with_no_tz(self):
         """acquisition_start_time_local returns acquisition_start_time unchanged when tz is None"""
         dt = datetime(2023, 6, 15, 20, 0, 0, tzinfo=timezone.utc)
-        acq = Acquisition.model_construct(
+        acq = Acquisition(
+            subject_names={"123456"},
+            acquisition_type="Test",
+            acquisition_end_time=dt,
+            data_streams=[],
             acquisition_start_time=dt,
             acquisition_start_tz=None,
         )
+        acq.acquisition_start_tz = None
         assert acq.acquisition_start_time_local == dt
 
     def test_acquisition_start_time_local_round_trip(self):

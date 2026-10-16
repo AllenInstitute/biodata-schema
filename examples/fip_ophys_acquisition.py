@@ -372,4 +372,4 @@ if __name__ == "__main__":
 
     serialized = acquisition.model_dump_json()
     deserialized = Acquisition.model_validate_json(serialized)
-    deserialized.write_standard_file(prefix="fip_ophys", output_directory=args.output_dir)
+    Acquisition.write_standard_file(deserialized, prefix="fip_ophys", output_directory=args.output_dir)

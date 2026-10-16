@@ -137,7 +137,7 @@ class Processing(DataCoreModel):
     def order_processes(self) -> "Processing":
         """Ensure that processes are ordered by start_date_time"""
 
-        if not hasattr(self, "data_processes") or not self.data_processes:
+        if not self.data_processes:
             return self
 
         # Check if any processes are out of order
@@ -169,9 +169,6 @@ class Processing(DataCoreModel):
     def validate_process_graph(self):
         """Check that the same processes are represented in data_processes and dependency_graph"""
 
-        if not hasattr(self, "data_processes"):  # bypass for testing
-            return self
-
         # If the dependency_graph is None, then no need to validate
         if self.dependency_graph is None:
             return self
@@ -197,9 +194,6 @@ class Processing(DataCoreModel):
     @model_validator(mode="after")
     def validate_pipeline_names(self):
         """Ensure that all pipeline names in the processes are in the pipelines list"""
-
-        if not hasattr(self, "data_processes"):  # bypass for testing
-            return self
 
         pipeline_names = [pipeline.name for pipeline in self.pipelines] if self.pipelines else []
 

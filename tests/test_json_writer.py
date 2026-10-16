@@ -4,6 +4,7 @@ import json
 import os
 import subprocess
 import sys
+from datetime import timedelta
 from pathlib import Path
 from typing import Annotated, Optional, Union
 from unittest.mock import MagicMock, call, mock_open, patch
@@ -61,7 +62,7 @@ class TestSchemaWriter:
     def test_collection_schemas_validate_written_files(self, tmp_path):
         """Published collection schemas validate the actual array files."""
         SchemaWriter(["--output", str(tmp_path)]).write_to_json()
-        metadata = Metadata.model_construct(
+        metadata = Metadata(
             name="test",
             location="",
             subjects=[subject, subject.model_copy(update={"subject_name": "789012"})],
@@ -131,16 +132,23 @@ class TestSchemaWriter:
 
     def test_full_metadata_validates_against_draft_schema(self):
         """Tests that a full metadata record validates against the draft schema."""
-        metadata = Metadata.model_construct(
+        metadata = Metadata(
             name="full_metadata",
             location="s3://bucket/full_metadata",
             other_identifiers=None,
             subjects=[subject],
             data_description=data_description,
-            procedures=[procedures],
+            procedures=[procedures.model_copy(update={"subject_name": subject.subject_name})],
             instrument=instrument,
             processing=processing,
-            acquisition=acquisition,
+            acquisition=acquisition.model_copy(
+                update={
+                    "instrument_name": instrument.instrument_name,
+                    "data_streams": [],
+                    "acquisition_start_time": processing.data_processes[0].start_date_time - timedelta(minutes=2),
+                    "acquisition_end_time": processing.data_processes[0].start_date_time - timedelta(minutes=1),
+                }
+            ),
             quality_control=quality_control,
             model=model,
         )
@@ -240,7 +248,10 @@ class TestSchemaWriter:
             schema_filename = filename.replace(file_extension, "_schema.json")
             model_directory_name = schema_filename.replace("_schema.json", "")
             path = (
-                Path("some_test_dir") / model_directory_name / schema.model_construct().schema_version / schema_filename
+                Path("some_test_dir")
+                / model_directory_name
+                / schema.model_fields["schema_version"].default
+                / schema_filename
             )
             schema_json: dict = (
                 TypeAdapter(list[schema]).json_schema()

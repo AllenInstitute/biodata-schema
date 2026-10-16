@@ -30,7 +30,6 @@ from biodata_schema.components.surgery_procedures import (
     Perfusion,
     ProbeImplant,
 )
-from biodata_schema.core.metadata import Metadata
 from biodata_schema.core.procedures import (
     Procedures,
     Surgery,
@@ -202,4 +201,4 @@ if __name__ == "__main__":
     parser.add_argument("--output-dir", default=None, help="Output directory for generated JSON file")
     args = parser.parse_args()
 
-    Metadata.model_construct(procedures=procedures).write_standard_files(output_directory=args.output_dir)
+    Procedures.write_standard_file(procedures, output_directory=args.output_dir)

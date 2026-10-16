@@ -43,10 +43,10 @@ Acquisition and data-description subject names must match the subject roster
 when those names are present. Subject-free assets may omit procedures or use an
 empty list.
 
-Normal validation converts JSON name arrays into sets. The permissive metadata
-fallback uses `model_construct`, which preserves the supplied values without
-conversion; name comparisons therefore also accept raw JSON arrays and ignore
-their order.
+Implanted device names must be unique across subjects and must not duplicate
+instrument component names. `Metadata` rejects collisions. Prefix implanted
+device names with `subject_name`, such as `123456_Probe A`, and update their
+device-name references accordingly.
 
 ### Subject-specific acquisition records
 
@@ -55,6 +55,9 @@ which must be a member of `Acquisition.subject_names`. Wrap acquisition subject
 details in a list even for one subject. Duplicate details for a subject are
 rejected, and in-vivo metadata requires one details record for every acquired
 subject.
+
+Every data stream (including `ExternalDataStream`) and stimulus epoch applies
+to all subjects in `Acquisition.subject_names`, not a subset.
 
 Old fields are not converted automatically. Rename them before validation.
 In particular, the old `Metadata.subject` field is ignored, not moved into
@@ -105,6 +108,26 @@ models still describe individual records.
 Asset names can now be any string; they no longer need to match a naming regex.
 `DataDescription.name` is required and is no longer generated automatically.
 Supply it explicitly, including for raw assets.
+
+### Naming helper imports
+
+`biodata-models` version 3 removes `biodata_models.data_name_patterns`. Replace
+imports from that module with:
+
+```python
+from biodata_models.data_levels import DataLevel
+from biodata_schema.utils.data_name_patterns import (
+    DataRegex,
+    RegexParts,
+    build_data_name,
+    datetime_from_name_string,
+    datetime_to_name_string,
+)
+```
+
+`build_data_name` accepts a string `label` and a `creation_datetime`, for example
+`build_data_name(label="group-5", creation_datetime=creation_time)`.
+`Group` has no replacement enum; use a string label when constructing a name.
 
 ## Removed fields
 

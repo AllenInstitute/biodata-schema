@@ -7,7 +7,7 @@ An acquisition is single episode of data collection that creates one data asset.
 The acquisition metadata is split into two parallel pieces the `DataStream` and the `StimulusEpoch`. At any given moment in time the active `DataStream`(s) represents all modalities of data being acquired, while the `StimulusEpoch` represents all stimuli being presented.
 
 - `DataStream`: A set of devices that are acquiring data and their configurations.
-- `StimulusEpoch`: All stimuli being presented to the subject. Not all acquisitions have StimulusEpochs.
+- `StimulusEpoch`: All stimuli being presented to subjects. Not all acquisitions have StimulusEpochs.
 
 A single DataStream should capture all the modalities of data acquired as a group, even when their start/stop times differ by a small amount.
 
@@ -175,8 +175,8 @@ Summary of a StimulusEpoch
 
 ### StimulusEpoch
 
-All stimuli being presented to the subject. starting and stopping at approximately the
-same time. Not all acquisitions have StimulusEpochs.
+All stimuli being presented to all subjects in Acquisition.subject_names, starting and stopping at
+approximately the same time. Epochs do not target a subset of subjects. Not all acquisitions have StimulusEpochs.
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|

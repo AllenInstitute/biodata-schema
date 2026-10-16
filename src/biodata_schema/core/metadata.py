@@ -1,46 +1,36 @@
 """Generic metadata class for Data Asset Records."""
 
-import inspect
-import json
-import logging
 import warnings
 from pathlib import Path
-from typing import Annotated, Dict, List, Literal, Optional, Union, get_args
+from typing import Annotated, Any, Dict, List, Literal, Optional, Union
 
-from biodata_models.modalities import Modality
 from pydantic import (
     ConfigDict,
     Field,
     PrivateAttr,
     SkipValidation,
     TypeAdapter,
-    ValidationError,
-    ValidationInfo,
     field_validator,
     model_validator,
 )
 
-from biodata_schema.base import MAX_FILE_SIZE, DataCoreModel, DraftRequirement
+from biodata_schema.base import DataCoreModel, DraftRequirement
 from biodata_schema.components.identifiers import DatabaseIdentifiers
-from biodata_schema.components.injection_procedures import Injection
 from biodata_schema.components.subject_procedures import TrainingProtocol
 from biodata_schema.components.subjects import CalibrationObject
 from biodata_schema.core.acquisition import Acquisition, DataStream, ExternalDataStream
 from biodata_schema.core.data_description import DataDescription
 from biodata_schema.core.instrument import Instrument
 from biodata_schema.core.model import Model
-from biodata_schema.core.procedures import Procedures, Surgery
+from biodata_schema.core.procedures import Procedures
 from biodata_schema.core.processing import Processing
 from biodata_schema.core.quality_control import QualityControl
 from biodata_schema.core.subject import Subject
 from biodata_schema.utils.compatibility_check import InstrumentAcquisitionCompatibility
 from biodata_schema.utils.validators import (
-    recursive_check_paths,
     recursive_time_validation_check,
     validate_creation_time_after_midnight,
 )
-
-logger = logging.getLogger(__name__)
 
 CORE_FILES = [
     "subjects",
@@ -67,38 +57,11 @@ REQUIRED_FILE_SETS = {
 }
 
 
-def _validate_model_list(value, model_class, field_name: str):
-    """Validate a list of models, preserving permissive fallback behavior for invalid items."""
-    if value is None:
-        return value
-    if not isinstance(value, list):
-        raise ValueError(f"{field_name}s must be provided as a list")
-    models = []
-    for model_value in value:
-        if isinstance(model_value, dict):
-            subject_name = model_value.get("subject_name")
-        elif isinstance(model_value, model_class):
-            subject_name = getattr(model_value, "subject_name", None)
-        else:
-            raise ValueError(f"Each {field_name} must be a dictionary or {model_class.__name__} object")
-        if not isinstance(subject_name, str):
-            raise ValueError(f"Each {field_name} must have a string subject_name")
-        if isinstance(model_value, model_class):
-            models.append(model_value)
-            continue
-        try:
-            models.append(model_class.model_validate(model_value))
-        except ValidationError as e:
-            logger.warning(f"Error in validating {field_name}: {e}")
-            models.append(model_class.model_construct(**model_value))
-    return models
-
-
 class Metadata(DataCoreModel):
     """The records in the Data Asset Collection needs to contain certain fields
     to easily query and index the data."""
 
-    model_config = ConfigDict(extra="ignore")
+    model_config = ConfigDict(extra="ignore", revalidate_instances="always")
 
     # Special file name extension to distinguish this json file from others
     # The models base on this schema will be saved to metadata.nd.json as
@@ -149,30 +112,11 @@ class Metadata(DataCoreModel):
         default=None, title="Model", description="Description of a machine learning model trained on data."
     )
 
-    @field_validator(
-        *CORE_FILES,
-        mode="before",
-    )
-    def validate_core_fields(cls, value, info: ValidationInfo):
-        """Don't automatically raise errors if the core models are invalid"""
-
-        # extract field from Optional[<class>] annotation
-        field_name = info.field_name
-        collection_models = {"subjects": Subject, "procedures": Procedures}
-        if field_name in collection_models:
-            return _validate_model_list(value, collection_models[field_name], field_name[:-1])
-
-        field_class = [f for f in get_args(cls.model_fields[field_name].annotation) if inspect.isclass(f)][0]
-
-        if isinstance(value, dict):
-            try:
-                core_model = field_class.model_validate(value)
-            except ValidationError as e:
-                logger.warning(f"Error in validating {field_name}: {e}")
-                core_model = field_class.model_construct(**value)
-        else:
-            core_model = value
-        return core_model
+    @field_validator(*CORE_FILES, mode="before")
+    @classmethod
+    def serialize_core_models(cls, value: Any) -> Any:
+        """Revalidate model instances and nested records through their serialized fields."""
+        return TypeAdapter(Any).dump_python(value)
 
     @model_validator(mode="after")
     def validate_unique_subjects(self):
@@ -190,13 +134,8 @@ class Metadata(DataCoreModel):
         if self.acquisition and not self.acquisition.specimen_names:
             if not self.acquisition.subject_details:
                 raise ValueError("Acquisition.subject_details are required for in vivo experiments")
-            expected = set(getattr(self.acquisition, "subject_names", []))
-            detail_names = TypeAdapter(set[str]).validate_python(
-                [
-                    details.get("subject_name") if isinstance(details, dict) else details.subject_name
-                    for details in self.acquisition.subject_details
-                ]
-            )
+            expected = self.acquisition.subject_names
+            detail_names = {details.subject_name for details in self.acquisition.subject_details}
             missing = expected - detail_names
             if missing:
                 raise ValueError(f"Acquisition.subject_details missing for subjects: {', '.join(sorted(missing))}")
@@ -234,41 +173,20 @@ class Metadata(DataCoreModel):
         return self
 
     @model_validator(mode="after")
-    def validate_smartspim_metadata(self):
-        """Validator for smartspim metadata"""
-
-        if (
-            self.data_description
-            and any([modality == Modality.SPIM for modality in self.data_description.modalities])
-            and self.procedures
-            and any(
-                isinstance(surgery, Injection) and getattr(surgery, "injection_materials", None) is None
-                for procedures in self.procedures
-                for subject_procedure in procedures.subject_procedures
-                if isinstance(subject_procedure, Surgery)
-                for surgery in subject_procedure.procedures
+    def validate_unique_device_names(self):
+        """Ensure implanted device names are unique across subjects and the instrument."""
+        seen = set(self.instrument.get_component_names()) if self.instrument else set()
+        duplicates = set()
+        for procedures in self.procedures or []:
+            names = set(procedures.get_device_names())
+            duplicates.update(seen & names)
+            seen.update(names)
+        if duplicates:
+            raise ValueError(
+                f"Duplicate device names found across instrument and subject procedures: {sorted(duplicates)}. "
+                "Prefix implanted device names with subject_name (e.g. '123456_Probe A') "
+                "so they are unique across subjects and the instrument."
             )
-        ):
-            raise ValueError("Injection is missing injection_materials.")
-
-        return self
-
-    @model_validator(mode="after")
-    def validate_ecephys_metadata(self):
-        """Validator for metadata"""
-        if (
-            self.data_description
-            and any([modality == Modality.ECEPHYS for modality in self.data_description.modalities])
-            and self.procedures
-            and any(
-                isinstance(surgery, Injection) and getattr(surgery, "injection_materials", None) is None
-                for procedures in self.procedures
-                for subject_procedure in procedures.subject_procedures
-                if isinstance(subject_procedure, Surgery)
-                for surgery in subject_procedure.procedures
-            )
-        ):
-            raise ValueError("Injection is missing injection_materials.")
         return self
 
     @model_validator(mode="after")
@@ -304,40 +222,6 @@ class Metadata(DataCoreModel):
                 f"Active devices '{missing_devices}' were not found in either the Instrument.components or "
                 f"in an individual procedure's implanted_device field."
             )
-
-        return self
-
-    @model_validator(mode="after")
-    def validate_acquisition_connections(self):
-        """Validate for Acquisition.data_streams.connections that all connections map between devices either in the
-        instrument OR procedures"""
-
-        device_names = []
-
-        if self.instrument:
-            device_names.extend(self.instrument.get_component_names())
-        for procedures in self.procedures or []:
-            device_names.extend(procedures.get_device_names())
-
-        # Check if all connection devices are in the available devices
-        if self.acquisition:
-            data_streams = self.acquisition.data_streams
-            for data_stream in data_streams:
-                if not isinstance(data_stream, DataStream):
-                    continue
-                for connection in data_stream.connections:
-                    # Check both source and target devices exist
-                    missing_devices = []
-                    if connection.source_device not in device_names:
-                        missing_devices.append(connection.source_device)
-                    if connection.target_device not in device_names:
-                        missing_devices.append(connection.target_device)
-
-                    if missing_devices:
-                        raise ValueError(
-                            f"Connection from '{connection.source_device}' to '{connection.target_device}' "
-                            f"contains devices not found in instrument or procedures: {missing_devices}"
-                        )
 
         return self
 
@@ -390,8 +274,8 @@ class Metadata(DataCoreModel):
         expected = {subject.subject_name for subject in self.subjects}
         mismatches = []
         for field_name, core_model in (("acquisition", self.acquisition), ("data_description", self.data_description)):
-            subject_names = getattr(core_model, "subject_names", None)
-            if subject_names is not None and TypeAdapter(set[str]).validate_python(subject_names) != expected:
+            subject_names = core_model.subject_names if core_model else None
+            if subject_names is not None and subject_names != expected:
                 mismatches.append(f"{field_name}.subject_names={subject_names}")
 
         if mismatches:
@@ -499,17 +383,12 @@ class Metadata(DataCoreModel):
             value = getattr(self, field_name, None)
             if value is None:
                 continue
-            if field_name in ("subjects", "procedures"):
-                directory = Path.cwd() if output_directory is None else Path(output_directory)
-                recursive_check_paths(value, directory)
-                filename = directory / f"{prefix + '_' if prefix else ''}{field_name}.json"
-                serialized = json.dumps([record.model_dump(mode="json") for record in value], indent=3)
-                with filename.open("w") as output_file:
-                    output_file.write(serialized)
-                if len(serialized) > MAX_FILE_SIZE:
-                    logger.warning(f"File size exceeds {MAX_FILE_SIZE / 1024} KB: {filename}")
+            if field_name == "subjects":
+                Subject.write_standard_file(value, output_directory=output_directory, prefix=prefix)
+            elif field_name == "procedures":
+                Procedures.write_standard_file(value, output_directory=output_directory, prefix=prefix)
             else:
-                value.write_standard_file(output_directory=output_directory, prefix=prefix)
+                type(value).write_standard_file(value, output_directory=output_directory, prefix=prefix)
 
     @classmethod
     def from_metadata(
@@ -570,9 +449,9 @@ class Metadata(DataCoreModel):
         )
 
         if isinstance(metadata, Metadata):
-            metadata_list = [metadata]
+            metadata_list = [cls.model_validate(metadata)]
         else:
-            metadata_list = list(metadata)
+            metadata_list = [cls.model_validate(source) for source in metadata]
 
         if not metadata_list:
             raise ValueError("At least one source Metadata object is required.")
@@ -624,7 +503,7 @@ class Metadata(DataCoreModel):
 def create_metadata_json(
     name: str,
     location: str,
-    core_jsons: Dict[str, Optional[dict]],
+    core_jsons: Dict[str, Optional[Union[dict, List[dict]]]],
     other_identifiers: Optional[dict] = None,
 ) -> dict:
     """Creates a Metadata dict from dictionary of core schema fields."""
@@ -640,15 +519,5 @@ def create_metadata_json(
     for key, value in core_jsons.items():
         if key in CORE_FILES and value is not None:
             core_fields[key] = value
-    # Create Metadata object and convert to JSON
-    # If there are any validation errors, still create it
-    try:
-        metadata = Metadata.model_validate(params | core_fields)
-        metadata_json = json.loads(metadata.model_dump_json(by_alias=True))
-    except Exception as e:
-        logger.warning(f"Issue with metadata construction! {e.args}")
-        metadata = Metadata.model_construct(**params)
-        metadata_json = json.loads(metadata.model_dump_json(by_alias=True))
-        for key, value in core_fields.items():
-            metadata_json[key] = value
-    return metadata_json
+    metadata = Metadata.model_validate(params | core_fields)
+    return metadata.model_dump(mode="json", by_alias=True)

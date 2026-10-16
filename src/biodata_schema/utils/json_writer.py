@@ -218,7 +218,7 @@ class SchemaWriter:
     @staticmethod
     def schema_filename(model: type[DataCoreModel]) -> str:
         """Return the published filename for a core schema."""
-        filename = "subjects.json" if model is Subject else model.default_filename()
+        filename = model.default_filename()
         file_extension = "".join(Path(filename).suffixes)
         return filename.replace(file_extension, "_schema.json")
 
@@ -239,7 +239,7 @@ class SchemaWriter:
         for schema in schemas_to_write:
             schema_filename = self.schema_filename(schema)
             if self.configs.attach_version:
-                schema_version = schema.model_construct().schema_version
+                schema_version = schema.model_fields["schema_version"].default
                 model_directory_name = schema_filename.replace("_schema.json", "")
                 sub_directory = Path(output_path) / model_directory_name / schema_version
                 output_file = sub_directory / schema_filename

@@ -20,6 +20,7 @@ from biodata_schema.utils.validators import recursive_get_device_names
 class Procedures(DataCoreModel):
     """Description of all procedures performed on a subject, including surgeries, injections, and tissue processing"""
 
+    _IS_COLLECTION = True
     _DESCRIBED_BY_URL = DataCoreModel._DESCRIBED_BY_BASE_URL.default + "biodata_schema/core/procedures.py"
     describedBy: str = Field(default=_DESCRIBED_BY_URL, json_schema_extra={"const": _DESCRIBED_BY_URL})
 

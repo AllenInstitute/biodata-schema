@@ -296,8 +296,8 @@ class ExternalDataStream(DataModel):
 
 
 class StimulusEpoch(DataModel):
-    """All stimuli being presented to the subject. starting and stopping at approximately the
-    same time. Not all acquisitions have StimulusEpochs.
+    """All stimuli being presented to all subjects in Acquisition.subject_names, starting and stopping at
+    approximately the same time. Epochs do not target a subset of subjects. Not all acquisitions have StimulusEpochs.
     """
 
     stimulus_start_time: Annotated[AwareDatetimeWithDefault, TimeValidation.BETWEEN] = Field(
@@ -520,15 +520,13 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
     @model_validator(mode="after")
     def extract_timezone(self):
         """Extract timezone information from acquisition_start_time and set acquisition_start_tz"""
-        if self.acquisition_start_tz is None and hasattr(self, "acquisition_start_time"):
+        if self.acquisition_start_tz is None:
             self.acquisition_start_tz = extract_timezone_from_datetime(self.acquisition_start_time)
         return self
 
     @model_validator(mode="after")
     def validate_subject_references(self):
         """Check subject-specific records against the acquisition roster."""
-        if not hasattr(self, "subject_names"):
-            return self
         for field_name, records in (("subject_details", self.subject_details), ("manipulations", self.manipulations)):
             names = TypeAdapter(list[str]).validate_python(
                 [
@@ -546,8 +544,6 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
     @model_validator(mode="after")
     def instrument_name_required_for_data_streams(self):
         """Require instrument_name when any standard DataStream is present"""
-        if not hasattr(self, "data_streams"):
-            return self
         if any(isinstance(stream, DataStream) for stream in self.data_streams):
             if not self.instrument_name:
                 raise ValueError("instrument_name is required when data_streams contains a DataStream")
@@ -556,9 +552,6 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
     @model_validator(mode="after")
     def specimen_required(self):
         """Check if specimen name is required for in vitro imaging modalities"""
-
-        if not hasattr(self, "data_streams"):  # bypass for testing
-            return self
 
         for stream in self.data_streams:
             if any([modality.abbreviation in SPECIMEN_MODALITIES for modality in stream.modalities]):

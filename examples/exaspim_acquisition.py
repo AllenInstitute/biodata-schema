@@ -188,4 +188,4 @@ if __name__ == "__main__":
 
     serialized = acq.model_dump_json()
     deserialized = Acquisition.model_validate_json(serialized)
-    deserialized.write_standard_file(prefix="exaspim", output_directory=args.output_dir)
+    Acquisition.write_standard_file(deserialized, prefix="exaspim", output_directory=args.output_dir)

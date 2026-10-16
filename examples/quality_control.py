@@ -146,4 +146,4 @@ if __name__ == "__main__":
 
     serialized = q.model_dump_json()
     deserialized = QualityControl.model_validate_json(serialized)
-    q.write_standard_file(output_directory=args.output_dir)
+    QualityControl.write_standard_file(deserialized, output_directory=args.output_dir)

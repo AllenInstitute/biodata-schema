@@ -96,7 +96,7 @@ def derive_data_description_from_derived(
     Create a DataLevel.DERIVED DataDescription from another DataLevel.DERIVED DataDescription object.
 
     Use an explicit name when supplied. Otherwise, append the process and timestamp
-    to the original raw name if it can be parsed, or to the current asset name.
+    to the original raw name, raising if it cannot be recovered from the derived name.
 
     Parameters
     ----------
@@ -126,13 +126,7 @@ def derive_data_description_from_derived(
 
     derived_name = kwargs.get("name")
     if derived_name is None:
-        original_input = data_description.name
-        try:
-            parsed_name = DataDescription.parse_name(original_input, DataLevel.DERIVED)
-        except ValueError:
-            pass
-        else:
-            original_input = parsed_name.get("input", original_input)
+        original_input = _get_root_asset_name(data_description)
         derived_name = build_data_name(f"{original_input}_{process_name}", creation_time)
 
     return DataDescription(
@@ -251,31 +245,38 @@ def derive_data_description_analyzed(
     )
 
 
-def _get_root_asset_name(data_description: DataDescription) -> Optional[str]:
+def _get_root_asset_name(data_description: DataDescription) -> str:
     """Return the original raw asset name that this data description traces back to"""
     if data_description.data_level == DataLevel.RAW:
         return data_description.name
     if data_description.data_level == DataLevel.DERIVED and data_description.name:
         try:
             parsed = DataDescription.parse_name(data_description.name, DataLevel.DERIVED)
-        except ValueError:
-            parsed = {}
+        except ValueError as exc:
+            raise ValueError(
+                f"Cannot determine the raw asset name from derived asset {data_description.name!r}. "
+                "Use a standard derived name that includes the raw asset name."
+            ) from exc
         if parsed.get("input"):
             return parsed["input"]
-        if data_description.source_data and len(data_description.source_data) == 1:
-            return data_description.source_data[0]
-    return None
+    raise ValueError(
+        f"Cannot determine the raw asset name for asset {data_description.name!r} "
+        f"with data_level={data_description.data_level!r}."
+    )
 
 
 def _is_single_acquisition(metadata_list) -> bool:
     """Check whether all metadata objects refer to the same acquisition"""
     if len(metadata_list) == 1:
         return True
-    roots = [
-        _get_root_asset_name(metadata.data_description) if metadata.data_description else None
-        for metadata in metadata_list
-    ]
-    return bool(roots) and all(root is not None for root in roots) and len(set(roots)) == 1
+    roots = []
+    for metadata in metadata_list:
+        if metadata.data_description is None:
+            raise ValueError(
+                f"Cannot determine the raw asset name for asset {metadata.name!r}: missing data_description."
+            )
+        roots.append(_get_root_asset_name(metadata.data_description))
+    return bool(roots) and len(set(roots)) == 1
 
 
 def _get_shared_subject_names(metadata_list) -> Optional[set[str]]:

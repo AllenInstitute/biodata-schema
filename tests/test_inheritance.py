@@ -7,6 +7,7 @@ from biodata_models.data_levels import DataLevel
 from biodata_models.licenses import License
 from biodata_models.modalities import Modality
 from biodata_models.organizations import Organization
+from pydantic import ValidationError
 
 from biodata_schema.components.identifiers import Code, Person
 from biodata_schema.core.data_description import DataDescription, Funding
@@ -99,44 +100,83 @@ def test_derivation_accepts_explicit_names(derive, name):
     assert result.name == name
 
 
+@pytest.mark.parametrize("data_level", [DataLevel.RAW, DataLevel.DERIVED])
+@pytest.mark.parametrize("name", ["custom name", "", "folder/name_with:punctuation", "a\nname"])
+@pytest.mark.parametrize("as_list", [False, True])
+def test_from_metadata_accepts_explicit_names(data_level, name, as_list):
+    """An explicit output name needs no parseable source name for a single source."""
+    description = DataDescription.model_validate(
+        example_data_description.model_dump() | {"name": "custom source", "data_level": data_level}
+    )
+    source = Metadata(
+        name=description.name,
+        location="s3://bucket/source",
+        data_description=description,
+        subjects=[example_subject],
+        procedures=[Procedures(subject_name=example_subject.subject_name)],
+        instrument=example_inst,
+        processing=example_processing,
+        quality_control=example_qc,
+    )
+
+    result = Metadata.from_metadata([source] if as_list else source, name=name, creation_time=t)
+
+    assert result.name == result.data_description.name == name
+    assert result.data_description.source_data == ["custom source"]
+    assert result.subjects == source.subjects
+    assert result.procedures == source.procedures
+    assert result.instrument == source.instrument
+    assert result.processing == source.processing
+    assert result.quality_control == source.quality_control
+    assert source.name == source.data_description.name == "custom source"
+
+
 @pytest.mark.parametrize("name", ["custom source", "project_analysis_20221122T084300", "", "a\nname"])
-def test_derivation_appends_to_nonstandard_derived_names(name):
-    """Names without a recoverable raw root use the current name as the base."""
+def test_derivation_rejects_nonstandard_derived_names(name):
+    """Generating a name requires an identifiable raw asset."""
     source = example_data_description.model_copy(update={"name": name, "data_level": DataLevel.DERIVED})
-    result = derive_data_description_from_derived(source, "next", creation_time=t)
-    assert result.name == f"{name}_next_20221122T084300"
-    assert result.source_data == [name]
+    with pytest.raises(ValueError, match="Cannot determine the raw asset name"):
+        derive_data_description_from_derived(source, "next", creation_time=t)
 
 
-def test_custom_named_asset_keeps_single_source_history():
-    """Processing and QC are retained when processing one custom-named derived asset."""
+def test_custom_named_derived_asset_requires_identifiable_root():
+    """A custom output name does not silently become a raw root on subsequent derivation."""
     source = _make_metadata()
     first = Metadata.from_metadata(source, name="custom result", creation_time=t)
-    second = Metadata.from_metadata(first, creation_time=t)
     assert first.name == first.data_description.name == "custom result"
-    assert second.name == "custom result_processed_20221122T084300"
-    assert second.data_description.source_data == ["custom result"]
-    assert second.processing == source.processing
-    assert second.quality_control == source.quality_control
+    assert first.processing == source.processing
+    assert first.quality_control == source.quality_control
+    with pytest.raises(ValueError, match="Cannot determine the raw asset name"):
+        Metadata.from_metadata(first, creation_time=t)
+
+
+def test_arbitrary_raw_name_is_not_misidentified_after_derivation():
+    """A derived name without an encoded raw root is rejected before another generation is built."""
+    source = _make_metadata()
+    source.data_description.name = source.name = "custom raw"
+    first = Metadata.from_metadata(source, process_name="pipelineA", creation_time=t)
+    with pytest.raises(ValueError, match="Cannot determine the raw asset name"):
+        Metadata.from_metadata(first, process_name="next", creation_time=t)
 
 
 @pytest.mark.parametrize("name", ["custom result", "project_analysis_20221122T084300"])
 @pytest.mark.parametrize(
-    "source_data,expected",
+    "source_data",
     [
-        (None, None),
-        ([], None),
-        (["123456_20221122T084300"], "123456_20221122T084300"),
-        (["123456_20221122T084300", "654321_20221122T084300"], None),
+        None,
+        [],
+        ["123456_20221122T084300"],
+        ["123456_20221122T084300", "654321_20221122T084300"],
     ],
 )
-def test_root_asset_name_falls_back_to_single_source(name, source_data, expected):
-    """Custom and analyzed names identify a root only with exactly one source."""
+def test_root_asset_name_does_not_guess_from_source_data(name, source_data):
+    """Immediate parents alone cannot establish the original raw asset."""
     source = DataDescription.model_validate(
         example_data_description.model_dump()
         | {"name": name, "data_level": DataLevel.DERIVED, "source_data": source_data}
     )
-    assert _get_root_asset_name(source) == expected
+    with pytest.raises(ValueError, match="Cannot determine the raw asset name"):
+        _get_root_asset_name(source)
 
 
 def test_multiple_sources_preserve_empty_names():
@@ -518,10 +558,8 @@ class TestFromMetadataDifferentSubjects:
             ),
             processing=example_processing,
         )
-        result = Metadata.from_metadata([self.source1, unknown], new_processing=example_processing)
-        assert result.subjects is None
-        assert result.procedures is None
-        assert result.data_description.subject_names is None
+        with pytest.raises(ValueError, match="Cannot determine the raw asset name"):
+            Metadata.from_metadata([self.source1, unknown], new_processing=example_processing)
 
     def test_matching_description_rosters_can_supply_missing_records(self):
         """A matching data-description roster can identify a source without subject files."""
@@ -555,6 +593,19 @@ class TestFromMetadataEdgeCases:
         with pytest.raises(ValueError):
             Metadata.from_metadata(m, process_name="x", location="s3://bucket/x")
 
+    def test_invalid_source_is_not_rebuilt(self):
+        """Rebuilding validates the input even when an override could repair the output."""
+        source = _make_metadata()
+        source.data_description.funding_source = []
+        with pytest.raises(ValidationError, match="funding_source"):
+            Metadata.from_metadata(source, funding_source=example_data_description.funding_source)
+
+    def test_missing_description_in_multiple_sources_raises(self):
+        """A source without a data description cannot establish its acquisition identity."""
+        missing = Metadata(name="missing", location="", processing=example_processing)
+        with pytest.raises(ValueError, match="missing data_description"):
+            Metadata.from_metadata([_make_metadata(), missing], new_processing=example_processing)
+
     def test_result_name_matches_data_description(self):
         """Result name should match its data_description name"""
         source = _make_metadata()
@@ -583,10 +634,11 @@ class TestInternalHelpers:
         root = _get_root_asset_name(self.derived.data_description)
         assert root == self.source.data_description.name
 
-    def test_get_root_asset_name_returns_none_for_non_raw_non_derived(self):
-        """_get_root_asset_name should return None for non-raw, non-derived data levels"""
+    def test_get_root_asset_name_rejects_non_raw_non_derived(self):
+        """Non-acquired data cannot establish a raw acquisition identity."""
         simulated_dd = self.source.data_description.model_copy(update={"data_level": DataLevel.SIMULATED})
-        assert _get_root_asset_name(simulated_dd) is None
+        with pytest.raises(ValueError, match="Cannot determine the raw asset name"):
+            _get_root_asset_name(simulated_dd)
 
     def test_inherit_subject_and_procedures_returns_none_when_no_subject_or_procedures(self):
         """_inherit_subject_and_procedures should return None when source has neither subject nor procedures"""

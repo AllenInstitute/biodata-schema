@@ -552,17 +552,15 @@ class TestInstrument:
         """Tests that modalities serializer can handle different types"""
         expected_modalities = [{"name": "Extracellular electrophysiology", "abbreviation": "ecephys"}]
         # Case 1: Modality is a class instance
-        instrument_instance_modality = Instrument.model_construct(
-            instrument_name="123_EPHYS1-OPTO_20220101",
-            modalities={Modality.ECEPHYS},  # Example with a valid Modality instance
-            global_coordinate_system=CoordinateSystem.NotApplicable,
+        instrument_instance_modality = Instrument.model_validate(
+            ephys_instrument.model_dump() | {"modalities": {Modality.ECEPHYS}}
         )
         instrument_json = instrument_instance_modality.model_dump_json()
         instrument_data = json.loads(instrument_json)
         assert instrument_data["modalities"] == expected_modalities
 
         # Case 2: Modality is a dictionary when Instrument is constructed from JSON
-        instrument_dict_modality = Instrument.model_construct(**instrument_data)
+        instrument_dict_modality = Instrument.model_validate(instrument_data)
         instrument_dict_json = instrument_dict_modality.model_dump_json()
         instrument_dict_data = json.loads(instrument_dict_json)
         assert instrument_dict_data["modalities"] == expected_modalities
@@ -828,29 +826,14 @@ class TestInstrument:
     def test_validate_unique_component_names(self):
         """Test that duplicate component names raise an error"""
         duplicate_component = ephys_instrument.components[0].model_copy(deep=True)
-        inst_with_dup = Instrument.model_construct(
-            instrument_name=ephys_instrument.instrument_name,
-            modification_date=ephys_instrument.modification_date,
-            modalities=ephys_instrument.modalities,
-            global_coordinate_system=ephys_instrument.global_coordinate_system,
-            components=list(ephys_instrument.components) + [duplicate_component],
-            connections=ephys_instrument.connections or [],
-            calibrations=ephys_instrument.calibrations,
-        )
-
         with pytest.raises(ValueError) as context:
-            inst_with_dup.validate_unique_component_names()
+            Instrument.model_validate(
+                ephys_instrument.model_dump()
+                | {"components": list(ephys_instrument.components) + [duplicate_component]}
+            )
         assert duplicate_component.name in str(context.value)
 
-        inst_no_dup = Instrument.model_construct(
-            instrument_name=ephys_instrument.instrument_name,
-            modification_date=ephys_instrument.modification_date,
-            modalities=ephys_instrument.modalities,
-            global_coordinate_system=ephys_instrument.global_coordinate_system,
-            components=list(ephys_instrument.components),
-            connections=ephys_instrument.connections or [],
-            calibrations=ephys_instrument.calibrations,
-        )
+        inst_no_dup = Instrument.model_validate(ephys_instrument.model_dump())
 
         assert inst_no_dup.validate_unique_component_names() is inst_no_dup
 
@@ -905,10 +888,10 @@ class TestInstrument:
                 lens=Lens(name=f"{name} Lens", manufacturer=Organization.OTHER, notes="Manufacturer unknown"),
             )
 
-        inst = Instrument.model_construct(
+        inst = Instrument(
             instrument_name=ephys_instrument.instrument_name,
             modification_date=ephys_instrument.modification_date,
-            modalities=ephys_instrument.modalities,
+            modalities=[],
             global_coordinate_system=ephys_instrument.global_coordinate_system,
             components=[_camera("Camera One"), _camera("Camera Two")],
             connections=[],
@@ -918,20 +901,21 @@ class TestInstrument:
 
     def test_coordinate_system_names_ignored(self):
         """Names on coordinate systems are not component collisions"""
-        inst = Instrument.model_construct(
+        cameras = [component for component in ephys_instrument.components if isinstance(component, CameraAssembly)][:2]
+        inst = Instrument(
             instrument_name=ephys_instrument.instrument_name,
             modification_date=ephys_instrument.modification_date,
-            modalities=ephys_instrument.modalities,
+            modalities=[],
             global_coordinate_system=ephys_instrument.global_coordinate_system,
             components=[
-                CameraAssembly.model_construct(
-                    name="Camera assembly one",
-                    local_coordinate_system=CoordinateSystem.model_construct(name="Shared coordinate system"),
-                ),
-                CameraAssembly.model_construct(
-                    name="Camera assembly two",
-                    local_coordinate_system=CoordinateSystem.model_construct(name="Shared coordinate system"),
-                ),
+                CameraAssembly.model_validate(
+                    camera.model_dump()
+                    | {
+                        "local_coordinate_system": BREGMA_ARI.model_copy(update={"name": "Shared coordinate system"}),
+                        "transform": [Translation(translation=[0, 0, 0])],
+                    }
+                )
+                for camera in cameras
             ],
             connections=[],
             calibrations=[],
@@ -941,17 +925,16 @@ class TestInstrument:
 
     def test_distinct_objects_sharing_a_name_rejected(self):
         """Two different devices with the same name are still a collision"""
-        inst = Instrument.model_construct(
-            instrument_name=ephys_instrument.instrument_name,
-            modification_date=ephys_instrument.modification_date,
-            modalities=ephys_instrument.modalities,
-            global_coordinate_system=ephys_instrument.global_coordinate_system,
-            components=[Disc(name="Shared", radius=1), Disc(name="Shared", radius=2)],
-            connections=[],
-            calibrations=[],
-        )
         with pytest.raises(ValueError) as context:
-            inst.validate_unique_component_names()
+            Instrument(
+                instrument_name=ephys_instrument.instrument_name,
+                modification_date=ephys_instrument.modification_date,
+                modalities=[],
+                global_coordinate_system=ephys_instrument.global_coordinate_system,
+                components=[Disc(name="Shared", radius=1), Disc(name="Shared", radius=2)],
+                connections=[],
+                calibrations=[],
+            )
         assert "Shared" in str(context.value)
 
 

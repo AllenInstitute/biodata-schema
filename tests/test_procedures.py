@@ -21,7 +21,7 @@ from pydantic import ValidationError
 
 from biodata_schema.components.configs import CatheterConfig
 from biodata_schema.components.coordinates import CoordinateSystem, Origin, ReferenceCoordinateSystem, Translation
-from biodata_schema.components.devices import Catheter, Device
+from biodata_schema.components.devices import Catheter
 from biodata_schema.components.injection_procedures import (
     InjectionDynamics,
     InjectionProfile,
@@ -440,8 +440,8 @@ class TestProcedures:
                 protocol_id=["10"],
                 notes="some extra information",
                 procedure_details=[
-                    HCRSeries.model_construct(),
-                    PlanarSectioning.model_construct(),
+                    HCRSeries(codebook_name="test", number_of_rounds=0, hcr_rounds=[], strip_qc_compatible=False),
+                    PlanarSectioning(sections=[], section_orientation=SectionOrientation.CORONAL),
                 ],
             )
         assert "SpecimenProcedure.procedure_details should only contain one type of model" in repr(e.value)
@@ -807,17 +807,6 @@ class TestProcedures:
         # Test with no devices
         procedures = Procedures(subject_name="12345")
         assert procedures.get_device_names() == []
-
-    def test_get_device_names_with_constructed_surgery_procedure(self):
-        """Test device-name traversal without requiring external anatomy lookups."""
-        device = Device.model_construct(name="Catheter")
-        surgery_procedure = CatheterImplant.model_construct(implanted_device=device)
-        procedures = Procedures.model_construct(
-            subject_name="12345",
-            subject_procedures=[Surgery.model_construct(procedures=[surgery_procedure])],
-        )
-
-        assert procedures.get_device_names() == ["Catheter"]
 
     @patch("biodata_models.anatomy.MouseAnatomyLookup.get_by_name")
     def test_get_device_names_with_surgery_procedures(self, mock_get_by_name):

@@ -19,7 +19,7 @@ from biodata_schema.components.devices import EphysAssembly, EphysProbe, Laser, 
 from biodata_schema.components.identifiers import Code, Database, Person
 from biodata_schema.components.subject_procedures import TrainingProtocol
 from biodata_schema.components.subjects import BreedingInfo, CalibrationObject, Housing, MouseSubject, Sex, Species
-from biodata_schema.components.surgery_procedures import BrainInjection
+from biodata_schema.components.surgery_procedures import DeviceImplant
 from biodata_schema.core.acquisition import Acquisition, AcquisitionSubjectDetails, DataStream, StimulusEpoch
 from biodata_schema.core.data_description import DataDescription, Funding
 from biodata_schema.core.instrument import Instrument
@@ -30,7 +30,6 @@ from biodata_schema.core.subject import Subject
 from examples.aibs_smartspim_instrument import inst as spim_inst
 from examples.barseq_acquisition import acquisition as barseq_acquisition
 from examples.data_description import d as data_description
-from examples.ephys_instrument import inst as ephys_inst
 from examples.model import m as model_example
 from examples.processing import p as processing_example
 from examples.quality_control import q as quality_control_example
@@ -54,6 +53,49 @@ laser = Laser(
 )
 
 t = datetime.fromisoformat("2024-09-13T14:00:00")
+
+
+def _acquisition(**updates):
+    """Build a valid in-vivo acquisition with overridable fields."""
+    return Acquisition.model_validate(
+        {
+            "subject_names": {"123456"},
+            "acquisition_type": "Test",
+            "instrument_name": "Test",
+            "acquisition_start_time": datetime(2023, 10, 3, 12, tzinfo=timezone.utc),
+            "acquisition_end_time": datetime(2023, 10, 3, 13, tzinfo=timezone.utc),
+            "subject_details": [AcquisitionSubjectDetails(subject_name="123456", mouse_platform_name="platform")],
+            "data_streams": [],
+        }
+        | updates
+    )
+
+
+def _instrument(**updates):
+    """Build a valid instrument with overridable fields."""
+    return Instrument.model_validate(
+        {
+            "instrument_name": "Test",
+            "modification_date": "2023-01-01",
+            "modalities": [],
+            "components": [],
+        }
+        | updates
+    )
+
+
+def _data_stream(**updates):
+    """Build a valid data stream with overridable fields."""
+    return DataStream.model_validate(
+        {
+            "stream_start_time": datetime(2023, 10, 3, 12, tzinfo=timezone.utc),
+            "stream_end_time": datetime(2023, 10, 3, 13, tzinfo=timezone.utc),
+            "active_devices": [],
+            "modalities": [],
+            "configurations": [],
+        }
+        | updates
+    )
 
 
 class TestMetadata:
@@ -130,49 +172,49 @@ class TestMetadata:
         """Tests that the default file extension used is as expected."""
         assert ".nd.json" == Metadata._FILE_EXTENSION.default
 
-    @pytest.mark.parametrize("field_name", ["data_description", "acquisition"])
-    @pytest.mark.parametrize("in_vivo", [False, True])
-    def test_fallback_subject_names_accept_json_arrays(self, field_name, in_vivo, caplog):
-        """An unrelated invalid core field must not turn matching list rosters into mismatches."""
-        if field_name == "data_description":
-            payload = self.dd.model_dump() | {"funding_source": []}
-        else:
-            payload = barseq_acquisition.model_dump() | {"data_streams": []}
-            payload.pop("acquisition_type")
-            if in_vivo:
-                payload.update(
-                    specimen_names=None,
-                    subject_details=[{"subject_name": "123456", "mouse_platform_name": "platform"}],
-                    manipulations=[
-                        {
-                            "subject_name": "123456",
-                            "start_time": barseq_acquisition.acquisition_start_time,
-                            "end_time": barseq_acquisition.acquisition_end_time,
-                        }
-                    ],
-                )
-        payload["subject_names"] = ["123456"]
-        metadata = Metadata(
-            name="partial",
-            location="",
-            subjects=[self.subject],
-            procedures=[self.procedures],
-            **{field_name: payload},
-        )
-        assert getattr(metadata, field_name).subject_names == ["123456"]
-        assert f"Error in validating {field_name}" in caplog.text
-
-    @pytest.mark.parametrize("subject_names", ["123456", [None], [{}]])
-    def test_fallback_rejects_malformed_subject_names(self, subject_names):
-        """Normalization must not interpret a scalar string as a collection of characters."""
-        with pytest.raises(ValidationError):
-            Metadata(
-                name="partial",
-                location="",
-                subjects=[self.subject],
-                procedures=[self.procedures],
-                data_description=self.dd.model_dump() | {"subject_names": subject_names, "funding_source": []},
+    @pytest.mark.parametrize(
+        "field_name,payload",
+        [
+            ("subjects", [{}]),
+            ("procedures", [{}]),
+            ("data_description", {}),
+            ("instrument", {}),
+            ("processing", {}),
+            ("acquisition", {}),
+            ("quality_control", {"metrics": [{}]}),
+            ("model", {}),
+        ],
+    )
+    def test_invalid_core_json_is_rejected(self, field_name, payload):
+        """Every supplied core file must validate in full."""
+        with pytest.raises(ValidationError, match=field_name):
+            Metadata.model_validate(
+                {"name": "invalid", "location": "", "processing": self.processing} | {field_name: payload}
             )
+
+    def test_invalid_existing_core_object_is_rejected(self):
+        """An existing model instance cannot bypass field validation."""
+        invalid = self.dd.model_copy(update={"funding_source": []})
+        with pytest.raises(ValidationError, match="funding_source"):
+            Metadata(name="invalid", location="", processing=self.processing, data_description=invalid)
+
+    def test_invalid_nested_model_instance_is_rejected(self):
+        """Models nested inside input dictionaries cannot bypass validation either."""
+        invalid_details = self.subject.subject_details.model_copy(update={"sex": {}})
+        with pytest.raises(ValidationError, match="sex"):
+            Metadata(
+                name="invalid",
+                location="",
+                subjects=[{"subject_name": "123456", "subject_details": invalid_details}],
+                procedures=[self.procedures],
+            )
+
+    def test_valid_core_json_is_normalized(self):
+        """Valid JSON arrays are converted to the declared set type."""
+        metadata = Metadata(
+            name="valid", location="", processing=self.processing, data_description=self.dd.model_dump(mode="json")
+        )
+        assert metadata.data_description.subject_names == {"123456"}
 
     def test_in_vivo_subject_details_cover_roster(self):
         """Every in-vivo subject requires a details record, not just one subject in the group."""
@@ -200,83 +242,21 @@ class TestMetadata:
         )
         assert Metadata(**kwargs)
 
-    def test_raw_description_missing_name_when_nested(self, caplog):
-        """An incomplete nested description logs validation failure without generating a name."""
-        metadata = Metadata(
-            name=self.sample_name,
-            location=self.sample_location,
-            data_description=self.dd.model_dump(exclude={"name"}),
-            processing=self.processing,
-        )
-        assert "name" not in metadata.data_description.model_dump()
-        assert "Error in validating data_description" in caplog.text
-        assert "name\n  Field required" in caplog.text
-
-    def test_injection_material_validator_spim(self):
-        """Tests that the injection validator works for SPIM"""
-        nano_inj = BrainInjection.model_construct()
-
-        # Tests missing injection materials
-        surgery2 = Surgery.model_construct(procedures=[nano_inj])
-        with pytest.raises(ValidationError) as context:
+    def test_raw_description_missing_name_when_nested(self):
+        """An incomplete nested description raises instead of generating a name."""
+        with pytest.raises(ValidationError, match="data_description.name"):
             Metadata(
-                name="655019_2023-04-03T181709",
-                location="bucket",
-                data_description=DataDescription.model_construct(
-                    creation_time=datetime(2020, 12, 12, 12, 12, 12),
-                    modalities=[Modality.SPIM],
-                    subject_names={"655019"},
-                    data_level="raw",
-                ),
-                subjects=[subject],
-                procedures=[
-                    Procedures.model_construct(subject_name=subject.subject_name, subject_procedures=[surgery2])
-                ],
-                acquisition=Acquisition.model_construct(
-                    acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
-                    subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
-                ),
-                instrument=self.spim_instrument,
-                processing=Processing.model_construct(),
+                name=self.sample_name,
+                location=self.sample_location,
+                data_description=self.dd.model_dump(exclude={"name"}),
+                processing=self.processing,
             )
-        assert "Injection is missing injection_materials." in str(context.value)
-
-    def test_injection_material_validator_ephys(self):
-        """Test that the injection validator works for ephys"""
-        nano_inj = BrainInjection.model_construct()
-
-        # Tests missing injection materials
-        surgery2 = Surgery.model_construct(procedures=[nano_inj])
-        modalities = [Modality.ECEPHYS]
-        with pytest.raises(ValidationError) as context:
-            Metadata(
-                name="655019_2023-04-03T181709",
-                location="bucket",
-                data_description=DataDescription.model_construct(
-                    creation_time=datetime(2020, 12, 12, 12, 12, 12),
-                    modalities=modalities,
-                    subject_names={"655019"},
-                    data_level="raw",
-                ),
-                subjects=[subject],
-                procedures=[
-                    Procedures.model_construct(subject_name=subject.subject_name, subject_procedures=[surgery2])
-                ],
-                instrument=ephys_inst,
-                processing=Processing.model_construct(),
-                acquisition=Acquisition.model_construct(
-                    instrument_name="323_EPHYS1_20231003",
-                    acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
-                    subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
-                ),
-            )
-        assert "Injection is missing injection_materials." in str(context.value)
 
     def test_validate_instrument_acquisition_compatibility(self):
         """Tests that instrument/acquisition compatibility validator works as expected"""
 
         modalities = [Modality.ECEPHYS]
-        inst = Instrument.model_construct(
+        inst = _instrument(
             instrument_name="123_EPHYS1_20220101",
             modalities=modalities,
             components=[ephys_assembly],
@@ -286,17 +266,10 @@ class TestMetadata:
             Metadata(
                 name="655019_2023-04-03T181709",
                 location="bucket",
-                data_description=DataDescription.model_construct(
-                    creation_time=datetime(2020, 12, 12, 12, 12, 12),
-                    modalities=modalities,
-                    subject_names={"655019"},
-                    data_level="raw",
-                ),
                 subjects=[subject],
                 procedures=[Procedures(subject_name=subject.subject_name)],
                 instrument=inst,
-                processing=Processing.model_construct(),
-                acquisition=Acquisition.model_construct(
+                acquisition=_acquisition(
                     instrument_name="123_EPHYS2_20230101",
                     acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
                     subject_details=[AcquisitionSubjectDetails(subject_name="123456", mouse_platform_name="platform1")],
@@ -309,7 +282,7 @@ class TestMetadata:
 
     def test_validate_old_schema_version(self):
         """Tests that old schema versions are ignored during validation"""
-        m = Metadata.model_construct(
+        m = Metadata(
             name="name",
             location="location",
             id="1",
@@ -397,10 +370,11 @@ class TestMetadata:
                 location=self.sample_location,
                 subjects=[self.subject],
                 procedures=[self.procedures],
-                acquisition=Acquisition.model_construct(
+                acquisition=_acquisition(
                     acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
-                    subject_names=subject_names,
+                    subject_names=subject_names or {"999"},
                     specimen_names={"specimen"},
+                    subject_details=None,
                     data_streams=[],
                 ),
             )
@@ -425,9 +399,10 @@ class TestMetadata:
                 subjects=[self.subject],
                 procedures=[self.procedures],
                 data_description=self.dd.model_copy(update={"subject_names": {"999"}}),
-                acquisition=Acquisition.model_construct(
+                acquisition=_acquisition(
                     subject_names={"888"},
                     specimen_names={"888-001"},
+                    subject_details=None,
                     data_streams=[],
                 ),
             )
@@ -438,18 +413,17 @@ class TestMetadata:
             "subjects": [self.subject_json],
             "data_description": None,
             "procedures": [self.procedures_json],
-            "instrument": Instrument.model_construct().model_dump(),
-            "processing": Processing.model_construct().model_dump(),
+            "instrument": {},
+            "processing": {},
             "acquisition": None,
             "quality_control": None,
         }
-        # invalid core_jsons
-        metadata = create_metadata_json(
-            name=self.sample_name,
-            location=self.sample_location,
-            core_jsons=core_jsons,
-        )
-        assert metadata is not None
+        with pytest.raises(ValidationError):
+            create_metadata_json(
+                name=self.sample_name,
+                location=self.sample_location,
+                core_jsons=core_jsons,
+            )
 
     def test_create_from_core_jsons_optional_overwrite(self):
         """Tests metadata json creation with created and external links"""
@@ -461,6 +435,7 @@ class TestMetadata:
             location=self.sample_location,
             core_jsons={
                 "subjects": [self.subject_json],
+                "procedures": [self.procedures_json],
             },
             other_identifiers=other_identifiers,
         )
@@ -511,24 +486,107 @@ class TestMetadata:
         instrument_warnings = [str(warning.message) for warning in w if "instrument" in str(warning.message)]
         assert [] == instrument_warnings
 
+    @pytest.mark.parametrize("as_json", [False, True])
+    @pytest.mark.parametrize("second_serial_number", ["probe-1", "probe-2"])
+    def test_duplicate_implanted_device_names_across_subjects(self, as_json, second_serial_number):
+        """Implants on different subjects need different names, regardless of device equality."""
+        subject_names = ["123456", "789012"]
+        procedures = [
+            Procedures(
+                subject_name=subject_name,
+                subject_procedures=[
+                    Surgery(
+                        start_date="2020-01-01",
+                        procedures=[
+                            DeviceImplant(
+                                implanted_device=EphysProbe(
+                                    name="Probe A", probe_model="Neuropixels 1.0", serial_number=serial_number
+                                ),
+                                relative_position=[],
+                            )
+                        ],
+                    )
+                ],
+            )
+            for subject_name, serial_number in zip(subject_names, ["probe-1", second_serial_number])
+        ]
+        kwargs = dict(
+            name="multi-subject",
+            location="",
+            subjects=[self.subject.model_copy(update={"subject_name": name}) for name in subject_names],
+            procedures=[record.model_dump(mode="json") for record in procedures] if as_json else procedures,
+        )
+        with pytest.raises(ValidationError, match="Duplicate device names.*Probe A") as exc:
+            Metadata(**kwargs)
+        assert "Prefix implanted device names with subject_name" in str(exc.value)
+
+        for record in procedures:
+            record.subject_procedures[0].procedures[0].implanted_device.name = f"{record.subject_name}_Probe A"
+        kwargs["procedures"] = [record.model_dump(mode="json") for record in procedures] if as_json else procedures
+        assert Metadata(**kwargs)
+
+    def test_implanted_device_name_collides_with_nested_instrument_component(self):
+        """An implant cannot shadow an instrument component, including one inside an assembly."""
+        implant = DeviceImplant(
+            implanted_device=EphysProbe(name="Probe A", probe_model="Neuropixels 1.0"),
+            relative_position=[],
+        )
+        kwargs = dict(
+            name="instrument-collision",
+            location="",
+            subjects=[self.subject],
+            procedures=[
+                Procedures(
+                    subject_name=self.subject.subject_name,
+                    subject_procedures=[Surgery(start_date="2020-01-01", procedures=[implant])],
+                )
+            ],
+            instrument=_instrument(instrument_name="Test", components=[ephys_assembly], modalities=[]),
+        )
+        with pytest.raises(ValidationError, match="Duplicate device names.*Probe A"):
+            Metadata(**kwargs)
+
+        kwargs["procedures"][0].subject_procedures[0].procedures[0].implanted_device.name = "123456_Probe A"
+        assert Metadata(**kwargs)
+
+    def test_repeated_implanted_device_in_subject_history(self):
+        """Repeated references to an implant in one subject's history are not cross-subject collisions."""
+        implant = DeviceImplant(
+            implanted_device=EphysProbe(name="Probe A", probe_model="Neuropixels 1.0"),
+            relative_position=[],
+        )
+        assert Metadata(
+            name="subject-history",
+            location="",
+            subjects=[self.subject],
+            procedures=[
+                Procedures(
+                    subject_name=self.subject.subject_name,
+                    subject_procedures=[
+                        Surgery(start_date="2020-01-01", procedures=[implant]),
+                        Surgery(start_date="2020-01-02", procedures=[implant]),
+                    ],
+                )
+            ],
+        )
+
     def test_validate_acquisition_connections(self):
         """Tests that acquisition connections are validated correctly."""
         # Case where all connection devices are present in instrument components
-        instrument = Instrument.model_construct(
+        instrument = _instrument(
             instrument_name="Test",
             components=[
-                EphysProbe.model_construct(name="Probe A"),
-                Laser.model_construct(name="Laser A"),
+                ephys_assembly,
+                laser,
             ],
             modalities=[],
         )
-        acquisition = Acquisition.model_construct(
+        acquisition = _acquisition(
             instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             data_streams=[
-                DataStream.model_construct(active_devices=["Probe A", "Laser A"], modalities=[], configurations=[]),
+                _data_stream(active_devices=["Probe A", "Laser A"]),
             ],
-            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
         metadata = Metadata(
             name="Test Metadata",
@@ -541,18 +599,17 @@ class TestMetadata:
         assert metadata is not None
 
         # Case where connection devices are missing
-        acquisition = Acquisition.model_construct(
+        acquisition = _acquisition(
             instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             data_streams=[
-                DataStream.model_construct(
-                    active_devices=["Probe A", "Laser A"],
+                _data_stream(
+                    active_devices=["Probe A", "Laser A", "Missing Device"],
                     modalities=[],
                     configurations=[],
                     connections=[Connection(source_device="Probe A", target_device="Missing Device")],
                 ),
             ],
-            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
         with pytest.raises(ValueError) as context:
             Metadata(
@@ -566,18 +623,17 @@ class TestMetadata:
         assert "Missing Device" in str(context.value)
 
         # Case where source device is missing
-        acquisition_missing_source = Acquisition.model_construct(
+        acquisition_missing_source = _acquisition(
             instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             data_streams=[
-                DataStream.model_construct(
-                    active_devices=["Probe A", "Laser A"],
+                _data_stream(
+                    active_devices=["Probe A", "Laser A", "Missing Source"],
                     modalities=[],
                     configurations=[],
                     connections=[Connection(source_device="Missing Source", target_device="Laser A")],
                 ),
             ],
-            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
         with pytest.raises(ValueError) as context:
             Metadata(
@@ -593,21 +649,20 @@ class TestMetadata:
     def test_validate_acquisition_active_devices(self):
         """Tests that acquisition active devices are validated correctly."""
         # Case where all active devices are present in instrument components
-        instrument = Instrument.model_construct(
+        instrument = _instrument(
             instrument_name="Test",
             components=[
-                EphysProbe.model_construct(name="Probe A"),
-                Laser.model_construct(name="Laser A"),
+                ephys_assembly,
+                laser,
             ],
             modalities=[],
         )
-        acquisition = Acquisition.model_construct(
+        acquisition = _acquisition(
             instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             data_streams=[
-                DataStream.model_construct(active_devices=["Probe A", "Laser A"], modalities=[], configurations=[]),
+                _data_stream(active_devices=["Probe A", "Laser A"]),
             ],
-            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
         metadata = Metadata(
             name="Test Metadata",
@@ -620,15 +675,12 @@ class TestMetadata:
         assert metadata is not None
 
         # Case where active devices are missing from both instrument and procedures
-        acquisition = Acquisition.model_construct(
+        acquisition = _acquisition(
             instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             data_streams=[
-                DataStream.model_construct(
-                    active_devices=["Probe A", "Missing Device"], modalities=[], configurations=[]
-                ),
+                _data_stream(active_devices=["Probe A", "Missing Device"], modalities=[], configurations=[]),
             ],
-            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
         with pytest.raises(ValueError) as context:
             Metadata(
@@ -648,17 +700,20 @@ class TestMetadata:
         """Tests that training protocol references are validated correctly."""
 
         # Case where training protocol references match
-        training_protocol = TrainingProtocol.model_construct(training_name="Protocol A")
-        procedures = Procedures.model_construct(
-            subject_name=subject.subject_name, subject_procedures=[training_protocol]
+        training_protocol = TrainingProtocol(training_name="Protocol A", start_date="2020-01-01")
+        procedures = Procedures(subject_name=subject.subject_name, subject_procedures=[training_protocol])
+        stimulus_epoch = StimulusEpoch(
+            stimulus_name="Test",
+            stimulus_modalities=[],
+            stimulus_start_time=datetime(2023, 10, 3, 12, tzinfo=timezone.utc),
+            stimulus_end_time=datetime(2023, 10, 3, 13, tzinfo=timezone.utc),
+            training_protocol_name="Protocol A",
         )
-        stimulus_epoch = StimulusEpoch.model_construct(training_protocol_name="Protocol A")
-        acquisition = Acquisition.model_construct(
+        acquisition = _acquisition(
             instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             stimulus_epochs=[stimulus_epoch],
             data_streams=[],
-            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
 
         metadata = Metadata(
@@ -671,13 +726,12 @@ class TestMetadata:
         assert metadata is not None
 
         # Case where training protocol reference doesn't match
-        stimulus_epoch_invalid = StimulusEpoch.model_construct(training_protocol_name="Missing Protocol")
-        acquisition_invalid = Acquisition.model_construct(
+        stimulus_epoch_invalid = stimulus_epoch.model_copy(update={"training_protocol_name": "Missing Protocol"})
+        acquisition_invalid = _acquisition(
             instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             stimulus_epochs=[stimulus_epoch_invalid],
             data_streams=[],
-            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
 
         with pytest.warns(UserWarning) as w:
@@ -714,13 +768,12 @@ class TestMetadata:
         assert metadata is not None
 
         # Case where stimulus epoch has no training protocol name (should pass)
-        stimulus_epoch_none = StimulusEpoch.model_construct(training_protocol_name=None)
-        acquisition_none = Acquisition.model_construct(
+        stimulus_epoch_none = stimulus_epoch.model_copy(update={"training_protocol_name": None})
+        acquisition_none = _acquisition(
             instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             data_streams=[],
             stimulus_epochs=[stimulus_epoch_none],
-            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
 
         metadata_none = Metadata(
@@ -760,12 +813,11 @@ class TestMetadata:
     def test_historical_names_with_acquisition(self, name, data_level):
         """Historical names remain valid when metadata checks acquisition times."""
         description = DataDescription.model_validate(self.dd.model_dump() | {"name": name, "data_level": data_level})
-        acquisition = Acquisition.model_construct(
+        acquisition = _acquisition(
             subject_names={self.subject.subject_name},
             acquisition_start_time=datetime(2023, 4, 3, 18, 0, tzinfo=timezone.utc),
             acquisition_end_time=datetime(2023, 4, 3, 18, 17, 9, tzinfo=timezone.utc),
             data_streams=[],
-            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
         metadata = Metadata(
             name=name,
@@ -797,13 +849,11 @@ class TestMetadata:
             project_name="Test Project",
         )
 
-        # Create acquisition with matching end time using model_construct
-        acquisition = Acquisition.model_construct(
+        acquisition = _acquisition(
             instrument_name="Test",
             acquisition_start_time=datetime(2023, 4, 3, 18, 0, 0, tzinfo=timezone.utc),
             acquisition_end_time=test_datetime,
             data_streams=[],
-            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
 
         # This should pass - creation time is exactly at acquisition end time
@@ -927,12 +977,11 @@ class TestMetadata:
         acquisition_start = datetime(2023, 4, 3, 18, 0, 0, tzinfo=timezone.utc)
         acquisition_end = datetime(2023, 4, 3, 19, 0, 0, tzinfo=timezone.utc)
 
-        acquisition = Acquisition.model_construct(
+        acquisition = _acquisition(
             instrument_name="Test",
             acquisition_start_time=acquisition_start,
             acquisition_end_time=acquisition_end,
             data_streams=[],
-            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
 
         # Test case where subject's date_of_birth is before acquisition (should pass)
@@ -1006,12 +1055,11 @@ class TestMetadata:
         acquisition_start = datetime(2023, 4, 3, 18, 0, 0, tzinfo=timezone.utc)
         acquisition_end = datetime(2023, 4, 3, 19, 0, 0, tzinfo=timezone.utc)
 
-        acquisition = Acquisition.model_construct(
+        acquisition = _acquisition(
             instrument_name="Test",
             acquisition_start_time=acquisition_start,
             acquisition_end_time=acquisition_end,
             data_streams=[],
-            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
 
         # Test case where processing times are after acquisition (should pass)
@@ -1115,7 +1163,7 @@ class TestMetadata:
                 self.procedures,
                 self.procedures.model_copy(update={"subject_name": "789012"}),
             ],
-            acquisition=Acquisition.model_construct(
+            acquisition=_acquisition(
                 subject_names=subject_names,
                 specimen_names={"789012-001"},
                 acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
@@ -1219,19 +1267,16 @@ class TestMetadata:
         "subject_payload",
         [{"subject_name": "123456", "subject_details": {}}, {"subject_name": "123456"}],
     )
-    def test_invalid_subject_item_uses_permissive_core_fallback(self, caplog, subject_payload):
-        """Keep partially valid core items available when nested validation fails."""
-        metadata = Metadata(
-            name="partial-subject",
-            location="s3://bucket/partial-subject",
-            subjects=[subject_payload],
-            procedures=[self.procedures],
-            processing=self.processing,
-        )
-
-        assert metadata.subjects[0].subject_name == "123456"
-        assert getattr(metadata.subjects[0], "subject_details", {}) == {}
-        assert "Error in validating subject" in caplog.text
+    def test_invalid_subject_item_is_rejected(self, subject_payload):
+        """Invalid subject records cannot be included in metadata."""
+        with pytest.raises(ValidationError, match="subjects"):
+            Metadata(
+                name="invalid-subject",
+                location="s3://bucket/invalid-subject",
+                subjects=[subject_payload],
+                procedures=[self.procedures],
+                processing=self.processing,
+            )
 
     @pytest.mark.parametrize(
         "field_name,item",
@@ -1239,13 +1284,12 @@ class TestMetadata:
             ("subjects", None),
             ("subjects", {}),
             ("subjects", {"subject_name": []}),
-            ("subjects", Subject.model_construct()),
             ("procedures", 42),
             ("procedures", {}),
         ],
     )
     def test_malformed_roster_items_raise_validation_errors(self, field_name, item):
-        """Malformed items do not leak TypeError or AttributeError from the fallback."""
+        """Malformed items raise validation errors."""
         with pytest.raises(ValidationError, match=field_name):
             Metadata(
                 name=self.sample_name,
@@ -1258,11 +1302,12 @@ class TestMetadata:
         """Tests that subject details are required if acquisition.specimen_names is not provided"""
 
         # Case where specimen_names is provided - should pass without subject_details
-        acquisition_with_specimen = Acquisition.model_construct(
+        acquisition_with_specimen = _acquisition(
             instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             subject_names={"123456"},
             specimen_names={"123456-001"},
+            subject_details=None,
             data_streams=[],
         )
         metadata_with_specimen = Metadata(
@@ -1275,12 +1320,11 @@ class TestMetadata:
         assert metadata_with_specimen is not None
 
         # Case where specimen_name is not provided and subject_details is provided - should pass
-        acquisition_with_details = Acquisition.model_construct(
+        acquisition_with_details = _acquisition(
             instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             subject_names={"123456"},
             data_streams=[],
-            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
         metadata_with_details = Metadata(
             name="Test Metadata",
@@ -1292,11 +1336,12 @@ class TestMetadata:
         assert metadata_with_details is not None
 
         # Case where neither specimen_name nor subject_details is provided - should fail
-        acquisition_missing_both = Acquisition.model_construct(
+        acquisition_missing_both = _acquisition(
             subject_names={"123456"},
             instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             data_streams=[],
+            subject_details=None,
         )
         with pytest.raises(ValueError) as context:
             Metadata(
@@ -1316,19 +1361,15 @@ class TestWriteStandardFiles:
     @pytest.mark.parametrize("field_name", ["subjects", "procedures"])
     def test_subject_names_are_data_not_filenames(self, tmp_path, field_name, subject_name):
         """Names are serialized inside fixed collection files, never used as paths."""
-        record = (
-            subject.model_copy(update={"subject_name": subject_name})
-            if field_name == "subjects"
-            else Procedures(subject_name=subject_name)
-        )
-        metadata = Metadata.model_construct(
+        metadata = Metadata(
             name="test",
             location="s3://bucket/test",
-            **{field_name: [record]},
+            subjects=[subject.model_copy(update={"subject_name": subject_name})],
+            procedures=[Procedures(subject_name=subject_name)],
         )
         metadata.write_standard_files(output_directory=tmp_path)
         filename = tmp_path / f"{field_name}.json"
-        assert list(tmp_path.iterdir()) == [filename]
+        assert {path.name for path in tmp_path.iterdir()} == {"subjects.json", "procedures.json"}
         assert json.loads(filename.read_text())[0]["subject_name"] == subject_name
 
     @pytest.mark.parametrize("count", [1, 2])
@@ -1336,7 +1377,7 @@ class TestWriteStandardFiles:
         """One file per collection contains all records, even for a single subject."""
         subjects = [subject.model_copy(update={"subject_name": name}) for name in ["123456", "789012"][:count]]
         procedures = [Procedures(subject_name=record.subject_name) for record in subjects]
-        metadata = Metadata.model_construct(name="test", location="", subjects=subjects, procedures=procedures)
+        metadata = Metadata(name="test", location="", subjects=subjects, procedures=procedures)
         metadata.write_standard_files(output_directory=str(tmp_path))
 
         assert {filename.name for filename in tmp_path.iterdir()} == {"subjects.json", "procedures.json"}
@@ -1349,43 +1390,47 @@ class TestWriteStandardFiles:
 
     def test_writes_empty_procedures_array(self, tmp_path):
         """An explicitly empty collection is written as an empty JSON array."""
-        metadata = Metadata.model_construct(name="test", location="", procedures=[])
+        metadata = Metadata(name="test", location="", processing=processing_example, procedures=[])
         metadata.write_standard_files(output_directory=tmp_path)
         assert json.loads((tmp_path / "procedures.json").read_text()) == []
 
     def test_warns_for_large_collection_file(self, tmp_path, caplog):
         """Collection files retain the standard file-size warning."""
-        metadata = Metadata.model_construct(name="test", location="", subjects=[subject])
-        with patch("biodata_schema.core.metadata.MAX_FILE_SIZE", 1):
+        metadata = Metadata(
+            name="test", location="", subjects=[subject], procedures=[Procedures(subject_name=subject.subject_name)]
+        )
+        with patch("biodata_schema.base.MAX_FILE_SIZE", 1):
             metadata.write_standard_files(output_directory=tmp_path)
         assert "File size exceeds" in caplog.text
         assert "subjects.json" in caplog.text
 
     @pytest.mark.parametrize("field_name", ["subjects", "procedures"])
-    @patch("biodata_schema.core.metadata.recursive_check_paths")
+    @patch("biodata_schema.base.recursive_check_paths")
     @patch.object(Path, "open", autospec=True)
     def test_checks_collection_paths(self, mock_open_fn, mock_rcp, field_name):
         """Collection path checks receive the normalized output directory."""
         records = [subject] if field_name == "subjects" else [Procedures(subject_name="123456")]
-        metadata = Metadata.model_construct(name="test", location="", **{field_name: records})
+        metadata = Metadata(
+            name="test", location="", subjects=[subject], procedures=[Procedures(subject_name="123456")]
+        )
         metadata.write_standard_files(output_directory="output_dir")
-        mock_rcp.assert_called_once_with(records, Path("output_dir"))
-        mock_open_fn.assert_called_once_with(Path("output_dir") / f"{field_name}.json", "w")
+        mock_rcp.assert_any_call(records, Path("output_dir"))
+        mock_open_fn.assert_any_call(Path("output_dir") / f"{field_name}.json", "w")
 
     @pytest.mark.parametrize("prefix", [None, "example"])
     @patch.object(Path, "open", autospec=True)
     @patch("biodata_schema.utils.validators.recursive_check_paths")
     def test_writes_each_present_core_file(self, mock_rcp, mock_open_fn, prefix):
         """Write each present collection once and each other present core file once."""
-        m = Metadata.model_construct(
+        m = Metadata(
             name="test",
             location="s3://bucket/test",
-            subjects=[subject],
+            subjects=[subject, subject.model_copy(update={"subject_name": "789012"})],
             procedures=[
-                Procedures.model_construct(subject_name="123456"),
-                Procedures.model_construct(subject_name="789012"),
+                Procedures(subject_name="123456"),
+                Procedures(subject_name="789012"),
             ],
-            data_description=data_description,
+            data_description=data_description.model_copy(update={"subject_names": {"123456", "789012"}}),
             processing=processing_example,
             quality_control=quality_control_example,
         )
@@ -1400,7 +1445,7 @@ class TestWriteStandardFiles:
     @patch("biodata_schema.utils.validators.recursive_check_paths")
     def test_skips_none_fields(self, mock_rcp, mock_open_fn):
         """Fields that are None produce no file writes"""
-        m = Metadata.model_construct(
+        m = Metadata(
             name="test",
             location="s3://bucket/test",
             processing=processing_example,
@@ -1415,10 +1460,11 @@ class TestWriteStandardFiles:
     @patch("biodata_schema.utils.validators.recursive_check_paths")
     def test_output_directory_forwarded(self, mock_rcp, mock_open_fn):
         """output_directory is forwarded to each write_standard_file call"""
-        m = Metadata.model_construct(
+        m = Metadata(
             name="test",
             location="s3://bucket/test",
             subjects=[subject],
+            procedures=[Procedures(subject_name=subject.subject_name)],
             model=model_example,
         )
         m.write_standard_files(output_directory=Path("output_dir"))
