@@ -14,6 +14,10 @@ Each `Procedures` object belongs to one subject. `Metadata.procedures` is a list
 
 `specimen_names` lists the specimens that were used in a procedure. Whole-tissue specimens can use the subject name. There are no specific rules about specimen naming, but we recommend using the `subject_name` as a prefix and adding a unique suffix, such as `<subject_name>_<###>`.
 
+When an acquisition is included in `Metadata`, specimen-procedure inputs must
+be listed in `Acquisition.specimen_names`. Specimen procedures are not required;
+this check does not validate perfusion or sectioning outputs.
+
 ## Examples
 
 - [Generic procedures](https://github.com/AllenNeuralDynamics/biodata-schema/blob/dev/examples/procedures.py)

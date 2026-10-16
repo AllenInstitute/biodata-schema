@@ -10,6 +10,7 @@ from biodata_models.units import SizeUnit
 from biodata_schema.components.coordinates import Axis, CoordinateSystem, Translation
 from biodata_schema.components.devices import Device
 from biodata_schema.components.surgery_procedures import Anaesthetic, DeviceImplant
+from biodata_schema.core.metadata import Metadata
 from biodata_schema.core.procedures import Procedures, Surgery
 
 thermistor_wire = Device(
@@ -66,4 +67,6 @@ if __name__ == "__main__":
 
     serialized = p.model_dump_json()
     deserialized = Procedures.model_validate_json(serialized)
-    deserialized.write_standard_file(prefix="thermistor", output_directory=args.output_dir)
+    Metadata.model_construct(procedures=[deserialized]).write_standard_files(
+        prefix="thermistor", output_directory=args.output_dir
+    )

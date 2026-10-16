@@ -47,9 +47,7 @@ a = Acquisition(
     acquisition_type="Parameter Testing",
     instrument_name="FIP1",
     ethics_review_id=["2115"],
-    subject_details=AcquisitionSubjectDetails(
-        mouse_platform_name="mouse_disc",
-    ),
+    subject_details=[AcquisitionSubjectDetails(subject_name="652567", mouse_platform_name="mouse_disc")],
     data_streams=[
         DataStream(
             stream_start_time=t,

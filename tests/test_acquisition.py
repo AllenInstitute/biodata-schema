@@ -24,6 +24,7 @@ from biodata_schema.core.acquisition import (
     Acquisition,
     AcquisitionSubjectDetails,
     DataStream,
+    Manipulation,
     StimulusEpoch,
 )
 from examples.barseq_acquisition import acquisition as barseq_acquisition
@@ -35,6 +36,53 @@ from examples.mri_acquisition import scan1
 
 class TestAcquisition:
     """Group of tests for the Acquisition class"""
+
+    @pytest.mark.parametrize("field_name", ["subject_details", "manipulations"])
+    def test_subject_references(self, field_name):
+        """Subject-specific records must reference an acquired subject."""
+        if field_name == "subject_details":
+            record = AcquisitionSubjectDetails(subject_name="123456", mouse_platform_name="platform")
+        else:
+            record = Manipulation(
+                subject_name="123456",
+                start_time=barseq_acquisition.acquisition_start_time,
+                end_time=barseq_acquisition.acquisition_end_time,
+            )
+        payload = barseq_acquisition.model_dump() | {field_name: [record]}
+        assert Acquisition.model_validate(payload)
+
+        record = record.model_copy(update={"subject_name": "unknown"})
+        with pytest.raises(ValidationError, match=f"{field_name}.subject_name not in subject_names"):
+            Acquisition.model_validate(payload | {field_name: [record]})
+
+    def test_duplicate_subject_details(self):
+        """There can be only one details record per subject."""
+        details = AcquisitionSubjectDetails(subject_name="123456", mouse_platform_name="platform")
+        with pytest.raises(ValidationError, match="unique subject_name"):
+            Acquisition.model_validate(barseq_acquisition.model_dump() | {"subject_details": [details, details]})
+
+    def test_merge_disjoint_subject_details_and_manipulations(self):
+        """Combining acquisitions retains per-subject details and manipulations."""
+        payload = barseq_acquisition.model_dump() | {"subject_names": {"123456", "789012"}}
+        sources = [
+            Acquisition.model_validate(
+                payload
+                | {
+                    "subject_details": [AcquisitionSubjectDetails(subject_name=name, mouse_platform_name="platform")],
+                    "manipulations": [
+                        Manipulation(
+                            subject_name=name,
+                            start_time=barseq_acquisition.acquisition_start_time,
+                            end_time=barseq_acquisition.acquisition_end_time,
+                        )
+                    ],
+                }
+            )
+            for name in sorted(payload["subject_names"])
+        ]
+        combined = sources[0] + sources[1]
+        assert {details.subject_name for details in combined.subject_details} == payload["subject_names"]
+        assert {record.subject_name for record in combined.manipulations} == payload["subject_names"]
 
     def test_constructors(self):
         """Test constructing acquisition files"""
@@ -128,9 +176,12 @@ class TestAcquisition:
                 subject_names={"123456"},
                 acquisition_type="Test",
                 instrument_name="1234",
-                subject_details=AcquisitionSubjectDetails(
-                    mouse_platform_name="Running wheel",
-                ),
+                subject_details=[
+                    AcquisitionSubjectDetails(
+                        subject_name="123456",
+                        mouse_platform_name="Running wheel",
+                    )
+                ],
                 data_streams=[
                     DataStream(
                         stream_start_time=datetime.now(),
@@ -165,9 +216,12 @@ class TestAcquisition:
             specimen_names={"SP123456"},
             acquisition_type="Test",
             instrument_name="1234",
-            subject_details=AcquisitionSubjectDetails(
-                mouse_platform_name="Running wheel",
-            ),
+            subject_details=[
+                AcquisitionSubjectDetails(
+                    subject_name="123456",
+                    mouse_platform_name="Running wheel",
+                )
+            ],
             data_streams=[
                 DataStream(
                     stream_start_time=datetime.now(),

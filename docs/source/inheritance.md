@@ -7,7 +7,7 @@ The four principles to follow are:
 - If a derived asset is related to a single acquisition, inherit the **Instrument** and **Acquisition** unchanged. Otherwise, drop these files.
 - If a derived asset is related to a single acquisition, *accumulate* **Processing** and **Quality Control**. Otherwise, start these files from scratch in the new asset.
 
-In practice these rules mean that single-subject and multi-subject assets that are analyzed in isolation inherit all the core files from asset to asset while analyses that combine multiple acquisitions drop the initial core files.
+In practice these rules mean that single-subject and multi-subject assets that are analyzed in isolation inherit all the core files from asset to asset while analyses that combine multiple acquisitions from different subjects (or different groups of subjects) drop the initial core files.
 
 Most users can rely on the `Metadata.from_metadata` function which implements all four of these rules for you. Load your core files and validate them as a `Metadata` object as well as any new `Processing` or `QualityControl` core data that was generated during your processing or analysis, then pass all three objects to the function. Call `metadata.write_standard_files()` to output your derived core files.
 
@@ -17,11 +17,11 @@ Note that relying on aggregated reference data (such as the CCF template) in you
 
 Pass `name="<asset-name>"` to `Metadata.from_metadata` or any derivation helper to use any string as the asset name. If omitted, a single source generates:
 
-`<source_name>_<process_label>_YYYYMMDDTHHMMSS+HHMM`
+`<source_name>_<process_label>_YYYYMMDDTHHMMSS`
 
 When a derived asset is used as source data, the helper tries to recover the raw asset name from the standard patter above. If that fails, it appends to the current name. For multiple input sources the default is:
 
-`<project_name>_<process_label>_YYYYMMDDTHHMMSS+HHMM`
+`<project_name>_<process_label>_YYYYMMDDTHHMMSS`
 
 ## Example
 

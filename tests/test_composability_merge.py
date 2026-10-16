@@ -218,10 +218,11 @@ class TestComposability:
         acq1 = self.exaspim_acquisition.model_copy()
         acq2 = self.exaspim_acquisition.model_copy()
         subject_details = AcquisitionSubjectDetails(
+            subject_name=next(iter(acq1.subject_names)),
             mouse_platform_name="mouse_platform_name",
         )
-        acq1.subject_details = subject_details
-        acq2.subject_details = subject_details
+        acq1.subject_details = [subject_details]
+        acq2.subject_details = [subject_details]
 
         with pytest.raises(ValueError) as context:
             acq1 + acq2

@@ -96,9 +96,7 @@ acquisition = Acquisition(
     acquisition_type="3D MRI Volume",
     instrument_name="NA",
     global_coordinate_system=MRI_LPS,
-    subject_details=AcquisitionSubjectDetails(
-        mouse_platform_name="cradle",
-    ),
+    subject_details=[AcquisitionSubjectDetails(subject_name="123456", mouse_platform_name="cradle")],
     data_streams=[stream],
     notes="There was some information about this scan acquisition",
 )

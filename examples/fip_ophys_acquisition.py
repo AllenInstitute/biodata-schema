@@ -349,13 +349,16 @@ acquisition = Acquisition(
     instrument_name="1_FIP1",
     protocol_id=[""],
     ethics_review_id=["2115"],
-    subject_details=AcquisitionSubjectDetails(
-        animal_weight_prior=None,
-        animal_weight_post=None,
-        mouse_platform_name="mouse_tube_foraging",
-        reward_consumed_total=None,
-        reward_consumed_unit=None,
-    ),
+    subject_details=[
+        AcquisitionSubjectDetails(
+            subject_name="687582",
+            animal_weight_prior=None,
+            animal_weight_post=None,
+            mouse_platform_name="mouse_tube_foraging",
+            reward_consumed_total=None,
+            reward_consumed_unit=None,
+        )
+    ],
     data_streams=[data_stream],
     stimulus_epochs=[stimulus_epoch],
     notes="",

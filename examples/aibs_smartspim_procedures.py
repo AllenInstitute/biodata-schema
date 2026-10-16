@@ -9,6 +9,7 @@ from biodata_schema.components.coordinates import CoordinateSystem
 from biodata_schema.components.reagent import Reagent
 from biodata_schema.components.subject_procedures import Perfusion
 from biodata_schema.core import procedures
+from biodata_schema.core.metadata import Metadata
 
 experimenters = ["John Smith"]
 specimen_name = "651286"
@@ -99,4 +100,6 @@ if __name__ == "__main__":
 
     serialized = all_procedures.model_dump_json()
     deserialized = procedures.Procedures.model_validate_json(serialized)
-    deserialized.write_standard_file(prefix="aibs_smartspim", output_directory=args.output_dir)
+    Metadata.model_construct(procedures=[deserialized]).write_standard_files(
+        prefix="aibs_smartspim", output_directory=args.output_dir
+    )

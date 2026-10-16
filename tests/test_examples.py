@@ -33,4 +33,7 @@ class TestExamples:
 
             with example_path.open() as f:
                 json_data = json.load(f)
-            assert isinstance(json_data, dict), f"{example_file} does not contain valid JSON."
+            expected_type = (
+                list if example_file == "subjects.json" or example_file.endswith("procedures.json") else dict
+            )
+            assert isinstance(json_data, expected_type), f"{example_file} has the wrong JSON container."

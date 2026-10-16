@@ -90,9 +90,7 @@ a = Acquisition(
     acquisition_type="BCI Photometry",
     instrument_name="322_bergamo_20220705",
     ethics_review_id=["2115"],
-    subject_details=AcquisitionSubjectDetails(
-        mouse_platform_name="Mouse tube",
-    ),
+    subject_details=[AcquisitionSubjectDetails(subject_name="652567", mouse_platform_name="Mouse tube")],
     global_coordinate_system=BREGMA_ARI,
     data_streams=[
         DataStream(

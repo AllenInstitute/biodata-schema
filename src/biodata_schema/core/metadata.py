@@ -13,6 +13,7 @@ from pydantic import (
     Field,
     PrivateAttr,
     SkipValidation,
+    TypeAdapter,
     ValidationError,
     ValidationInfo,
     field_validator,
@@ -189,6 +190,16 @@ class Metadata(DataCoreModel):
         if self.acquisition and not self.acquisition.specimen_names:
             if not self.acquisition.subject_details:
                 raise ValueError("Acquisition.subject_details are required for in vivo experiments")
+            expected = set(getattr(self.acquisition, "subject_names", []))
+            detail_names = TypeAdapter(set[str]).validate_python(
+                [
+                    details.get("subject_name") if isinstance(details, dict) else details.subject_name
+                    for details in self.acquisition.subject_details
+                ]
+            )
+            missing = expected - detail_names
+            if missing:
+                raise ValueError(f"Acquisition.subject_details missing for subjects: {', '.join(sorted(missing))}")
 
         return self
 
@@ -380,12 +391,29 @@ class Metadata(DataCoreModel):
         mismatches = []
         for field_name, core_model in (("acquisition", self.acquisition), ("data_description", self.data_description)):
             subject_names = getattr(core_model, "subject_names", None)
-            if subject_names is not None and subject_names != expected:
+            if subject_names is not None and TypeAdapter(set[str]).validate_python(subject_names) != expected:
                 mismatches.append(f"{field_name}.subject_names={subject_names}")
 
         if mismatches:
             raise ValueError(f"subject_names mismatch with subjects.subject_name={expected}: {', '.join(mismatches)}")
 
+        return self
+
+    @model_validator(mode="after")
+    def validate_specimen_procedure_inputs(self):
+        """Check specimen-procedure inputs when an acquisition supplies specimen names."""
+        if not self.acquisition:
+            return self
+        acquired_names = TypeAdapter(set[str]).validate_python(self.acquisition.specimen_names or set())
+        for procedures in self.procedures or []:
+            for procedure in procedures.specimen_procedures:
+                names = procedure.get("specimen_names") if isinstance(procedure, dict) else procedure.specimen_names
+                unknown = TypeAdapter(set[str]).validate_python(names) - acquired_names
+                if unknown:
+                    raise ValueError(
+                        f"Specimen procedures for subject {procedures.subject_name} reference specimen_names "
+                        f"not in acquisition.specimen_names: {', '.join(sorted(unknown))}"
+                    )
         return self
 
     @model_validator(mode="after")
@@ -474,13 +502,15 @@ class Metadata(DataCoreModel):
 
         return self
 
-    def write_standard_files(self, output_directory: Optional[Path] = None) -> None:
+    def write_standard_files(self, output_directory: Optional[Path] = None, prefix: Optional[str] = None) -> None:
         """Write core files, with subjects and procedures stored as JSON arrays.
 
         Parameters
         ----------
         output_directory : Optional[Path]
             Optional directory to write files to. Defaults to current directory.
+        prefix : Optional[str]
+            Optional prefix for every filename, matching DataCoreModel.write_standard_file.
         """
         for field_name in CORE_FILES:
             value = getattr(self, field_name, None)
@@ -489,14 +519,14 @@ class Metadata(DataCoreModel):
             if field_name in ("subjects", "procedures"):
                 directory = Path.cwd() if output_directory is None else Path(output_directory)
                 recursive_check_paths(value, directory)
-                filename = directory / f"{field_name}.json"
+                filename = directory / f"{prefix + '_' if prefix else ''}{field_name}.json"
                 serialized = json.dumps([record.model_dump(mode="json") for record in value], indent=3)
                 with filename.open("w") as output_file:
                     output_file.write(serialized)
                 if len(serialized) > MAX_FILE_SIZE:
                     logger.warning(f"File size exceeds {MAX_FILE_SIZE / 1024} KB: {filename}")
             else:
-                value.write_standard_file(output_directory=output_directory)
+                value.write_standard_file(output_directory=output_directory, prefix=prefix)
 
     @classmethod
     def from_metadata(

@@ -1,4 +1,4 @@
-"""example subject"""
+"""Example subjects collection."""
 
 import argparse
 from datetime import datetime, timezone
@@ -7,6 +7,7 @@ from biodata_models.organizations import Organization
 from biodata_models.species import Species, Strain
 
 from biodata_schema.components.subjects import BreedingInfo, Housing, MouseSubject, Sex
+from biodata_schema.core.metadata import Metadata
 from biodata_schema.core.subject import Subject
 
 # If a timezone isn't specified, the timezone of the computer running this
@@ -32,11 +33,25 @@ s = Subject(
     ),
 )
 
+subjects = [
+    s,
+    Subject(
+        subject_name="789012",
+        subject_details=MouseSubject(
+            species=Species.HOUSE_MOUSE,
+            strain=Strain.C57BL_6J,
+            sex=Sex.FEMALE,
+            date_of_birth=t.date(),
+            source=Organization.OTHER,
+            genotype="wt",
+            housing=Housing(home_cage_enrichment=["Running wheel"], cage_id="456"),
+        ),
+    ),
+]
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--output-dir", default=None, help="Output directory for generated JSON file")
     args = parser.parse_args()
 
-    serialized = s.model_dump_json()
-    deserialized = Subject.model_validate_json(serialized)
-    deserialized.write_standard_file(output_directory=args.output_dir)
+    Metadata.model_construct(subjects=subjects).write_standard_files(output_directory=args.output_dir)

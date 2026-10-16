@@ -67,7 +67,7 @@ def _field_schema(source_schema: dict, field_name: str, field_info: Any) -> dict
 def _preserve_array_container(source: dict, item_schema: dict) -> dict:
     """Keep a collection wrapper while replacing its nested item details."""
     if source.get("type") == "array":
-        return {"type": "array", "items": item_schema}
+        return {**copy.deepcopy(source), "items": item_schema}
     if "anyOf" in source:
         array_options = [option for option in source["anyOf"] if option.get("type") == "array"]
         if array_options:
@@ -207,13 +207,28 @@ class SchemaWriter:
         return optional_args
 
     @staticmethod
-    def get_schemas() -> Iterator[DataCoreModel]:
+    def get_schemas() -> Iterator[type[DataCoreModel]]:
         """
         Returns Iterator of DataCoreModel classes
         """
 
         for model in DataCoreModel.__subclasses__():
             yield model
+
+    @staticmethod
+    def schema_filename(model: type[DataCoreModel]) -> str:
+        """Return the published filename for a core schema."""
+        filename = "subjects.json" if model is Subject else model.default_filename()
+        file_extension = "".join(Path(filename).suffixes)
+        return filename.replace(file_extension, "_schema.json")
+
+    @staticmethod
+    def model_schema(model: type[DataCoreModel]) -> dict:
+        """Return the schema for a standard core file, including collection wrappers."""
+        schema = TypeAdapter(list[model]).json_schema() if model in (Subject, Procedures) else model.model_json_schema()
+        if model is Subject:
+            schema["minItems"] = 1
+        return schema
 
     def write_to_json(self) -> None:
         """
@@ -222,9 +237,7 @@ class SchemaWriter:
         schemas_to_write = self.get_schemas()
         output_path = self.configs.output
         for schema in schemas_to_write:
-            filename = "subjects.json" if schema is Subject else schema.default_filename()
-            file_extension = "".join(Path(filename).suffixes)
-            schema_filename = filename.replace(file_extension, "_schema.json")
+            schema_filename = self.schema_filename(schema)
             if self.configs.attach_version:
                 schema_version = schema.model_construct().schema_version
                 model_directory_name = schema_filename.replace("_schema.json", "")
@@ -237,13 +250,7 @@ class SchemaWriter:
                 os.makedirs(output_file.parent)
 
             with open(output_file, "w") as f:
-                schema_json: dict = (
-                    TypeAdapter(list[schema]).json_schema()
-                    if schema in (Subject, Procedures)
-                    else schema.model_json_schema()
-                )
-                if schema is Subject:
-                    schema_json["minItems"] = 1
+                schema_json = self.model_schema(schema)
                 schema_json_str: str = json.dumps(schema_json, indent=3)
                 f.write(schema_json_str)
 

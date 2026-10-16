@@ -29,7 +29,7 @@ from examples.data_description import d as example_data_description
 from examples.ephys_instrument import inst as example_inst
 from examples.processing import p as example_processing
 from examples.quality_control import q as example_qc
-from examples.subject import s as example_subject
+from examples.subjects import s as example_subject
 
 t = datetime(2022, 11, 22, 8, 43, 00, tzinfo=timezone.utc)
 

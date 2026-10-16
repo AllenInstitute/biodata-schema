@@ -17,6 +17,7 @@ from biodata_schema.components.connections import Connection
 from biodata_schema.components.coordinates import CoordinateSystem
 from biodata_schema.components.devices import EphysAssembly, EphysProbe, Laser, Manipulator
 from biodata_schema.components.identifiers import Code, Database, Person
+from biodata_schema.components.specimen_procedures import SpecimenProcedure
 from biodata_schema.components.subject_procedures import TrainingProtocol
 from biodata_schema.components.subjects import BreedingInfo, CalibrationObject, Housing, MouseSubject, Sex, Species
 from biodata_schema.components.surgery_procedures import BrainInjection
@@ -34,7 +35,7 @@ from examples.ephys_instrument import inst as ephys_inst
 from examples.model import m as model_example
 from examples.processing import p as processing_example
 from examples.quality_control import q as quality_control_example
-from examples.subject import s as subject
+from examples.subjects import s as subject
 
 ephys_assembly = EphysAssembly(
     probes=[EphysProbe(probe_model="Neuropixels 1.0", name="Probe A")],
@@ -130,6 +131,107 @@ class TestMetadata:
         """Tests that the default file extension used is as expected."""
         assert ".nd.json" == Metadata._FILE_EXTENSION.default
 
+    @pytest.mark.parametrize("field_name", ["data_description", "acquisition"])
+    @pytest.mark.parametrize("in_vivo", [False, True])
+    def test_fallback_subject_names_accept_json_arrays(self, field_name, in_vivo, caplog):
+        """An unrelated invalid core field must not turn matching list rosters into mismatches."""
+        if field_name == "data_description":
+            payload = self.dd.model_dump() | {"funding_source": []}
+        else:
+            payload = barseq_acquisition.model_dump() | {"data_streams": []}
+            payload.pop("acquisition_type")
+            if in_vivo:
+                payload.update(
+                    specimen_names=None,
+                    subject_details=[{"subject_name": "123456", "mouse_platform_name": "platform"}],
+                    manipulations=[
+                        {
+                            "subject_name": "123456",
+                            "start_time": barseq_acquisition.acquisition_start_time,
+                            "end_time": barseq_acquisition.acquisition_end_time,
+                        }
+                    ],
+                )
+        payload["subject_names"] = ["123456"]
+        metadata = Metadata(
+            name="partial",
+            location="",
+            subjects=[self.subject],
+            procedures=[self.procedures],
+            **{field_name: payload},
+        )
+        assert getattr(metadata, field_name).subject_names == ["123456"]
+        assert f"Error in validating {field_name}" in caplog.text
+
+    @pytest.mark.parametrize("subject_names", ["123456", [None], [{}]])
+    def test_fallback_rejects_malformed_subject_names(self, subject_names):
+        """Normalization must not interpret a scalar string as a collection of characters."""
+        with pytest.raises(ValidationError):
+            Metadata(
+                name="partial",
+                location="",
+                subjects=[self.subject],
+                procedures=[self.procedures],
+                data_description=self.dd.model_dump() | {"subject_names": subject_names, "funding_source": []},
+            )
+
+    @pytest.mark.parametrize("include_acquisition", [False, True])
+    @pytest.mark.parametrize("specimen_names", [{"123456_bar001"}, {"unknown"}, set()])
+    def test_specimen_procedure_inputs(self, include_acquisition, specimen_names):
+        """Only specimen-procedure inputs are checked against acquired specimens."""
+        procedures = Procedures(
+            subject_name="123456",
+            specimen_procedures=[
+                SpecimenProcedure(
+                    procedure_type="Other",
+                    specimen_names=specimen_names,
+                    start_date="2020-01-01",
+                    end_date="2020-01-01",
+                    notes="Example preparation",
+                )
+            ]
+            if specimen_names
+            else [],
+        )
+        kwargs = dict(
+            name="specimens",
+            location="",
+            subjects=[self.subject],
+            procedures=[procedures],
+            acquisition=barseq_acquisition if include_acquisition else None,
+        )
+        if include_acquisition and specimen_names == {"unknown"}:
+            with pytest.raises(ValidationError, match="not in acquisition.specimen_names"):
+                Metadata(**kwargs)
+        else:
+            assert Metadata(**kwargs)
+
+    def test_in_vivo_subject_details_cover_roster(self):
+        """Every in-vivo subject requires a details record, not just one subject in the group."""
+        acquisition = Acquisition.model_validate(
+            barseq_acquisition.model_dump()
+            | {
+                "subject_names": {"123456", "789012"},
+                "specimen_names": None,
+                "data_streams": [],
+                "subject_details": [AcquisitionSubjectDetails(subject_name="123456", mouse_platform_name="platform")],
+            }
+        )
+        roster = [self.subject, self.subject.model_copy(update={"subject_name": "789012"})]
+        kwargs = dict(
+            name="in-vivo",
+            location="",
+            subjects=roster,
+            procedures=[Procedures(subject_name=subject.subject_name) for subject in roster],
+            acquisition=acquisition,
+        )
+        with pytest.raises(ValidationError, match="subject_details missing for subjects: 789012"):
+            Metadata(**kwargs)
+        acquisition.subject_details.append(
+            AcquisitionSubjectDetails(subject_name="789012", mouse_platform_name="platform")
+        )
+        assert Metadata(**kwargs)
+
     def test_raw_description_missing_name_when_nested(self, caplog):
         """An incomplete nested description logs validation failure without generating a name."""
         metadata = Metadata(
@@ -164,7 +266,7 @@ class TestMetadata:
                 ],
                 acquisition=Acquisition.model_construct(
                     acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
-                    subject_details=AcquisitionSubjectDetails.model_construct(),
+                    subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
                 ),
                 instrument=self.spim_instrument,
                 processing=Processing.model_construct(),
@@ -197,7 +299,7 @@ class TestMetadata:
                 acquisition=Acquisition.model_construct(
                     instrument_name="323_EPHYS1_20231003",
                     acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
-                    subject_details=AcquisitionSubjectDetails.model_construct(),
+                    subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
                 ),
             )
         assert "Injection is missing injection_materials." in str(context.value)
@@ -229,7 +331,7 @@ class TestMetadata:
                 acquisition=Acquisition.model_construct(
                     instrument_name="123_EPHYS2_20230101",
                     acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
-                    subject_details=AcquisitionSubjectDetails.model_construct(mouse_platform_name="platform1"),
+                    subject_details=[AcquisitionSubjectDetails(subject_name="123456", mouse_platform_name="platform1")],
                     data_streams=[],
                 ),
             )
@@ -330,7 +432,7 @@ class TestMetadata:
                 acquisition=Acquisition.model_construct(
                     acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
                     subject_names=subject_names,
-                    subject_details=AcquisitionSubjectDetails.model_construct(),
+                    specimen_names={"specimen"},
                     data_streams=[],
                 ),
             )
@@ -458,7 +560,7 @@ class TestMetadata:
             data_streams=[
                 DataStream.model_construct(active_devices=["Probe A", "Laser A"], modalities=[], configurations=[]),
             ],
-            subject_details=AcquisitionSubjectDetails.model_construct(),
+            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
         metadata = Metadata(
             name="Test Metadata",
@@ -482,7 +584,7 @@ class TestMetadata:
                     connections=[Connection(source_device="Probe A", target_device="Missing Device")],
                 ),
             ],
-            subject_details=AcquisitionSubjectDetails.model_construct(),
+            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
         with pytest.raises(ValueError) as context:
             Metadata(
@@ -507,7 +609,7 @@ class TestMetadata:
                     connections=[Connection(source_device="Missing Source", target_device="Laser A")],
                 ),
             ],
-            subject_details=AcquisitionSubjectDetails.model_construct(),
+            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
         with pytest.raises(ValueError) as context:
             Metadata(
@@ -537,7 +639,7 @@ class TestMetadata:
             data_streams=[
                 DataStream.model_construct(active_devices=["Probe A", "Laser A"], modalities=[], configurations=[]),
             ],
-            subject_details=AcquisitionSubjectDetails.model_construct(),
+            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
         metadata = Metadata(
             name="Test Metadata",
@@ -558,7 +660,7 @@ class TestMetadata:
                     active_devices=["Probe A", "Missing Device"], modalities=[], configurations=[]
                 ),
             ],
-            subject_details=AcquisitionSubjectDetails.model_construct(),
+            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
         with pytest.raises(ValueError) as context:
             Metadata(
@@ -588,7 +690,7 @@ class TestMetadata:
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             stimulus_epochs=[stimulus_epoch],
             data_streams=[],
-            subject_details=AcquisitionSubjectDetails.model_construct(),
+            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
 
         metadata = Metadata(
@@ -607,7 +709,7 @@ class TestMetadata:
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             stimulus_epochs=[stimulus_epoch_invalid],
             data_streams=[],
-            subject_details=AcquisitionSubjectDetails.model_construct(),
+            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
 
         with pytest.warns(UserWarning) as w:
@@ -650,7 +752,7 @@ class TestMetadata:
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             data_streams=[],
             stimulus_epochs=[stimulus_epoch_none],
-            subject_details=AcquisitionSubjectDetails.model_construct(),
+            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
 
         metadata_none = Metadata(
@@ -695,7 +797,7 @@ class TestMetadata:
             acquisition_start_time=datetime(2023, 4, 3, 18, 0, tzinfo=timezone.utc),
             acquisition_end_time=datetime(2023, 4, 3, 18, 17, 9, tzinfo=timezone.utc),
             data_streams=[],
-            subject_details=AcquisitionSubjectDetails.model_construct(),
+            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
         metadata = Metadata(
             name=name,
@@ -733,7 +835,7 @@ class TestMetadata:
             acquisition_start_time=datetime(2023, 4, 3, 18, 0, 0, tzinfo=timezone.utc),
             acquisition_end_time=test_datetime,
             data_streams=[],
-            subject_details=AcquisitionSubjectDetails.model_construct(),
+            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
 
         # This should pass - creation time is exactly at acquisition end time
@@ -862,7 +964,7 @@ class TestMetadata:
             acquisition_start_time=acquisition_start,
             acquisition_end_time=acquisition_end,
             data_streams=[],
-            subject_details=AcquisitionSubjectDetails.model_construct(),
+            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
 
         # Test case where subject's date_of_birth is before acquisition (should pass)
@@ -941,7 +1043,7 @@ class TestMetadata:
             acquisition_start_time=acquisition_start,
             acquisition_end_time=acquisition_end,
             data_streams=[],
-            subject_details=AcquisitionSubjectDetails.model_construct(),
+            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
 
         # Test case where processing times are after acquisition (should pass)
@@ -1210,7 +1312,7 @@ class TestMetadata:
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             subject_names={"123456"},
             data_streams=[],
-            subject_details=AcquisitionSubjectDetails.model_construct(),
+            subject_details=[AcquisitionSubjectDetails.model_construct(subject_name="123456")],
         )
         metadata_with_details = Metadata(
             name="Test Metadata",
@@ -1302,9 +1404,10 @@ class TestWriteStandardFiles:
         mock_rcp.assert_called_once_with(records, Path("output_dir"))
         mock_open_fn.assert_called_once_with(Path("output_dir") / f"{field_name}.json", "w")
 
+    @pytest.mark.parametrize("prefix", [None, "example"])
     @patch.object(Path, "open", autospec=True)
     @patch("biodata_schema.utils.validators.recursive_check_paths")
-    def test_writes_each_present_core_file(self, mock_rcp, mock_open_fn):
+    def test_writes_each_present_core_file(self, mock_rcp, mock_open_fn, prefix):
         """Write each present collection once and each other present core file once."""
         m = Metadata.model_construct(
             name="test",
@@ -1318,14 +1421,11 @@ class TestWriteStandardFiles:
             processing=processing_example,
             quality_control=quality_control_example,
         )
-        m.write_standard_files()
+        m.write_standard_files(prefix=prefix)
 
         opened_files = [call_args[0][0].name for call_args in mock_open_fn.call_args_list]
-        assert "subjects.json" in opened_files
-        assert "procedures.json" in opened_files
-        assert "data_description.json" in opened_files
-        assert "processing.json" in opened_files
-        assert "quality_control.json" in opened_files
+        for name in ("subjects", "procedures", "data_description", "processing", "quality_control"):
+            assert f"{prefix + '_' if prefix else ''}{name}.json" in opened_files
         assert 5 == mock_open_fn.call_count
 
     @patch.object(Path, "open", autospec=True)

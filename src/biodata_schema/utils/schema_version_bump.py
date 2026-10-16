@@ -9,6 +9,7 @@ import dictdiffer
 import semver
 
 from biodata_schema.base import DataCoreModel
+from biodata_schema.core.subject import Subject
 from biodata_schema.utils.json_writer import SchemaWriter
 
 CURRENT_DIR = Path(os.path.dirname(os.path.realpath(__file__)))
@@ -34,7 +35,7 @@ class SchemaVersionHandler:
         self.commit_message = commit_message
         self.json_schemas_location = json_schemas_location
 
-    def _get_schema_json(self, model: DataCoreModel) -> dict:
+    def _get_schema_json(self, model: type[DataCoreModel]) -> dict:
         """
         Get the json schema of a model
         Parameters
@@ -47,10 +48,10 @@ class SchemaVersionHandler:
         dict
           The json schema of the model
         """
-        default_filename = model.default_filename()
-        if default_filename.find(".") != -1:
-            schema_filename = default_filename[: default_filename.find(".")] + "_schema.json"
-        main_branch_schema_path = self.json_schemas_location / schema_filename
+        main_branch_schema_path = self.json_schemas_location / SchemaWriter.schema_filename(model)
+        if model is Subject and not main_branch_schema_path.exists():
+            # Releases predating collection files used the singular filename.
+            main_branch_schema_path = self.json_schemas_location / "subject_schema.json"
         if main_branch_schema_path.exists():
             with open(main_branch_schema_path, "r") as f:
                 main_branch_schema_contents = json.load(f)
@@ -58,7 +59,7 @@ class SchemaVersionHandler:
             raise FileNotFoundError(f"Schema file not found: {main_branch_schema_path}")
         return main_branch_schema_contents
 
-    def _get_list_of_models_that_changed(self) -> List[DataCoreModel]:
+    def _get_list_of_models_that_changed(self) -> List[type[DataCoreModel]]:
         """
         Get a list of core models that have been updated by comparing the json
         schema of the models to the json schema in the schemas folder.
@@ -69,7 +70,7 @@ class SchemaVersionHandler:
         """
         schemas_that_need_updating = []
         for core_model in SchemaWriter.get_schemas():
-            core_model_json = json.loads(json.dumps(core_model.model_json_schema()))
+            core_model_json = json.loads(json.dumps(SchemaWriter.model_schema(core_model)))
             original_schema = self._get_schema_json(core_model)
 
             diff_list = list(dictdiffer.diff(original_schema, core_model_json))
@@ -79,7 +80,9 @@ class SchemaVersionHandler:
 
         return schemas_that_need_updating
 
-    def _get_incremented_versions_map(self, models_that_changed: List[DataCoreModel]) -> Dict[DataCoreModel, str]:
+    def _get_incremented_versions_map(
+        self, models_that_changed: List[type[DataCoreModel]]
+    ) -> Dict[type[DataCoreModel], str]:
         """
 
         Parameters
@@ -98,6 +101,9 @@ class SchemaVersionHandler:
             # We only want to bump the patch if the major or minor versions didn't already change
             # Load the current version of the model
             original_schema = self._get_schema_json(model)
+            if original_schema.get("type") == "array":
+                reference = original_schema["items"]["$ref"].removeprefix("#/$defs/")
+                original_schema = original_schema["$defs"][reference]
             schema_version = original_schema.get("properties", {}).get("schema_version", {}).get("default")
             if schema_version:
                 orig_ver = semver.Version.parse(schema_version)
@@ -164,7 +170,7 @@ class SchemaVersionHandler:
             for line in new_file_contents:
                 f.write(line)
 
-    def _update_files(self, version_bump_map: Dict[DataCoreModel, str]) -> None:
+    def _update_files(self, version_bump_map: Dict[type[DataCoreModel], str]) -> None:
         """
         Using the information in the version_bump_map, will update the python
         files in the core directory.

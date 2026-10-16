@@ -6,11 +6,10 @@ The `subjects.json` file contains a list of `Subject` objects describing the sub
 
 ## Example
 
-```{literalinclude} ../../examples/subject.py
+```{literalinclude} ../../examples/subjects.py
 :language: python
 :linenos:
 ```
-
 
 ## Core file
 

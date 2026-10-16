@@ -1,4 +1,4 @@
-"""ephys procedure mouse 625100"""
+"""Example procedures collection for two subjects."""
 
 import argparse
 from datetime import datetime, timezone
@@ -30,6 +30,7 @@ from biodata_schema.components.surgery_procedures import (
     Perfusion,
     ProbeImplant,
 )
+from biodata_schema.core.metadata import Metadata
 from biodata_schema.core.procedures import (
     Procedures,
     Surgery,
@@ -180,11 +181,25 @@ p = Procedures(
     ],
 )
 
+procedures = [
+    p,
+    Procedures(
+        subject_name="789012",
+        subject_procedures=[
+            Surgery(
+                start_date=t2.date(),
+                experimenters=["Scientist Smith"],
+                ethics_review_id="2109",
+                protocol_id="doi",
+                procedures=[Perfusion(protocol_id="doi_of_protocol", output_specimen_names=["789012"])],
+            )
+        ],
+    ),
+]
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--output-dir", default=None, help="Output directory for generated JSON file")
     args = parser.parse_args()
 
-    serialized = p.model_dump_json()
-    deserialized = Procedures.model_validate_json(serialized)
-    deserialized.write_standard_file(output_directory=args.output_dir)
+    Metadata.model_construct(procedures=procedures).write_standard_files(output_directory=args.output_dir)

@@ -16,6 +16,7 @@ subjects or specimens in an asset use plural names and collections:
 | `SpecimenProcedure` | `specimen_name: str or List[str]` | `specimen_names: set[str]` |
 | `Metadata` | `subject: Subject` | `subjects: List[Subject]` |
 | `Metadata` | `procedures: Procedures` | `procedures: List[Procedures]` |
+| `Acquisition` | `subject_details: AcquisitionSubjectDetails` | `subject_details: List[AcquisitionSubjectDetails]` |
 
 Use a collection even when there is only one name. In Python, write
 `subject_names={"123456"}`. In JSON, write `"subject_names": ["123456"]`.
@@ -41,6 +42,24 @@ procedures, and procedures for a subject outside the roster are rejected.
 Acquisition and data-description subject names must match the subject roster
 when those names are present. Subject-free assets may omit procedures or use an
 empty list.
+
+Normal validation converts JSON name arrays into sets. The permissive metadata
+fallback uses `model_construct`, which preserves the supplied values without
+conversion; name comparisons therefore also accept raw JSON arrays and ignore
+their order.
+
+### Subject-specific acquisition records
+
+Both `Manipulation` and `AcquisitionSubjectDetails` now require `subject_name`,
+which must be a member of `Acquisition.subject_names`. Wrap acquisition subject
+details in a list even for one subject. Duplicate details for a subject are
+rejected, and in-vivo metadata requires one details record for every acquired
+subject.
+
+When acquisition metadata and specimen procedures are both present, every
+`SpecimenProcedure.specimen_names` input must belong to
+`Acquisition.specimen_names`. This check does not require specimen procedures,
+infer subject-to-specimen mappings, or validate perfusion and sectioning outputs.
 
 Old fields are not converted automatically. Rename them before validation.
 In particular, the old `Metadata.subject` field is ignored, not moved into
@@ -89,3 +108,10 @@ models still describe individual records.
 ## Data Asset Naming
 
 Asset names can now be any string; they no longer need to match a naming regex.
+`DataDescription.name` is required and is no longer generated automatically.
+Supply it explicitly, including for raw assets.
+
+## Removed fields
+
+`DataDescription.group` has been removed. Remove it from existing data
+descriptions before validation; it is no longer copied by derivation helpers.

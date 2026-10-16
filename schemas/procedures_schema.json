@@ -487,6 +487,7 @@
                            "Abcam": "#/$defs/_Abcam",
                            "Addgene": "#/$defs/_Addgene",
                            "Ailipu Technology Co": "#/$defs/_Ailipu_Technology_Co",
+                           "Aligning Science Across Parkinson's": "#/$defs/_Aligning_Science_Across_Parkinson_S",
                            "Allen Institute": "#/$defs/_Allen_Institute",
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
@@ -519,11 +520,14 @@
                            "Ealing": "#/$defs/_Ealing",
                            "Edmund Optics": "#/$defs/_Edmund_Optics",
                            "Emory University": "#/$defs/_Emory_University",
+                           "Esther A. & Joseph Klingenstein Fund": "#/$defs/_Esther_A_Joseph_Klingenstein_Fund",
                            "Euresys": "#/$defs/_Euresys",
                            "Excelitas Technologies": "#/$defs/_Excelitas_Technologies",
                            "Fujinon": "#/$defs/_Fujinon",
+                           "G. Harold & Leila Y. Mathers Foundation": "#/$defs/_G_Harold_Leila_Y_Mathers_Foundation",
                            "Hamamatsu": "#/$defs/_Hamamatsu",
                            "Hamilton": "#/$defs/_Hamilton",
+                           "Helen Hay Whitney Foundation": "#/$defs/_Helen_Hay_Whitney_Foundation",
                            "Huazhong University of Science and Technology": "#/$defs/_Huazhong_University_Of_Science_And_Technology",
                            "IR Robot Co": "#/$defs/_Ir_Robot_Co",
                            "ISL Products International": "#/$defs/_Isl_Products_International",
@@ -538,10 +542,12 @@
                            "Johns Hopkins University": "#/$defs/_Johns_Hopkins_University",
                            "Julabo": "#/$defs/_Julabo",
                            "Kent Scientific Corporation": "#/$defs/_Kent_Scientific_Corporation",
+                           "Klingenstein Third Generation Foundation": "#/$defs/_Klingenstein_Third_Generation_Foundation",
                            "Kowa": "#/$defs/_Kowa",
                            "LASOS Lasertechnik": "#/$defs/_Lasos_Lasertechnik",
                            "LG": "#/$defs/_Lg",
                            "Leica": "#/$defs/_Leica",
+                           "Life Sciences Research Foundation": "#/$defs/_Life_Sciences_Research_Foundation",
                            "LifeCanvas": "#/$defs/_Lifecanvas",
                            "Lumen Dynamics": "#/$defs/_Lumen_Dynamics",
                            "Lumencor": "#/$defs/_Lumencor",
@@ -551,6 +557,8 @@
                            "MPI": "#/$defs/_Mpi",
                            "Massachusetts Institute of Technology": "#/$defs/_Massachusetts_Institute_Of_Technology",
                            "McGovern Institute for Brain Research": "#/$defs/_Mcgovern_Institute_For_Brain_Research",
+                           "McKnight Brain Research Foundation": "#/$defs/_Mcknight_Brain_Research_Foundation",
+                           "McKnight Foundation": "#/$defs/_Mcknight_Foundation",
                            "Meadowlark Optics": "#/$defs/_Meadowlark_Optics",
                            "Michael J. Fox Foundation for Parkinson's Research": "#/$defs/_Michael_J_Fox_Foundation_For_Parkinson_S_Research",
                            "Midwest Optical Systems, Inc.": "#/$defs/_Midwest_Optical_Systems_Inc_",
@@ -560,6 +568,7 @@
                            "National Center for Complementary and Integrative Health": "#/$defs/_National_Center_For_Complementary_And_Integrative_Health",
                            "National Institute of Mental Health": "#/$defs/_National_Institute_Of_Mental_Health",
                            "National Institute of Neurological Disorders and Stroke": "#/$defs/_National_Institute_Of_Neurological_Disorders_And_Stroke",
+                           "National Institute on Aging": "#/$defs/_National_Institute_On_Aging",
                            "National Instruments": "#/$defs/_National_Instruments",
                            "Navitar": "#/$defs/_Navitar",
                            "NeuraLynx": "#/$defs/_Neuralynx",
@@ -573,6 +582,7 @@
                            "Other": "#/$defs/_Other",
                            "Oxford Instruments": "#/$defs/_Oxford_Instruments",
                            "Oxxius": "#/$defs/_Oxxius",
+                           "Pew Charitable Trusts": "#/$defs/_Pew_Charitable_Trusts",
                            "Placid Industries": "#/$defs/_Placid_Industries",
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
@@ -602,11 +612,16 @@
                            "Thorlabs": "#/$defs/_Thorlabs",
                            "Transducer Techniques": "#/$defs/_Transducer_Techniques",
                            "Tymphany": "#/$defs/_Tymphany",
+                           "U.S. National Science Foundation": "#/$defs/_U_S_National_Science_Foundation",
+                           "United States Department of Defense": "#/$defs/_United_States_Department_Of_Defense",
+                           "United States Department of Energy": "#/$defs/_United_States_Department_Of_Energy",
                            "University of California, San Diego": "#/$defs/_University_Of_California_San_Diego",
                            "University of Pennsylvania": "#/$defs/_University_Of_Pennsylvania",
                            "Unknown": "#/$defs/_Unknown",
                            "Vieworks": "#/$defs/_Vieworks",
                            "Vortran": "#/$defs/_Vortran",
+                           "W. M. Keck Foundation": "#/$defs/_W_M_Keck_Foundation",
+                           "Warren Alpert Foundation": "#/$defs/_Warren_Alpert_Foundation",
                            "World Precision Intstruments": "#/$defs/_World_Precision_Intstruments",
                            "ams OSRAM": "#/$defs/_Ams_Osram"
                         },
@@ -627,6 +642,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Ailipu_Technology_Co"
+                        },
+                        {
+                           "$ref": "#/$defs/_Aligning_Science_Across_Parkinson_S"
                         },
                         {
                            "$ref": "#/$defs/_Allen_Institute"
@@ -725,6 +743,9 @@
                            "$ref": "#/$defs/_Emory_University"
                         },
                         {
+                           "$ref": "#/$defs/_Esther_A_Joseph_Klingenstein_Fund"
+                        },
+                        {
                            "$ref": "#/$defs/_Euresys"
                         },
                         {
@@ -734,10 +755,16 @@
                            "$ref": "#/$defs/_Fujinon"
                         },
                         {
+                           "$ref": "#/$defs/_G_Harold_Leila_Y_Mathers_Foundation"
+                        },
+                        {
                            "$ref": "#/$defs/_Hamamatsu"
                         },
                         {
                            "$ref": "#/$defs/_Hamilton"
+                        },
+                        {
+                           "$ref": "#/$defs/_Helen_Hay_Whitney_Foundation"
                         },
                         {
                            "$ref": "#/$defs/_Huazhong_University_Of_Science_And_Technology"
@@ -782,6 +809,9 @@
                            "$ref": "#/$defs/_Kent_Scientific_Corporation"
                         },
                         {
+                           "$ref": "#/$defs/_Klingenstein_Third_Generation_Foundation"
+                        },
+                        {
                            "$ref": "#/$defs/_Kowa"
                         },
                         {
@@ -792,6 +822,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Leica"
+                        },
+                        {
+                           "$ref": "#/$defs/_Life_Sciences_Research_Foundation"
                         },
                         {
                            "$ref": "#/$defs/_Lifecanvas"
@@ -821,6 +854,12 @@
                            "$ref": "#/$defs/_Mcgovern_Institute_For_Brain_Research"
                         },
                         {
+                           "$ref": "#/$defs/_Mcknight_Brain_Research_Foundation"
+                        },
+                        {
+                           "$ref": "#/$defs/_Mcknight_Foundation"
+                        },
+                        {
                            "$ref": "#/$defs/_Meadowlark_Optics"
                         },
                         {
@@ -846,6 +885,9 @@
                         },
                         {
                            "$ref": "#/$defs/_National_Institute_Of_Neurological_Disorders_And_Stroke"
+                        },
+                        {
+                           "$ref": "#/$defs/_National_Institute_On_Aging"
                         },
                         {
                            "$ref": "#/$defs/_National_Instruments"
@@ -885,6 +927,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Oxxius"
+                        },
+                        {
+                           "$ref": "#/$defs/_Pew_Charitable_Trusts"
                         },
                         {
                            "$ref": "#/$defs/_Placid_Industries"
@@ -974,6 +1019,15 @@
                            "$ref": "#/$defs/_Tymphany"
                         },
                         {
+                           "$ref": "#/$defs/_U_S_National_Science_Foundation"
+                        },
+                        {
+                           "$ref": "#/$defs/_United_States_Department_Of_Defense"
+                        },
+                        {
+                           "$ref": "#/$defs/_United_States_Department_Of_Energy"
+                        },
+                        {
                            "$ref": "#/$defs/_University_Of_California_San_Diego"
                         },
                         {
@@ -987,6 +1041,12 @@
                         },
                         {
                            "$ref": "#/$defs/_Vortran"
+                        },
+                        {
+                           "$ref": "#/$defs/_W_M_Keck_Foundation"
+                        },
+                        {
+                           "$ref": "#/$defs/_Warren_Alpert_Foundation"
                         },
                         {
                            "$ref": "#/$defs/_World_Precision_Intstruments"
@@ -1117,6 +1177,7 @@
                      "Abcam": "#/$defs/_Abcam",
                      "Addgene": "#/$defs/_Addgene",
                      "Ailipu Technology Co": "#/$defs/_Ailipu_Technology_Co",
+                     "Aligning Science Across Parkinson's": "#/$defs/_Aligning_Science_Across_Parkinson_S",
                      "Allen Institute": "#/$defs/_Allen_Institute",
                      "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                      "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
@@ -1149,11 +1210,14 @@
                      "Ealing": "#/$defs/_Ealing",
                      "Edmund Optics": "#/$defs/_Edmund_Optics",
                      "Emory University": "#/$defs/_Emory_University",
+                     "Esther A. & Joseph Klingenstein Fund": "#/$defs/_Esther_A_Joseph_Klingenstein_Fund",
                      "Euresys": "#/$defs/_Euresys",
                      "Excelitas Technologies": "#/$defs/_Excelitas_Technologies",
                      "Fujinon": "#/$defs/_Fujinon",
+                     "G. Harold & Leila Y. Mathers Foundation": "#/$defs/_G_Harold_Leila_Y_Mathers_Foundation",
                      "Hamamatsu": "#/$defs/_Hamamatsu",
                      "Hamilton": "#/$defs/_Hamilton",
+                     "Helen Hay Whitney Foundation": "#/$defs/_Helen_Hay_Whitney_Foundation",
                      "Huazhong University of Science and Technology": "#/$defs/_Huazhong_University_Of_Science_And_Technology",
                      "IR Robot Co": "#/$defs/_Ir_Robot_Co",
                      "ISL Products International": "#/$defs/_Isl_Products_International",
@@ -1168,10 +1232,12 @@
                      "Johns Hopkins University": "#/$defs/_Johns_Hopkins_University",
                      "Julabo": "#/$defs/_Julabo",
                      "Kent Scientific Corporation": "#/$defs/_Kent_Scientific_Corporation",
+                     "Klingenstein Third Generation Foundation": "#/$defs/_Klingenstein_Third_Generation_Foundation",
                      "Kowa": "#/$defs/_Kowa",
                      "LASOS Lasertechnik": "#/$defs/_Lasos_Lasertechnik",
                      "LG": "#/$defs/_Lg",
                      "Leica": "#/$defs/_Leica",
+                     "Life Sciences Research Foundation": "#/$defs/_Life_Sciences_Research_Foundation",
                      "LifeCanvas": "#/$defs/_Lifecanvas",
                      "Lumen Dynamics": "#/$defs/_Lumen_Dynamics",
                      "Lumencor": "#/$defs/_Lumencor",
@@ -1181,6 +1247,8 @@
                      "MPI": "#/$defs/_Mpi",
                      "Massachusetts Institute of Technology": "#/$defs/_Massachusetts_Institute_Of_Technology",
                      "McGovern Institute for Brain Research": "#/$defs/_Mcgovern_Institute_For_Brain_Research",
+                     "McKnight Brain Research Foundation": "#/$defs/_Mcknight_Brain_Research_Foundation",
+                     "McKnight Foundation": "#/$defs/_Mcknight_Foundation",
                      "Meadowlark Optics": "#/$defs/_Meadowlark_Optics",
                      "Michael J. Fox Foundation for Parkinson's Research": "#/$defs/_Michael_J_Fox_Foundation_For_Parkinson_S_Research",
                      "Midwest Optical Systems, Inc.": "#/$defs/_Midwest_Optical_Systems_Inc_",
@@ -1190,6 +1258,7 @@
                      "National Center for Complementary and Integrative Health": "#/$defs/_National_Center_For_Complementary_And_Integrative_Health",
                      "National Institute of Mental Health": "#/$defs/_National_Institute_Of_Mental_Health",
                      "National Institute of Neurological Disorders and Stroke": "#/$defs/_National_Institute_Of_Neurological_Disorders_And_Stroke",
+                     "National Institute on Aging": "#/$defs/_National_Institute_On_Aging",
                      "National Instruments": "#/$defs/_National_Instruments",
                      "Navitar": "#/$defs/_Navitar",
                      "NeuraLynx": "#/$defs/_Neuralynx",
@@ -1203,6 +1272,7 @@
                      "Other": "#/$defs/_Other",
                      "Oxford Instruments": "#/$defs/_Oxford_Instruments",
                      "Oxxius": "#/$defs/_Oxxius",
+                     "Pew Charitable Trusts": "#/$defs/_Pew_Charitable_Trusts",
                      "Placid Industries": "#/$defs/_Placid_Industries",
                      "Prizmatix": "#/$defs/_Prizmatix",
                      "Quantifi": "#/$defs/_Quantifi",
@@ -1232,11 +1302,16 @@
                      "Thorlabs": "#/$defs/_Thorlabs",
                      "Transducer Techniques": "#/$defs/_Transducer_Techniques",
                      "Tymphany": "#/$defs/_Tymphany",
+                     "U.S. National Science Foundation": "#/$defs/_U_S_National_Science_Foundation",
+                     "United States Department of Defense": "#/$defs/_United_States_Department_Of_Defense",
+                     "United States Department of Energy": "#/$defs/_United_States_Department_Of_Energy",
                      "University of California, San Diego": "#/$defs/_University_Of_California_San_Diego",
                      "University of Pennsylvania": "#/$defs/_University_Of_Pennsylvania",
                      "Unknown": "#/$defs/_Unknown",
                      "Vieworks": "#/$defs/_Vieworks",
                      "Vortran": "#/$defs/_Vortran",
+                     "W. M. Keck Foundation": "#/$defs/_W_M_Keck_Foundation",
+                     "Warren Alpert Foundation": "#/$defs/_Warren_Alpert_Foundation",
                      "World Precision Intstruments": "#/$defs/_World_Precision_Intstruments",
                      "ams OSRAM": "#/$defs/_Ams_Osram"
                   },
@@ -1257,6 +1332,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Ailipu_Technology_Co"
+                  },
+                  {
+                     "$ref": "#/$defs/_Aligning_Science_Across_Parkinson_S"
                   },
                   {
                      "$ref": "#/$defs/_Allen_Institute"
@@ -1355,6 +1433,9 @@
                      "$ref": "#/$defs/_Emory_University"
                   },
                   {
+                     "$ref": "#/$defs/_Esther_A_Joseph_Klingenstein_Fund"
+                  },
+                  {
                      "$ref": "#/$defs/_Euresys"
                   },
                   {
@@ -1364,10 +1445,16 @@
                      "$ref": "#/$defs/_Fujinon"
                   },
                   {
+                     "$ref": "#/$defs/_G_Harold_Leila_Y_Mathers_Foundation"
+                  },
+                  {
                      "$ref": "#/$defs/_Hamamatsu"
                   },
                   {
                      "$ref": "#/$defs/_Hamilton"
+                  },
+                  {
+                     "$ref": "#/$defs/_Helen_Hay_Whitney_Foundation"
                   },
                   {
                      "$ref": "#/$defs/_Huazhong_University_Of_Science_And_Technology"
@@ -1412,6 +1499,9 @@
                      "$ref": "#/$defs/_Kent_Scientific_Corporation"
                   },
                   {
+                     "$ref": "#/$defs/_Klingenstein_Third_Generation_Foundation"
+                  },
+                  {
                      "$ref": "#/$defs/_Kowa"
                   },
                   {
@@ -1422,6 +1512,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Leica"
+                  },
+                  {
+                     "$ref": "#/$defs/_Life_Sciences_Research_Foundation"
                   },
                   {
                      "$ref": "#/$defs/_Lifecanvas"
@@ -1451,6 +1544,12 @@
                      "$ref": "#/$defs/_Mcgovern_Institute_For_Brain_Research"
                   },
                   {
+                     "$ref": "#/$defs/_Mcknight_Brain_Research_Foundation"
+                  },
+                  {
+                     "$ref": "#/$defs/_Mcknight_Foundation"
+                  },
+                  {
                      "$ref": "#/$defs/_Meadowlark_Optics"
                   },
                   {
@@ -1476,6 +1575,9 @@
                   },
                   {
                      "$ref": "#/$defs/_National_Institute_Of_Neurological_Disorders_And_Stroke"
+                  },
+                  {
+                     "$ref": "#/$defs/_National_Institute_On_Aging"
                   },
                   {
                      "$ref": "#/$defs/_National_Instruments"
@@ -1515,6 +1617,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Oxxius"
+                  },
+                  {
+                     "$ref": "#/$defs/_Pew_Charitable_Trusts"
                   },
                   {
                      "$ref": "#/$defs/_Placid_Industries"
@@ -1604,6 +1709,15 @@
                      "$ref": "#/$defs/_Tymphany"
                   },
                   {
+                     "$ref": "#/$defs/_U_S_National_Science_Foundation"
+                  },
+                  {
+                     "$ref": "#/$defs/_United_States_Department_Of_Defense"
+                  },
+                  {
+                     "$ref": "#/$defs/_United_States_Department_Of_Energy"
+                  },
+                  {
                      "$ref": "#/$defs/_University_Of_California_San_Diego"
                   },
                   {
@@ -1617,6 +1731,12 @@
                   },
                   {
                      "$ref": "#/$defs/_Vortran"
+                  },
+                  {
+                     "$ref": "#/$defs/_W_M_Keck_Foundation"
+                  },
+                  {
+                     "$ref": "#/$defs/_Warren_Alpert_Foundation"
                   },
                   {
                      "$ref": "#/$defs/_World_Precision_Intstruments"
@@ -2228,6 +2348,7 @@
                            "Abcam": "#/$defs/_Abcam",
                            "Addgene": "#/$defs/_Addgene",
                            "Ailipu Technology Co": "#/$defs/_Ailipu_Technology_Co",
+                           "Aligning Science Across Parkinson's": "#/$defs/_Aligning_Science_Across_Parkinson_S",
                            "Allen Institute": "#/$defs/_Allen_Institute",
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
@@ -2260,11 +2381,14 @@
                            "Ealing": "#/$defs/_Ealing",
                            "Edmund Optics": "#/$defs/_Edmund_Optics",
                            "Emory University": "#/$defs/_Emory_University",
+                           "Esther A. & Joseph Klingenstein Fund": "#/$defs/_Esther_A_Joseph_Klingenstein_Fund",
                            "Euresys": "#/$defs/_Euresys",
                            "Excelitas Technologies": "#/$defs/_Excelitas_Technologies",
                            "Fujinon": "#/$defs/_Fujinon",
+                           "G. Harold & Leila Y. Mathers Foundation": "#/$defs/_G_Harold_Leila_Y_Mathers_Foundation",
                            "Hamamatsu": "#/$defs/_Hamamatsu",
                            "Hamilton": "#/$defs/_Hamilton",
+                           "Helen Hay Whitney Foundation": "#/$defs/_Helen_Hay_Whitney_Foundation",
                            "Huazhong University of Science and Technology": "#/$defs/_Huazhong_University_Of_Science_And_Technology",
                            "IR Robot Co": "#/$defs/_Ir_Robot_Co",
                            "ISL Products International": "#/$defs/_Isl_Products_International",
@@ -2279,10 +2403,12 @@
                            "Johns Hopkins University": "#/$defs/_Johns_Hopkins_University",
                            "Julabo": "#/$defs/_Julabo",
                            "Kent Scientific Corporation": "#/$defs/_Kent_Scientific_Corporation",
+                           "Klingenstein Third Generation Foundation": "#/$defs/_Klingenstein_Third_Generation_Foundation",
                            "Kowa": "#/$defs/_Kowa",
                            "LASOS Lasertechnik": "#/$defs/_Lasos_Lasertechnik",
                            "LG": "#/$defs/_Lg",
                            "Leica": "#/$defs/_Leica",
+                           "Life Sciences Research Foundation": "#/$defs/_Life_Sciences_Research_Foundation",
                            "LifeCanvas": "#/$defs/_Lifecanvas",
                            "Lumen Dynamics": "#/$defs/_Lumen_Dynamics",
                            "Lumencor": "#/$defs/_Lumencor",
@@ -2292,6 +2418,8 @@
                            "MPI": "#/$defs/_Mpi",
                            "Massachusetts Institute of Technology": "#/$defs/_Massachusetts_Institute_Of_Technology",
                            "McGovern Institute for Brain Research": "#/$defs/_Mcgovern_Institute_For_Brain_Research",
+                           "McKnight Brain Research Foundation": "#/$defs/_Mcknight_Brain_Research_Foundation",
+                           "McKnight Foundation": "#/$defs/_Mcknight_Foundation",
                            "Meadowlark Optics": "#/$defs/_Meadowlark_Optics",
                            "Michael J. Fox Foundation for Parkinson's Research": "#/$defs/_Michael_J_Fox_Foundation_For_Parkinson_S_Research",
                            "Midwest Optical Systems, Inc.": "#/$defs/_Midwest_Optical_Systems_Inc_",
@@ -2301,6 +2429,7 @@
                            "National Center for Complementary and Integrative Health": "#/$defs/_National_Center_For_Complementary_And_Integrative_Health",
                            "National Institute of Mental Health": "#/$defs/_National_Institute_Of_Mental_Health",
                            "National Institute of Neurological Disorders and Stroke": "#/$defs/_National_Institute_Of_Neurological_Disorders_And_Stroke",
+                           "National Institute on Aging": "#/$defs/_National_Institute_On_Aging",
                            "National Instruments": "#/$defs/_National_Instruments",
                            "Navitar": "#/$defs/_Navitar",
                            "NeuraLynx": "#/$defs/_Neuralynx",
@@ -2314,6 +2443,7 @@
                            "Other": "#/$defs/_Other",
                            "Oxford Instruments": "#/$defs/_Oxford_Instruments",
                            "Oxxius": "#/$defs/_Oxxius",
+                           "Pew Charitable Trusts": "#/$defs/_Pew_Charitable_Trusts",
                            "Placid Industries": "#/$defs/_Placid_Industries",
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
@@ -2343,11 +2473,16 @@
                            "Thorlabs": "#/$defs/_Thorlabs",
                            "Transducer Techniques": "#/$defs/_Transducer_Techniques",
                            "Tymphany": "#/$defs/_Tymphany",
+                           "U.S. National Science Foundation": "#/$defs/_U_S_National_Science_Foundation",
+                           "United States Department of Defense": "#/$defs/_United_States_Department_Of_Defense",
+                           "United States Department of Energy": "#/$defs/_United_States_Department_Of_Energy",
                            "University of California, San Diego": "#/$defs/_University_Of_California_San_Diego",
                            "University of Pennsylvania": "#/$defs/_University_Of_Pennsylvania",
                            "Unknown": "#/$defs/_Unknown",
                            "Vieworks": "#/$defs/_Vieworks",
                            "Vortran": "#/$defs/_Vortran",
+                           "W. M. Keck Foundation": "#/$defs/_W_M_Keck_Foundation",
+                           "Warren Alpert Foundation": "#/$defs/_Warren_Alpert_Foundation",
                            "World Precision Intstruments": "#/$defs/_World_Precision_Intstruments",
                            "ams OSRAM": "#/$defs/_Ams_Osram"
                         },
@@ -2368,6 +2503,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Ailipu_Technology_Co"
+                        },
+                        {
+                           "$ref": "#/$defs/_Aligning_Science_Across_Parkinson_S"
                         },
                         {
                            "$ref": "#/$defs/_Allen_Institute"
@@ -2466,6 +2604,9 @@
                            "$ref": "#/$defs/_Emory_University"
                         },
                         {
+                           "$ref": "#/$defs/_Esther_A_Joseph_Klingenstein_Fund"
+                        },
+                        {
                            "$ref": "#/$defs/_Euresys"
                         },
                         {
@@ -2475,10 +2616,16 @@
                            "$ref": "#/$defs/_Fujinon"
                         },
                         {
+                           "$ref": "#/$defs/_G_Harold_Leila_Y_Mathers_Foundation"
+                        },
+                        {
                            "$ref": "#/$defs/_Hamamatsu"
                         },
                         {
                            "$ref": "#/$defs/_Hamilton"
+                        },
+                        {
+                           "$ref": "#/$defs/_Helen_Hay_Whitney_Foundation"
                         },
                         {
                            "$ref": "#/$defs/_Huazhong_University_Of_Science_And_Technology"
@@ -2523,6 +2670,9 @@
                            "$ref": "#/$defs/_Kent_Scientific_Corporation"
                         },
                         {
+                           "$ref": "#/$defs/_Klingenstein_Third_Generation_Foundation"
+                        },
+                        {
                            "$ref": "#/$defs/_Kowa"
                         },
                         {
@@ -2533,6 +2683,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Leica"
+                        },
+                        {
+                           "$ref": "#/$defs/_Life_Sciences_Research_Foundation"
                         },
                         {
                            "$ref": "#/$defs/_Lifecanvas"
@@ -2562,6 +2715,12 @@
                            "$ref": "#/$defs/_Mcgovern_Institute_For_Brain_Research"
                         },
                         {
+                           "$ref": "#/$defs/_Mcknight_Brain_Research_Foundation"
+                        },
+                        {
+                           "$ref": "#/$defs/_Mcknight_Foundation"
+                        },
+                        {
                            "$ref": "#/$defs/_Meadowlark_Optics"
                         },
                         {
@@ -2587,6 +2746,9 @@
                         },
                         {
                            "$ref": "#/$defs/_National_Institute_Of_Neurological_Disorders_And_Stroke"
+                        },
+                        {
+                           "$ref": "#/$defs/_National_Institute_On_Aging"
                         },
                         {
                            "$ref": "#/$defs/_National_Instruments"
@@ -2626,6 +2788,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Oxxius"
+                        },
+                        {
+                           "$ref": "#/$defs/_Pew_Charitable_Trusts"
                         },
                         {
                            "$ref": "#/$defs/_Placid_Industries"
@@ -2715,6 +2880,15 @@
                            "$ref": "#/$defs/_Tymphany"
                         },
                         {
+                           "$ref": "#/$defs/_U_S_National_Science_Foundation"
+                        },
+                        {
+                           "$ref": "#/$defs/_United_States_Department_Of_Defense"
+                        },
+                        {
+                           "$ref": "#/$defs/_United_States_Department_Of_Energy"
+                        },
+                        {
                            "$ref": "#/$defs/_University_Of_California_San_Diego"
                         },
                         {
@@ -2728,6 +2902,12 @@
                         },
                         {
                            "$ref": "#/$defs/_Vortran"
+                        },
+                        {
+                           "$ref": "#/$defs/_W_M_Keck_Foundation"
+                        },
+                        {
+                           "$ref": "#/$defs/_Warren_Alpert_Foundation"
                         },
                         {
                            "$ref": "#/$defs/_World_Precision_Intstruments"
@@ -2935,6 +3115,7 @@
                            "Abcam": "#/$defs/_Abcam",
                            "Addgene": "#/$defs/_Addgene",
                            "Ailipu Technology Co": "#/$defs/_Ailipu_Technology_Co",
+                           "Aligning Science Across Parkinson's": "#/$defs/_Aligning_Science_Across_Parkinson_S",
                            "Allen Institute": "#/$defs/_Allen_Institute",
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
@@ -2967,11 +3148,14 @@
                            "Ealing": "#/$defs/_Ealing",
                            "Edmund Optics": "#/$defs/_Edmund_Optics",
                            "Emory University": "#/$defs/_Emory_University",
+                           "Esther A. & Joseph Klingenstein Fund": "#/$defs/_Esther_A_Joseph_Klingenstein_Fund",
                            "Euresys": "#/$defs/_Euresys",
                            "Excelitas Technologies": "#/$defs/_Excelitas_Technologies",
                            "Fujinon": "#/$defs/_Fujinon",
+                           "G. Harold & Leila Y. Mathers Foundation": "#/$defs/_G_Harold_Leila_Y_Mathers_Foundation",
                            "Hamamatsu": "#/$defs/_Hamamatsu",
                            "Hamilton": "#/$defs/_Hamilton",
+                           "Helen Hay Whitney Foundation": "#/$defs/_Helen_Hay_Whitney_Foundation",
                            "Huazhong University of Science and Technology": "#/$defs/_Huazhong_University_Of_Science_And_Technology",
                            "IR Robot Co": "#/$defs/_Ir_Robot_Co",
                            "ISL Products International": "#/$defs/_Isl_Products_International",
@@ -2986,10 +3170,12 @@
                            "Johns Hopkins University": "#/$defs/_Johns_Hopkins_University",
                            "Julabo": "#/$defs/_Julabo",
                            "Kent Scientific Corporation": "#/$defs/_Kent_Scientific_Corporation",
+                           "Klingenstein Third Generation Foundation": "#/$defs/_Klingenstein_Third_Generation_Foundation",
                            "Kowa": "#/$defs/_Kowa",
                            "LASOS Lasertechnik": "#/$defs/_Lasos_Lasertechnik",
                            "LG": "#/$defs/_Lg",
                            "Leica": "#/$defs/_Leica",
+                           "Life Sciences Research Foundation": "#/$defs/_Life_Sciences_Research_Foundation",
                            "LifeCanvas": "#/$defs/_Lifecanvas",
                            "Lumen Dynamics": "#/$defs/_Lumen_Dynamics",
                            "Lumencor": "#/$defs/_Lumencor",
@@ -2999,6 +3185,8 @@
                            "MPI": "#/$defs/_Mpi",
                            "Massachusetts Institute of Technology": "#/$defs/_Massachusetts_Institute_Of_Technology",
                            "McGovern Institute for Brain Research": "#/$defs/_Mcgovern_Institute_For_Brain_Research",
+                           "McKnight Brain Research Foundation": "#/$defs/_Mcknight_Brain_Research_Foundation",
+                           "McKnight Foundation": "#/$defs/_Mcknight_Foundation",
                            "Meadowlark Optics": "#/$defs/_Meadowlark_Optics",
                            "Michael J. Fox Foundation for Parkinson's Research": "#/$defs/_Michael_J_Fox_Foundation_For_Parkinson_S_Research",
                            "Midwest Optical Systems, Inc.": "#/$defs/_Midwest_Optical_Systems_Inc_",
@@ -3008,6 +3196,7 @@
                            "National Center for Complementary and Integrative Health": "#/$defs/_National_Center_For_Complementary_And_Integrative_Health",
                            "National Institute of Mental Health": "#/$defs/_National_Institute_Of_Mental_Health",
                            "National Institute of Neurological Disorders and Stroke": "#/$defs/_National_Institute_Of_Neurological_Disorders_And_Stroke",
+                           "National Institute on Aging": "#/$defs/_National_Institute_On_Aging",
                            "National Instruments": "#/$defs/_National_Instruments",
                            "Navitar": "#/$defs/_Navitar",
                            "NeuraLynx": "#/$defs/_Neuralynx",
@@ -3021,6 +3210,7 @@
                            "Other": "#/$defs/_Other",
                            "Oxford Instruments": "#/$defs/_Oxford_Instruments",
                            "Oxxius": "#/$defs/_Oxxius",
+                           "Pew Charitable Trusts": "#/$defs/_Pew_Charitable_Trusts",
                            "Placid Industries": "#/$defs/_Placid_Industries",
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
@@ -3050,11 +3240,16 @@
                            "Thorlabs": "#/$defs/_Thorlabs",
                            "Transducer Techniques": "#/$defs/_Transducer_Techniques",
                            "Tymphany": "#/$defs/_Tymphany",
+                           "U.S. National Science Foundation": "#/$defs/_U_S_National_Science_Foundation",
+                           "United States Department of Defense": "#/$defs/_United_States_Department_Of_Defense",
+                           "United States Department of Energy": "#/$defs/_United_States_Department_Of_Energy",
                            "University of California, San Diego": "#/$defs/_University_Of_California_San_Diego",
                            "University of Pennsylvania": "#/$defs/_University_Of_Pennsylvania",
                            "Unknown": "#/$defs/_Unknown",
                            "Vieworks": "#/$defs/_Vieworks",
                            "Vortran": "#/$defs/_Vortran",
+                           "W. M. Keck Foundation": "#/$defs/_W_M_Keck_Foundation",
+                           "Warren Alpert Foundation": "#/$defs/_Warren_Alpert_Foundation",
                            "World Precision Intstruments": "#/$defs/_World_Precision_Intstruments",
                            "ams OSRAM": "#/$defs/_Ams_Osram"
                         },
@@ -3075,6 +3270,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Ailipu_Technology_Co"
+                        },
+                        {
+                           "$ref": "#/$defs/_Aligning_Science_Across_Parkinson_S"
                         },
                         {
                            "$ref": "#/$defs/_Allen_Institute"
@@ -3173,6 +3371,9 @@
                            "$ref": "#/$defs/_Emory_University"
                         },
                         {
+                           "$ref": "#/$defs/_Esther_A_Joseph_Klingenstein_Fund"
+                        },
+                        {
                            "$ref": "#/$defs/_Euresys"
                         },
                         {
@@ -3182,10 +3383,16 @@
                            "$ref": "#/$defs/_Fujinon"
                         },
                         {
+                           "$ref": "#/$defs/_G_Harold_Leila_Y_Mathers_Foundation"
+                        },
+                        {
                            "$ref": "#/$defs/_Hamamatsu"
                         },
                         {
                            "$ref": "#/$defs/_Hamilton"
+                        },
+                        {
+                           "$ref": "#/$defs/_Helen_Hay_Whitney_Foundation"
                         },
                         {
                            "$ref": "#/$defs/_Huazhong_University_Of_Science_And_Technology"
@@ -3230,6 +3437,9 @@
                            "$ref": "#/$defs/_Kent_Scientific_Corporation"
                         },
                         {
+                           "$ref": "#/$defs/_Klingenstein_Third_Generation_Foundation"
+                        },
+                        {
                            "$ref": "#/$defs/_Kowa"
                         },
                         {
@@ -3240,6 +3450,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Leica"
+                        },
+                        {
+                           "$ref": "#/$defs/_Life_Sciences_Research_Foundation"
                         },
                         {
                            "$ref": "#/$defs/_Lifecanvas"
@@ -3269,6 +3482,12 @@
                            "$ref": "#/$defs/_Mcgovern_Institute_For_Brain_Research"
                         },
                         {
+                           "$ref": "#/$defs/_Mcknight_Brain_Research_Foundation"
+                        },
+                        {
+                           "$ref": "#/$defs/_Mcknight_Foundation"
+                        },
+                        {
                            "$ref": "#/$defs/_Meadowlark_Optics"
                         },
                         {
@@ -3294,6 +3513,9 @@
                         },
                         {
                            "$ref": "#/$defs/_National_Institute_Of_Neurological_Disorders_And_Stroke"
+                        },
+                        {
+                           "$ref": "#/$defs/_National_Institute_On_Aging"
                         },
                         {
                            "$ref": "#/$defs/_National_Instruments"
@@ -3333,6 +3555,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Oxxius"
+                        },
+                        {
+                           "$ref": "#/$defs/_Pew_Charitable_Trusts"
                         },
                         {
                            "$ref": "#/$defs/_Placid_Industries"
@@ -3422,6 +3647,15 @@
                            "$ref": "#/$defs/_Tymphany"
                         },
                         {
+                           "$ref": "#/$defs/_U_S_National_Science_Foundation"
+                        },
+                        {
+                           "$ref": "#/$defs/_United_States_Department_Of_Defense"
+                        },
+                        {
+                           "$ref": "#/$defs/_United_States_Department_Of_Energy"
+                        },
+                        {
                            "$ref": "#/$defs/_University_Of_California_San_Diego"
                         },
                         {
@@ -3435,6 +3669,12 @@
                         },
                         {
                            "$ref": "#/$defs/_Vortran"
+                        },
+                        {
+                           "$ref": "#/$defs/_W_M_Keck_Foundation"
+                        },
+                        {
+                           "$ref": "#/$defs/_Warren_Alpert_Foundation"
                         },
                         {
                            "$ref": "#/$defs/_World_Precision_Intstruments"
@@ -3556,6 +3796,7 @@
                            "Abcam": "#/$defs/_Abcam",
                            "Addgene": "#/$defs/_Addgene",
                            "Ailipu Technology Co": "#/$defs/_Ailipu_Technology_Co",
+                           "Aligning Science Across Parkinson's": "#/$defs/_Aligning_Science_Across_Parkinson_S",
                            "Allen Institute": "#/$defs/_Allen_Institute",
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
@@ -3588,11 +3829,14 @@
                            "Ealing": "#/$defs/_Ealing",
                            "Edmund Optics": "#/$defs/_Edmund_Optics",
                            "Emory University": "#/$defs/_Emory_University",
+                           "Esther A. & Joseph Klingenstein Fund": "#/$defs/_Esther_A_Joseph_Klingenstein_Fund",
                            "Euresys": "#/$defs/_Euresys",
                            "Excelitas Technologies": "#/$defs/_Excelitas_Technologies",
                            "Fujinon": "#/$defs/_Fujinon",
+                           "G. Harold & Leila Y. Mathers Foundation": "#/$defs/_G_Harold_Leila_Y_Mathers_Foundation",
                            "Hamamatsu": "#/$defs/_Hamamatsu",
                            "Hamilton": "#/$defs/_Hamilton",
+                           "Helen Hay Whitney Foundation": "#/$defs/_Helen_Hay_Whitney_Foundation",
                            "Huazhong University of Science and Technology": "#/$defs/_Huazhong_University_Of_Science_And_Technology",
                            "IR Robot Co": "#/$defs/_Ir_Robot_Co",
                            "ISL Products International": "#/$defs/_Isl_Products_International",
@@ -3607,10 +3851,12 @@
                            "Johns Hopkins University": "#/$defs/_Johns_Hopkins_University",
                            "Julabo": "#/$defs/_Julabo",
                            "Kent Scientific Corporation": "#/$defs/_Kent_Scientific_Corporation",
+                           "Klingenstein Third Generation Foundation": "#/$defs/_Klingenstein_Third_Generation_Foundation",
                            "Kowa": "#/$defs/_Kowa",
                            "LASOS Lasertechnik": "#/$defs/_Lasos_Lasertechnik",
                            "LG": "#/$defs/_Lg",
                            "Leica": "#/$defs/_Leica",
+                           "Life Sciences Research Foundation": "#/$defs/_Life_Sciences_Research_Foundation",
                            "LifeCanvas": "#/$defs/_Lifecanvas",
                            "Lumen Dynamics": "#/$defs/_Lumen_Dynamics",
                            "Lumencor": "#/$defs/_Lumencor",
@@ -3620,6 +3866,8 @@
                            "MPI": "#/$defs/_Mpi",
                            "Massachusetts Institute of Technology": "#/$defs/_Massachusetts_Institute_Of_Technology",
                            "McGovern Institute for Brain Research": "#/$defs/_Mcgovern_Institute_For_Brain_Research",
+                           "McKnight Brain Research Foundation": "#/$defs/_Mcknight_Brain_Research_Foundation",
+                           "McKnight Foundation": "#/$defs/_Mcknight_Foundation",
                            "Meadowlark Optics": "#/$defs/_Meadowlark_Optics",
                            "Michael J. Fox Foundation for Parkinson's Research": "#/$defs/_Michael_J_Fox_Foundation_For_Parkinson_S_Research",
                            "Midwest Optical Systems, Inc.": "#/$defs/_Midwest_Optical_Systems_Inc_",
@@ -3629,6 +3877,7 @@
                            "National Center for Complementary and Integrative Health": "#/$defs/_National_Center_For_Complementary_And_Integrative_Health",
                            "National Institute of Mental Health": "#/$defs/_National_Institute_Of_Mental_Health",
                            "National Institute of Neurological Disorders and Stroke": "#/$defs/_National_Institute_Of_Neurological_Disorders_And_Stroke",
+                           "National Institute on Aging": "#/$defs/_National_Institute_On_Aging",
                            "National Instruments": "#/$defs/_National_Instruments",
                            "Navitar": "#/$defs/_Navitar",
                            "NeuraLynx": "#/$defs/_Neuralynx",
@@ -3642,6 +3891,7 @@
                            "Other": "#/$defs/_Other",
                            "Oxford Instruments": "#/$defs/_Oxford_Instruments",
                            "Oxxius": "#/$defs/_Oxxius",
+                           "Pew Charitable Trusts": "#/$defs/_Pew_Charitable_Trusts",
                            "Placid Industries": "#/$defs/_Placid_Industries",
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
@@ -3671,11 +3921,16 @@
                            "Thorlabs": "#/$defs/_Thorlabs",
                            "Transducer Techniques": "#/$defs/_Transducer_Techniques",
                            "Tymphany": "#/$defs/_Tymphany",
+                           "U.S. National Science Foundation": "#/$defs/_U_S_National_Science_Foundation",
+                           "United States Department of Defense": "#/$defs/_United_States_Department_Of_Defense",
+                           "United States Department of Energy": "#/$defs/_United_States_Department_Of_Energy",
                            "University of California, San Diego": "#/$defs/_University_Of_California_San_Diego",
                            "University of Pennsylvania": "#/$defs/_University_Of_Pennsylvania",
                            "Unknown": "#/$defs/_Unknown",
                            "Vieworks": "#/$defs/_Vieworks",
                            "Vortran": "#/$defs/_Vortran",
+                           "W. M. Keck Foundation": "#/$defs/_W_M_Keck_Foundation",
+                           "Warren Alpert Foundation": "#/$defs/_Warren_Alpert_Foundation",
                            "World Precision Intstruments": "#/$defs/_World_Precision_Intstruments",
                            "ams OSRAM": "#/$defs/_Ams_Osram"
                         },
@@ -3696,6 +3951,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Ailipu_Technology_Co"
+                        },
+                        {
+                           "$ref": "#/$defs/_Aligning_Science_Across_Parkinson_S"
                         },
                         {
                            "$ref": "#/$defs/_Allen_Institute"
@@ -3794,6 +4052,9 @@
                            "$ref": "#/$defs/_Emory_University"
                         },
                         {
+                           "$ref": "#/$defs/_Esther_A_Joseph_Klingenstein_Fund"
+                        },
+                        {
                            "$ref": "#/$defs/_Euresys"
                         },
                         {
@@ -3803,10 +4064,16 @@
                            "$ref": "#/$defs/_Fujinon"
                         },
                         {
+                           "$ref": "#/$defs/_G_Harold_Leila_Y_Mathers_Foundation"
+                        },
+                        {
                            "$ref": "#/$defs/_Hamamatsu"
                         },
                         {
                            "$ref": "#/$defs/_Hamilton"
+                        },
+                        {
+                           "$ref": "#/$defs/_Helen_Hay_Whitney_Foundation"
                         },
                         {
                            "$ref": "#/$defs/_Huazhong_University_Of_Science_And_Technology"
@@ -3851,6 +4118,9 @@
                            "$ref": "#/$defs/_Kent_Scientific_Corporation"
                         },
                         {
+                           "$ref": "#/$defs/_Klingenstein_Third_Generation_Foundation"
+                        },
+                        {
                            "$ref": "#/$defs/_Kowa"
                         },
                         {
@@ -3861,6 +4131,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Leica"
+                        },
+                        {
+                           "$ref": "#/$defs/_Life_Sciences_Research_Foundation"
                         },
                         {
                            "$ref": "#/$defs/_Lifecanvas"
@@ -3890,6 +4163,12 @@
                            "$ref": "#/$defs/_Mcgovern_Institute_For_Brain_Research"
                         },
                         {
+                           "$ref": "#/$defs/_Mcknight_Brain_Research_Foundation"
+                        },
+                        {
+                           "$ref": "#/$defs/_Mcknight_Foundation"
+                        },
+                        {
                            "$ref": "#/$defs/_Meadowlark_Optics"
                         },
                         {
@@ -3915,6 +4194,9 @@
                         },
                         {
                            "$ref": "#/$defs/_National_Institute_Of_Neurological_Disorders_And_Stroke"
+                        },
+                        {
+                           "$ref": "#/$defs/_National_Institute_On_Aging"
                         },
                         {
                            "$ref": "#/$defs/_National_Instruments"
@@ -3954,6 +4236,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Oxxius"
+                        },
+                        {
+                           "$ref": "#/$defs/_Pew_Charitable_Trusts"
                         },
                         {
                            "$ref": "#/$defs/_Placid_Industries"
@@ -4043,6 +4328,15 @@
                            "$ref": "#/$defs/_Tymphany"
                         },
                         {
+                           "$ref": "#/$defs/_U_S_National_Science_Foundation"
+                        },
+                        {
+                           "$ref": "#/$defs/_United_States_Department_Of_Defense"
+                        },
+                        {
+                           "$ref": "#/$defs/_United_States_Department_Of_Energy"
+                        },
+                        {
                            "$ref": "#/$defs/_University_Of_California_San_Diego"
                         },
                         {
@@ -4056,6 +4350,12 @@
                         },
                         {
                            "$ref": "#/$defs/_Vortran"
+                        },
+                        {
+                           "$ref": "#/$defs/_W_M_Keck_Foundation"
+                        },
+                        {
+                           "$ref": "#/$defs/_Warren_Alpert_Foundation"
                         },
                         {
                            "$ref": "#/$defs/_World_Precision_Intstruments"
@@ -4211,6 +4511,7 @@
                      "Abcam": "#/$defs/_Abcam",
                      "Addgene": "#/$defs/_Addgene",
                      "Ailipu Technology Co": "#/$defs/_Ailipu_Technology_Co",
+                     "Aligning Science Across Parkinson's": "#/$defs/_Aligning_Science_Across_Parkinson_S",
                      "Allen Institute": "#/$defs/_Allen_Institute",
                      "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                      "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
@@ -4243,11 +4544,14 @@
                      "Ealing": "#/$defs/_Ealing",
                      "Edmund Optics": "#/$defs/_Edmund_Optics",
                      "Emory University": "#/$defs/_Emory_University",
+                     "Esther A. & Joseph Klingenstein Fund": "#/$defs/_Esther_A_Joseph_Klingenstein_Fund",
                      "Euresys": "#/$defs/_Euresys",
                      "Excelitas Technologies": "#/$defs/_Excelitas_Technologies",
                      "Fujinon": "#/$defs/_Fujinon",
+                     "G. Harold & Leila Y. Mathers Foundation": "#/$defs/_G_Harold_Leila_Y_Mathers_Foundation",
                      "Hamamatsu": "#/$defs/_Hamamatsu",
                      "Hamilton": "#/$defs/_Hamilton",
+                     "Helen Hay Whitney Foundation": "#/$defs/_Helen_Hay_Whitney_Foundation",
                      "Huazhong University of Science and Technology": "#/$defs/_Huazhong_University_Of_Science_And_Technology",
                      "IR Robot Co": "#/$defs/_Ir_Robot_Co",
                      "ISL Products International": "#/$defs/_Isl_Products_International",
@@ -4262,10 +4566,12 @@
                      "Johns Hopkins University": "#/$defs/_Johns_Hopkins_University",
                      "Julabo": "#/$defs/_Julabo",
                      "Kent Scientific Corporation": "#/$defs/_Kent_Scientific_Corporation",
+                     "Klingenstein Third Generation Foundation": "#/$defs/_Klingenstein_Third_Generation_Foundation",
                      "Kowa": "#/$defs/_Kowa",
                      "LASOS Lasertechnik": "#/$defs/_Lasos_Lasertechnik",
                      "LG": "#/$defs/_Lg",
                      "Leica": "#/$defs/_Leica",
+                     "Life Sciences Research Foundation": "#/$defs/_Life_Sciences_Research_Foundation",
                      "LifeCanvas": "#/$defs/_Lifecanvas",
                      "Lumen Dynamics": "#/$defs/_Lumen_Dynamics",
                      "Lumencor": "#/$defs/_Lumencor",
@@ -4275,6 +4581,8 @@
                      "MPI": "#/$defs/_Mpi",
                      "Massachusetts Institute of Technology": "#/$defs/_Massachusetts_Institute_Of_Technology",
                      "McGovern Institute for Brain Research": "#/$defs/_Mcgovern_Institute_For_Brain_Research",
+                     "McKnight Brain Research Foundation": "#/$defs/_Mcknight_Brain_Research_Foundation",
+                     "McKnight Foundation": "#/$defs/_Mcknight_Foundation",
                      "Meadowlark Optics": "#/$defs/_Meadowlark_Optics",
                      "Michael J. Fox Foundation for Parkinson's Research": "#/$defs/_Michael_J_Fox_Foundation_For_Parkinson_S_Research",
                      "Midwest Optical Systems, Inc.": "#/$defs/_Midwest_Optical_Systems_Inc_",
@@ -4284,6 +4592,7 @@
                      "National Center for Complementary and Integrative Health": "#/$defs/_National_Center_For_Complementary_And_Integrative_Health",
                      "National Institute of Mental Health": "#/$defs/_National_Institute_Of_Mental_Health",
                      "National Institute of Neurological Disorders and Stroke": "#/$defs/_National_Institute_Of_Neurological_Disorders_And_Stroke",
+                     "National Institute on Aging": "#/$defs/_National_Institute_On_Aging",
                      "National Instruments": "#/$defs/_National_Instruments",
                      "Navitar": "#/$defs/_Navitar",
                      "NeuraLynx": "#/$defs/_Neuralynx",
@@ -4297,6 +4606,7 @@
                      "Other": "#/$defs/_Other",
                      "Oxford Instruments": "#/$defs/_Oxford_Instruments",
                      "Oxxius": "#/$defs/_Oxxius",
+                     "Pew Charitable Trusts": "#/$defs/_Pew_Charitable_Trusts",
                      "Placid Industries": "#/$defs/_Placid_Industries",
                      "Prizmatix": "#/$defs/_Prizmatix",
                      "Quantifi": "#/$defs/_Quantifi",
@@ -4326,11 +4636,16 @@
                      "Thorlabs": "#/$defs/_Thorlabs",
                      "Transducer Techniques": "#/$defs/_Transducer_Techniques",
                      "Tymphany": "#/$defs/_Tymphany",
+                     "U.S. National Science Foundation": "#/$defs/_U_S_National_Science_Foundation",
+                     "United States Department of Defense": "#/$defs/_United_States_Department_Of_Defense",
+                     "United States Department of Energy": "#/$defs/_United_States_Department_Of_Energy",
                      "University of California, San Diego": "#/$defs/_University_Of_California_San_Diego",
                      "University of Pennsylvania": "#/$defs/_University_Of_Pennsylvania",
                      "Unknown": "#/$defs/_Unknown",
                      "Vieworks": "#/$defs/_Vieworks",
                      "Vortran": "#/$defs/_Vortran",
+                     "W. M. Keck Foundation": "#/$defs/_W_M_Keck_Foundation",
+                     "Warren Alpert Foundation": "#/$defs/_Warren_Alpert_Foundation",
                      "World Precision Intstruments": "#/$defs/_World_Precision_Intstruments",
                      "ams OSRAM": "#/$defs/_Ams_Osram"
                   },
@@ -4351,6 +4666,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Ailipu_Technology_Co"
+                  },
+                  {
+                     "$ref": "#/$defs/_Aligning_Science_Across_Parkinson_S"
                   },
                   {
                      "$ref": "#/$defs/_Allen_Institute"
@@ -4449,6 +4767,9 @@
                      "$ref": "#/$defs/_Emory_University"
                   },
                   {
+                     "$ref": "#/$defs/_Esther_A_Joseph_Klingenstein_Fund"
+                  },
+                  {
                      "$ref": "#/$defs/_Euresys"
                   },
                   {
@@ -4458,10 +4779,16 @@
                      "$ref": "#/$defs/_Fujinon"
                   },
                   {
+                     "$ref": "#/$defs/_G_Harold_Leila_Y_Mathers_Foundation"
+                  },
+                  {
                      "$ref": "#/$defs/_Hamamatsu"
                   },
                   {
                      "$ref": "#/$defs/_Hamilton"
+                  },
+                  {
+                     "$ref": "#/$defs/_Helen_Hay_Whitney_Foundation"
                   },
                   {
                      "$ref": "#/$defs/_Huazhong_University_Of_Science_And_Technology"
@@ -4506,6 +4833,9 @@
                      "$ref": "#/$defs/_Kent_Scientific_Corporation"
                   },
                   {
+                     "$ref": "#/$defs/_Klingenstein_Third_Generation_Foundation"
+                  },
+                  {
                      "$ref": "#/$defs/_Kowa"
                   },
                   {
@@ -4516,6 +4846,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Leica"
+                  },
+                  {
+                     "$ref": "#/$defs/_Life_Sciences_Research_Foundation"
                   },
                   {
                      "$ref": "#/$defs/_Lifecanvas"
@@ -4545,6 +4878,12 @@
                      "$ref": "#/$defs/_Mcgovern_Institute_For_Brain_Research"
                   },
                   {
+                     "$ref": "#/$defs/_Mcknight_Brain_Research_Foundation"
+                  },
+                  {
+                     "$ref": "#/$defs/_Mcknight_Foundation"
+                  },
+                  {
                      "$ref": "#/$defs/_Meadowlark_Optics"
                   },
                   {
@@ -4570,6 +4909,9 @@
                   },
                   {
                      "$ref": "#/$defs/_National_Institute_Of_Neurological_Disorders_And_Stroke"
+                  },
+                  {
+                     "$ref": "#/$defs/_National_Institute_On_Aging"
                   },
                   {
                      "$ref": "#/$defs/_National_Instruments"
@@ -4609,6 +4951,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Oxxius"
+                  },
+                  {
+                     "$ref": "#/$defs/_Pew_Charitable_Trusts"
                   },
                   {
                      "$ref": "#/$defs/_Placid_Industries"
@@ -4698,6 +5043,15 @@
                      "$ref": "#/$defs/_Tymphany"
                   },
                   {
+                     "$ref": "#/$defs/_U_S_National_Science_Foundation"
+                  },
+                  {
+                     "$ref": "#/$defs/_United_States_Department_Of_Defense"
+                  },
+                  {
+                     "$ref": "#/$defs/_United_States_Department_Of_Energy"
+                  },
+                  {
                      "$ref": "#/$defs/_University_Of_California_San_Diego"
                   },
                   {
@@ -4711,6 +5065,12 @@
                   },
                   {
                      "$ref": "#/$defs/_Vortran"
+                  },
+                  {
+                     "$ref": "#/$defs/_W_M_Keck_Foundation"
+                  },
+                  {
+                     "$ref": "#/$defs/_Warren_Alpert_Foundation"
                   },
                   {
                      "$ref": "#/$defs/_World_Precision_Intstruments"
@@ -4808,6 +5168,7 @@
                      "Abcam": "#/$defs/_Abcam",
                      "Addgene": "#/$defs/_Addgene",
                      "Ailipu Technology Co": "#/$defs/_Ailipu_Technology_Co",
+                     "Aligning Science Across Parkinson's": "#/$defs/_Aligning_Science_Across_Parkinson_S",
                      "Allen Institute": "#/$defs/_Allen_Institute",
                      "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                      "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
@@ -4840,11 +5201,14 @@
                      "Ealing": "#/$defs/_Ealing",
                      "Edmund Optics": "#/$defs/_Edmund_Optics",
                      "Emory University": "#/$defs/_Emory_University",
+                     "Esther A. & Joseph Klingenstein Fund": "#/$defs/_Esther_A_Joseph_Klingenstein_Fund",
                      "Euresys": "#/$defs/_Euresys",
                      "Excelitas Technologies": "#/$defs/_Excelitas_Technologies",
                      "Fujinon": "#/$defs/_Fujinon",
+                     "G. Harold & Leila Y. Mathers Foundation": "#/$defs/_G_Harold_Leila_Y_Mathers_Foundation",
                      "Hamamatsu": "#/$defs/_Hamamatsu",
                      "Hamilton": "#/$defs/_Hamilton",
+                     "Helen Hay Whitney Foundation": "#/$defs/_Helen_Hay_Whitney_Foundation",
                      "Huazhong University of Science and Technology": "#/$defs/_Huazhong_University_Of_Science_And_Technology",
                      "IR Robot Co": "#/$defs/_Ir_Robot_Co",
                      "ISL Products International": "#/$defs/_Isl_Products_International",
@@ -4859,10 +5223,12 @@
                      "Johns Hopkins University": "#/$defs/_Johns_Hopkins_University",
                      "Julabo": "#/$defs/_Julabo",
                      "Kent Scientific Corporation": "#/$defs/_Kent_Scientific_Corporation",
+                     "Klingenstein Third Generation Foundation": "#/$defs/_Klingenstein_Third_Generation_Foundation",
                      "Kowa": "#/$defs/_Kowa",
                      "LASOS Lasertechnik": "#/$defs/_Lasos_Lasertechnik",
                      "LG": "#/$defs/_Lg",
                      "Leica": "#/$defs/_Leica",
+                     "Life Sciences Research Foundation": "#/$defs/_Life_Sciences_Research_Foundation",
                      "LifeCanvas": "#/$defs/_Lifecanvas",
                      "Lumen Dynamics": "#/$defs/_Lumen_Dynamics",
                      "Lumencor": "#/$defs/_Lumencor",
@@ -4872,6 +5238,8 @@
                      "MPI": "#/$defs/_Mpi",
                      "Massachusetts Institute of Technology": "#/$defs/_Massachusetts_Institute_Of_Technology",
                      "McGovern Institute for Brain Research": "#/$defs/_Mcgovern_Institute_For_Brain_Research",
+                     "McKnight Brain Research Foundation": "#/$defs/_Mcknight_Brain_Research_Foundation",
+                     "McKnight Foundation": "#/$defs/_Mcknight_Foundation",
                      "Meadowlark Optics": "#/$defs/_Meadowlark_Optics",
                      "Michael J. Fox Foundation for Parkinson's Research": "#/$defs/_Michael_J_Fox_Foundation_For_Parkinson_S_Research",
                      "Midwest Optical Systems, Inc.": "#/$defs/_Midwest_Optical_Systems_Inc_",
@@ -4881,6 +5249,7 @@
                      "National Center for Complementary and Integrative Health": "#/$defs/_National_Center_For_Complementary_And_Integrative_Health",
                      "National Institute of Mental Health": "#/$defs/_National_Institute_Of_Mental_Health",
                      "National Institute of Neurological Disorders and Stroke": "#/$defs/_National_Institute_Of_Neurological_Disorders_And_Stroke",
+                     "National Institute on Aging": "#/$defs/_National_Institute_On_Aging",
                      "National Instruments": "#/$defs/_National_Instruments",
                      "Navitar": "#/$defs/_Navitar",
                      "NeuraLynx": "#/$defs/_Neuralynx",
@@ -4894,6 +5263,7 @@
                      "Other": "#/$defs/_Other",
                      "Oxford Instruments": "#/$defs/_Oxford_Instruments",
                      "Oxxius": "#/$defs/_Oxxius",
+                     "Pew Charitable Trusts": "#/$defs/_Pew_Charitable_Trusts",
                      "Placid Industries": "#/$defs/_Placid_Industries",
                      "Prizmatix": "#/$defs/_Prizmatix",
                      "Quantifi": "#/$defs/_Quantifi",
@@ -4923,11 +5293,16 @@
                      "Thorlabs": "#/$defs/_Thorlabs",
                      "Transducer Techniques": "#/$defs/_Transducer_Techniques",
                      "Tymphany": "#/$defs/_Tymphany",
+                     "U.S. National Science Foundation": "#/$defs/_U_S_National_Science_Foundation",
+                     "United States Department of Defense": "#/$defs/_United_States_Department_Of_Defense",
+                     "United States Department of Energy": "#/$defs/_United_States_Department_Of_Energy",
                      "University of California, San Diego": "#/$defs/_University_Of_California_San_Diego",
                      "University of Pennsylvania": "#/$defs/_University_Of_Pennsylvania",
                      "Unknown": "#/$defs/_Unknown",
                      "Vieworks": "#/$defs/_Vieworks",
                      "Vortran": "#/$defs/_Vortran",
+                     "W. M. Keck Foundation": "#/$defs/_W_M_Keck_Foundation",
+                     "Warren Alpert Foundation": "#/$defs/_Warren_Alpert_Foundation",
                      "World Precision Intstruments": "#/$defs/_World_Precision_Intstruments",
                      "ams OSRAM": "#/$defs/_Ams_Osram"
                   },
@@ -4948,6 +5323,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Ailipu_Technology_Co"
+                  },
+                  {
+                     "$ref": "#/$defs/_Aligning_Science_Across_Parkinson_S"
                   },
                   {
                      "$ref": "#/$defs/_Allen_Institute"
@@ -5046,6 +5424,9 @@
                      "$ref": "#/$defs/_Emory_University"
                   },
                   {
+                     "$ref": "#/$defs/_Esther_A_Joseph_Klingenstein_Fund"
+                  },
+                  {
                      "$ref": "#/$defs/_Euresys"
                   },
                   {
@@ -5055,10 +5436,16 @@
                      "$ref": "#/$defs/_Fujinon"
                   },
                   {
+                     "$ref": "#/$defs/_G_Harold_Leila_Y_Mathers_Foundation"
+                  },
+                  {
                      "$ref": "#/$defs/_Hamamatsu"
                   },
                   {
                      "$ref": "#/$defs/_Hamilton"
+                  },
+                  {
+                     "$ref": "#/$defs/_Helen_Hay_Whitney_Foundation"
                   },
                   {
                      "$ref": "#/$defs/_Huazhong_University_Of_Science_And_Technology"
@@ -5103,6 +5490,9 @@
                      "$ref": "#/$defs/_Kent_Scientific_Corporation"
                   },
                   {
+                     "$ref": "#/$defs/_Klingenstein_Third_Generation_Foundation"
+                  },
+                  {
                      "$ref": "#/$defs/_Kowa"
                   },
                   {
@@ -5113,6 +5503,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Leica"
+                  },
+                  {
+                     "$ref": "#/$defs/_Life_Sciences_Research_Foundation"
                   },
                   {
                      "$ref": "#/$defs/_Lifecanvas"
@@ -5142,6 +5535,12 @@
                      "$ref": "#/$defs/_Mcgovern_Institute_For_Brain_Research"
                   },
                   {
+                     "$ref": "#/$defs/_Mcknight_Brain_Research_Foundation"
+                  },
+                  {
+                     "$ref": "#/$defs/_Mcknight_Foundation"
+                  },
+                  {
                      "$ref": "#/$defs/_Meadowlark_Optics"
                   },
                   {
@@ -5167,6 +5566,9 @@
                   },
                   {
                      "$ref": "#/$defs/_National_Institute_Of_Neurological_Disorders_And_Stroke"
+                  },
+                  {
+                     "$ref": "#/$defs/_National_Institute_On_Aging"
                   },
                   {
                      "$ref": "#/$defs/_National_Instruments"
@@ -5206,6 +5608,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Oxxius"
+                  },
+                  {
+                     "$ref": "#/$defs/_Pew_Charitable_Trusts"
                   },
                   {
                      "$ref": "#/$defs/_Placid_Industries"
@@ -5295,6 +5700,15 @@
                      "$ref": "#/$defs/_Tymphany"
                   },
                   {
+                     "$ref": "#/$defs/_U_S_National_Science_Foundation"
+                  },
+                  {
+                     "$ref": "#/$defs/_United_States_Department_Of_Defense"
+                  },
+                  {
+                     "$ref": "#/$defs/_United_States_Department_Of_Energy"
+                  },
+                  {
                      "$ref": "#/$defs/_University_Of_California_San_Diego"
                   },
                   {
@@ -5308,6 +5722,12 @@
                   },
                   {
                      "$ref": "#/$defs/_Vortran"
+                  },
+                  {
+                     "$ref": "#/$defs/_W_M_Keck_Foundation"
+                  },
+                  {
+                     "$ref": "#/$defs/_Warren_Alpert_Foundation"
                   },
                   {
                      "$ref": "#/$defs/_World_Precision_Intstruments"
@@ -5510,6 +5930,7 @@
                      "Abcam": "#/$defs/_Abcam",
                      "Addgene": "#/$defs/_Addgene",
                      "Ailipu Technology Co": "#/$defs/_Ailipu_Technology_Co",
+                     "Aligning Science Across Parkinson's": "#/$defs/_Aligning_Science_Across_Parkinson_S",
                      "Allen Institute": "#/$defs/_Allen_Institute",
                      "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                      "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
@@ -5542,11 +5963,14 @@
                      "Ealing": "#/$defs/_Ealing",
                      "Edmund Optics": "#/$defs/_Edmund_Optics",
                      "Emory University": "#/$defs/_Emory_University",
+                     "Esther A. & Joseph Klingenstein Fund": "#/$defs/_Esther_A_Joseph_Klingenstein_Fund",
                      "Euresys": "#/$defs/_Euresys",
                      "Excelitas Technologies": "#/$defs/_Excelitas_Technologies",
                      "Fujinon": "#/$defs/_Fujinon",
+                     "G. Harold & Leila Y. Mathers Foundation": "#/$defs/_G_Harold_Leila_Y_Mathers_Foundation",
                      "Hamamatsu": "#/$defs/_Hamamatsu",
                      "Hamilton": "#/$defs/_Hamilton",
+                     "Helen Hay Whitney Foundation": "#/$defs/_Helen_Hay_Whitney_Foundation",
                      "Huazhong University of Science and Technology": "#/$defs/_Huazhong_University_Of_Science_And_Technology",
                      "IR Robot Co": "#/$defs/_Ir_Robot_Co",
                      "ISL Products International": "#/$defs/_Isl_Products_International",
@@ -5561,10 +5985,12 @@
                      "Johns Hopkins University": "#/$defs/_Johns_Hopkins_University",
                      "Julabo": "#/$defs/_Julabo",
                      "Kent Scientific Corporation": "#/$defs/_Kent_Scientific_Corporation",
+                     "Klingenstein Third Generation Foundation": "#/$defs/_Klingenstein_Third_Generation_Foundation",
                      "Kowa": "#/$defs/_Kowa",
                      "LASOS Lasertechnik": "#/$defs/_Lasos_Lasertechnik",
                      "LG": "#/$defs/_Lg",
                      "Leica": "#/$defs/_Leica",
+                     "Life Sciences Research Foundation": "#/$defs/_Life_Sciences_Research_Foundation",
                      "LifeCanvas": "#/$defs/_Lifecanvas",
                      "Lumen Dynamics": "#/$defs/_Lumen_Dynamics",
                      "Lumencor": "#/$defs/_Lumencor",
@@ -5574,6 +6000,8 @@
                      "MPI": "#/$defs/_Mpi",
                      "Massachusetts Institute of Technology": "#/$defs/_Massachusetts_Institute_Of_Technology",
                      "McGovern Institute for Brain Research": "#/$defs/_Mcgovern_Institute_For_Brain_Research",
+                     "McKnight Brain Research Foundation": "#/$defs/_Mcknight_Brain_Research_Foundation",
+                     "McKnight Foundation": "#/$defs/_Mcknight_Foundation",
                      "Meadowlark Optics": "#/$defs/_Meadowlark_Optics",
                      "Michael J. Fox Foundation for Parkinson's Research": "#/$defs/_Michael_J_Fox_Foundation_For_Parkinson_S_Research",
                      "Midwest Optical Systems, Inc.": "#/$defs/_Midwest_Optical_Systems_Inc_",
@@ -5583,6 +6011,7 @@
                      "National Center for Complementary and Integrative Health": "#/$defs/_National_Center_For_Complementary_And_Integrative_Health",
                      "National Institute of Mental Health": "#/$defs/_National_Institute_Of_Mental_Health",
                      "National Institute of Neurological Disorders and Stroke": "#/$defs/_National_Institute_Of_Neurological_Disorders_And_Stroke",
+                     "National Institute on Aging": "#/$defs/_National_Institute_On_Aging",
                      "National Instruments": "#/$defs/_National_Instruments",
                      "Navitar": "#/$defs/_Navitar",
                      "NeuraLynx": "#/$defs/_Neuralynx",
@@ -5596,6 +6025,7 @@
                      "Other": "#/$defs/_Other",
                      "Oxford Instruments": "#/$defs/_Oxford_Instruments",
                      "Oxxius": "#/$defs/_Oxxius",
+                     "Pew Charitable Trusts": "#/$defs/_Pew_Charitable_Trusts",
                      "Placid Industries": "#/$defs/_Placid_Industries",
                      "Prizmatix": "#/$defs/_Prizmatix",
                      "Quantifi": "#/$defs/_Quantifi",
@@ -5625,11 +6055,16 @@
                      "Thorlabs": "#/$defs/_Thorlabs",
                      "Transducer Techniques": "#/$defs/_Transducer_Techniques",
                      "Tymphany": "#/$defs/_Tymphany",
+                     "U.S. National Science Foundation": "#/$defs/_U_S_National_Science_Foundation",
+                     "United States Department of Defense": "#/$defs/_United_States_Department_Of_Defense",
+                     "United States Department of Energy": "#/$defs/_United_States_Department_Of_Energy",
                      "University of California, San Diego": "#/$defs/_University_Of_California_San_Diego",
                      "University of Pennsylvania": "#/$defs/_University_Of_Pennsylvania",
                      "Unknown": "#/$defs/_Unknown",
                      "Vieworks": "#/$defs/_Vieworks",
                      "Vortran": "#/$defs/_Vortran",
+                     "W. M. Keck Foundation": "#/$defs/_W_M_Keck_Foundation",
+                     "Warren Alpert Foundation": "#/$defs/_Warren_Alpert_Foundation",
                      "World Precision Intstruments": "#/$defs/_World_Precision_Intstruments",
                      "ams OSRAM": "#/$defs/_Ams_Osram"
                   },
@@ -5650,6 +6085,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Ailipu_Technology_Co"
+                  },
+                  {
+                     "$ref": "#/$defs/_Aligning_Science_Across_Parkinson_S"
                   },
                   {
                      "$ref": "#/$defs/_Allen_Institute"
@@ -5748,6 +6186,9 @@
                      "$ref": "#/$defs/_Emory_University"
                   },
                   {
+                     "$ref": "#/$defs/_Esther_A_Joseph_Klingenstein_Fund"
+                  },
+                  {
                      "$ref": "#/$defs/_Euresys"
                   },
                   {
@@ -5757,10 +6198,16 @@
                      "$ref": "#/$defs/_Fujinon"
                   },
                   {
+                     "$ref": "#/$defs/_G_Harold_Leila_Y_Mathers_Foundation"
+                  },
+                  {
                      "$ref": "#/$defs/_Hamamatsu"
                   },
                   {
                      "$ref": "#/$defs/_Hamilton"
+                  },
+                  {
+                     "$ref": "#/$defs/_Helen_Hay_Whitney_Foundation"
                   },
                   {
                      "$ref": "#/$defs/_Huazhong_University_Of_Science_And_Technology"
@@ -5805,6 +6252,9 @@
                      "$ref": "#/$defs/_Kent_Scientific_Corporation"
                   },
                   {
+                     "$ref": "#/$defs/_Klingenstein_Third_Generation_Foundation"
+                  },
+                  {
                      "$ref": "#/$defs/_Kowa"
                   },
                   {
@@ -5815,6 +6265,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Leica"
+                  },
+                  {
+                     "$ref": "#/$defs/_Life_Sciences_Research_Foundation"
                   },
                   {
                      "$ref": "#/$defs/_Lifecanvas"
@@ -5844,6 +6297,12 @@
                      "$ref": "#/$defs/_Mcgovern_Institute_For_Brain_Research"
                   },
                   {
+                     "$ref": "#/$defs/_Mcknight_Brain_Research_Foundation"
+                  },
+                  {
+                     "$ref": "#/$defs/_Mcknight_Foundation"
+                  },
+                  {
                      "$ref": "#/$defs/_Meadowlark_Optics"
                   },
                   {
@@ -5869,6 +6328,9 @@
                   },
                   {
                      "$ref": "#/$defs/_National_Institute_Of_Neurological_Disorders_And_Stroke"
+                  },
+                  {
+                     "$ref": "#/$defs/_National_Institute_On_Aging"
                   },
                   {
                      "$ref": "#/$defs/_National_Instruments"
@@ -5908,6 +6370,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Oxxius"
+                  },
+                  {
+                     "$ref": "#/$defs/_Pew_Charitable_Trusts"
                   },
                   {
                      "$ref": "#/$defs/_Placid_Industries"
@@ -5997,6 +6462,15 @@
                      "$ref": "#/$defs/_Tymphany"
                   },
                   {
+                     "$ref": "#/$defs/_U_S_National_Science_Foundation"
+                  },
+                  {
+                     "$ref": "#/$defs/_United_States_Department_Of_Defense"
+                  },
+                  {
+                     "$ref": "#/$defs/_United_States_Department_Of_Energy"
+                  },
+                  {
                      "$ref": "#/$defs/_University_Of_California_San_Diego"
                   },
                   {
@@ -6010,6 +6484,12 @@
                   },
                   {
                      "$ref": "#/$defs/_Vortran"
+                  },
+                  {
+                     "$ref": "#/$defs/_W_M_Keck_Foundation"
+                  },
+                  {
+                     "$ref": "#/$defs/_Warren_Alpert_Foundation"
                   },
                   {
                      "$ref": "#/$defs/_World_Precision_Intstruments"
@@ -6726,6 +7206,7 @@
                            "Abcam": "#/$defs/_Abcam",
                            "Addgene": "#/$defs/_Addgene",
                            "Ailipu Technology Co": "#/$defs/_Ailipu_Technology_Co",
+                           "Aligning Science Across Parkinson's": "#/$defs/_Aligning_Science_Across_Parkinson_S",
                            "Allen Institute": "#/$defs/_Allen_Institute",
                            "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                            "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
@@ -6758,11 +7239,14 @@
                            "Ealing": "#/$defs/_Ealing",
                            "Edmund Optics": "#/$defs/_Edmund_Optics",
                            "Emory University": "#/$defs/_Emory_University",
+                           "Esther A. & Joseph Klingenstein Fund": "#/$defs/_Esther_A_Joseph_Klingenstein_Fund",
                            "Euresys": "#/$defs/_Euresys",
                            "Excelitas Technologies": "#/$defs/_Excelitas_Technologies",
                            "Fujinon": "#/$defs/_Fujinon",
+                           "G. Harold & Leila Y. Mathers Foundation": "#/$defs/_G_Harold_Leila_Y_Mathers_Foundation",
                            "Hamamatsu": "#/$defs/_Hamamatsu",
                            "Hamilton": "#/$defs/_Hamilton",
+                           "Helen Hay Whitney Foundation": "#/$defs/_Helen_Hay_Whitney_Foundation",
                            "Huazhong University of Science and Technology": "#/$defs/_Huazhong_University_Of_Science_And_Technology",
                            "IR Robot Co": "#/$defs/_Ir_Robot_Co",
                            "ISL Products International": "#/$defs/_Isl_Products_International",
@@ -6777,10 +7261,12 @@
                            "Johns Hopkins University": "#/$defs/_Johns_Hopkins_University",
                            "Julabo": "#/$defs/_Julabo",
                            "Kent Scientific Corporation": "#/$defs/_Kent_Scientific_Corporation",
+                           "Klingenstein Third Generation Foundation": "#/$defs/_Klingenstein_Third_Generation_Foundation",
                            "Kowa": "#/$defs/_Kowa",
                            "LASOS Lasertechnik": "#/$defs/_Lasos_Lasertechnik",
                            "LG": "#/$defs/_Lg",
                            "Leica": "#/$defs/_Leica",
+                           "Life Sciences Research Foundation": "#/$defs/_Life_Sciences_Research_Foundation",
                            "LifeCanvas": "#/$defs/_Lifecanvas",
                            "Lumen Dynamics": "#/$defs/_Lumen_Dynamics",
                            "Lumencor": "#/$defs/_Lumencor",
@@ -6790,6 +7276,8 @@
                            "MPI": "#/$defs/_Mpi",
                            "Massachusetts Institute of Technology": "#/$defs/_Massachusetts_Institute_Of_Technology",
                            "McGovern Institute for Brain Research": "#/$defs/_Mcgovern_Institute_For_Brain_Research",
+                           "McKnight Brain Research Foundation": "#/$defs/_Mcknight_Brain_Research_Foundation",
+                           "McKnight Foundation": "#/$defs/_Mcknight_Foundation",
                            "Meadowlark Optics": "#/$defs/_Meadowlark_Optics",
                            "Michael J. Fox Foundation for Parkinson's Research": "#/$defs/_Michael_J_Fox_Foundation_For_Parkinson_S_Research",
                            "Midwest Optical Systems, Inc.": "#/$defs/_Midwest_Optical_Systems_Inc_",
@@ -6799,6 +7287,7 @@
                            "National Center for Complementary and Integrative Health": "#/$defs/_National_Center_For_Complementary_And_Integrative_Health",
                            "National Institute of Mental Health": "#/$defs/_National_Institute_Of_Mental_Health",
                            "National Institute of Neurological Disorders and Stroke": "#/$defs/_National_Institute_Of_Neurological_Disorders_And_Stroke",
+                           "National Institute on Aging": "#/$defs/_National_Institute_On_Aging",
                            "National Instruments": "#/$defs/_National_Instruments",
                            "Navitar": "#/$defs/_Navitar",
                            "NeuraLynx": "#/$defs/_Neuralynx",
@@ -6812,6 +7301,7 @@
                            "Other": "#/$defs/_Other",
                            "Oxford Instruments": "#/$defs/_Oxford_Instruments",
                            "Oxxius": "#/$defs/_Oxxius",
+                           "Pew Charitable Trusts": "#/$defs/_Pew_Charitable_Trusts",
                            "Placid Industries": "#/$defs/_Placid_Industries",
                            "Prizmatix": "#/$defs/_Prizmatix",
                            "Quantifi": "#/$defs/_Quantifi",
@@ -6841,11 +7331,16 @@
                            "Thorlabs": "#/$defs/_Thorlabs",
                            "Transducer Techniques": "#/$defs/_Transducer_Techniques",
                            "Tymphany": "#/$defs/_Tymphany",
+                           "U.S. National Science Foundation": "#/$defs/_U_S_National_Science_Foundation",
+                           "United States Department of Defense": "#/$defs/_United_States_Department_Of_Defense",
+                           "United States Department of Energy": "#/$defs/_United_States_Department_Of_Energy",
                            "University of California, San Diego": "#/$defs/_University_Of_California_San_Diego",
                            "University of Pennsylvania": "#/$defs/_University_Of_Pennsylvania",
                            "Unknown": "#/$defs/_Unknown",
                            "Vieworks": "#/$defs/_Vieworks",
                            "Vortran": "#/$defs/_Vortran",
+                           "W. M. Keck Foundation": "#/$defs/_W_M_Keck_Foundation",
+                           "Warren Alpert Foundation": "#/$defs/_Warren_Alpert_Foundation",
                            "World Precision Intstruments": "#/$defs/_World_Precision_Intstruments",
                            "ams OSRAM": "#/$defs/_Ams_Osram"
                         },
@@ -6866,6 +7361,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Ailipu_Technology_Co"
+                        },
+                        {
+                           "$ref": "#/$defs/_Aligning_Science_Across_Parkinson_S"
                         },
                         {
                            "$ref": "#/$defs/_Allen_Institute"
@@ -6964,6 +7462,9 @@
                            "$ref": "#/$defs/_Emory_University"
                         },
                         {
+                           "$ref": "#/$defs/_Esther_A_Joseph_Klingenstein_Fund"
+                        },
+                        {
                            "$ref": "#/$defs/_Euresys"
                         },
                         {
@@ -6973,10 +7474,16 @@
                            "$ref": "#/$defs/_Fujinon"
                         },
                         {
+                           "$ref": "#/$defs/_G_Harold_Leila_Y_Mathers_Foundation"
+                        },
+                        {
                            "$ref": "#/$defs/_Hamamatsu"
                         },
                         {
                            "$ref": "#/$defs/_Hamilton"
+                        },
+                        {
+                           "$ref": "#/$defs/_Helen_Hay_Whitney_Foundation"
                         },
                         {
                            "$ref": "#/$defs/_Huazhong_University_Of_Science_And_Technology"
@@ -7021,6 +7528,9 @@
                            "$ref": "#/$defs/_Kent_Scientific_Corporation"
                         },
                         {
+                           "$ref": "#/$defs/_Klingenstein_Third_Generation_Foundation"
+                        },
+                        {
                            "$ref": "#/$defs/_Kowa"
                         },
                         {
@@ -7031,6 +7541,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Leica"
+                        },
+                        {
+                           "$ref": "#/$defs/_Life_Sciences_Research_Foundation"
                         },
                         {
                            "$ref": "#/$defs/_Lifecanvas"
@@ -7060,6 +7573,12 @@
                            "$ref": "#/$defs/_Mcgovern_Institute_For_Brain_Research"
                         },
                         {
+                           "$ref": "#/$defs/_Mcknight_Brain_Research_Foundation"
+                        },
+                        {
+                           "$ref": "#/$defs/_Mcknight_Foundation"
+                        },
+                        {
                            "$ref": "#/$defs/_Meadowlark_Optics"
                         },
                         {
@@ -7085,6 +7604,9 @@
                         },
                         {
                            "$ref": "#/$defs/_National_Institute_Of_Neurological_Disorders_And_Stroke"
+                        },
+                        {
+                           "$ref": "#/$defs/_National_Institute_On_Aging"
                         },
                         {
                            "$ref": "#/$defs/_National_Instruments"
@@ -7124,6 +7646,9 @@
                         },
                         {
                            "$ref": "#/$defs/_Oxxius"
+                        },
+                        {
+                           "$ref": "#/$defs/_Pew_Charitable_Trusts"
                         },
                         {
                            "$ref": "#/$defs/_Placid_Industries"
@@ -7213,6 +7738,15 @@
                            "$ref": "#/$defs/_Tymphany"
                         },
                         {
+                           "$ref": "#/$defs/_U_S_National_Science_Foundation"
+                        },
+                        {
+                           "$ref": "#/$defs/_United_States_Department_Of_Defense"
+                        },
+                        {
+                           "$ref": "#/$defs/_United_States_Department_Of_Energy"
+                        },
+                        {
                            "$ref": "#/$defs/_University_Of_California_San_Diego"
                         },
                         {
@@ -7226,6 +7760,12 @@
                         },
                         {
                            "$ref": "#/$defs/_Vortran"
+                        },
+                        {
+                           "$ref": "#/$defs/_W_M_Keck_Foundation"
+                        },
+                        {
+                           "$ref": "#/$defs/_Warren_Alpert_Foundation"
                         },
                         {
                            "$ref": "#/$defs/_World_Precision_Intstruments"
@@ -7498,6 +8038,7 @@
                      "Abcam": "#/$defs/_Abcam",
                      "Addgene": "#/$defs/_Addgene",
                      "Ailipu Technology Co": "#/$defs/_Ailipu_Technology_Co",
+                     "Aligning Science Across Parkinson's": "#/$defs/_Aligning_Science_Across_Parkinson_S",
                      "Allen Institute": "#/$defs/_Allen_Institute",
                      "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                      "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
@@ -7530,11 +8071,14 @@
                      "Ealing": "#/$defs/_Ealing",
                      "Edmund Optics": "#/$defs/_Edmund_Optics",
                      "Emory University": "#/$defs/_Emory_University",
+                     "Esther A. & Joseph Klingenstein Fund": "#/$defs/_Esther_A_Joseph_Klingenstein_Fund",
                      "Euresys": "#/$defs/_Euresys",
                      "Excelitas Technologies": "#/$defs/_Excelitas_Technologies",
                      "Fujinon": "#/$defs/_Fujinon",
+                     "G. Harold & Leila Y. Mathers Foundation": "#/$defs/_G_Harold_Leila_Y_Mathers_Foundation",
                      "Hamamatsu": "#/$defs/_Hamamatsu",
                      "Hamilton": "#/$defs/_Hamilton",
+                     "Helen Hay Whitney Foundation": "#/$defs/_Helen_Hay_Whitney_Foundation",
                      "Huazhong University of Science and Technology": "#/$defs/_Huazhong_University_Of_Science_And_Technology",
                      "IR Robot Co": "#/$defs/_Ir_Robot_Co",
                      "ISL Products International": "#/$defs/_Isl_Products_International",
@@ -7549,10 +8093,12 @@
                      "Johns Hopkins University": "#/$defs/_Johns_Hopkins_University",
                      "Julabo": "#/$defs/_Julabo",
                      "Kent Scientific Corporation": "#/$defs/_Kent_Scientific_Corporation",
+                     "Klingenstein Third Generation Foundation": "#/$defs/_Klingenstein_Third_Generation_Foundation",
                      "Kowa": "#/$defs/_Kowa",
                      "LASOS Lasertechnik": "#/$defs/_Lasos_Lasertechnik",
                      "LG": "#/$defs/_Lg",
                      "Leica": "#/$defs/_Leica",
+                     "Life Sciences Research Foundation": "#/$defs/_Life_Sciences_Research_Foundation",
                      "LifeCanvas": "#/$defs/_Lifecanvas",
                      "Lumen Dynamics": "#/$defs/_Lumen_Dynamics",
                      "Lumencor": "#/$defs/_Lumencor",
@@ -7562,6 +8108,8 @@
                      "MPI": "#/$defs/_Mpi",
                      "Massachusetts Institute of Technology": "#/$defs/_Massachusetts_Institute_Of_Technology",
                      "McGovern Institute for Brain Research": "#/$defs/_Mcgovern_Institute_For_Brain_Research",
+                     "McKnight Brain Research Foundation": "#/$defs/_Mcknight_Brain_Research_Foundation",
+                     "McKnight Foundation": "#/$defs/_Mcknight_Foundation",
                      "Meadowlark Optics": "#/$defs/_Meadowlark_Optics",
                      "Michael J. Fox Foundation for Parkinson's Research": "#/$defs/_Michael_J_Fox_Foundation_For_Parkinson_S_Research",
                      "Midwest Optical Systems, Inc.": "#/$defs/_Midwest_Optical_Systems_Inc_",
@@ -7571,6 +8119,7 @@
                      "National Center for Complementary and Integrative Health": "#/$defs/_National_Center_For_Complementary_And_Integrative_Health",
                      "National Institute of Mental Health": "#/$defs/_National_Institute_Of_Mental_Health",
                      "National Institute of Neurological Disorders and Stroke": "#/$defs/_National_Institute_Of_Neurological_Disorders_And_Stroke",
+                     "National Institute on Aging": "#/$defs/_National_Institute_On_Aging",
                      "National Instruments": "#/$defs/_National_Instruments",
                      "Navitar": "#/$defs/_Navitar",
                      "NeuraLynx": "#/$defs/_Neuralynx",
@@ -7584,6 +8133,7 @@
                      "Other": "#/$defs/_Other",
                      "Oxford Instruments": "#/$defs/_Oxford_Instruments",
                      "Oxxius": "#/$defs/_Oxxius",
+                     "Pew Charitable Trusts": "#/$defs/_Pew_Charitable_Trusts",
                      "Placid Industries": "#/$defs/_Placid_Industries",
                      "Prizmatix": "#/$defs/_Prizmatix",
                      "Quantifi": "#/$defs/_Quantifi",
@@ -7613,11 +8163,16 @@
                      "Thorlabs": "#/$defs/_Thorlabs",
                      "Transducer Techniques": "#/$defs/_Transducer_Techniques",
                      "Tymphany": "#/$defs/_Tymphany",
+                     "U.S. National Science Foundation": "#/$defs/_U_S_National_Science_Foundation",
+                     "United States Department of Defense": "#/$defs/_United_States_Department_Of_Defense",
+                     "United States Department of Energy": "#/$defs/_United_States_Department_Of_Energy",
                      "University of California, San Diego": "#/$defs/_University_Of_California_San_Diego",
                      "University of Pennsylvania": "#/$defs/_University_Of_Pennsylvania",
                      "Unknown": "#/$defs/_Unknown",
                      "Vieworks": "#/$defs/_Vieworks",
                      "Vortran": "#/$defs/_Vortran",
+                     "W. M. Keck Foundation": "#/$defs/_W_M_Keck_Foundation",
+                     "Warren Alpert Foundation": "#/$defs/_Warren_Alpert_Foundation",
                      "World Precision Intstruments": "#/$defs/_World_Precision_Intstruments",
                      "ams OSRAM": "#/$defs/_Ams_Osram"
                   },
@@ -7638,6 +8193,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Ailipu_Technology_Co"
+                  },
+                  {
+                     "$ref": "#/$defs/_Aligning_Science_Across_Parkinson_S"
                   },
                   {
                      "$ref": "#/$defs/_Allen_Institute"
@@ -7736,6 +8294,9 @@
                      "$ref": "#/$defs/_Emory_University"
                   },
                   {
+                     "$ref": "#/$defs/_Esther_A_Joseph_Klingenstein_Fund"
+                  },
+                  {
                      "$ref": "#/$defs/_Euresys"
                   },
                   {
@@ -7745,10 +8306,16 @@
                      "$ref": "#/$defs/_Fujinon"
                   },
                   {
+                     "$ref": "#/$defs/_G_Harold_Leila_Y_Mathers_Foundation"
+                  },
+                  {
                      "$ref": "#/$defs/_Hamamatsu"
                   },
                   {
                      "$ref": "#/$defs/_Hamilton"
+                  },
+                  {
+                     "$ref": "#/$defs/_Helen_Hay_Whitney_Foundation"
                   },
                   {
                      "$ref": "#/$defs/_Huazhong_University_Of_Science_And_Technology"
@@ -7793,6 +8360,9 @@
                      "$ref": "#/$defs/_Kent_Scientific_Corporation"
                   },
                   {
+                     "$ref": "#/$defs/_Klingenstein_Third_Generation_Foundation"
+                  },
+                  {
                      "$ref": "#/$defs/_Kowa"
                   },
                   {
@@ -7803,6 +8373,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Leica"
+                  },
+                  {
+                     "$ref": "#/$defs/_Life_Sciences_Research_Foundation"
                   },
                   {
                      "$ref": "#/$defs/_Lifecanvas"
@@ -7832,6 +8405,12 @@
                      "$ref": "#/$defs/_Mcgovern_Institute_For_Brain_Research"
                   },
                   {
+                     "$ref": "#/$defs/_Mcknight_Brain_Research_Foundation"
+                  },
+                  {
+                     "$ref": "#/$defs/_Mcknight_Foundation"
+                  },
+                  {
                      "$ref": "#/$defs/_Meadowlark_Optics"
                   },
                   {
@@ -7857,6 +8436,9 @@
                   },
                   {
                      "$ref": "#/$defs/_National_Institute_Of_Neurological_Disorders_And_Stroke"
+                  },
+                  {
+                     "$ref": "#/$defs/_National_Institute_On_Aging"
                   },
                   {
                      "$ref": "#/$defs/_National_Instruments"
@@ -7896,6 +8478,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Oxxius"
+                  },
+                  {
+                     "$ref": "#/$defs/_Pew_Charitable_Trusts"
                   },
                   {
                      "$ref": "#/$defs/_Placid_Industries"
@@ -7985,6 +8570,15 @@
                      "$ref": "#/$defs/_Tymphany"
                   },
                   {
+                     "$ref": "#/$defs/_U_S_National_Science_Foundation"
+                  },
+                  {
+                     "$ref": "#/$defs/_United_States_Department_Of_Defense"
+                  },
+                  {
+                     "$ref": "#/$defs/_United_States_Department_Of_Energy"
+                  },
+                  {
                      "$ref": "#/$defs/_University_Of_California_San_Diego"
                   },
                   {
@@ -7998,6 +8592,12 @@
                   },
                   {
                      "$ref": "#/$defs/_Vortran"
+                  },
+                  {
+                     "$ref": "#/$defs/_W_M_Keck_Foundation"
+                  },
+                  {
+                     "$ref": "#/$defs/_Warren_Alpert_Foundation"
                   },
                   {
                      "$ref": "#/$defs/_World_Precision_Intstruments"
@@ -8208,7 +8808,7 @@
                "title": "Protocol ID"
             },
             "output_specimen_names": {
-               "description": "Names of specimens resulting from this procedure. Whole brains can use the {subject_name}, partial sections should always include a suffix {subject_name}_###",
+               "description": "Names of specimens resulting from this procedure. Whole brains can use the {subject_name}; partial sections commonly use a {subject_name}_### suffix.",
                "items": {
                   "type": "string"
                },
@@ -8362,14 +8962,15 @@
                      "$ref": "#/$defs/CoordinateSystem"
                   },
                   {
-                     "$ref": "#/$defs/Atlas"
+                     "const": "Not applicable",
+                     "type": "string"
                   },
                   {
-                     "type": "null"
+                     "$ref": "#/$defs/Atlas"
                   }
                ],
-               "default": null,
-               "description": "Only required if different from the Procedures.global_coordinate_system",
+               "default": "Not applicable",
+               "description": "Origin and axis definitions for section coordinates. Required when coordinates are provided. Use 'Not applicable' when no global coordinate system applies.",
                "title": "Sectioning global coordinate system"
             },
             "section_orientation": {
@@ -8585,6 +9186,7 @@
                      "Abcam": "#/$defs/_Abcam",
                      "Addgene": "#/$defs/_Addgene",
                      "Ailipu Technology Co": "#/$defs/_Ailipu_Technology_Co",
+                     "Aligning Science Across Parkinson's": "#/$defs/_Aligning_Science_Across_Parkinson_S",
                      "Allen Institute": "#/$defs/_Allen_Institute",
                      "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                      "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
@@ -8617,11 +9219,14 @@
                      "Ealing": "#/$defs/_Ealing",
                      "Edmund Optics": "#/$defs/_Edmund_Optics",
                      "Emory University": "#/$defs/_Emory_University",
+                     "Esther A. & Joseph Klingenstein Fund": "#/$defs/_Esther_A_Joseph_Klingenstein_Fund",
                      "Euresys": "#/$defs/_Euresys",
                      "Excelitas Technologies": "#/$defs/_Excelitas_Technologies",
                      "Fujinon": "#/$defs/_Fujinon",
+                     "G. Harold & Leila Y. Mathers Foundation": "#/$defs/_G_Harold_Leila_Y_Mathers_Foundation",
                      "Hamamatsu": "#/$defs/_Hamamatsu",
                      "Hamilton": "#/$defs/_Hamilton",
+                     "Helen Hay Whitney Foundation": "#/$defs/_Helen_Hay_Whitney_Foundation",
                      "Huazhong University of Science and Technology": "#/$defs/_Huazhong_University_Of_Science_And_Technology",
                      "IR Robot Co": "#/$defs/_Ir_Robot_Co",
                      "ISL Products International": "#/$defs/_Isl_Products_International",
@@ -8636,10 +9241,12 @@
                      "Johns Hopkins University": "#/$defs/_Johns_Hopkins_University",
                      "Julabo": "#/$defs/_Julabo",
                      "Kent Scientific Corporation": "#/$defs/_Kent_Scientific_Corporation",
+                     "Klingenstein Third Generation Foundation": "#/$defs/_Klingenstein_Third_Generation_Foundation",
                      "Kowa": "#/$defs/_Kowa",
                      "LASOS Lasertechnik": "#/$defs/_Lasos_Lasertechnik",
                      "LG": "#/$defs/_Lg",
                      "Leica": "#/$defs/_Leica",
+                     "Life Sciences Research Foundation": "#/$defs/_Life_Sciences_Research_Foundation",
                      "LifeCanvas": "#/$defs/_Lifecanvas",
                      "Lumen Dynamics": "#/$defs/_Lumen_Dynamics",
                      "Lumencor": "#/$defs/_Lumencor",
@@ -8649,6 +9256,8 @@
                      "MPI": "#/$defs/_Mpi",
                      "Massachusetts Institute of Technology": "#/$defs/_Massachusetts_Institute_Of_Technology",
                      "McGovern Institute for Brain Research": "#/$defs/_Mcgovern_Institute_For_Brain_Research",
+                     "McKnight Brain Research Foundation": "#/$defs/_Mcknight_Brain_Research_Foundation",
+                     "McKnight Foundation": "#/$defs/_Mcknight_Foundation",
                      "Meadowlark Optics": "#/$defs/_Meadowlark_Optics",
                      "Michael J. Fox Foundation for Parkinson's Research": "#/$defs/_Michael_J_Fox_Foundation_For_Parkinson_S_Research",
                      "Midwest Optical Systems, Inc.": "#/$defs/_Midwest_Optical_Systems_Inc_",
@@ -8658,6 +9267,7 @@
                      "National Center for Complementary and Integrative Health": "#/$defs/_National_Center_For_Complementary_And_Integrative_Health",
                      "National Institute of Mental Health": "#/$defs/_National_Institute_Of_Mental_Health",
                      "National Institute of Neurological Disorders and Stroke": "#/$defs/_National_Institute_Of_Neurological_Disorders_And_Stroke",
+                     "National Institute on Aging": "#/$defs/_National_Institute_On_Aging",
                      "National Instruments": "#/$defs/_National_Instruments",
                      "Navitar": "#/$defs/_Navitar",
                      "NeuraLynx": "#/$defs/_Neuralynx",
@@ -8671,6 +9281,7 @@
                      "Other": "#/$defs/_Other",
                      "Oxford Instruments": "#/$defs/_Oxford_Instruments",
                      "Oxxius": "#/$defs/_Oxxius",
+                     "Pew Charitable Trusts": "#/$defs/_Pew_Charitable_Trusts",
                      "Placid Industries": "#/$defs/_Placid_Industries",
                      "Prizmatix": "#/$defs/_Prizmatix",
                      "Quantifi": "#/$defs/_Quantifi",
@@ -8700,11 +9311,16 @@
                      "Thorlabs": "#/$defs/_Thorlabs",
                      "Transducer Techniques": "#/$defs/_Transducer_Techniques",
                      "Tymphany": "#/$defs/_Tymphany",
+                     "U.S. National Science Foundation": "#/$defs/_U_S_National_Science_Foundation",
+                     "United States Department of Defense": "#/$defs/_United_States_Department_Of_Defense",
+                     "United States Department of Energy": "#/$defs/_United_States_Department_Of_Energy",
                      "University of California, San Diego": "#/$defs/_University_Of_California_San_Diego",
                      "University of Pennsylvania": "#/$defs/_University_Of_Pennsylvania",
                      "Unknown": "#/$defs/_Unknown",
                      "Vieworks": "#/$defs/_Vieworks",
                      "Vortran": "#/$defs/_Vortran",
+                     "W. M. Keck Foundation": "#/$defs/_W_M_Keck_Foundation",
+                     "Warren Alpert Foundation": "#/$defs/_Warren_Alpert_Foundation",
                      "World Precision Intstruments": "#/$defs/_World_Precision_Intstruments",
                      "ams OSRAM": "#/$defs/_Ams_Osram"
                   },
@@ -8725,6 +9341,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Ailipu_Technology_Co"
+                  },
+                  {
+                     "$ref": "#/$defs/_Aligning_Science_Across_Parkinson_S"
                   },
                   {
                      "$ref": "#/$defs/_Allen_Institute"
@@ -8823,6 +9442,9 @@
                      "$ref": "#/$defs/_Emory_University"
                   },
                   {
+                     "$ref": "#/$defs/_Esther_A_Joseph_Klingenstein_Fund"
+                  },
+                  {
                      "$ref": "#/$defs/_Euresys"
                   },
                   {
@@ -8832,10 +9454,16 @@
                      "$ref": "#/$defs/_Fujinon"
                   },
                   {
+                     "$ref": "#/$defs/_G_Harold_Leila_Y_Mathers_Foundation"
+                  },
+                  {
                      "$ref": "#/$defs/_Hamamatsu"
                   },
                   {
                      "$ref": "#/$defs/_Hamilton"
+                  },
+                  {
+                     "$ref": "#/$defs/_Helen_Hay_Whitney_Foundation"
                   },
                   {
                      "$ref": "#/$defs/_Huazhong_University_Of_Science_And_Technology"
@@ -8880,6 +9508,9 @@
                      "$ref": "#/$defs/_Kent_Scientific_Corporation"
                   },
                   {
+                     "$ref": "#/$defs/_Klingenstein_Third_Generation_Foundation"
+                  },
+                  {
                      "$ref": "#/$defs/_Kowa"
                   },
                   {
@@ -8890,6 +9521,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Leica"
+                  },
+                  {
+                     "$ref": "#/$defs/_Life_Sciences_Research_Foundation"
                   },
                   {
                      "$ref": "#/$defs/_Lifecanvas"
@@ -8919,6 +9553,12 @@
                      "$ref": "#/$defs/_Mcgovern_Institute_For_Brain_Research"
                   },
                   {
+                     "$ref": "#/$defs/_Mcknight_Brain_Research_Foundation"
+                  },
+                  {
+                     "$ref": "#/$defs/_Mcknight_Foundation"
+                  },
+                  {
                      "$ref": "#/$defs/_Meadowlark_Optics"
                   },
                   {
@@ -8944,6 +9584,9 @@
                   },
                   {
                      "$ref": "#/$defs/_National_Institute_Of_Neurological_Disorders_And_Stroke"
+                  },
+                  {
+                     "$ref": "#/$defs/_National_Institute_On_Aging"
                   },
                   {
                      "$ref": "#/$defs/_National_Instruments"
@@ -8983,6 +9626,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Oxxius"
+                  },
+                  {
+                     "$ref": "#/$defs/_Pew_Charitable_Trusts"
                   },
                   {
                      "$ref": "#/$defs/_Placid_Industries"
@@ -9072,6 +9718,15 @@
                      "$ref": "#/$defs/_Tymphany"
                   },
                   {
+                     "$ref": "#/$defs/_U_S_National_Science_Foundation"
+                  },
+                  {
+                     "$ref": "#/$defs/_United_States_Department_Of_Defense"
+                  },
+                  {
+                     "$ref": "#/$defs/_United_States_Department_Of_Energy"
+                  },
+                  {
                      "$ref": "#/$defs/_University_Of_California_San_Diego"
                   },
                   {
@@ -9085,6 +9740,12 @@
                   },
                   {
                      "$ref": "#/$defs/_Vortran"
+                  },
+                  {
+                     "$ref": "#/$defs/_W_M_Keck_Foundation"
+                  },
+                  {
+                     "$ref": "#/$defs/_Warren_Alpert_Foundation"
                   },
                   {
                      "$ref": "#/$defs/_World_Precision_Intstruments"
@@ -9153,6 +9814,96 @@
             "target"
          ],
          "title": "ProbeReagent",
+         "type": "object"
+      },
+      "Procedures": {
+         "additionalProperties": false,
+         "description": "Description of all procedures performed on a subject, including surgeries, injections, and tissue processing",
+         "properties": {
+            "object_type": {
+               "const": "Procedures",
+               "default": "Procedures",
+               "title": "Object Type",
+               "type": "string"
+            },
+            "describedBy": {
+               "const": "https://raw.githubusercontent.com/AllenNeuralDynamics/biodata-schema/main/src/biodata_schema/core/procedures.py",
+               "default": "https://raw.githubusercontent.com/AllenNeuralDynamics/biodata-schema/main/src/biodata_schema/core/procedures.py",
+               "title": "Describedby",
+               "type": "string"
+            },
+            "schema_version": {
+               "const": "3.0.2",
+               "default": "3.0.2",
+               "title": "Schema Version",
+               "type": "string"
+            },
+            "subject_name": {
+               "description": "Unique name for the subject associated with these procedures",
+               "title": "Subject name",
+               "type": "string"
+            },
+            "subject_procedures": {
+               "default": [],
+               "description": "Procedures performed on a live subject",
+               "items": {
+                  "discriminator": {
+                     "mapping": {
+                        "Generic subject procedure": "#/$defs/GenericSubjectProcedure",
+                        "Non surgical injection": "#/$defs/NonSurgicalInjection",
+                        "Surgery": "#/$defs/Surgery",
+                        "Training protocol": "#/$defs/TrainingProtocol",
+                        "Water restriction": "#/$defs/WaterRestriction"
+                     },
+                     "propertyName": "object_type"
+                  },
+                  "oneOf": [
+                     {
+                        "$ref": "#/$defs/Surgery"
+                     },
+                     {
+                        "$ref": "#/$defs/NonSurgicalInjection"
+                     },
+                     {
+                        "$ref": "#/$defs/TrainingProtocol"
+                     },
+                     {
+                        "$ref": "#/$defs/WaterRestriction"
+                     },
+                     {
+                        "$ref": "#/$defs/GenericSubjectProcedure"
+                     }
+                  ]
+               },
+               "title": "Subject Procedures",
+               "type": "array"
+            },
+            "specimen_procedures": {
+               "default": [],
+               "description": "Procedures performed on tissue extracted after perfusion",
+               "items": {
+                  "$ref": "#/$defs/SpecimenProcedure"
+               },
+               "title": "Specimen Procedures",
+               "type": "array"
+            },
+            "notes": {
+               "anyOf": [
+                  {
+                     "type": "string"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": null,
+               "title": "Notes"
+            }
+         },
+         "required": [
+            "subject_name"
+         ],
+         "title": "Procedures",
          "type": "object"
       },
       "ProtectiveMaterial": {
@@ -9310,6 +10061,7 @@
                      "Abcam": "#/$defs/_Abcam",
                      "Addgene": "#/$defs/_Addgene",
                      "Ailipu Technology Co": "#/$defs/_Ailipu_Technology_Co",
+                     "Aligning Science Across Parkinson's": "#/$defs/_Aligning_Science_Across_Parkinson_S",
                      "Allen Institute": "#/$defs/_Allen_Institute",
                      "Allen Institute for Brain Science": "#/$defs/_Allen_Institute_For_Brain_Science",
                      "Allen Institute for Neural Dynamics": "#/$defs/_Allen_Institute_For_Neural_Dynamics",
@@ -9342,11 +10094,14 @@
                      "Ealing": "#/$defs/_Ealing",
                      "Edmund Optics": "#/$defs/_Edmund_Optics",
                      "Emory University": "#/$defs/_Emory_University",
+                     "Esther A. & Joseph Klingenstein Fund": "#/$defs/_Esther_A_Joseph_Klingenstein_Fund",
                      "Euresys": "#/$defs/_Euresys",
                      "Excelitas Technologies": "#/$defs/_Excelitas_Technologies",
                      "Fujinon": "#/$defs/_Fujinon",
+                     "G. Harold & Leila Y. Mathers Foundation": "#/$defs/_G_Harold_Leila_Y_Mathers_Foundation",
                      "Hamamatsu": "#/$defs/_Hamamatsu",
                      "Hamilton": "#/$defs/_Hamilton",
+                     "Helen Hay Whitney Foundation": "#/$defs/_Helen_Hay_Whitney_Foundation",
                      "Huazhong University of Science and Technology": "#/$defs/_Huazhong_University_Of_Science_And_Technology",
                      "IR Robot Co": "#/$defs/_Ir_Robot_Co",
                      "ISL Products International": "#/$defs/_Isl_Products_International",
@@ -9361,10 +10116,12 @@
                      "Johns Hopkins University": "#/$defs/_Johns_Hopkins_University",
                      "Julabo": "#/$defs/_Julabo",
                      "Kent Scientific Corporation": "#/$defs/_Kent_Scientific_Corporation",
+                     "Klingenstein Third Generation Foundation": "#/$defs/_Klingenstein_Third_Generation_Foundation",
                      "Kowa": "#/$defs/_Kowa",
                      "LASOS Lasertechnik": "#/$defs/_Lasos_Lasertechnik",
                      "LG": "#/$defs/_Lg",
                      "Leica": "#/$defs/_Leica",
+                     "Life Sciences Research Foundation": "#/$defs/_Life_Sciences_Research_Foundation",
                      "LifeCanvas": "#/$defs/_Lifecanvas",
                      "Lumen Dynamics": "#/$defs/_Lumen_Dynamics",
                      "Lumencor": "#/$defs/_Lumencor",
@@ -9374,6 +10131,8 @@
                      "MPI": "#/$defs/_Mpi",
                      "Massachusetts Institute of Technology": "#/$defs/_Massachusetts_Institute_Of_Technology",
                      "McGovern Institute for Brain Research": "#/$defs/_Mcgovern_Institute_For_Brain_Research",
+                     "McKnight Brain Research Foundation": "#/$defs/_Mcknight_Brain_Research_Foundation",
+                     "McKnight Foundation": "#/$defs/_Mcknight_Foundation",
                      "Meadowlark Optics": "#/$defs/_Meadowlark_Optics",
                      "Michael J. Fox Foundation for Parkinson's Research": "#/$defs/_Michael_J_Fox_Foundation_For_Parkinson_S_Research",
                      "Midwest Optical Systems, Inc.": "#/$defs/_Midwest_Optical_Systems_Inc_",
@@ -9383,6 +10142,7 @@
                      "National Center for Complementary and Integrative Health": "#/$defs/_National_Center_For_Complementary_And_Integrative_Health",
                      "National Institute of Mental Health": "#/$defs/_National_Institute_Of_Mental_Health",
                      "National Institute of Neurological Disorders and Stroke": "#/$defs/_National_Institute_Of_Neurological_Disorders_And_Stroke",
+                     "National Institute on Aging": "#/$defs/_National_Institute_On_Aging",
                      "National Instruments": "#/$defs/_National_Instruments",
                      "Navitar": "#/$defs/_Navitar",
                      "NeuraLynx": "#/$defs/_Neuralynx",
@@ -9396,6 +10156,7 @@
                      "Other": "#/$defs/_Other",
                      "Oxford Instruments": "#/$defs/_Oxford_Instruments",
                      "Oxxius": "#/$defs/_Oxxius",
+                     "Pew Charitable Trusts": "#/$defs/_Pew_Charitable_Trusts",
                      "Placid Industries": "#/$defs/_Placid_Industries",
                      "Prizmatix": "#/$defs/_Prizmatix",
                      "Quantifi": "#/$defs/_Quantifi",
@@ -9425,11 +10186,16 @@
                      "Thorlabs": "#/$defs/_Thorlabs",
                      "Transducer Techniques": "#/$defs/_Transducer_Techniques",
                      "Tymphany": "#/$defs/_Tymphany",
+                     "U.S. National Science Foundation": "#/$defs/_U_S_National_Science_Foundation",
+                     "United States Department of Defense": "#/$defs/_United_States_Department_Of_Defense",
+                     "United States Department of Energy": "#/$defs/_United_States_Department_Of_Energy",
                      "University of California, San Diego": "#/$defs/_University_Of_California_San_Diego",
                      "University of Pennsylvania": "#/$defs/_University_Of_Pennsylvania",
                      "Unknown": "#/$defs/_Unknown",
                      "Vieworks": "#/$defs/_Vieworks",
                      "Vortran": "#/$defs/_Vortran",
+                     "W. M. Keck Foundation": "#/$defs/_W_M_Keck_Foundation",
+                     "Warren Alpert Foundation": "#/$defs/_Warren_Alpert_Foundation",
                      "World Precision Intstruments": "#/$defs/_World_Precision_Intstruments",
                      "ams OSRAM": "#/$defs/_Ams_Osram"
                   },
@@ -9450,6 +10216,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Ailipu_Technology_Co"
+                  },
+                  {
+                     "$ref": "#/$defs/_Aligning_Science_Across_Parkinson_S"
                   },
                   {
                      "$ref": "#/$defs/_Allen_Institute"
@@ -9548,6 +10317,9 @@
                      "$ref": "#/$defs/_Emory_University"
                   },
                   {
+                     "$ref": "#/$defs/_Esther_A_Joseph_Klingenstein_Fund"
+                  },
+                  {
                      "$ref": "#/$defs/_Euresys"
                   },
                   {
@@ -9557,10 +10329,16 @@
                      "$ref": "#/$defs/_Fujinon"
                   },
                   {
+                     "$ref": "#/$defs/_G_Harold_Leila_Y_Mathers_Foundation"
+                  },
+                  {
                      "$ref": "#/$defs/_Hamamatsu"
                   },
                   {
                      "$ref": "#/$defs/_Hamilton"
+                  },
+                  {
+                     "$ref": "#/$defs/_Helen_Hay_Whitney_Foundation"
                   },
                   {
                      "$ref": "#/$defs/_Huazhong_University_Of_Science_And_Technology"
@@ -9605,6 +10383,9 @@
                      "$ref": "#/$defs/_Kent_Scientific_Corporation"
                   },
                   {
+                     "$ref": "#/$defs/_Klingenstein_Third_Generation_Foundation"
+                  },
+                  {
                      "$ref": "#/$defs/_Kowa"
                   },
                   {
@@ -9615,6 +10396,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Leica"
+                  },
+                  {
+                     "$ref": "#/$defs/_Life_Sciences_Research_Foundation"
                   },
                   {
                      "$ref": "#/$defs/_Lifecanvas"
@@ -9644,6 +10428,12 @@
                      "$ref": "#/$defs/_Mcgovern_Institute_For_Brain_Research"
                   },
                   {
+                     "$ref": "#/$defs/_Mcknight_Brain_Research_Foundation"
+                  },
+                  {
+                     "$ref": "#/$defs/_Mcknight_Foundation"
+                  },
+                  {
                      "$ref": "#/$defs/_Meadowlark_Optics"
                   },
                   {
@@ -9669,6 +10459,9 @@
                   },
                   {
                      "$ref": "#/$defs/_National_Institute_Of_Neurological_Disorders_And_Stroke"
+                  },
+                  {
+                     "$ref": "#/$defs/_National_Institute_On_Aging"
                   },
                   {
                      "$ref": "#/$defs/_National_Instruments"
@@ -9708,6 +10501,9 @@
                   },
                   {
                      "$ref": "#/$defs/_Oxxius"
+                  },
+                  {
+                     "$ref": "#/$defs/_Pew_Charitable_Trusts"
                   },
                   {
                      "$ref": "#/$defs/_Placid_Industries"
@@ -9797,6 +10593,15 @@
                      "$ref": "#/$defs/_Tymphany"
                   },
                   {
+                     "$ref": "#/$defs/_U_S_National_Science_Foundation"
+                  },
+                  {
+                     "$ref": "#/$defs/_United_States_Department_Of_Defense"
+                  },
+                  {
+                     "$ref": "#/$defs/_United_States_Department_Of_Energy"
+                  },
+                  {
                      "$ref": "#/$defs/_University_Of_California_San_Diego"
                   },
                   {
@@ -9810,6 +10615,12 @@
                   },
                   {
                      "$ref": "#/$defs/_Vortran"
+                  },
+                  {
+                     "$ref": "#/$defs/_W_M_Keck_Foundation"
+                  },
+                  {
+                     "$ref": "#/$defs/_Warren_Alpert_Foundation"
                   },
                   {
                      "$ref": "#/$defs/_World_Precision_Intstruments"
@@ -10286,19 +11097,14 @@
                "default": null,
                "title": "Procedure name"
             },
-            "specimen_name": {
-               "anyOf": [
-                  {
-                     "type": "string"
-                  },
-                  {
-                     "items": {
-                        "type": "string"
-                     },
-                     "type": "array"
-                  }
-               ],
-               "title": "Specimen name(s)"
+            "specimen_names": {
+               "items": {
+                  "type": "string"
+               },
+               "minItems": 1,
+               "title": "Specimen names",
+               "type": "array",
+               "uniqueItems": true
             },
             "start_date": {
                "format": "date",
@@ -10400,7 +11206,7 @@
          },
          "required": [
             "procedure_type",
-            "specimen_name",
+            "specimen_names",
             "start_date",
             "end_date"
          ],
@@ -10560,11 +11366,12 @@
                      "$ref": "#/$defs/CoordinateSystem"
                   },
                   {
-                     "type": "null"
+                     "const": "Not applicable",
+                     "type": "string"
                   }
                ],
-               "default": null,
-               "description": "Only required when the Surgery.global_coordinate_system is different from the Procedures.global_coordinate_system",
+               "default": "Not applicable",
+               "description": "Origin and axis definitions for coordinates within this surgery. Required when coordinates are provided. Use 'Not applicable' when no global coordinate system applies.",
                "title": "Surgery global coordinate system"
             },
             "measured_coordinates": {
@@ -11211,6 +12018,48 @@
             }
          },
          "title": "_Ailipu_Technology_Co",
+         "type": "object"
+      },
+      "_Aligning_Science_Across_Parkinson_S": {
+         "description": "Model Aligning Science Across Parkinson's",
+         "properties": {
+            "name": {
+               "const": "Aligning Science Across Parkinson's",
+               "default": "Aligning Science Across Parkinson's",
+               "title": "Name",
+               "type": "string"
+            },
+            "abbreviation": {
+               "const": "ASAP",
+               "default": "ASAP",
+               "title": "Abbreviation",
+               "type": "string"
+            },
+            "registry": {
+               "anyOf": [
+                  {
+                     "$ref": "#/$defs/Registry"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "Research Organization Registry (ROR)"
+            },
+            "registry_identifier": {
+               "anyOf": [
+                  {
+                     "type": "string"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "03zj4c476",
+               "title": "Registry Identifier"
+            }
+         },
+         "title": "_Aligning_Science_Across_Parkinson_S",
          "type": "object"
       },
       "_Allen_Institute": {
@@ -12757,6 +13606,48 @@
          "title": "_Equus_Asinus",
          "type": "object"
       },
+      "_Esther_A_Joseph_Klingenstein_Fund": {
+         "description": "Model Esther A. & Joseph Klingenstein Fund",
+         "properties": {
+            "name": {
+               "const": "Esther A. & Joseph Klingenstein Fund",
+               "default": "Esther A. & Joseph Klingenstein Fund",
+               "title": "Name",
+               "type": "string"
+            },
+            "abbreviation": {
+               "const": null,
+               "default": null,
+               "title": "Abbreviation",
+               "type": "null"
+            },
+            "registry": {
+               "anyOf": [
+                  {
+                     "$ref": "#/$defs/Registry"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "Research Organization Registry (ROR)"
+            },
+            "registry_identifier": {
+               "anyOf": [
+                  {
+                     "type": "string"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "01q222b25",
+               "title": "Registry Identifier"
+            }
+         },
+         "title": "_Esther_A_Joseph_Klingenstein_Fund",
+         "type": "object"
+      },
       "_Euresys": {
          "description": "Model Euresys",
          "properties": {
@@ -12883,6 +13774,48 @@
          "title": "_Fujinon",
          "type": "object"
       },
+      "_G_Harold_Leila_Y_Mathers_Foundation": {
+         "description": "Model G. Harold & Leila Y. Mathers Foundation",
+         "properties": {
+            "name": {
+               "const": "G. Harold & Leila Y. Mathers Foundation",
+               "default": "G. Harold & Leila Y. Mathers Foundation",
+               "title": "Name",
+               "type": "string"
+            },
+            "abbreviation": {
+               "const": null,
+               "default": null,
+               "title": "Abbreviation",
+               "type": "null"
+            },
+            "registry": {
+               "anyOf": [
+                  {
+                     "$ref": "#/$defs/Registry"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "Research Organization Registry (ROR)"
+            },
+            "registry_identifier": {
+               "anyOf": [
+                  {
+                     "type": "string"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "02a7hjv13",
+               "title": "Registry Identifier"
+            }
+         },
+         "title": "_G_Harold_Leila_Y_Mathers_Foundation",
+         "type": "object"
+      },
       "_Gallus_Gallus": {
          "description": "Model Gallus gallus",
          "properties": {
@@ -13001,6 +13934,48 @@
             }
          },
          "title": "_Hamilton",
+         "type": "object"
+      },
+      "_Helen_Hay_Whitney_Foundation": {
+         "description": "Model Helen Hay Whitney Foundation",
+         "properties": {
+            "name": {
+               "const": "Helen Hay Whitney Foundation",
+               "default": "Helen Hay Whitney Foundation",
+               "title": "Name",
+               "type": "string"
+            },
+            "abbreviation": {
+               "const": null,
+               "default": null,
+               "title": "Abbreviation",
+               "type": "null"
+            },
+            "registry": {
+               "anyOf": [
+                  {
+                     "$ref": "#/$defs/Registry"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "Research Organization Registry (ROR)"
+            },
+            "registry_identifier": {
+               "anyOf": [
+                  {
+                     "type": "string"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "037ebw447",
+               "title": "Registry Identifier"
+            }
+         },
+         "title": "_Helen_Hay_Whitney_Foundation",
          "type": "object"
       },
       "_Homo_Sapiens": {
@@ -13620,6 +14595,48 @@
          "title": "_Kent_Scientific_Corporation",
          "type": "object"
       },
+      "_Klingenstein_Third_Generation_Foundation": {
+         "description": "Model Klingenstein Third Generation Foundation",
+         "properties": {
+            "name": {
+               "const": "Klingenstein Third Generation Foundation",
+               "default": "Klingenstein Third Generation Foundation",
+               "title": "Name",
+               "type": "string"
+            },
+            "abbreviation": {
+               "const": "KTGF",
+               "default": "KTGF",
+               "title": "Abbreviation",
+               "type": "string"
+            },
+            "registry": {
+               "anyOf": [
+                  {
+                     "$ref": "#/$defs/Registry"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "Research Organization Registry (ROR)"
+            },
+            "registry_identifier": {
+               "anyOf": [
+                  {
+                     "type": "string"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "00cxc2y95",
+               "title": "Registry Identifier"
+            }
+         },
+         "title": "_Klingenstein_Third_Generation_Foundation",
+         "type": "object"
+      },
       "_Kowa": {
          "description": "Model Kowa",
          "properties": {
@@ -13815,6 +14832,48 @@
             }
          },
          "title": "_Lg",
+         "type": "object"
+      },
+      "_Life_Sciences_Research_Foundation": {
+         "description": "Model Life Sciences Research Foundation",
+         "properties": {
+            "name": {
+               "const": "Life Sciences Research Foundation",
+               "default": "Life Sciences Research Foundation",
+               "title": "Name",
+               "type": "string"
+            },
+            "abbreviation": {
+               "const": "LSRF",
+               "default": "LSRF",
+               "title": "Abbreviation",
+               "type": "string"
+            },
+            "registry": {
+               "anyOf": [
+                  {
+                     "$ref": "#/$defs/Registry"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "Research Organization Registry (ROR)"
+            },
+            "registry_identifier": {
+               "anyOf": [
+                  {
+                     "type": "string"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "0195dxj21",
+               "title": "Registry Identifier"
+            }
+         },
+         "title": "_Life_Sciences_Research_Foundation",
          "type": "object"
       },
       "_Lifecanvas": {
@@ -14154,6 +15213,90 @@
             }
          },
          "title": "_Mcgovern_Institute_For_Brain_Research",
+         "type": "object"
+      },
+      "_Mcknight_Brain_Research_Foundation": {
+         "description": "Model McKnight Brain Research Foundation",
+         "properties": {
+            "name": {
+               "const": "McKnight Brain Research Foundation",
+               "default": "McKnight Brain Research Foundation",
+               "title": "Name",
+               "type": "string"
+            },
+            "abbreviation": {
+               "const": null,
+               "default": null,
+               "title": "Abbreviation",
+               "type": "null"
+            },
+            "registry": {
+               "anyOf": [
+                  {
+                     "$ref": "#/$defs/Registry"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "Research Organization Registry (ROR)"
+            },
+            "registry_identifier": {
+               "anyOf": [
+                  {
+                     "type": "string"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "00vsf1v04",
+               "title": "Registry Identifier"
+            }
+         },
+         "title": "_Mcknight_Brain_Research_Foundation",
+         "type": "object"
+      },
+      "_Mcknight_Foundation": {
+         "description": "Model McKnight Foundation",
+         "properties": {
+            "name": {
+               "const": "McKnight Foundation",
+               "default": "McKnight Foundation",
+               "title": "Name",
+               "type": "string"
+            },
+            "abbreviation": {
+               "const": null,
+               "default": null,
+               "title": "Abbreviation",
+               "type": "null"
+            },
+            "registry": {
+               "anyOf": [
+                  {
+                     "$ref": "#/$defs/Registry"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "Research Organization Registry (ROR)"
+            },
+            "registry_identifier": {
+               "anyOf": [
+                  {
+                     "type": "string"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "003ghvj67",
+               "title": "Registry Identifier"
+            }
+         },
+         "title": "_Mcknight_Foundation",
          "type": "object"
       },
       "_Meadowlark_Optics": {
@@ -14645,6 +15788,48 @@
             }
          },
          "title": "_National_Institute_Of_Neurological_Disorders_And_Stroke",
+         "type": "object"
+      },
+      "_National_Institute_On_Aging": {
+         "description": "Model National Institute on Aging",
+         "properties": {
+            "name": {
+               "const": "National Institute on Aging",
+               "default": "National Institute on Aging",
+               "title": "Name",
+               "type": "string"
+            },
+            "abbreviation": {
+               "const": "NIA",
+               "default": "NIA",
+               "title": "Abbreviation",
+               "type": "string"
+            },
+            "registry": {
+               "anyOf": [
+                  {
+                     "$ref": "#/$defs/Registry"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "Research Organization Registry (ROR)"
+            },
+            "registry_identifier": {
+               "anyOf": [
+                  {
+                     "type": "string"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "049v75w11",
+               "title": "Registry Identifier"
+            }
+         },
+         "title": "_National_Institute_On_Aging",
          "type": "object"
       },
       "_National_Instruments": {
@@ -15262,6 +16447,48 @@
             }
          },
          "title": "_Oxxius",
+         "type": "object"
+      },
+      "_Pew_Charitable_Trusts": {
+         "description": "Model Pew Charitable Trusts",
+         "properties": {
+            "name": {
+               "const": "Pew Charitable Trusts",
+               "default": "Pew Charitable Trusts",
+               "title": "Name",
+               "type": "string"
+            },
+            "abbreviation": {
+               "const": null,
+               "default": null,
+               "title": "Abbreviation",
+               "type": "null"
+            },
+            "registry": {
+               "anyOf": [
+                  {
+                     "$ref": "#/$defs/Registry"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "Research Organization Registry (ROR)"
+            },
+            "registry_identifier": {
+               "anyOf": [
+                  {
+                     "type": "string"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "02xhk2825",
+               "title": "Registry Identifier"
+            }
+         },
+         "title": "_Pew_Charitable_Trusts",
          "type": "object"
       },
       "_Placid_Industries": {
@@ -16540,6 +17767,132 @@
          "title": "_Tymphany",
          "type": "object"
       },
+      "_U_S_National_Science_Foundation": {
+         "description": "Model U.S. National Science Foundation",
+         "properties": {
+            "name": {
+               "const": "U.S. National Science Foundation",
+               "default": "U.S. National Science Foundation",
+               "title": "Name",
+               "type": "string"
+            },
+            "abbreviation": {
+               "const": "NSF",
+               "default": "NSF",
+               "title": "Abbreviation",
+               "type": "string"
+            },
+            "registry": {
+               "anyOf": [
+                  {
+                     "$ref": "#/$defs/Registry"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "Research Organization Registry (ROR)"
+            },
+            "registry_identifier": {
+               "anyOf": [
+                  {
+                     "type": "string"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "021nxhr62",
+               "title": "Registry Identifier"
+            }
+         },
+         "title": "_U_S_National_Science_Foundation",
+         "type": "object"
+      },
+      "_United_States_Department_Of_Defense": {
+         "description": "Model United States Department of Defense",
+         "properties": {
+            "name": {
+               "const": "United States Department of Defense",
+               "default": "United States Department of Defense",
+               "title": "Name",
+               "type": "string"
+            },
+            "abbreviation": {
+               "const": "DOD",
+               "default": "DOD",
+               "title": "Abbreviation",
+               "type": "string"
+            },
+            "registry": {
+               "anyOf": [
+                  {
+                     "$ref": "#/$defs/Registry"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "Research Organization Registry (ROR)"
+            },
+            "registry_identifier": {
+               "anyOf": [
+                  {
+                     "type": "string"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "0447fe631",
+               "title": "Registry Identifier"
+            }
+         },
+         "title": "_United_States_Department_Of_Defense",
+         "type": "object"
+      },
+      "_United_States_Department_Of_Energy": {
+         "description": "Model United States Department of Energy",
+         "properties": {
+            "name": {
+               "const": "United States Department of Energy",
+               "default": "United States Department of Energy",
+               "title": "Name",
+               "type": "string"
+            },
+            "abbreviation": {
+               "const": "DOE",
+               "default": "DOE",
+               "title": "Abbreviation",
+               "type": "string"
+            },
+            "registry": {
+               "anyOf": [
+                  {
+                     "$ref": "#/$defs/Registry"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "Research Organization Registry (ROR)"
+            },
+            "registry_identifier": {
+               "anyOf": [
+                  {
+                     "type": "string"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "01bj3aw27",
+               "title": "Registry Identifier"
+            }
+         },
+         "title": "_United_States_Department_Of_Energy",
+         "type": "object"
+      },
       "_University_Of_California_San_Diego": {
          "description": "Model University of California, San Diego",
          "properties": {
@@ -16779,6 +18132,90 @@
          "title": "_Vortran",
          "type": "object"
       },
+      "_W_M_Keck_Foundation": {
+         "description": "Model W. M. Keck Foundation",
+         "properties": {
+            "name": {
+               "const": "W. M. Keck Foundation",
+               "default": "W. M. Keck Foundation",
+               "title": "Name",
+               "type": "string"
+            },
+            "abbreviation": {
+               "const": null,
+               "default": null,
+               "title": "Abbreviation",
+               "type": "null"
+            },
+            "registry": {
+               "anyOf": [
+                  {
+                     "$ref": "#/$defs/Registry"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "Research Organization Registry (ROR)"
+            },
+            "registry_identifier": {
+               "anyOf": [
+                  {
+                     "type": "string"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "000dswa46",
+               "title": "Registry Identifier"
+            }
+         },
+         "title": "_W_M_Keck_Foundation",
+         "type": "object"
+      },
+      "_Warren_Alpert_Foundation": {
+         "description": "Model Warren Alpert Foundation",
+         "properties": {
+            "name": {
+               "const": "Warren Alpert Foundation",
+               "default": "Warren Alpert Foundation",
+               "title": "Name",
+               "type": "string"
+            },
+            "abbreviation": {
+               "const": null,
+               "default": null,
+               "title": "Abbreviation",
+               "type": "null"
+            },
+            "registry": {
+               "anyOf": [
+                  {
+                     "$ref": "#/$defs/Registry"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "Research Organization Registry (ROR)"
+            },
+            "registry_identifier": {
+               "anyOf": [
+                  {
+                     "type": "string"
+                  },
+                  {
+                     "type": "null"
+                  }
+               ],
+               "default": "041ztcd61",
+               "title": "Registry Identifier"
+            }
+         },
+         "title": "_Warren_Alpert_Foundation",
+         "type": "object"
+      },
       "_World_Precision_Intstruments": {
          "description": "Model World Precision Intstruments",
          "properties": {
@@ -16822,109 +18259,8 @@
          "type": "object"
       }
    },
-   "additionalProperties": false,
-   "description": "Description of all procedures performed on a subject, including surgeries, injections, and tissue processing",
-   "properties": {
-      "object_type": {
-         "const": "Procedures",
-         "default": "Procedures",
-         "title": "Object Type",
-         "type": "string"
-      },
-      "describedBy": {
-         "const": "https://raw.githubusercontent.com/AllenNeuralDynamics/biodata-schema/main/src/biodata_schema/core/procedures.py",
-         "default": "https://raw.githubusercontent.com/AllenNeuralDynamics/biodata-schema/main/src/biodata_schema/core/procedures.py",
-         "title": "Describedby",
-         "type": "string"
-      },
-      "schema_version": {
-         "const": "3.0.2",
-         "default": "3.0.2",
-         "title": "Schema Version",
-         "type": "string"
-      },
-      "subject_name": {
-         "description": "Unique name for the subject associated with these procedures",
-         "title": "Subject name",
-         "type": "string"
-      },
-      "subject_procedures": {
-         "default": [],
-         "description": "Procedures performed on a live subject",
-         "items": {
-            "discriminator": {
-               "mapping": {
-                  "Generic subject procedure": "#/$defs/GenericSubjectProcedure",
-                  "Injection": "#/$defs/Injection",
-                  "Non surgical injection": "#/$defs/NonSurgicalInjection",
-                  "Surgery": "#/$defs/Surgery",
-                  "Training protocol": "#/$defs/TrainingProtocol",
-                  "Water restriction": "#/$defs/WaterRestriction"
-               },
-               "propertyName": "object_type"
-            },
-            "oneOf": [
-               {
-                  "$ref": "#/$defs/Surgery"
-               },
-               {
-                  "$ref": "#/$defs/Injection"
-               },
-               {
-                  "$ref": "#/$defs/NonSurgicalInjection"
-               },
-               {
-                  "$ref": "#/$defs/TrainingProtocol"
-               },
-               {
-                  "$ref": "#/$defs/WaterRestriction"
-               },
-               {
-                  "$ref": "#/$defs/GenericSubjectProcedure"
-               }
-            ]
-         },
-         "title": "Subject Procedures",
-         "type": "array"
-      },
-      "specimen_procedures": {
-         "default": [],
-         "description": "Procedures performed on tissue extracted after perfusion",
-         "items": {
-            "$ref": "#/$defs/SpecimenProcedure"
-         },
-         "title": "Specimen Procedures",
-         "type": "array"
-      },
-      "global_coordinate_system": {
-         "anyOf": [
-            {
-               "$ref": "#/$defs/CoordinateSystem"
-            },
-            {
-               "type": "null"
-            }
-         ],
-         "default": null,
-         "description": "Origin and axis definitions for determining the configured position of devices implanted during procedures. Required when coordinates are provided within the Procedures",
-         "title": "Global Coordinate System"
-      },
-      "notes": {
-         "anyOf": [
-            {
-               "type": "string"
-            },
-            {
-               "type": "null"
-            }
-         ],
-         "default": null,
-         "title": "Notes"
-      }
+   "items": {
+      "$ref": "#/$defs/Procedures"
    },
-   "required": [
-      "subject_name"
-   ],
-   "title": "Procedures",
-   "type": "object"
+   "type": "array"
 }

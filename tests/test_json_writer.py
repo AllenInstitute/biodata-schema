@@ -2,10 +2,13 @@
 
 import json
 import os
+import subprocess
+import sys
 from pathlib import Path
 from typing import Annotated, Optional, Union
 from unittest.mock import MagicMock, call, mock_open, patch
 
+import pytest
 from jsonschema import Draft202012Validator
 from pydantic import BaseModel, TypeAdapter
 
@@ -27,13 +30,33 @@ from examples.model import m as model
 from examples.procedures import p as procedures
 from examples.processing import p as processing
 from examples.quality_control import q as quality_control
-from examples.subject import s as subject
+from examples.subjects import s as subject
 
 
 class TestSchemaWriter:
     """Tests for SchemaWriter methods"""
 
     TEST_ARGS = ["--output", "some_test_dir"]
+
+    @pytest.mark.parametrize(
+        "script,field_name,count",
+        [
+            ("subjects", "subjects", 2),
+            ("procedures", "procedures", 2),
+            ("ophys_procedures", "procedures", 1),
+            ("aibs_smartspim_procedures", "procedures", 1),
+            ("thermistor_procedures", "procedures", 1),
+        ],
+    )
+    def test_collection_examples(self, tmp_path, script, field_name, count):
+        """Runnable examples produce standard files that match published collection schemas."""
+        example = Path(__file__).parents[1] / "examples" / f"{script}.py"
+        subprocess.run([sys.executable, str(example), "--output-dir", str(tmp_path)], check=True)
+        assert {path.name for path in tmp_path.iterdir()} == {f"{script}.json"}
+        records = json.loads((tmp_path / f"{script}.json").read_text())
+        assert len(records) == count
+        model_class = Subject if field_name == "subjects" else Procedures
+        Draft202012Validator(SchemaWriter.model_schema(model_class)).validate(records)
 
     def test_collection_schemas_validate_written_files(self, tmp_path):
         """Published collection schemas validate the actual array files."""
@@ -87,6 +110,7 @@ class TestSchemaWriter:
 
         assert set(schema["properties"]) == {"location", "data_description", "subjects", "acquisition", "instrument"}
         assert set(schema["required"]) == set(schema["properties"])
+        assert schema["properties"]["subjects"]["minItems"] == 1
         assert schema["additionalProperties"] is True
         assert set(schema["$defs"]) == {"License"}
 
@@ -123,6 +147,8 @@ class TestSchemaWriter:
         metadata_json = json.loads(metadata.model_dump_json(by_alias=True))
 
         Draft202012Validator(draft_metadata_schema()).validate(metadata_json)
+        metadata_json["subjects"] = []
+        assert not Draft202012Validator(draft_metadata_schema()).is_valid(metadata_json)
 
     def test_draft_schema_projection_helpers(self):
         """Tests nested, recursive, and union model projections."""
