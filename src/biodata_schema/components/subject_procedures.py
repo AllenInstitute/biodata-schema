@@ -4,6 +4,7 @@ from datetime import date
 from typing import Dict, List, Optional
 
 from biodata_models.coordinates import Origin
+from biodata_models.human_disease import HumanDiseaseModel
 from biodata_models.units import MassUnit, UnitlessUnit, VolumeUnit
 from pydantic import Field
 
@@ -11,6 +12,7 @@ from biodata_schema.base import DataModel, DiscriminatedList
 from biodata_schema.components.coordinates import CoordinateSystem, CoordinateSystemOrNA, Translation
 from biodata_schema.components.identifiers import Code, ProtocolMixin
 from biodata_schema.components.injection_procedures import Injection
+from biodata_schema.components.reagent import Reagent
 from biodata_schema.components.surgery_procedures import (
     Anaesthetic,
     BrainInjection,
@@ -51,11 +53,10 @@ class NonSurgicalInjection(DataModel):
     notes: Optional[str] = Field(default=None, title="Notes")
 
 
-class TrainingProtocol(DataModel):
+class TrainingProtocol(ProtocolMixin, DataModel):
     """Description of an animal training protocol"""
 
     training_name: str = Field(..., title="Training protocol name")
-    protocol_id: Optional[str] = Field(default=None, title="Training protocol ID")
     start_date: date = Field(..., title="Training protocol start date")
     end_date: Optional[date] = Field(default=None, title="Training protocol end date")
     curriculum_code: Optional[Code] = Field(
@@ -66,7 +67,7 @@ class TrainingProtocol(DataModel):
     notes: Optional[str] = Field(default=None, title="Notes")
 
 
-class WaterRestriction(DataModel):
+class WaterRestriction(ProtocolMixin, DataModel):
     """Description of a water restriction procedure"""
 
     ethics_review_id: str = Field(..., title="Ethics review ID")
@@ -84,7 +85,7 @@ class WaterRestriction(DataModel):
     end_date: Optional[date] = Field(default=None, title="Water restriction end date")
 
 
-class FoodRestriction(DataModel):
+class FoodRestriction(ProtocolMixin, DataModel):
     """Description of a food restriction procedure"""
 
     ethics_review_id: str = Field(..., title="Ethics review ID")
@@ -100,6 +101,27 @@ class FoodRestriction(DataModel):
     weight_unit: MassUnit = Field(default=MassUnit.G, title="Weight unit")
     start_date: date = Field(..., title="Food restriction start date")
     end_date: Optional[date] = Field(default=None, title="Food restriction end date")
+
+
+class ClinicalTreatment(DataModel):
+    """Description of a clinical treatment procedure"""
+
+    start_date: date = Field(..., title="Treatment start date")
+    end_date: Optional[date] = Field(default=None, title="Treatment end date")
+    treatment: Reagent = Field(..., title="Treament drug")
+    dose: Optional[float] = Field(default=None, title="Dose")
+    dose_unit: Optional[DiscriminatedList[MassUnit, VolumeUnit]] = Field(default=None, title="Dose unit")
+    notes: Optional[str] = Field(default=None, title="Notes")
+
+
+class ClinicalVisit(DataModel):
+    """Description of clinical visit"""
+
+    start_date: date = Field(..., title="Start date")
+    samples: Optional[List[SampleCollection]] = Field(default=None, title="Samples")
+    surveys: Optional[List[str]] = Field(default=None, title="Surveys")
+    diagnosis: Optional[List[HumanDiseaseModel]] = Field(default=None, title="Diagnosis")
+    notes: Optional[str] = Field(default=None, title="Notes")
 
 
 class Surgery(ProtocolMixin, DataModel):
