@@ -4,10 +4,10 @@ The metadata schema supports flexible definitions of coordinate systems. This al
 
 Unlike many parts of the metadata schema where fields are just floats or strings, it is critical to understand **how coordinate systems are stored in the schema** to be able to use them properly. There are two rules to be aware of:
 
-1. Each [Instrument](instrument.md), [Acquisition](acquisition.md), and [Procedures](procedures.md) has its own `.global_coordinate_system` field. In most assets, the global coordinate system is the same in all three files.
-2. Local to global transforms (i.e. a [Translation](components/coordinates.md#translation), [Rotation](components/coordinates.md#rotation), or [Scale](components/coordinates.md#scale)) that position devices or configurations of devices **must be defined in it's core file's coordinate system**. To help you avoid mistakes, these transform fields are paired with a `.coordinate_system_name` field which must match the name of the global coordinate system defined in the core file.
+1. Each [Instrument](instrument.md) and [Acquisition](acquisition.md) has its own `.global_coordinate_system` field. In the Procedures, [Surgery](components/subject_procedures.md#surgery) and [PlanarSectioning](components/specimen_procedures.md#planarsectioning) each define their `.global_coordinate_system`.
+2. Local to global transforms (i.e. a [Translation](components/coordinates.md#translation), [Rotation](components/coordinates.md#rotation), or [Scale](components/coordinates.md#scale)) that position devices or configurations of devices **must use the global coordinate system of their instrument, acquisition, or individual procedure**. Where a `.coordinate_system_name` field accompanies transforms, it must match that frame's name.
 
-The top-level coordinate systems in the instrument, acquisition, and procedures are generally defined in *in vivo* space, usually relative to an origin on an animal's skull. Often when targeting coordinates in the brain we plan our experiments in a **standardized atlas** like the mouse common coordinate framework. When you encounter a field that that requires an atlas transform (i.e. a point or vector in an atlas), you'll see that an [Atlas](components/coordinates.md#atlas) will have to be defined alongside that transform. An Atlas library is available in `biodata_schema.components.coordinates.AtlasLibrary` for your convenience.
+The global coordinate systems in the instrument, acquisition, and individual procedures are generally defined in *in vivo* space, usually relative to an origin on an animal's skull. Often when targeting coordinates in the brain we plan our experiments in a **standardized atlas** like the mouse common coordinate framework. When you encounter a field that that requires an atlas transform (i.e. a point or vector in an atlas), you'll see that an [Atlas](components/coordinates.md#atlas) will have to be defined alongside that transform. An Atlas library is available in `biodata_schema.components.coordinates.AtlasLibrary` for your convenience.
 
 ## CoordinateSystem
 
@@ -28,17 +28,29 @@ CoordinateSystem(
 
 ### Not Applicable
 
-When no global coordinate system applies, set `global_coordinate_system=CoordinateSystem.NotApplicable`. Note that this is different from using `global_coordinate_system=None` which will inherit from any parent coordinate systems. `"Not applicable"` should be used in situations where no transforms are present in an object.
+Global coordinate-system fields accept either a `CoordinateSystem` (including an `Atlas` where supported) or `CoordinateSystem.NotApplicable`, and default to `NotApplicable`. `None` is not accepted, and procedure frames are not inherited from a parent procedure collection.
+
+Set a real frame on each instrument, acquisition, or individual procedure that contains transforms requiring that global frame. Validation rejects those transforms when the frame is `NotApplicable`. Local-reference transforms with an explicit local frame and atlas coordinates with their own frame can still be used without a global frame. A real coordinate system is also allowed when there are no transforms.
 
 ```{code} python
 from biodata_schema.components.coordinates import CoordinateSystem
+from biodata_schema.components.subject_procedures import Surgery
+from biodata_schema.components.surgery_procedures import GenericSurgeryProcedure
 from biodata_schema.core.procedures import Procedures
 
 procedures = Procedures(
   subject_name="12345",
-  global_coordinate_system=CoordinateSystem.NotApplicable,
+  subject_procedures=[
+    Surgery(
+      start_date="2026-10-15",
+      global_coordinate_system=CoordinateSystem.NotApplicable,
+      procedures=[GenericSurgeryProcedure(description="Non-coordinate procedure")],
+    )
+  ],
 )
 ```
+
+To migrate existing metadata, move `Procedures.global_coordinate_system` onto each surgery or planar sectioning operation that previously relied on it. Replace `None` global frames with a real frame where coordinates require one, or with `NotApplicable` otherwise. Optional local coordinate-system fields are unchanged.
 
 ### Origin
 

@@ -46,6 +46,7 @@ thermistor_implant = DeviceImplant(
 )
 
 surgery = Surgery(
+    global_coordinate_system=procedures_coordinate_system,
     start_date=date(2026, 6, 30),
     experimenters=["Dr. Dan"],
     ethics_review_id="1234",
@@ -55,7 +56,6 @@ surgery = Surgery(
 
 p = Procedures(
     subject_name="000000",
-    global_coordinate_system=procedures_coordinate_system,
     subject_procedures=[surgery],
 )
 

@@ -5,7 +5,6 @@ from typing import List, Literal, Optional
 from pydantic import Field, SkipValidation, model_validator
 
 from biodata_schema.base import DataCoreModel, DiscriminatedList
-from biodata_schema.components.coordinates import CoordinateSystemOrNA
 from biodata_schema.components.specimen_procedures import SpecimenProcedure
 from biodata_schema.components.subject_procedures import (
     GenericSubjectProcedure,
@@ -14,7 +13,7 @@ from biodata_schema.components.subject_procedures import (
     TrainingProtocol,
     WaterRestriction,
 )
-from biodata_schema.utils.merge import merge_coordinate_systems, merge_notes
+from biodata_schema.utils.merge import merge_notes
 from biodata_schema.utils.validators import recursive_get_device_names, subject_specimen_name_compatibility
 
 
@@ -35,17 +34,6 @@ class Procedures(DataCoreModel):
     ] = Field(default=[], title="Subject Procedures", description="Procedures performed on a live subject")
     specimen_procedures: List[SpecimenProcedure] = Field(
         default=[], title="Specimen Procedures", description="Procedures performed on tissue extracted after perfusion"
-    )
-
-    # Coordinate system
-    global_coordinate_system: Optional[CoordinateSystemOrNA] = Field(
-        default=None,
-        title="Global Coordinate System",
-        description=(
-            "Origin and axis definitions for determining the configured position of devices implanted during"
-            " procedures. Required when coordinates are provided within the Procedures"
-            ". Use 'Not applicable' when no global coordinate system applies."
-        ),
     )
 
     notes: Optional[str] = Field(default=None, title="Notes")
@@ -104,12 +92,9 @@ class Procedures(DataCoreModel):
         if not self.subject_name == other.subject_name:
             raise ValueError("Subject names must match to combine Procedures objects.")
 
-        coordinate_system = merge_coordinate_systems(self.global_coordinate_system, other.global_coordinate_system)
-
         return Procedures(
             subject_name=self.subject_name,
             subject_procedures=self.subject_procedures + other.subject_procedures,
             specimen_procedures=self.specimen_procedures + other.specimen_procedures,
-            global_coordinate_system=coordinate_system,
             notes=merge_notes(self.notes, other.notes),
         )

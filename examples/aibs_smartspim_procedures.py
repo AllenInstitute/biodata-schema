@@ -82,7 +82,6 @@ embedding = procedures.SpecimenProcedure(
 
 all_procedures = procedures.Procedures(
     subject_name=specimen_name,
-    global_coordinate_system=CoordinateSystem.NotApplicable,
     subject_procedures=[
         perfusion,
     ],

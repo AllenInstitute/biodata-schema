@@ -162,7 +162,6 @@ surgery1 = Surgery(
 
 p = Procedures(
     subject_name="625100",
-    global_coordinate_system=CoordinateSystem.NotApplicable,
     subject_procedures=[
         surgery1,
         Surgery(

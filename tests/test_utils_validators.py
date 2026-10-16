@@ -400,31 +400,28 @@ def test_measured_coordinate_dictionary():
 
 
 @pytest.mark.parametrize("field_name", ["global_coordinate_system", "local_coordinate_system", "coordinate_system"])
-def test_coordinate_system_requires_position_information(field_name):
-    """An unused real frame is rejected even when it only describes relative positions."""
+def test_coordinate_system_without_position_information(field_name):
+    """A real frame may be declared without any transforms."""
     data = SimpleNamespace(**{field_name: BREGMA_ARI}, relative_position=["Anterior"], transform=[])
-    with pytest.raises(ValueError, match="no position information"):
-        recursive_coord_system_check(data, None, None)
+    recursive_coord_system_check(data, None, None)
 
 
 def test_coordinate_system_dimensions_are_not_positions():
-    """Image dimensions must not justify an otherwise unused coordinate system."""
+    """Image dimensions are not spatial transforms requiring frame validation."""
     data = SimpleNamespace(
         global_coordinate_system=BREGMA_ARI,
         image=SimpleNamespace(dimensions=Scale(scale=[100, 100, 100]), dimensions_unit=SizeUnit.PX),
     )
-    with pytest.raises(ValueError, match="no position information"):
-        recursive_coord_system_check(data, None, None)
+    recursive_coord_system_check(data, None, None)
 
 
-def test_nested_frame_does_not_justify_unused_parent():
-    """A nested independent frame has no positions in the parent frame."""
+def test_nested_frame_with_unused_parent():
+    """Independent frames and unused parent frames are accepted."""
     data = SimpleNamespace(
         global_coordinate_system=BREGMA_ARI,
         nested=SimpleNamespace(global_coordinate_system=BREGMA_ARI, position=Translation(translation=[0, 0, 0])),
     )
-    with pytest.raises(ValueError, match="no position information"):
-        recursive_coord_system_check(data, None, None)
+    recursive_coord_system_check(data, None, None)
 
 
 def test_measured_coordinates_justify_frame():
@@ -437,7 +434,7 @@ def test_measured_coordinates_justify_frame():
 
 
 def test_not_applicable_coordinate_frame():
-    """An explicit absent global frame blocks inheritance but allows nested frames."""
+    """An absent global frame starts an independent scope but allows nested frames."""
     data = SimpleNamespace(global_coordinate_system=CoordinateSystem.NotApplicable)
     recursive_coord_system_check(data, "BREGMA_ARI", 3)
     data.transform = Translation(translation=[0, 0, 0])
@@ -456,6 +453,18 @@ def test_not_applicable_coordinate_frame():
     recursive_coord_system_check(data, None, None)
     data.transform = AtlasCoordinate(translation=[0, 0, 0], coordinate_system=AtlasLibrary.CCFv3_10um)
     recursive_coord_system_check(data, None, None)
+
+
+def test_independent_scopes_do_not_share_coordinate_frames():
+    """An explicit frame in one sibling cannot resolve another sibling's transforms."""
+    data = [
+        SimpleNamespace(global_coordinate_system=BREGMA_ARI, transform=Translation(translation=[0, 0, 0])),
+        SimpleNamespace(
+            global_coordinate_system=CoordinateSystem.NotApplicable, transform=Translation(translation=[0, 0, 0])
+        ),
+    ]
+    with pytest.raises(ValueError, match="CoordinateSystem is required"):
+        recursive_coord_system_check(data, None, None)
 
 
 def test_local_and_atlas_coordinate_frames():

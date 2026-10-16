@@ -9,7 +9,7 @@ from pydantic import Field, SkipValidation, field_validator, model_validator
 
 from biodata_schema.base import DataCoreModel, DiscriminatedList, DraftRequirement
 from biodata_schema.components.connections import Connection
-from biodata_schema.components.coordinates import CoordinateSystemOrNA
+from biodata_schema.components.coordinates import CoordinateSystem, CoordinateSystemOrNA
 from biodata_schema.components.devices import (
     AdditionalImagingDevice,
     AirPuffDevice,
@@ -110,7 +110,7 @@ class Instrument(DataCoreModel):
 
     # coordinate system
     global_coordinate_system: CoordinateSystemOrNA = Field(
-        ...,
+        default=CoordinateSystem.NotApplicable,
         title="Global coordinate system",
         description=(
             "Origin and axis definitions for determining the position of the instrument's components."

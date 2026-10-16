@@ -19,16 +19,16 @@ from biodata_schema.components.coordinates import (
     RotationDirection,
     Translation,
 )
-from biodata_schema.components.specimen_procedures import PlanarSectioning
+from biodata_schema.components.specimen_procedures import PlanarSectioning, SectionOrientation
 from biodata_schema.components.subject_procedures import Surgery
+from biodata_schema.components.surgery_procedures import GenericSurgeryProcedure
 from biodata_schema.core.acquisition import Acquisition
 from biodata_schema.core.instrument import Instrument
-from biodata_schema.core.procedures import Procedures
 from biodata_schema.utils.merge import merge_coordinate_systems
 from tests.coordinate_systems import BREGMA_ARI
 
 
-@pytest.mark.parametrize("model", [Instrument, Acquisition, Procedures, Surgery, PlanarSectioning])
+@pytest.mark.parametrize("model", [Instrument, Acquisition, Surgery, PlanarSectioning])
 def test_not_applicable_global_coordinate_field(model):
     """Every global frame accepts and round-trips only the explicit sentinel."""
     adapter = TypeAdapter(model.model_fields["global_coordinate_system"].annotation)
@@ -39,9 +39,15 @@ def test_not_applicable_global_coordinate_field(model):
         adapter.validate_python("unknown")
     schema = model.model_json_schema()["properties"]["global_coordinate_system"]
     assert {"const": "Not applicable", "type": "string"} in schema["anyOf"]
-    assert model.model_fields["global_coordinate_system"].is_required() == (model is Instrument)
-    if model is not Instrument:
-        assert adapter.validate_python(None) is None
+    assert not model.model_fields["global_coordinate_system"].is_required()
+    assert model.model_fields["global_coordinate_system"].default == CoordinateSystem.NotApplicable
+    assert schema["default"] == CoordinateSystem.NotApplicable
+    assert {"type": "null"} not in schema["anyOf"]
+    with pytest.raises(ValidationError):
+        adapter.validate_python(None)
+    with pytest.raises(ValidationError):
+        adapter.validate_json("null")
+    assert adapter.validate_python(BREGMA_ARI) == BREGMA_ARI
 
 
 def test_not_applicable_is_not_a_coordinate_model_field():
@@ -50,6 +56,38 @@ def test_not_applicable_is_not_a_coordinate_model_field():
     assert "NotApplicable" not in BREGMA_ARI.model_dump()
     adapter = TypeAdapter(CoordinateSystemOrNA)
     assert adapter.validate_json(adapter.dump_json(BREGMA_ARI)) == BREGMA_ARI
+
+
+@pytest.mark.parametrize("model", [Instrument, Acquisition])
+def test_core_global_frame_default(model):
+    """Omitting a core global frame uses NotApplicable and still validates transforms."""
+    if model is Instrument:
+        from examples.ephys_instrument import inst as spatial
+
+        values = spatial.model_dump(exclude={"global_coordinate_system", "components", "modalities", "connections"})
+        values.update(components=[], modalities=[])
+    else:
+        from examples.ephys_acquisition import acquisition as spatial
+
+        values = spatial.model_dump(exclude={"global_coordinate_system", "data_streams"})
+        values["data_streams"] = []
+    nonspatial = model.model_validate(values)
+    assert nonspatial.global_coordinate_system == CoordinateSystem.NotApplicable
+    assert model.model_validate_json(nonspatial.model_dump_json()) == nonspatial
+    with pytest.raises(ValidationError, match="CoordinateSystem is required"):
+        model.model_validate(spatial.model_dump(exclude={"global_coordinate_system"}))
+
+
+def test_procedure_global_frame_defaults():
+    """Procedures without coordinates default to an explicit absent frame."""
+    surgery = Surgery(
+        start_date="2026-10-15",
+        procedures=[GenericSurgeryProcedure(description="Non-coordinate procedure")],
+    )
+    sectioning = PlanarSectioning(sections=[], section_orientation=SectionOrientation.CORONAL)
+    for procedure in (surgery, sectioning):
+        assert procedure.global_coordinate_system == CoordinateSystem.NotApplicable
+        assert type(procedure).model_validate_json(procedure.model_dump_json()) == procedure
 
 
 @pytest.mark.parametrize(
@@ -73,7 +111,7 @@ def test_merge_not_applicable_with_real_frame(first, second):
     assert merge_coordinate_systems(first, second) == BREGMA_ARI
 
 
-@pytest.mark.parametrize("model", [Instrument, Acquisition, Procedures])
+@pytest.mark.parametrize("model", [Instrument, Acquisition])
 @pytest.mark.parametrize("real_first", [True, False])
 def test_core_merge_real_frame_overrides_not_applicable(model, real_first):
     """Core-model addition keeps the real frame and validates in both operand orders."""
@@ -89,7 +127,7 @@ def test_core_merge_real_frame_overrides_not_applicable(model, real_first):
             components=[],
             global_coordinate_system=CoordinateSystem.NotApplicable,
         )
-    elif model is Acquisition:
+    else:
         from examples.ephys_acquisition import acquisition as spatial
 
         nonspatial = Acquisition(
@@ -99,13 +137,6 @@ def test_core_merge_real_frame_overrides_not_applicable(model, real_first):
             acquisition_end_time=spatial.acquisition_end_time,
             acquisition_type=spatial.acquisition_type,
             data_streams=[],
-            global_coordinate_system=CoordinateSystem.NotApplicable,
-        )
-    else:
-        from examples.thermistor_procedures import p as spatial
-
-        nonspatial = Procedures(
-            subject_name=spatial.subject_name,
             global_coordinate_system=CoordinateSystem.NotApplicable,
         )
     combined = spatial + nonspatial if real_first else nonspatial + spatial
