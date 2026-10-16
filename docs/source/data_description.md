@@ -6,7 +6,9 @@ The `data_description.json` file tracks administrative information about a data 
 
 ## Uniqueness
 
-`DataDescription.name` can be any string. If omitted for single-subject raw data, it is generated as `<subject_name>_<creation_time>`. For multi-subject raw data, supply a name; we suggest `<label>_<acquisition-start-time>`, for example `batch-17_20221012T232311+0000`.
+`DataDescription.name` is required and can be any string. It is not generated automatically.
+
+We recommend using the pattern `<subject_name>_<acquisition-start-time>` for single-subject raw data or `<label>_<acquisition-start-time>` for multi-subject raw data. We recommend using ISO format datetimes in the *local time zone* of the acquisition, e.g. `123456_20260101T123500` or `group-5_20260101T123500`.
 
 You can group data assets together using `DataDescription.tags: List[str]`. Tags should be shared across assets within experiments. **Do not repeat information in the tags that already exists elsewhere in the metadata**, for example modalities should never be included in tags.
 
@@ -29,7 +31,7 @@ Description of a logical collection of data files
 | `subject_names` | `Optional[set[str]]` | Subject names (Unique names for subjects associated with this data asset) |
 | `creation_time` | `datetime (timezone-aware)` | Creation Time (Time that data files were created, used to uniquely identify the data) |
 | `tags` | `Optional[List[str]]` | Tags (Descriptive strings to help categorize and search for data) |
-| `name` | `Optional[str]` | Data asset name (Any string naming the data asset, conventionally also used as the data folder name.) |
+| `name` | `str` | Data asset name (Any string naming the data asset, conventionally also used as the data folder name.) |
 | `institution` | [Organization](biodata_models/organizations.md#organization) | Institution (An established society, corporation, foundation or other organization that collected this data) |
 | `funding_source` | List[[Funding](data_description.md#funding)] | Funding source (Funding source. If internal funding, select 'Allen Institute') |
 | `data_level` | [DataLevel](biodata_models/data_levels.md#datalevel) | Data Level (Level of processing that data has undergone) |
