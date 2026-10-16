@@ -209,11 +209,12 @@ class SchemaWriter:
     @staticmethod
     def get_schemas() -> Iterator[type[DataCoreModel]]:
         """
-        Returns Iterator of DataCoreModel classes
+        Yield DataCoreModel classes defined in the core schema package.
         """
 
         for model in DataCoreModel.__subclasses__():
-            yield model
+            if model.__module__.startswith(f"{core.__name__}."):
+                yield model
 
     @staticmethod
     def schema_filename(model: type[DataCoreModel]) -> str:

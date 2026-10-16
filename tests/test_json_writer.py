@@ -13,7 +13,7 @@ import pytest
 from jsonschema import Draft202012Validator
 from pydantic import BaseModel, TypeAdapter
 
-from biodata_schema.base import DraftRequirement
+from biodata_schema.base import DataCoreModel, DraftRequirement
 from biodata_schema.core.metadata import Metadata
 from biodata_schema.core.procedures import Procedures
 from biodata_schema.core.subject import Subject
@@ -90,6 +90,19 @@ class TestSchemaWriter:
             schema_contents = schema.model_json_schema()
             assert filename is not None
             assert schema_contents is not None
+
+    def test_get_schemas_excludes_external_models(self, tmp_path):
+        """Test-local core models must not be discovered or published."""
+
+        class TestCoreModel(DataCoreModel):
+            """Core model defined outside the schema package."""
+
+        schemas = list(SchemaWriter.get_schemas())
+        assert TestCoreModel not in schemas
+        assert {Subject, Procedures, Metadata}.issubset(schemas)
+
+        SchemaWriter(["--output", str(tmp_path)]).write_to_json()
+        assert not (tmp_path / SchemaWriter.schema_filename(TestCoreModel)).exists()
 
     def test_parse_args(self):
         """Tests arguments are parsed correctly."""
