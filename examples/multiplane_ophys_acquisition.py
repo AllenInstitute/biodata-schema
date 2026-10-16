@@ -1,4 +1,4 @@
-"""example fiber photometry acquisition"""
+"""Example multiplane optical physiology acquisition with illustrative VISp positions."""
 
 import argparse
 from datetime import datetime
@@ -30,14 +30,14 @@ from biodata_schema.core.acquisition import (
     StimulusEpoch,
 )
 
-BREGMA_ARI = CoordinateSystem(
-    name="BREGMA_ARI",
+BREGMA_RAS = CoordinateSystem(
+    name="BREGMA_RAS",
     origin=Origin.BREGMA,
     axis_unit=SizeUnit.MM,
     axes=[
-        Axis(name=AxisName.AP, direction=Direction.PA),
         Axis(name=AxisName.ML, direction=Direction.LR),
-        Axis(name=AxisName.SI, direction=Direction.SI),
+        Axis(name=AxisName.AP, direction=Direction.PA),
+        Axis(name=AxisName.SI, direction=Direction.IS),
     ],
 )
 
@@ -62,7 +62,7 @@ a = Acquisition(
     subject_details=AcquisitionSubjectDetails(
         mouse_platform_name="disc",
     ),
-    global_coordinate_system=BREGMA_ARI,
+    global_coordinate_system=BREGMA_RAS,
     data_streams=[
         DataStream(
             stream_start_time=t,
@@ -110,7 +110,7 @@ a = Acquisition(
                             channel_name="Green channel",
                             image_to_acquisition_transform=[
                                 Translation(
-                                    translation=[1.5, 1.5, 0],
+                                    translation=[2.5, -3.5, 0],
                                 ),
                             ],
                             dimensions=Scale(
