@@ -56,7 +56,7 @@ CAMERA_CS = CoordinateSystem(
     axes=[
         Axis(name=AxisName.X, direction=Direction.LR),
         Axis(name=AxisName.Y, direction=Direction.FB),
-        Axis(name=AxisName.Z, direction=Direction.DU)
+        Axis(name=AxisName.Z, direction=Direction.DU),
     ],
 )
 
@@ -104,7 +104,7 @@ camera2 = CameraAssembly(
     name="BehaviorVideography_FaceBottom",
     target=CameraTarget.FACE,
     relative_position=[AnatomicalRelative.INFERIOR],
-    local_coordinate_system=CAMERA_CSS,
+    local_coordinate_system=CAMERA_CS,
     # Illustrative placement, 20 cm below bregma, with axes aligned to BREGMA_RAS.
     transform=[Translation(translation=[0, 0, -200])],
     camera=Camera(
