@@ -120,6 +120,25 @@ def test_custom_named_asset_keeps_single_source_history():
     assert second.quality_control == source.quality_control
 
 
+@pytest.mark.parametrize("name", ["custom result", "project_analysis_20221122T084300"])
+@pytest.mark.parametrize(
+    "source_data,expected",
+    [
+        (None, None),
+        ([], None),
+        (["123456_20221122T084300"], "123456_20221122T084300"),
+        (["123456_20221122T084300", "654321_20221122T084300"], None),
+    ],
+)
+def test_root_asset_name_falls_back_to_single_source(name, source_data, expected):
+    """Custom and analyzed names identify a root only with exactly one source."""
+    source = DataDescription.model_validate(
+        example_data_description.model_dump()
+        | {"name": name, "data_level": DataLevel.DERIVED, "source_data": source_data}
+    )
+    assert _get_root_asset_name(source) == expected
+
+
 def test_multiple_sources_preserve_empty_names():
     """An empty source name is still included in source_data."""
     source = _make_metadata()
