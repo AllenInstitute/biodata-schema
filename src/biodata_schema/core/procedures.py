@@ -2,7 +2,7 @@
 
 from typing import List, Literal, Optional
 
-from pydantic import Field, SkipValidation, model_validator
+from pydantic import Field, SkipValidation
 
 from biodata_schema.base import DataCoreModel, DiscriminatedList
 from biodata_schema.components.specimen_procedures import SpecimenProcedure
@@ -13,8 +13,8 @@ from biodata_schema.components.subject_procedures import (
     TrainingProtocol,
     WaterRestriction,
 )
-from biodata_schema.utils.validators import recursive_get_device_names
 from biodata_schema.utils.merge import merge_notes
+from biodata_schema.utils.validators import recursive_get_device_names
 
 
 class Procedures(DataCoreModel):

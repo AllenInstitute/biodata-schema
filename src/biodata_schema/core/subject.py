@@ -5,7 +5,6 @@ from typing import Annotated, Literal, Optional
 from pydantic import Field, SkipValidation, StringConstraints
 
 from biodata_schema.base import DataCoreModel, Discriminated, DraftRequirement
-from biodata_schema.utils.data_name_patterns import DataRegex
 from biodata_schema.components.subjects import (
     CalibrationObject,
     CellLine,
@@ -14,6 +13,7 @@ from biodata_schema.components.subjects import (
     MouseSubject,
     NonHumanPrimateSubject,
 )
+from biodata_schema.utils.data_name_patterns import DataRegex
 
 
 class Subject(DataCoreModel):
