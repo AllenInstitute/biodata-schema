@@ -49,8 +49,6 @@ REQUIRED_FILE_SETS = {
     "subjects": [
         "data_description",
         "procedures",
-        "instrument",
-        "acquisition",
     ],
     "processing": ["data_description"],
     "model": ["data_description"],
