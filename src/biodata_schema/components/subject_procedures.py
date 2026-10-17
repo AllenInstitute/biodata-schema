@@ -1,7 +1,7 @@
 """Subject procedures module for AIND data schema"""
 
 from datetime import date
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 from biodata_models.coordinates import Origin
 from biodata_models.human_disease import HumanDiseaseModel
@@ -110,7 +110,7 @@ class ClinicalTreatment(DataModel):
     end_date: Optional[date] = Field(default=None, title="Treatment end date")
     treatment: Reagent = Field(..., title="Treament drug")
     dose: Optional[float] = Field(default=None, title="Dose")
-    dose_unit: Optional[DiscriminatedList[MassUnit, VolumeUnit]] = Field(default=None, title="Dose unit")
+    dose_unit: Optional[Union[MassUnit, VolumeUnit]] = Field(default=None, title="Dose unit")
     notes: Optional[str] = Field(default=None, title="Notes")
 
 

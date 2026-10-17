@@ -1,6 +1,6 @@
 """test Procedures"""
 
-from datetime import date
+from datetime import date, datetime, timezone
 from unittest.mock import call, patch
 
 import pytest
@@ -13,10 +13,11 @@ from biodata_models.anatomy import (
 )
 from biodata_models.brain_atlas import CCFv3
 from biodata_models.coordinates import AnatomicalRelative
+from biodata_models.human_disease import HumanDiseaseModel
 from biodata_models.organizations import Organization
 from biodata_models.registries import Registry
 from biodata_models.specimen_procedure_types import SpecimenProcedureType
-from biodata_models.units import ConcentrationUnit, CurrentUnit, SizeUnit, TimeUnit, VolumeUnit
+from biodata_models.units import ConcentrationUnit, CurrentUnit, MassUnit, SizeUnit, TimeUnit, VolumeUnit
 from pydantic import ValidationError
 
 from biodata_schema.components.configs import CatheterConfig
@@ -29,6 +30,7 @@ from biodata_schema.components.injection_procedures import (
     TarsVirusIdentifiers,
     ViralMaterial,
 )
+from biodata_schema.components.reagent import Reagent
 from biodata_schema.components.specimen_procedures import (
     HCRSeries,
     PlanarSection,
@@ -38,13 +40,21 @@ from biodata_schema.components.specimen_procedures import (
     SectionOrientation,
     SpecimenProcedure,
 )
-from biodata_schema.components.subject_procedures import BrainInjection, Injection, Surgery
+from biodata_schema.components.subject_procedures import (
+    BrainInjection,
+    ClinicalTreatment,
+    ClinicalVisit,
+    Injection,
+    Surgery,
+)
 from biodata_schema.components.surgery_procedures import (
     CatheterImplant,
     Craniotomy,
     CraniotomyType,
     GenericSurgeryProcedure,
     GroundWireImplant,
+    SampleCollection,
+    SampleType,
 )
 from biodata_schema.core.procedures import Procedures
 from biodata_schema.utils.exceptions import OneOfError
@@ -892,3 +902,79 @@ class TestProcedures:
         assert [surgery.global_coordinate_system for surgery in combined.subject_procedures] == [BREGMA_ARI, BREGMA_RAS]
         assert "global_coordinate_system" not in combined.model_dump()
         assert Procedures.model_validate_json(combined.model_dump_json()) == combined
+
+    def test_clinical_treatment(self):
+        """ClinicalTreatment requires a start date and a treatment reagent"""
+        with pytest.raises(ValidationError):
+            ClinicalTreatment()
+
+        treatment = ClinicalTreatment(
+            start_date=self.start_date,
+            end_date=date.fromisoformat("2020-10-20"),
+            treatment=Reagent(name="Drug A", source=Organization.OTHER),
+            dose=5.0,
+            dose_unit=MassUnit.MG,
+            notes="Administered daily",
+        )
+        assert treatment.treatment.name == "Drug A"
+
+        procedures = Procedures(subject_name="12345", subject_procedures=[treatment])
+        assert Procedures.model_validate_json(procedures.model_dump_json()) == procedures
+
+    def test_clinical_treatment_dose_unit_accepts_mass_or_volume(self):
+        """dose_unit accepts either a mass or a volume unit"""
+        mass_treatment = ClinicalTreatment(
+            start_date=self.start_date,
+            treatment=Reagent(name="Drug A", source=Organization.OTHER),
+            dose=5.0,
+            dose_unit=MassUnit.MG,
+        )
+        assert mass_treatment.dose_unit == MassUnit.MG
+
+        volume_treatment = ClinicalTreatment(
+            start_date=self.start_date,
+            treatment=Reagent(name="Saline", source=Organization.OTHER),
+            dose=1.0,
+            dose_unit=VolumeUnit.ML,
+        )
+        assert volume_treatment.dose_unit == VolumeUnit.ML
+
+    def test_clinical_visit(self):
+        """ClinicalVisit requires a start date and supports samples, surveys, and diagnoses"""
+        with pytest.raises(ValidationError):
+            ClinicalVisit()
+
+        visit = ClinicalVisit(
+            start_date=self.start_date,
+            samples=[
+                SampleCollection(
+                    sample_type=SampleType.BLOOD,
+                    time=datetime(2020, 10, 10, 12, 0, 0, tzinfo=timezone.utc),
+                    specimen_name="12345_blood_001",
+                    collection_volume=1.0,
+                    collection_volume_unit=VolumeUnit.ML,
+                )
+            ],
+            surveys=["PHQ-9"],
+            diagnosis=[
+                HumanDiseaseModel(
+                    name="type 2 diabetes mellitus",
+                    registry=Registry.DOID,
+                    registry_identifier="DOID:9352",
+                )
+            ],
+            notes="Routine follow-up",
+        )
+        assert visit.samples[0].specimen_name == "12345_blood_001"
+        assert visit.diagnosis[0].name == "type 2 diabetes mellitus"
+
+        procedures = Procedures(subject_name="12345", subject_procedures=[visit])
+        assert Procedures.model_validate_json(procedures.model_dump_json()) == procedures
+
+    def test_clinical_visit_optional_fields_default_to_none(self):
+        """samples, surveys, diagnosis, and notes are optional on ClinicalVisit"""
+        visit = ClinicalVisit(start_date=self.start_date)
+        assert visit.samples is None
+        assert visit.surveys is None
+        assert visit.diagnosis is None
+        assert visit.notes is None

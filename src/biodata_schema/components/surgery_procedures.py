@@ -225,16 +225,6 @@ class BrainInjection(Injection):
         return self
 
 
-class SampleCollection(DataModel):
-    """Description of a single sample collection"""
-
-    sample_type: SampleType = Field(..., title="Sample type")
-    time: AwareDatetimeWithDefault = Field(..., title="Collection time")
-    collection_volume: float = Field(..., title="Collection volume")
-    collection_volume_unit: VolumeUnit = Field(..., title="Collection volume unit")
-    collection_method: Optional[str] = Field(default=None, title="Collection method for terminal collection")
-
-
 class MyomatrixInsertion(ProtocolMixin, DataModel):
     """Description of a Myomatrix array insertion for EMG"""
 
