@@ -195,9 +195,11 @@ Description of a single sample collection
 |-------|------|-------------|
 | `sample_type` | [SampleType](#sampletype) | Sample type  |
 | `time` | `datetime (timezone-aware)` | Collection time  |
+| `specimen_name` | `str` | Specimen name  |
 | `collection_volume` | `float` | Collection volume  |
 | `collection_volume_unit` | [VolumeUnit](../biodata_models/units.md#volumeunit) | Collection volume unit  |
 | `collection_method` | `Optional[str]` | Collection method for terminal collection  |
+| `protocol_id` | `Optional[str]` | Protocol ID (DOI for protocols.io) |
 
 
 ### SampleType
@@ -207,6 +209,8 @@ Sample type
 | Name | Value |
 |------|-------|
 | `BLOOD` | `Blood` |
+| `URINE` | `Urine` |
+| `TISSUE` | `Tissue` |
 | `OTHER` | `Other` |
 
 
