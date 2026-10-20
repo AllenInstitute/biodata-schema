@@ -501,8 +501,7 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
         default=None,
         title="Subject details",
         description=(
-            "One record per subject, identified by subject_name. Required for every subject in "
-            "an in vivo acquisition."
+            "One record per subject, identified by subject_name. Required for every subject in an in vivo acquisition."
         ),
     )
 
