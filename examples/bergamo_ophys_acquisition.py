@@ -24,7 +24,7 @@ from biodata_schema.components.identifiers import Code
 from biodata_schema.components.stimulus import PhotoStimulation, PhotoStimulationGroup
 from biodata_schema.core.acquisition import (
     Acquisition,
-    AcquisitionSubjectDetails,
+    AcquisitionMouseDetails,
     DataStream,
     StimulusEpoch,
 )
@@ -90,7 +90,7 @@ a = Acquisition(
     acquisition_type="BCI Photometry",
     instrument_name="322_bergamo_20220705",
     ethics_review_id=["2115"],
-    subject_details=[AcquisitionSubjectDetails(subject_name="652567", mouse_platform_name="Mouse tube")],
+    subject_details=[AcquisitionMouseDetails(subject_name="652567", mouse_platform_name="Mouse tube")],
     global_coordinate_system=BREGMA_ARI,
     data_streams=[
         DataStream(

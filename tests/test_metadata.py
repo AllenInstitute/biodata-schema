@@ -20,7 +20,7 @@ from biodata_schema.components.identifiers import Code, Database, Person
 from biodata_schema.components.subject_procedures import TrainingProtocol
 from biodata_schema.components.subjects import BreedingInfo, CalibrationObject, Housing, MouseSubject, Sex, Species
 from biodata_schema.components.surgery_procedures import DeviceImplant
-from biodata_schema.core.acquisition import Acquisition, AcquisitionSubjectDetails, DataStream, StimulusEpoch
+from biodata_schema.core.acquisition import Acquisition, AcquisitionMouseDetails, DataStream, StimulusEpoch
 from biodata_schema.core.data_description import DataDescription, Funding
 from biodata_schema.core.instrument import Instrument
 from biodata_schema.core.metadata import Metadata, create_metadata_json
@@ -64,7 +64,7 @@ def _acquisition(**updates):
             "instrument_name": "Test",
             "acquisition_start_time": datetime(2023, 10, 3, 12, tzinfo=timezone.utc),
             "acquisition_end_time": datetime(2023, 10, 3, 13, tzinfo=timezone.utc),
-            "subject_details": [AcquisitionSubjectDetails(subject_name="123456", mouse_platform_name="platform")],
+            "subject_details": [AcquisitionMouseDetails(subject_name="123456", mouse_platform_name="platform")],
             "data_streams": [],
         }
         | updates
@@ -224,7 +224,7 @@ class TestMetadata:
                 "subject_names": {"123456", "789012"},
                 "specimen_names": None,
                 "data_streams": [],
-                "subject_details": [AcquisitionSubjectDetails(subject_name="123456", mouse_platform_name="platform")],
+                "subject_details": [AcquisitionMouseDetails(subject_name="123456", mouse_platform_name="platform")],
             }
         )
         roster = [self.subject, self.subject.model_copy(update={"subject_name": "789012"})]
@@ -238,7 +238,7 @@ class TestMetadata:
         with pytest.raises(ValidationError, match="subject_details missing for subjects: 789012"):
             Metadata(**kwargs)
         acquisition.subject_details.append(
-            AcquisitionSubjectDetails(subject_name="789012", mouse_platform_name="platform")
+            AcquisitionMouseDetails(subject_name="789012", mouse_platform_name="platform")
         )
         assert Metadata(**kwargs)
 
@@ -272,7 +272,7 @@ class TestMetadata:
                 acquisition=_acquisition(
                     instrument_name="123_EPHYS2_20230101",
                     acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
-                    subject_details=[AcquisitionSubjectDetails(subject_name="123456", mouse_platform_name="platform1")],
+                    subject_details=[AcquisitionMouseDetails(subject_name="123456", mouse_platform_name="platform1")],
                     data_streams=[],
                 ),
             )
@@ -374,7 +374,7 @@ class TestMetadata:
                     acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
                     subject_names=subject_names or {"999"},
                     specimen_names={"specimen"},
-                    subject_details=None,
+                    subject_details=[],
                     data_streams=[],
                 ),
             )
@@ -402,7 +402,7 @@ class TestMetadata:
                 acquisition=_acquisition(
                     subject_names={"888"},
                     specimen_names={"888-001"},
-                    subject_details=None,
+                    subject_details=[],
                     data_streams=[],
                 ),
             )
@@ -1307,7 +1307,7 @@ class TestMetadata:
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             subject_names={"123456"},
             specimen_names={"123456-001"},
-            subject_details=None,
+            subject_details=[],
             data_streams=[],
         )
         metadata_with_specimen = Metadata(
@@ -1341,7 +1341,7 @@ class TestMetadata:
             instrument_name="Test",
             acquisition_start_time=datetime(2023, 10, 3, 12, 0, 0, tzinfo=timezone.utc),
             data_streams=[],
-            subject_details=None,
+            subject_details=[],
         )
         with pytest.raises(ValueError) as context:
             Metadata(

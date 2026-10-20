@@ -28,7 +28,7 @@ from biodata_schema.components.identifiers import Code, Software
 from biodata_schema.components.stimulus import VisualStimulation
 from biodata_schema.core.acquisition import (
     Acquisition,
-    AcquisitionSubjectDetails,
+    AcquisitionMouseDetails,
     DataStream,
     StimulusEpoch,
 )
@@ -145,7 +145,7 @@ acquisition = Acquisition(
     acquisition_type="Receptive field mapping",
     instrument_name="EPHYS1",
     ethics_review_id=["2109"],
-    subject_details=[AcquisitionSubjectDetails(subject_name="664484", mouse_platform_name="Running Wheel")],
+    subject_details=[AcquisitionMouseDetails(subject_name="664484", mouse_platform_name="Running Wheel")],
     global_coordinate_system=BREGMA_ARI,
     stimulus_epochs=[
         StimulusEpoch(

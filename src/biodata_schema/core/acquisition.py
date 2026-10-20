@@ -8,6 +8,7 @@ from typing import Annotated, List, Literal, Optional, Union
 from zoneinfo import ZoneInfo
 
 from biodata_models.modalities import Modality
+from biodata_models.mouse_developmental_stage import MouseDevelopmentalStageModel
 from biodata_models.stimulus_modality import StimulusModality
 from biodata_models.units import MassUnit, VolumeUnit
 from pydantic import Field, SkipValidation, TypeAdapter, field_validator, model_validator
@@ -89,10 +90,11 @@ def _drop_non_iana_timezones(schema: dict) -> None:
             option["enum"] = [tz for tz in option["enum"] if tz not in NON_IANA_TIMEZONES]
 
 
-class AcquisitionSubjectDetails(DataModel):
-    """Details about the subject during an acquisition"""
+class AcquisitionMouseDetails(DataModel):
+    """Details about the mouse during an in vivo acquisition"""
 
     subject_name: str = Field(..., title="Subject name")
+    developmental_stage: Optional[MouseDevelopmentalStageModel] = Field(default=None, title="Development stage")
     animal_weight_prior: Optional[Decimal] = Field(
         default=None,
         title="Animal weight (g)",
@@ -495,7 +497,7 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
     manipulations: List[Manipulation] = Field(
         default=[], title="Manipulations", description="Procedures performed during the acquisition."
     )
-    subject_details: Optional[List[AcquisitionSubjectDetails]] = Field(
+    subject_details: Optional[DiscriminatedList[AcquisitionMouseDetails]] = Field(
         default=None,
         title="Subject details",
         description="One record per subject, identified by subject_name. Required for every subject in vivo.",
@@ -665,6 +667,6 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
             notes=notes,
             data_streams=data_streams,
             stimulus_epochs=stimulus_epochs,
-            subject_details=subject_details if subject_details else None,
+            subject_details=subject_details,
             manipulations=self.manipulations + other.manipulations,
         )

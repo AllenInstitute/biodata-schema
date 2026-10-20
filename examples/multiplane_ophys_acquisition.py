@@ -24,7 +24,7 @@ from biodata_schema.components.coordinates import Axis, CoordinateSystem, Scale,
 from biodata_schema.components.identifiers import Code, Software
 from biodata_schema.core.acquisition import (
     Acquisition,
-    AcquisitionSubjectDetails,
+    AcquisitionMouseDetails,
     DataStream,
     PerformanceMetrics,
     StimulusEpoch,
@@ -59,7 +59,7 @@ a = Acquisition(
     acquisition_type="Mesoscope",
     instrument_name="MESO.1",
     ethics_review_id=["1234"],
-    subject_details=[AcquisitionSubjectDetails(subject_name="12345", mouse_platform_name="disc")],
+    subject_details=[AcquisitionMouseDetails(subject_name="12345", mouse_platform_name="disc")],
     global_coordinate_system=BREGMA_RAS,
     data_streams=[
         DataStream(

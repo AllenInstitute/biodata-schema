@@ -22,7 +22,7 @@ from biodata_schema.components.connections import Connection
 from biodata_schema.core.acquisition import (
     NON_IANA_TIMEZONES,
     Acquisition,
-    AcquisitionSubjectDetails,
+    AcquisitionMouseDetails,
     DataStream,
     Manipulation,
     StimulusEpoch,
@@ -42,7 +42,7 @@ class TestAcquisition:
     def test_subject_references(self, field_name):
         """Subject-specific records must reference an acquired subject."""
         if field_name == "subject_details":
-            record = AcquisitionSubjectDetails(subject_name="123456", mouse_platform_name="platform")
+            record = AcquisitionMouseDetails(subject_name="123456", mouse_platform_name="platform")
         else:
             record = Manipulation(
                 subject_name="123456",
@@ -58,7 +58,7 @@ class TestAcquisition:
 
     def test_duplicate_subject_details(self):
         """There can be only one details record per subject."""
-        details = AcquisitionSubjectDetails(subject_name="123456", mouse_platform_name="platform")
+        details = AcquisitionMouseDetails(subject_name="123456", mouse_platform_name="platform")
         with pytest.raises(ValidationError, match="unique subject_name"):
             Acquisition.model_validate(barseq_acquisition.model_dump() | {"subject_details": [details, details]})
 
@@ -69,7 +69,7 @@ class TestAcquisition:
             Acquisition.model_validate(
                 payload
                 | {
-                    "subject_details": [AcquisitionSubjectDetails(subject_name=name, mouse_platform_name="platform")],
+                    "subject_details": [AcquisitionMouseDetails(subject_name=name, mouse_platform_name="platform")],
                     "manipulations": [
                         Manipulation(
                             subject_name=name,
@@ -178,7 +178,7 @@ class TestAcquisition:
                 acquisition_type="Test",
                 instrument_name="1234",
                 subject_details=[
-                    AcquisitionSubjectDetails(
+                    AcquisitionMouseDetails(
                         subject_name="123456",
                         mouse_platform_name="Running wheel",
                     )
@@ -218,7 +218,7 @@ class TestAcquisition:
             acquisition_type="Test",
             instrument_name="1234",
             subject_details=[
-                AcquisitionSubjectDetails(
+                AcquisitionMouseDetails(
                     subject_name="123456",
                     mouse_platform_name="Running wheel",
                 )

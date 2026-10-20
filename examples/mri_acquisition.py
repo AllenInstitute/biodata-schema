@@ -14,7 +14,7 @@ from biodata_schema.components.coordinates import Affine, Axis, CoordinateSystem
 from biodata_schema.components.devices import Scanner
 from biodata_schema.core.acquisition import (
     Acquisition,
-    AcquisitionSubjectDetails,
+    AcquisitionMouseDetails,
     DataStream,
 )
 
@@ -96,7 +96,7 @@ acquisition = Acquisition(
     acquisition_type="3D MRI Volume",
     instrument_name="NA",
     global_coordinate_system=MRI_LPS,
-    subject_details=[AcquisitionSubjectDetails(subject_name="123456", mouse_platform_name="cradle")],
+    subject_details=[AcquisitionMouseDetails(subject_name="123456", mouse_platform_name="cradle")],
     data_streams=[stream],
     notes="There was some information about this scan acquisition",
 )

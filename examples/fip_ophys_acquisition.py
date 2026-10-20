@@ -23,7 +23,7 @@ from biodata_schema.components.coordinates import CoordinateSystem
 from biodata_schema.components.identifiers import Code
 from biodata_schema.core.acquisition import (
     Acquisition,
-    AcquisitionSubjectDetails,
+    AcquisitionMouseDetails,
     DataStream,
     PerformanceMetrics,
     StimulusEpoch,
@@ -350,7 +350,7 @@ acquisition = Acquisition(
     protocol_id=[""],
     ethics_review_id=["2115"],
     subject_details=[
-        AcquisitionSubjectDetails(
+        AcquisitionMouseDetails(
             subject_name="687582",
             animal_weight_prior=None,
             animal_weight_post=None,
