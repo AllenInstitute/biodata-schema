@@ -500,7 +500,10 @@ class Acquisition(ProtocolListMixin, DataCoreModel):
     subject_details: Optional[DiscriminatedList[AcquisitionMouseDetails]] = Field(
         default=None,
         title="Subject details",
-        description="One record per subject, identified by subject_name. Required for every subject in vivo.",
+        description=(
+            "One record per subject, identified by subject_name. Required for every subject in "
+            "an in vivo acquisition."
+        ),
     )
 
     @property
