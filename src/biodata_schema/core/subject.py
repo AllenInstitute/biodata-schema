@@ -29,7 +29,7 @@ class Subject(DataCoreModel):
         description="Unique name for the subject of data acquisition",
         title="Subject name",
     )
-
+    cohort_name: Optional[str] = Field(default=None, title="Cohort")
     subject_details: Discriminated[
         MouseSubject | HumanSubject | NonHumanPrimateSubject | CellLine | FluorescentCellLine | CalibrationObject
     ] = Field(..., title="Subject Details")
