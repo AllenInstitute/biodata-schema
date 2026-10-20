@@ -42,10 +42,11 @@ from biodata_schema.components.specimen_procedures import (
 )
 from biodata_schema.components.subject_procedures import (
     BrainInjection,
-    ClinicalTreatment,
     ClinicalVisit,
     Injection,
+    SelfAdministeredTreatment,
     Surgery,
+    Treatment,
 )
 from biodata_schema.components.surgery_procedures import (
     CatheterImplant,
@@ -903,37 +904,37 @@ class TestProcedures:
         assert "global_coordinate_system" not in combined.model_dump()
         assert Procedures.model_validate_json(combined.model_dump_json()) == combined
 
-    def test_clinical_treatment(self):
-        """ClinicalTreatment requires a start date and a treatment reagent"""
+    def test_self_administered_treatment(self):
+        """SelfAdministeredTreatment requires a start date and a drug reagent"""
         with pytest.raises(ValidationError):
-            ClinicalTreatment()
+            SelfAdministeredTreatment()
 
-        treatment = ClinicalTreatment(
+        treatment = SelfAdministeredTreatment(
             start_date=self.start_date,
             end_date=date.fromisoformat("2020-10-20"),
-            treatment=Reagent(name="Drug A", source=Organization.OTHER),
+            drug=Reagent(name="Drug A", source=Organization.OTHER),
             dose=5.0,
             dose_unit=MassUnit.MG,
             notes="Administered daily",
         )
-        assert treatment.treatment.name == "Drug A"
+        assert treatment.drug.name == "Drug A"
 
         procedures = Procedures(subject_name="12345", subject_procedures=[treatment])
         assert Procedures.model_validate_json(procedures.model_dump_json()) == procedures
 
-    def test_clinical_treatment_dose_unit_accepts_mass_or_volume(self):
+    def test_self_administered_treatment_dose_unit_accepts_mass_or_volume(self):
         """dose_unit accepts either a mass or a volume unit"""
-        mass_treatment = ClinicalTreatment(
+        mass_treatment = SelfAdministeredTreatment(
             start_date=self.start_date,
-            treatment=Reagent(name="Drug A", source=Organization.OTHER),
+            drug=Reagent(name="Drug A", source=Organization.OTHER),
             dose=5.0,
             dose_unit=MassUnit.MG,
         )
         assert mass_treatment.dose_unit == MassUnit.MG
 
-        volume_treatment = ClinicalTreatment(
+        volume_treatment = SelfAdministeredTreatment(
             start_date=self.start_date,
-            treatment=Reagent(name="Saline", source=Organization.OTHER),
+            drug=Reagent(name="Saline", source=Organization.OTHER),
             dose=1.0,
             dose_unit=VolumeUnit.ML,
         )
@@ -978,3 +979,33 @@ class TestProcedures:
         assert visit.surveys is None
         assert visit.diagnosis is None
         assert visit.notes is None
+        assert visit.treatment is None
+        assert visit.hospitalized is False
+
+    def test_treatment(self):
+        """Treatment requires a drug; dose and dose_unit are optional"""
+        with pytest.raises(ValidationError):
+            Treatment()
+
+        treatment = Treatment(drug=Reagent(name="Drug A", source=Organization.OTHER))
+        assert treatment.dose is None
+        assert treatment.dose_unit is None
+
+    def test_clinical_visit_treatment_and_hospitalized(self):
+        """ClinicalVisit accepts a list of treatments and a hospitalized flag"""
+        visit = ClinicalVisit(
+            start_date=self.start_date,
+            treatment=[
+                Treatment(
+                    drug=Reagent(name="Drug A", source=Organization.OTHER),
+                    dose=5.0,
+                    dose_unit=MassUnit.MG,
+                )
+            ],
+            hospitalized=True,
+        )
+        assert visit.treatment[0].drug.name == "Drug A"
+        assert visit.hospitalized is True
+
+        procedures = Procedures(subject_name="12345", subject_procedures=[visit])
+        assert Procedures.model_validate_json(procedures.model_dump_json()) == procedures
