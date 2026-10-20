@@ -7,11 +7,11 @@ from pydantic import Field, SkipValidation
 from biodata_schema.base import DataCoreModel, DiscriminatedList
 from biodata_schema.components.specimen_procedures import SpecimenProcedure
 from biodata_schema.components.subject_procedures import (
-    SelfAdministeredTreatment,
     ClinicalVisit,
     FoodRestriction,
     GenericSubjectProcedure,
     NonSurgicalInjection,
+    SelfAdministeredTreatment,
     Surgery,
     TrainingProtocol,
     WaterRestriction,
