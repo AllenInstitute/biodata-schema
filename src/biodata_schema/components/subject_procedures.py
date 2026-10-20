@@ -103,14 +103,19 @@ class FoodRestriction(ProtocolMixin, DataModel):
     end_date: Optional[date] = Field(default=None, title="Food restriction end date")
 
 
-class ClinicalTreatment(DataModel):
-    """Description of a clinical treatment procedure"""
+class Treatment(DataModel):
+    """Description of a treatment procedure"""
+
+    drug: Reagent = Field(..., title="Treament drug")
+    dose: Optional[float] = Field(default=None, title="Dose")
+    dose_unit: Optional[Union[MassUnit, VolumeUnit]] = Field(default=None, title="Dose unit")
+
+
+class SelfAdministeredTreatment(Treatment):
+    """Description of a treatment over a period of time"""
 
     start_date: date = Field(..., title="Treatment start date")
     end_date: Optional[date] = Field(default=None, title="Treatment end date")
-    treatment: Reagent = Field(..., title="Treament drug")
-    dose: Optional[float] = Field(default=None, title="Dose")
-    dose_unit: Optional[Union[MassUnit, VolumeUnit]] = Field(default=None, title="Dose unit")
     notes: Optional[str] = Field(default=None, title="Notes")
 
 
@@ -121,6 +126,8 @@ class ClinicalVisit(DataModel):
     samples: Optional[List[SampleCollection]] = Field(default=None, title="Samples")
     surveys: Optional[List[str]] = Field(default=None, title="Surveys")
     diagnosis: Optional[List[HumanDiseaseModel]] = Field(default=None, title="Diagnosis")
+    treatment: Optional[List[Treatment]] = Field(default=None, title="Treatment")
+    hospitalized: bool = Field(default=False, title="Hospitalized")
     notes: Optional[str] = Field(default=None, title="Notes")
 
 
