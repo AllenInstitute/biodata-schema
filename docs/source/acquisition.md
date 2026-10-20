@@ -93,7 +93,7 @@ while the StimulusEpoch represents all stimuli being presented.
 | `data_streams` | List[[DataStream](acquisition.md#datastream) or [ExternalDataStream](acquisition.md#externaldatastream)] | Data streams (A data stream is a collection of devices that are acquiring data simultaneously. Each acquisition can include multiple streams. Streams should be split when configurations are changed. Use ExternalDataStream for acquisitions where instrument metadata is unavailable.) |
 | `stimulus_epochs` | List[[StimulusEpoch](acquisition.md#stimulusepoch)] | Stimulus (A stimulus epoch captures all stimuli being presented during an acquisition. Epochs should be split when the purpose of the stimulus changes.) |
 | `manipulations` | List[[Manipulation](acquisition.md#manipulation)] | Manipulations (Procedures performed during the acquisition.) |
-| `subject_details` | `Optional[List[typing.Annotated[biodata_schema.core.acquisition.AcquisitionMouseDetails, FieldInfo(annotation=NoneType, required=True, discriminator='object_type')]]]` | Subject details (One record per subject, identified by subject_name. Required for every subject in vivo.) |
+| `subject_details` | `Optional[List[typing.Annotated[biodata_schema.core.acquisition.AcquisitionMouseDetails, FieldInfo(annotation=NoneType, required=True, discriminator='object_type')]]]` | Subject details (One record per subject, identified by subject_name. Required for every subject in an in vivo acquisition.) |
 | `protocol_id` | `Optional[List[str]]` | Protocol ID (DOI for protocols.io) |
 
 
