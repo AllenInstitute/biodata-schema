@@ -2,20 +2,6 @@
 
 ## Model definitions
 
-### ClinicalTreatment
-
-Description of a clinical treatment procedure
-
-| Field | Type | Title (Description) |
-|-------|------|-------------|
-| `start_date` | `datetime.date` | Treatment start date  |
-| `end_date` | `Optional[datetime.date]` | Treatment end date  |
-| `treatment` | [Reagent](reagent.md#reagent) | Treament drug  |
-| `dose` | `Optional[float]` | Dose  |
-| `dose_unit` | [MassUnit](../biodata_models/units.md#massunit) or [VolumeUnit](../biodata_models/units.md#volumeunit) or NoneType | Dose unit  |
-| `notes` | `Optional[str]` | Notes  |
-
-
 ### ClinicalVisit
 
 Description of clinical visit
@@ -26,6 +12,8 @@ Description of clinical visit
 | `samples` | Optional[List[[SampleCollection](surgery_procedures.md#samplecollection)]] | Samples  |
 | `surveys` | `Optional[List[str]]` | Surveys  |
 | `diagnosis` | `Optional[List[biodata_models.human_disease.HumanDiseaseModel]]` | Diagnosis  |
+| `treatment` | Optional[List[[Treatment](#treatment)]] | Treatment  |
+| `hospitalized` | `bool` | Hospitalized  |
 | `notes` | `Optional[str]` | Notes  |
 
 
@@ -75,6 +63,20 @@ which may include one or more injections at different locations/depths
 | `notes` | `Optional[str]` | Notes  |
 
 
+### SelfAdministeredTreatment
+
+Description of a treatment over a period of time
+
+| Field | Type | Title (Description) |
+|-------|------|-------------|
+| `start_date` | `datetime.date` | Treatment start date  |
+| `end_date` | `Optional[datetime.date]` | Treatment end date  |
+| `notes` | `Optional[str]` | Notes  |
+| `drug` | [Reagent](reagent.md#reagent) | Treament drug  |
+| `dose` | `Optional[float]` | Dose  |
+| `dose_unit` | [MassUnit](../biodata_models/units.md#massunit) or [VolumeUnit](../biodata_models/units.md#volumeunit) or NoneType | Dose unit  |
+
+
 ### Surgery
 
 Description of subject procedures performed at one time
@@ -108,6 +110,17 @@ Description of an animal training protocol
 | `curriculum_code` | Optional[[Code](identifiers.md#code)] | Curriculum code (Code describing the directed graph used for the training curriculum) |
 | `notes` | `Optional[str]` | Notes  |
 | `protocol_id` | `Optional[str]` | Protocol ID (DOI for protocols.io) |
+
+
+### Treatment
+
+Description of a treatment procedure
+
+| Field | Type | Title (Description) |
+|-------|------|-------------|
+| `drug` | [Reagent](reagent.md#reagent) | Treament drug  |
+| `dose` | `Optional[float]` | Dose  |
+| `dose_unit` | [MassUnit](../biodata_models/units.md#massunit) or [VolumeUnit](../biodata_models/units.md#volumeunit) or NoneType | Dose unit  |
 
 
 ### WaterRestriction
