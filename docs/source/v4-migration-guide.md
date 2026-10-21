@@ -16,7 +16,7 @@ subjects or specimens in an asset use plural names and collections:
 | `SpecimenProcedure` | `specimen_name: str or List[str]` | `specimen_names: set[str]` |
 | `Metadata` | `subject: Subject` | `subjects: List[Subject]` |
 | `Metadata` | `procedures: Procedures` | `procedures: List[Procedures]` |
-| `Acquisition` | `subject_details: AcquisitionSubjectDetails` | `subject_details: List[AcquisitionSubjectDetails]` |
+| `Acquisition` | `subject_details: AcquisitionMouseDetails` | `subject_details: List[AcquisitionMouseDetails]` |
 
 Use a collection even when there is only one name. In Python, write
 `subject_names={"123456"}`. In JSON, write `"subject_names": ["123456"]`.
@@ -50,7 +50,7 @@ device-name references accordingly.
 
 ### Subject-specific acquisition records
 
-Both `Manipulation` and `AcquisitionSubjectDetails` now require `subject_name`,
+Both `Manipulation` and `AcquisitionMouseDetails` now require `subject_name`,
 which must be a member of `Acquisition.subject_names`. Wrap acquisition subject
 details in a list even for one subject. Duplicate details for a subject are
 rejected, and in-vivo metadata requires one details record for every acquired

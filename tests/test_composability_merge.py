@@ -7,7 +7,7 @@ import pytest
 from biodata_models.modalities import Modality
 
 from biodata_schema.components.identifiers import Code
-from biodata_schema.core.acquisition import AcquisitionSubjectDetails
+from biodata_schema.core.acquisition import AcquisitionMouseDetails
 from biodata_schema.core.procedures import Procedures
 from biodata_schema.core.processing import DataProcess, Processing, ProcessStage
 from biodata_schema.core.quality_control import QCMetric, QCStatus, QualityControl, Stage, Status
@@ -217,7 +217,7 @@ class TestComposability:
         # Test incompatible SubjectDetails
         acq1 = self.exaspim_acquisition.model_copy()
         acq2 = self.exaspim_acquisition.model_copy()
-        subject_details = AcquisitionSubjectDetails(
+        subject_details = AcquisitionMouseDetails(
             subject_name=next(iter(acq1.subject_names)),
             mouse_platform_name="mouse_platform_name",
         )
