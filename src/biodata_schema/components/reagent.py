@@ -106,4 +106,3 @@ class Vaccine(Reagent):
 
     strain: str = Field(..., title="Strain")
     vaccine_type: str = Field(..., title="Vaccine type")
-    
