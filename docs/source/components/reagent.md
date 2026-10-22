@@ -143,3 +143,18 @@ Description of a solution made in house. Should match a solution named in protoc
 | `lot_number` | `Optional[str]` | Lot number  |
 
 
+### Vaccine
+
+Description of a vaccine
+
+| Field | Type | Title (Description) |
+|-------|------|-------------|
+| `strain` | `str` | Strain  |
+| `vaccine_type` | `str` | Vaccine type  |
+| `name` | `str` | Name  |
+| `source` | [Organization](../biodata_models/organizations.md#organization) | Source  |
+| `rrid` | Optional[[PIDName](../biodata_models/pid_names.md#pidname)] | Research Resource ID  |
+| `lot_number` | `Optional[str]` | Lot number  |
+| `expiration_date` | `Optional[datetime.date]` | Lot expiration date  |
+
+

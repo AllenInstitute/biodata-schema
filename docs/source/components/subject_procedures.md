@@ -65,14 +65,14 @@ which may include one or more injections at different locations/depths
 
 ### SelfAdministeredTreatment
 
-Description of a treatment over a period of time
+Description of a treatment taken over a period of time (e.g. a prescription taken at home)
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `start_date` | `datetime.date` | Treatment start date  |
 | `end_date` | `Optional[datetime.date]` | Treatment end date  |
 | `notes` | `Optional[str]` | Notes  |
-| `drug` | [Reagent](reagent.md#reagent) | Treament drug  |
+| `therapeutic` | List[[Reagent](reagent.md#reagent) or [Vaccine](reagent.md#vaccine)] | Treament drug  |
 | `dose` | `Optional[float]` | Dose  |
 | `dose_unit` | [MassUnit](../biodata_models/units.md#massunit) or [VolumeUnit](../biodata_models/units.md#volumeunit) or NoneType | Dose unit  |
 
@@ -118,7 +118,7 @@ Description of a treatment procedure
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `drug` | [Reagent](reagent.md#reagent) | Treament drug  |
+| `therapeutic` | List[[Reagent](reagent.md#reagent) or [Vaccine](reagent.md#vaccine)] | Treament drug  |
 | `dose` | `Optional[float]` | Dose  |
 | `dose_unit` | [MassUnit](../biodata_models/units.md#massunit) or [VolumeUnit](../biodata_models/units.md#volumeunit) or NoneType | Dose unit  |
 

@@ -194,6 +194,7 @@ Description of a single sample collection
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `sample_type` | [SampleType](#sampletype) | Sample type  |
+| `sample_location` | Optional[[AnatomyModel](../biodata_models/external.md#anatomymodel)] | Sample location (Anatomical location sample collected from) |
 | `time` | `datetime (timezone-aware)` | Collection time  |
 | `specimen_name` | `str` | Specimen name  |
 | `collection_volume` | `float` | Collection volume  |
