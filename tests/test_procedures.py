@@ -30,7 +30,7 @@ from biodata_schema.components.injection_procedures import (
     TarsVirusIdentifiers,
     ViralMaterial,
 )
-from biodata_schema.components.reagent import Reagent
+from biodata_schema.components.reagent import Reagent, Vaccine
 from biodata_schema.components.specimen_procedures import (
     HCRSeries,
     PlanarSection,
@@ -905,19 +905,19 @@ class TestProcedures:
         assert Procedures.model_validate_json(combined.model_dump_json()) == combined
 
     def test_self_administered_treatment(self):
-        """SelfAdministeredTreatment requires a start date and a drug reagent"""
+        """SelfAdministeredTreatment requires a start date and a therapeutic"""
         with pytest.raises(ValidationError):
             SelfAdministeredTreatment()
 
         treatment = SelfAdministeredTreatment(
             start_date=self.start_date,
             end_date=date.fromisoformat("2020-10-20"),
-            drug=Reagent(name="Drug A", source=Organization.OTHER),
+            therapeutic=[Reagent(name="Drug A", source=Organization.OTHER)],
             dose=5.0,
             dose_unit=MassUnit.MG,
             notes="Administered daily",
         )
-        assert treatment.drug.name == "Drug A"
+        assert treatment.therapeutic[0].name == "Drug A"
 
         procedures = Procedures(subject_name="12345", subject_procedures=[treatment])
         assert Procedures.model_validate_json(procedures.model_dump_json()) == procedures
@@ -926,7 +926,7 @@ class TestProcedures:
         """dose_unit accepts either a mass or a volume unit"""
         mass_treatment = SelfAdministeredTreatment(
             start_date=self.start_date,
-            drug=Reagent(name="Drug A", source=Organization.OTHER),
+            therapeutic=[Reagent(name="Drug A", source=Organization.OTHER)],
             dose=5.0,
             dose_unit=MassUnit.MG,
         )
@@ -934,7 +934,7 @@ class TestProcedures:
 
         volume_treatment = SelfAdministeredTreatment(
             start_date=self.start_date,
-            drug=Reagent(name="Saline", source=Organization.OTHER),
+            therapeutic=[Reagent(name="Saline", source=Organization.OTHER)],
             dose=1.0,
             dose_unit=VolumeUnit.ML,
         )
@@ -983,13 +983,27 @@ class TestProcedures:
         assert visit.hospitalized is False
 
     def test_treatment(self):
-        """Treatment requires a drug; dose and dose_unit are optional"""
+        """Treatment requires a therapeutic; dose and dose_unit are optional"""
         with pytest.raises(ValidationError):
             Treatment()
 
-        treatment = Treatment(drug=Reagent(name="Drug A", source=Organization.OTHER))
+        treatment = Treatment(therapeutic=[Reagent(name="Drug A", source=Organization.OTHER)])
         assert treatment.dose is None
         assert treatment.dose_unit is None
+
+    def test_treatment_vaccine(self):
+        """Treatment therapeutic accepts a Vaccine and round-trips through JSON"""
+        with pytest.raises(ValidationError):
+            Vaccine(name="Flu shot", source=Organization.OTHER)
+
+        vaccine = Vaccine(name="Flu shot", source=Organization.OTHER, strain="H1N1", vaccine_type="inactivated")
+        treatment = Treatment(therapeutic=[vaccine])
+        assert isinstance(treatment.therapeutic[0], Vaccine)
+
+        procedures = Procedures(subject_name="12345", subject_procedures=[ClinicalVisit(start_date=self.start_date, treatment=[treatment])])
+        restored = Procedures.model_validate_json(procedures.model_dump_json())
+        assert restored == procedures
+        assert isinstance(restored.subject_procedures[0].treatment[0].therapeutic[0], Vaccine)
 
     def test_clinical_visit_treatment_and_hospitalized(self):
         """ClinicalVisit accepts a list of treatments and a hospitalized flag"""
@@ -997,14 +1011,14 @@ class TestProcedures:
             start_date=self.start_date,
             treatment=[
                 Treatment(
-                    drug=Reagent(name="Drug A", source=Organization.OTHER),
+                    therapeutic=[Reagent(name="Drug A", source=Organization.OTHER)],
                     dose=5.0,
                     dose_unit=MassUnit.MG,
                 )
             ],
             hospitalized=True,
         )
-        assert visit.treatment[0].drug.name == "Drug A"
+        assert visit.treatment[0].therapeutic[0].name == "Drug A"
         assert visit.hospitalized is True
 
         procedures = Procedures(subject_name="12345", subject_procedures=[visit])
