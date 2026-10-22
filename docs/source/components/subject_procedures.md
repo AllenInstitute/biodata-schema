@@ -72,7 +72,7 @@ Description of a treatment taken over a period of time (e.g. a prescription take
 | `start_date` | `datetime.date` | Treatment start date  |
 | `end_date` | `Optional[datetime.date]` | Treatment end date  |
 | `notes` | `Optional[str]` | Notes  |
-| `therapeutic` | List[[Reagent](reagent.md#reagent) or [Vaccine](reagent.md#vaccine)] | Treament drug  |
+| `therapeutic` | [Reagent](reagent.md#reagent) or [Vaccine](reagent.md#vaccine) | Therapeutic  |
 | `dose` | `Optional[float]` | Dose  |
 | `dose_unit` | [MassUnit](../biodata_models/units.md#massunit) or [VolumeUnit](../biodata_models/units.md#volumeunit) or NoneType | Dose unit  |
 
@@ -118,7 +118,7 @@ Description of a treatment procedure
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
-| `therapeutic` | List[[Reagent](reagent.md#reagent) or [Vaccine](reagent.md#vaccine)] | Treament drug  |
+| `therapeutic` | [Reagent](reagent.md#reagent) or [Vaccine](reagent.md#vaccine) | Therapeutic  |
 | `dose` | `Optional[float]` | Dose  |
 | `dose_unit` | [MassUnit](../biodata_models/units.md#massunit) or [VolumeUnit](../biodata_models/units.md#volumeunit) or NoneType | Dose unit  |
 

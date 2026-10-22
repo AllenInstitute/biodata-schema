@@ -912,12 +912,12 @@ class TestProcedures:
         treatment = SelfAdministeredTreatment(
             start_date=self.start_date,
             end_date=date.fromisoformat("2020-10-20"),
-            therapeutic=[Reagent(name="Drug A", source=Organization.OTHER)],
+            therapeutic=Reagent(name="Drug A", source=Organization.OTHER),
             dose=5.0,
             dose_unit=MassUnit.MG,
             notes="Administered daily",
         )
-        assert treatment.therapeutic[0].name == "Drug A"
+        assert treatment.therapeutic.name == "Drug A"
 
         procedures = Procedures(subject_name="12345", subject_procedures=[treatment])
         assert Procedures.model_validate_json(procedures.model_dump_json()) == procedures
@@ -926,7 +926,7 @@ class TestProcedures:
         """dose_unit accepts either a mass or a volume unit"""
         mass_treatment = SelfAdministeredTreatment(
             start_date=self.start_date,
-            therapeutic=[Reagent(name="Drug A", source=Organization.OTHER)],
+            therapeutic=Reagent(name="Drug A", source=Organization.OTHER),
             dose=5.0,
             dose_unit=MassUnit.MG,
         )
@@ -934,7 +934,7 @@ class TestProcedures:
 
         volume_treatment = SelfAdministeredTreatment(
             start_date=self.start_date,
-            therapeutic=[Reagent(name="Saline", source=Organization.OTHER)],
+            therapeutic=Reagent(name="Saline", source=Organization.OTHER),
             dose=1.0,
             dose_unit=VolumeUnit.ML,
         )
@@ -987,7 +987,7 @@ class TestProcedures:
         with pytest.raises(ValidationError):
             Treatment()
 
-        treatment = Treatment(therapeutic=[Reagent(name="Drug A", source=Organization.OTHER)])
+        treatment = Treatment(therapeutic=Reagent(name="Drug A", source=Organization.OTHER))
         assert treatment.dose is None
         assert treatment.dose_unit is None
 
@@ -997,15 +997,15 @@ class TestProcedures:
             Vaccine(name="Flu shot", source=Organization.OTHER)
 
         vaccine = Vaccine(name="Flu shot", source=Organization.OTHER, strain="H1N1", vaccine_type="inactivated")
-        treatment = Treatment(therapeutic=[vaccine])
-        assert isinstance(treatment.therapeutic[0], Vaccine)
+        treatment = Treatment(therapeutic=vaccine)
+        assert isinstance(treatment.therapeutic, Vaccine)
 
         procedures = Procedures(
             subject_name="12345", subject_procedures=[ClinicalVisit(start_date=self.start_date, treatment=[treatment])]
         )
         restored = Procedures.model_validate_json(procedures.model_dump_json())
         assert restored == procedures
-        assert isinstance(restored.subject_procedures[0].treatment[0].therapeutic[0], Vaccine)
+        assert isinstance(restored.subject_procedures[0].treatment[0].therapeutic, Vaccine)
 
     def test_clinical_visit_treatment_and_hospitalized(self):
         """ClinicalVisit accepts a list of treatments and a hospitalized flag"""
@@ -1013,14 +1013,14 @@ class TestProcedures:
             start_date=self.start_date,
             treatment=[
                 Treatment(
-                    therapeutic=[Reagent(name="Drug A", source=Organization.OTHER)],
+                    therapeutic=Reagent(name="Drug A", source=Organization.OTHER),
                     dose=5.0,
                     dose_unit=MassUnit.MG,
                 )
             ],
             hospitalized=True,
         )
-        assert visit.treatment[0].therapeutic[0].name == "Drug A"
+        assert visit.treatment[0].therapeutic.name == "Drug A"
         assert visit.hospitalized is True
 
         procedures = Procedures(subject_name="12345", subject_procedures=[visit])

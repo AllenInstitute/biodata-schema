@@ -106,7 +106,7 @@ class FoodRestriction(ProtocolMixin, DataModel):
 class Treatment(DataModel):
     """Description of a treatment procedure"""
 
-    therapeutic: DiscriminatedList[Reagent | Vaccine] = Field(..., title="Treament drug")
+    therapeutic: Union[Reagent | Vaccine] = Field(..., title="Therapeutic")
     dose: Optional[float] = Field(default=None, title="Dose")
     dose_unit: Optional[Union[MassUnit, VolumeUnit]] = Field(default=None, title="Dose unit")
 
