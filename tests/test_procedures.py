@@ -1000,7 +1000,9 @@ class TestProcedures:
         treatment = Treatment(therapeutic=[vaccine])
         assert isinstance(treatment.therapeutic[0], Vaccine)
 
-        procedures = Procedures(subject_name="12345", subject_procedures=[ClinicalVisit(start_date=self.start_date, treatment=[treatment])])
+        procedures = Procedures(
+            subject_name="12345", subject_procedures=[ClinicalVisit(start_date=self.start_date, treatment=[treatment])]
+        )
         restored = Procedures.model_validate_json(procedures.model_dump_json())
         assert restored == procedures
         assert isinstance(restored.subject_procedures[0].treatment[0].therapeutic[0], Vaccine)
