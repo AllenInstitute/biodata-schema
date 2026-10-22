@@ -99,3 +99,11 @@ class FluorescentReagent(Reagent):
     excitation_wavelength: int = Field(..., title="Excitation wavelength (nm)")
     emission_wavelength: int = Field(..., title="Emission wavelength (nm)")
     wavelength_unit: SizeUnit = Field(default=SizeUnit.NM, title="Excitation wavelength unit")
+
+
+class Vaccine(Reagent):
+    """Description of a vaccine"""
+
+    strain: str = Field(..., title="Strain")
+    vaccine_type: str = Field(..., title="Vaccine type")
+    

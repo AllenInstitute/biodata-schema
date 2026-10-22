@@ -12,7 +12,7 @@ from biodata_schema.base import DataModel, DiscriminatedList
 from biodata_schema.components.coordinates import CoordinateSystem, CoordinateSystemOrNA, Translation
 from biodata_schema.components.identifiers import Code, ProtocolMixin
 from biodata_schema.components.injection_procedures import Injection
-from biodata_schema.components.reagent import Reagent
+from biodata_schema.components.reagent import Reagent, Vaccine
 from biodata_schema.components.surgery_procedures import (
     Anaesthetic,
     BrainInjection,
@@ -106,13 +106,13 @@ class FoodRestriction(ProtocolMixin, DataModel):
 class Treatment(DataModel):
     """Description of a treatment procedure"""
 
-    drug: Reagent = Field(..., title="Treament drug")
+    therapeutic: DiscriminatedList[Reagent | Vaccine] = Field(..., title="Treament drug")
     dose: Optional[float] = Field(default=None, title="Dose")
     dose_unit: Optional[Union[MassUnit, VolumeUnit]] = Field(default=None, title="Dose unit")
 
 
 class SelfAdministeredTreatment(Treatment):
-    """Description of a treatment over a period of time"""
+    """Description of a treatment taken over a period of time (e.g. a prescription taken at home)"""
 
     start_date: date = Field(..., title="Treatment start date")
     end_date: Optional[date] = Field(default=None, title="Treatment end date")

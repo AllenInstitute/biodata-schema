@@ -87,6 +87,7 @@ class SampleCollection(ProtocolMixin, DataModel):
     """Description of a single sample collection"""
 
     sample_type: SampleType = Field(..., title="Sample type")
+    sample_location: Optional[AnatomyModel] = Field(default=None, title="Sample location", description="Anatomical location sample collected from")
     time: AwareDatetimeWithDefault = Field(..., title="Collection time")
     specimen_name: str = Field(..., title="Specimen name")
     collection_volume: float = Field(..., title="Collection volume")
