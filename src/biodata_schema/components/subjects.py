@@ -6,6 +6,7 @@ from enum import Enum
 from typing import Annotated, List, Optional
 
 from biodata_models.cell_line import CellLineModel
+from biodata_models.human_ancestry import HumanAncestryModel
 from biodata_models.organizations import Organization
 from biodata_models.pid_names import PIDName
 from biodata_models.species import Species, Strain
@@ -108,11 +109,6 @@ class MouseSubject(DataModel):
         description="Where the subject was acquired from. If bred in-house, use Allen Institute.",
         title="Source",
     )
-    restrictions: Optional[str] = Field(
-        default=None,
-        description="Any restrictions on use or publishing based on subject source",
-        title="Restrictions",
-    )
     rrid: Optional[PIDName] = Field(
         default=None,
         description="RRID of mouse if acquired from supplier",
@@ -150,6 +146,9 @@ class HumanSubject(DataModel):
         description="Where the subject was acquired from.",
         title="Source",
     )
+    ethnicity: Optional[HumanAncestryModel] = Field(default=None, title="Ethnicity")
+    race: Optional[HumanAncestryModel] = Field(default=None, title="Race")
+    
 
     @field_validator("species", mode="after")
     def validate_species_is_human(cls, v):
