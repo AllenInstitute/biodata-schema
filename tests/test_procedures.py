@@ -980,7 +980,6 @@ class TestProcedures:
         assert visit.diagnosis is None
         assert visit.notes is None
         assert visit.treatment is None
-        assert visit.hospitalized is False
 
     def test_treatment(self):
         """Treatment requires a therapeutic; dose and dose_unit are optional"""
@@ -990,11 +989,14 @@ class TestProcedures:
         treatment = Treatment(therapeutic=Reagent(name="Drug A", source=Organization.OTHER))
         assert treatment.dose is None
         assert treatment.dose_unit is None
+        assert treatment.dose_schedule is None
 
     def test_treatment_vaccine(self):
         """Treatment therapeutic accepts a Vaccine and round-trips through JSON"""
         with pytest.raises(ValidationError):
             Vaccine(name="Flu shot", source=Organization.OTHER)
+
+        assert Vaccine(name="Flu shot", source=Organization.OTHER, strain="H1N1").vaccine_type is None
 
         vaccine = Vaccine(name="Flu shot", source=Organization.OTHER, strain="H1N1", vaccine_type="inactivated")
         treatment = Treatment(therapeutic=vaccine)
@@ -1007,8 +1009,8 @@ class TestProcedures:
         assert restored == procedures
         assert isinstance(restored.subject_procedures[0].treatment[0].therapeutic, Vaccine)
 
-    def test_clinical_visit_treatment_and_hospitalized(self):
-        """ClinicalVisit accepts a list of treatments and a hospitalized flag"""
+    def test_clinical_visit_treatment(self):
+        """ClinicalVisit accepts a list of treatments"""
         visit = ClinicalVisit(
             start_date=self.start_date,
             treatment=[
@@ -1016,12 +1018,12 @@ class TestProcedures:
                     therapeutic=Reagent(name="Drug A", source=Organization.OTHER),
                     dose=5.0,
                     dose_unit=MassUnit.MG,
+                    dose_schedule="once daily",
                 )
             ],
-            hospitalized=True,
         )
         assert visit.treatment[0].therapeutic.name == "Drug A"
-        assert visit.hospitalized is True
+        assert visit.treatment[0].dose_schedule == "once daily"
 
         procedures = Procedures(subject_name="12345", subject_procedures=[visit])
         assert Procedures.model_validate_json(procedures.model_dump_json()) == procedures

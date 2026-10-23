@@ -197,8 +197,8 @@ Description of a single sample collection
 | `sample_location` | Optional[[AnatomyModel](../biodata_models/external.md#anatomymodel)] | Sample location (Anatomical location sample collected from) |
 | `time` | `datetime (timezone-aware)` | Collection time  |
 | `specimen_name` | `str` | Specimen name  |
-| `collection_volume` | `float` | Collection volume  |
-| `collection_volume_unit` | [VolumeUnit](../biodata_models/units.md#volumeunit) | Collection volume unit  |
+| `collection_volume` | `Optional[float]` | Collection volume  |
+| `collection_volume_unit` | Optional[[VolumeUnit](../biodata_models/units.md#volumeunit)] | Collection volume unit  |
 | `collection_method` | `Optional[str]` | Collection method for terminal collection  |
 | `protocol_id` | `Optional[str]` | Protocol ID (DOI for protocols.io) |
 

@@ -4,7 +4,7 @@
 
 ### ClinicalVisit
 
-Description of clinical visit
+Description of an outpatient clinical visit
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
@@ -13,7 +13,6 @@ Description of clinical visit
 | `surveys` | `Optional[List[str]]` | Surveys  |
 | `diagnosis` | `Optional[List[biodata_models.human_disease.HumanDiseaseModel]]` | Diagnosis  |
 | `treatment` | Optional[List[[Treatment](#treatment)]] | Treatment  |
-| `hospitalized` | `bool` | Hospitalized  |
 | `notes` | `Optional[str]` | Notes  |
 
 
@@ -75,6 +74,7 @@ Description of a treatment taken over a period of time (e.g. a prescription take
 | `therapeutic` | [Reagent](reagent.md#reagent) or [Vaccine](reagent.md#vaccine) | Therapeutic  |
 | `dose` | `Optional[float]` | Dose  |
 | `dose_unit` | [MassUnit](../biodata_models/units.md#massunit) or [VolumeUnit](../biodata_models/units.md#volumeunit) or NoneType | Dose unit  |
+| `dose_schedule` | `Optional[str]` | Dose schedule (Details on treatment schedule, e.g. once daily) |
 
 
 ### Surgery
@@ -121,6 +121,7 @@ Description of a treatment procedure
 | `therapeutic` | [Reagent](reagent.md#reagent) or [Vaccine](reagent.md#vaccine) | Therapeutic  |
 | `dose` | `Optional[float]` | Dose  |
 | `dose_unit` | [MassUnit](../biodata_models/units.md#massunit) or [VolumeUnit](../biodata_models/units.md#volumeunit) or NoneType | Dose unit  |
+| `dose_schedule` | `Optional[str]` | Dose schedule (Details on treatment schedule, e.g. once daily) |
 
 
 ### WaterRestriction
