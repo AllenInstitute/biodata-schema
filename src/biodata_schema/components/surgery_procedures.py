@@ -92,8 +92,8 @@ class SampleCollection(ProtocolMixin, DataModel):
     )
     time: AwareDatetimeWithDefault = Field(..., title="Collection time")
     specimen_name: str = Field(..., title="Specimen name")
-    collection_volume: float = Field(..., title="Collection volume")
-    collection_volume_unit: VolumeUnit = Field(..., title="Collection volume unit")
+    collection_volume: Optional[float] = Field(default=None, title="Collection volume")
+    collection_volume_unit: Optional[VolumeUnit] = Field(default=None, title="Collection volume unit")
     collection_method: Optional[str] = Field(default=None, title="Collection method for terminal collection")
 
 

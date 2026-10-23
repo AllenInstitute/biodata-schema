@@ -26,7 +26,7 @@ class Reagent(DataModel):
 
     name: str = Field(..., title="Name")
     source: Organization.ONE_OF = Field(..., title="Source")
-    rrid: Optional[PIDName] = Field(default=None, title="Research Resource ID")
+    identifier: Optional[PIDName] = Field(default=None, title="Identifier", description="Persistent ID from external database, such as RRID")
     lot_number: Optional[str] = Field(default=None, title="Lot number")
     expiration_date: Optional[date] = Field(default=None, title="Lot expiration date")
 
@@ -105,4 +105,4 @@ class Vaccine(Reagent):
     """Description of a vaccine"""
 
     strain: str = Field(..., title="Strain")
-    vaccine_type: str = Field(..., title="Vaccine type")
+    vaccine_type: Optional[str] = Field(default=None, title="Vaccine type")

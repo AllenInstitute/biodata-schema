@@ -109,6 +109,7 @@ class Treatment(DataModel):
     therapeutic: Union[Reagent | Vaccine] = Field(..., title="Therapeutic")
     dose: Optional[float] = Field(default=None, title="Dose")
     dose_unit: Optional[Union[MassUnit, VolumeUnit]] = Field(default=None, title="Dose unit")
+    dose_schedule: Optional[str] = Field(default=None, title="Dose schedule", description="Details on treatment schedule, e.g. once daily")
 
 
 class SelfAdministeredTreatment(Treatment):
@@ -120,14 +121,13 @@ class SelfAdministeredTreatment(Treatment):
 
 
 class ClinicalVisit(DataModel):
-    """Description of clinical visit"""
+    """Description of an outpatient clinical visit"""
 
     start_date: date = Field(..., title="Start date")
     samples: Optional[List[SampleCollection]] = Field(default=None, title="Samples")
     surveys: Optional[List[str]] = Field(default=None, title="Surveys")
     diagnosis: Optional[List[HumanDiseaseModel]] = Field(default=None, title="Diagnosis")
     treatment: Optional[List[Treatment]] = Field(default=None, title="Treatment")
-    hospitalized: bool = Field(default=False, title="Hospitalized")
     notes: Optional[str] = Field(default=None, title="Notes")
 
 
