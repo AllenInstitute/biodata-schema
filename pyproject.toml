@@ -14,7 +14,7 @@ readme = "README.md"
 dynamic = ["version"]
 
 dependencies = [
-    'biodata-models>=3.0.0,<4',
+    'biodata-models>=3.0.1,<4',
     'pydantic>=2.7, <3; python_version < "3.13"',
     'pydantic>=2.10, <3; python_version >= "3.13"',
     'pydantic-extra-types',

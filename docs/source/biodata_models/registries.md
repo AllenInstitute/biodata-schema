@@ -15,6 +15,7 @@ Registries
 | `FBDV` | `Drosophila Development (FBDV)` |
 | `EMAPA` | `Edinburgh Mouse Atlas Project (EMAPA)` |
 | `FMA` | `Foundational Model of Anatomy (FMA)` |
+| `HANCESTRO` | `Human Ancestry Ontology (HANCESTRO)` |
 | `HSAPDV` | `Human Developmental Stages (HSAPDV)` |
 | `DOID` | `Human Disease Ontology (DOID)` |
 | `MMUSDV` | `Mouse Developmental Stages (MMUSDV)` |

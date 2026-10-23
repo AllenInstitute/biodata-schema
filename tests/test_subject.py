@@ -83,3 +83,28 @@ class TestSubject:
                     alleles=[PIDName(registry_identifier="12345", name="adsf", registry=Registry.MGI)],
                 ),
             )
+
+    def test_restrictions(self):
+        """Restrictions live on Subject, not on the subject details"""
+        assert "restrictions" in Subject.model_fields
+        assert "restrictions" not in MouseSubject.model_fields
+
+        now = datetime.datetime.now()
+        s = Subject(
+            subject_name="123456",
+            restrictions="No commercial use",
+            subject_details=MouseSubject(
+                species=Species.HOUSE_MOUSE,
+                strain=Strain.C57BL_6J,
+                sex="Male",
+                date_of_birth=now.date(),
+                genotype="wt",
+                source=Organization.JAX,
+                housing=Housing(
+                    light_cycle=LightCycle(lights_on_time=now.time(), lights_off_time=now.time()),
+                    cage_id="543",
+                ),
+                alleles=[PIDName(registry_identifier="12345", name="adsf", registry=Registry.MGI)],
+            ),
+        )
+        assert Subject.model_validate_json(s.model_dump_json()).restrictions == "No commercial use"

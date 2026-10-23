@@ -33,7 +33,11 @@ class Subject(DataCoreModel):
     subject_details: Discriminated[
         MouseSubject | HumanSubject | NonHumanPrimateSubject | CellLine | FluorescentCellLine | CalibrationObject
     ] = Field(..., title="Subject Details")
-
+    restrictions: Optional[str] = Field(
+        default=None,
+        description="Any restrictions on use or publishing based on subject source",
+        title="Restrictions",
+    )
     notes: Optional[str] = Field(default=None, title="Notes")
 
     @classmethod

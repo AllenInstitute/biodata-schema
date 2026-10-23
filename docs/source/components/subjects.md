@@ -92,6 +92,8 @@ Description of a human subject
 | `sex` | [Sex](#sex) | Sex  |
 | `year_of_birth` | `int` | Year of birth  |
 | `source` | [Organization](../biodata_models/organizations.md#organization) | Source (Where the subject was acquired from.) |
+| `ethnicity` | `Optional[biodata_models.human_ancestry.HumanAncestryModel]` | Ethnicity  |
+| `race` | `Optional[List[biodata_models.human_ancestry.HumanAncestryModel]]` | Race  |
 
 
 ### LightCycle
@@ -131,7 +133,6 @@ Description of a mouse subject
 | `wellness_reports` | List[[WellnessReport](#wellnessreport)] | Wellness Report  |
 | `housing` | Optional[[Housing](#housing)] | Housing  |
 | `source` | [Organization](../biodata_models/organizations.md#organization) | Source (Where the subject was acquired from. If bred in-house, use Allen Institute.) |
-| `restrictions` | `Optional[str]` | Restrictions (Any restrictions on use or publishing based on subject source) |
 | `rrid` | Optional[[PIDName](../biodata_models/pid_names.md#pidname)] | RRID (RRID of mouse if acquired from supplier) |
 
 

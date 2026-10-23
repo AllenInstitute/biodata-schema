@@ -22,4 +22,5 @@ Description of a subject of data collection
 | `subject_name` | `str` | Subject name (Unique name for the subject of data acquisition) |
 | `cohort_name` | `Optional[str]` | Cohort  |
 | `subject_details` | [MouseSubject](components/subjects.md#mousesubject) or [HumanSubject](components/subjects.md#humansubject) or [NonHumanPrimateSubject](components/subjects.md#nonhumanprimatesubject) or [CellLine](components/subjects.md#cellline) or [FluorescentCellLine](components/subjects.md#fluorescentcellline) or [CalibrationObject](components/subjects.md#calibrationobject) | Subject Details  |
+| `restrictions` | `Optional[str]` | Restrictions (Any restrictions on use or publishing based on subject source) |
 | `notes` | `Optional[str]` | Notes  |
