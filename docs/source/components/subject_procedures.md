@@ -2,6 +2,20 @@
 
 ## Model definitions
 
+### ClinicalVisit
+
+Description of an outpatient clinical visit
+
+| Field | Type | Title (Description) |
+|-------|------|-------------|
+| `start_date` | `datetime.date` | Start date  |
+| `samples` | Optional[List[[SampleCollection](surgery_procedures.md#samplecollection)]] | Samples  |
+| `surveys` | `Optional[List[str]]` | Surveys  |
+| `diagnosis` | `Optional[List[biodata_models.human_disease.HumanDiseaseModel]]` | Diagnosis  |
+| `treatment` | Optional[List[[Treatment](#treatment)]] | Treatment  |
+| `notes` | `Optional[str]` | Notes  |
+
+
 ### FoodRestriction
 
 Description of a food restriction procedure
@@ -17,6 +31,7 @@ Description of a food restriction procedure
 | `weight_unit` | [MassUnit](../biodata_models/units.md#massunit) | Weight unit  |
 | `start_date` | `datetime.date` | Food restriction start date  |
 | `end_date` | `Optional[datetime.date]` | Food restriction end date  |
+| `protocol_id` | `Optional[str]` | Protocol ID (DOI for protocols.io) |
 
 
 ### GenericSubjectProcedure
@@ -47,6 +62,21 @@ which may include one or more injections at different locations/depths
 | `notes` | `Optional[str]` | Notes  |
 
 
+### SelfAdministeredTreatment
+
+Description of a treatment taken over a period of time (e.g. a prescription taken at home)
+
+| Field | Type | Title (Description) |
+|-------|------|-------------|
+| `start_date` | `datetime.date` | Treatment start date  |
+| `end_date` | `Optional[datetime.date]` | Treatment end date  |
+| `notes` | `Optional[str]` | Notes  |
+| `therapeutic` | [Reagent](reagent.md#reagent) or [Vaccine](reagent.md#vaccine) | Therapeutic  |
+| `dose` | `Optional[float]` | Dose  |
+| `dose_unit` | [MassUnit](../biodata_models/units.md#massunit) or [VolumeUnit](../biodata_models/units.md#volumeunit) or NoneType | Dose unit  |
+| `dose_schedule` | `Optional[str]` | Dose schedule (Details on treatment schedule, e.g. once daily) |
+
+
 ### Surgery
 
 Description of subject procedures performed at one time
@@ -75,11 +105,23 @@ Description of an animal training protocol
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `training_name` | `str` | Training protocol name  |
-| `protocol_id` | `Optional[str]` | Training protocol ID  |
 | `start_date` | `datetime.date` | Training protocol start date  |
 | `end_date` | `Optional[datetime.date]` | Training protocol end date  |
 | `curriculum_code` | Optional[[Code](identifiers.md#code)] | Curriculum code (Code describing the directed graph used for the training curriculum) |
 | `notes` | `Optional[str]` | Notes  |
+| `protocol_id` | `Optional[str]` | Protocol ID (DOI for protocols.io) |
+
+
+### Treatment
+
+Description of a treatment procedure
+
+| Field | Type | Title (Description) |
+|-------|------|-------------|
+| `therapeutic` | [Reagent](reagent.md#reagent) or [Vaccine](reagent.md#vaccine) | Therapeutic  |
+| `dose` | `Optional[float]` | Dose  |
+| `dose_unit` | [MassUnit](../biodata_models/units.md#massunit) or [VolumeUnit](../biodata_models/units.md#volumeunit) or NoneType | Dose unit  |
+| `dose_schedule` | `Optional[str]` | Dose schedule (Details on treatment schedule, e.g. once daily) |
 
 
 ### WaterRestriction
@@ -97,5 +139,6 @@ Description of a water restriction procedure
 | `weight_unit` | [MassUnit](../biodata_models/units.md#massunit) | Weight unit  |
 | `start_date` | `datetime.date` | Water restriction start date  |
 | `end_date` | `Optional[datetime.date]` | Water restriction end date  |
+| `protocol_id` | `Optional[str]` | Protocol ID (DOI for protocols.io) |
 
 

@@ -140,7 +140,9 @@ acq = Acquisition(
                 Reagent(
                     name="reagent1",
                     source=Organization.OTHER,
-                    rrid=PIDName(name="xxx", abbreviation="xx", registry=Registry.RRID, registry_identifier="100"),
+                    identifier=PIDName(
+                        name="xxx", abbreviation="xx", registry=Registry.RRID, registry_identifier="100"
+                    ),
                     lot_number="xxx",
                     expiration_date=t.date(),
                 ),

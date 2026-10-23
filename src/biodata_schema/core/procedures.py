@@ -7,8 +7,11 @@ from pydantic import Field, SkipValidation
 from biodata_schema.base import DataCoreModel, DiscriminatedList
 from biodata_schema.components.specimen_procedures import SpecimenProcedure
 from biodata_schema.components.subject_procedures import (
+    ClinicalVisit,
+    FoodRestriction,
     GenericSubjectProcedure,
     NonSurgicalInjection,
+    SelfAdministeredTreatment,
     Surgery,
     TrainingProtocol,
     WaterRestriction,
@@ -31,7 +34,14 @@ class Procedures(DataCoreModel):
         title="Subject name",
     )
     subject_procedures: DiscriminatedList[
-        Surgery | NonSurgicalInjection | TrainingProtocol | WaterRestriction | GenericSubjectProcedure
+        SelfAdministeredTreatment
+        | ClinicalVisit
+        | FoodRestriction
+        | GenericSubjectProcedure
+        | NonSurgicalInjection
+        | Surgery
+        | TrainingProtocol
+        | WaterRestriction
     ] = Field(default=[], title="Subject Procedures", description="Procedures performed on a live subject")
     specimen_procedures: List[SpecimenProcedure] = Field(
         default=[], title="Specimen Procedures", description="Procedures performed on tissue extracted after perfusion"

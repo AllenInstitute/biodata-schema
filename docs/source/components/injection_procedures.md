@@ -52,7 +52,7 @@ Description of a non-viral injection material
 | `concentration_unit` | `Optional[str]` | Concentration unit (For example, mg/mL) |
 | `name` | `str` | Name  |
 | `source` | [Organization](../biodata_models/organizations.md#organization) | Source  |
-| `rrid` | Optional[[PIDName](../biodata_models/pid_names.md#pidname)] | Research Resource ID  |
+| `identifier` | Optional[[PIDName](../biodata_models/pid_names.md#pidname)] | Identifier (Persistent ID from external database, such as RRID) |
 | `lot_number` | `Optional[str]` | Lot number  |
 | `expiration_date` | `Optional[datetime.date]` | Lot expiration date  |
 

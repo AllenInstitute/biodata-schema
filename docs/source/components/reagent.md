@@ -14,7 +14,7 @@ Description of an inherently fluorescent marker. Note this class will change nam
 | `wavelength_unit` | [SizeUnit](../biodata_models/units.md#sizeunit) | Excitation wavelength unit  |
 | `name` | `str` | Name  |
 | `source` | [Organization](../biodata_models/organizations.md#organization) | Source  |
-| `rrid` | Optional[[PIDName](../biodata_models/pid_names.md#pidname)] | Research Resource ID  |
+| `identifier` | Optional[[PIDName](../biodata_models/pid_names.md#pidname)] | Identifier (Persistent ID from external database, such as RRID) |
 | `lot_number` | `Optional[str]` | Lot number  |
 | `expiration_date` | `Optional[datetime.date]` | Lot expiration date  |
 
@@ -32,7 +32,7 @@ Note this class will change names in v3.0
 | `initiator_name` | `Optional[str]` | Initiator for HCR probes  |
 | `name` | `str` | Name  |
 | `source` | [Organization](../biodata_models/organizations.md#organization) | Source  |
-| `rrid` | Optional[[PIDName](../biodata_models/pid_names.md#pidname)] | Research Resource ID  |
+| `identifier` | Optional[[PIDName](../biodata_models/pid_names.md#pidname)] | Identifier (Persistent ID from external database, such as RRID) |
 | `lot_number` | `Optional[str]` | Lot number  |
 | `expiration_date` | `Optional[datetime.date]` | Lot expiration date  |
 
@@ -67,7 +67,7 @@ set of probes used in BarSEQ
 | `gene_probes` | List[[GeneProbe](#geneprobe)] | Gene probes  |
 | `name` | `str` | Name  |
 | `source` | [Organization](../biodata_models/organizations.md#organization) | Source  |
-| `rrid` | Optional[[PIDName](../biodata_models/pid_names.md#pidname)] | Research Resource ID  |
+| `identifier` | Optional[[PIDName](../biodata_models/pid_names.md#pidname)] | Identifier (Persistent ID from external database, such as RRID) |
 | `lot_number` | `Optional[str]` | Lot number  |
 | `expiration_date` | `Optional[datetime.date]` | Lot expiration date  |
 
@@ -91,7 +91,7 @@ Description of a probe used as a reagent
 | `target` | [GeneProbe](#geneprobe) or [ProteinProbe](#proteinprobe) or [SmallMoleculeProbe](#smallmoleculeprobe) | Target  |
 | `name` | `str` | Name  |
 | `source` | [Organization](../biodata_models/organizations.md#organization) | Source  |
-| `rrid` | Optional[[PIDName](../biodata_models/pid_names.md#pidname)] | Research Resource ID  |
+| `identifier` | Optional[[PIDName](../biodata_models/pid_names.md#pidname)] | Identifier (Persistent ID from external database, such as RRID) |
 | `lot_number` | `Optional[str]` | Lot number  |
 | `expiration_date` | `Optional[datetime.date]` | Lot expiration date  |
 
@@ -117,7 +117,7 @@ Description of reagent used in procedure
 |-------|------|-------------|
 | `name` | `str` | Name  |
 | `source` | [Organization](../biodata_models/organizations.md#organization) | Source  |
-| `rrid` | Optional[[PIDName](../biodata_models/pid_names.md#pidname)] | Research Resource ID  |
+| `identifier` | Optional[[PIDName](../biodata_models/pid_names.md#pidname)] | Identifier (Persistent ID from external database, such as RRID) |
 | `lot_number` | `Optional[str]` | Lot number  |
 | `expiration_date` | `Optional[datetime.date]` | Lot expiration date  |
 
@@ -141,5 +141,20 @@ Description of a solution made in house. Should match a solution named in protoc
 |-------|------|-------------|
 | `name` | `str` | Name  |
 | `lot_number` | `Optional[str]` | Lot number  |
+
+
+### Vaccine
+
+Description of a vaccine
+
+| Field | Type | Title (Description) |
+|-------|------|-------------|
+| `strain` | `str` | Strain  |
+| `vaccine_type` | `Optional[str]` | Vaccine type  |
+| `name` | `str` | Name  |
+| `source` | [Organization](../biodata_models/organizations.md#organization) | Source  |
+| `identifier` | Optional[[PIDName](../biodata_models/pid_names.md#pidname)] | Identifier (Persistent ID from external database, such as RRID) |
+| `lot_number` | `Optional[str]` | Lot number  |
+| `expiration_date` | `Optional[datetime.date]` | Lot expiration date  |
 
 

@@ -1,6 +1,6 @@
 """test Procedures"""
 
-from datetime import date
+from datetime import date, datetime, timezone
 from unittest.mock import call, patch
 
 import pytest
@@ -13,10 +13,11 @@ from biodata_models.anatomy import (
 )
 from biodata_models.brain_atlas import CCFv3
 from biodata_models.coordinates import AnatomicalRelative
+from biodata_models.human_disease import HumanDiseaseModel
 from biodata_models.organizations import Organization
 from biodata_models.registries import Registry
 from biodata_models.specimen_procedure_types import SpecimenProcedureType
-from biodata_models.units import ConcentrationUnit, CurrentUnit, SizeUnit, TimeUnit, VolumeUnit
+from biodata_models.units import ConcentrationUnit, CurrentUnit, MassUnit, SizeUnit, TimeUnit, VolumeUnit
 from pydantic import ValidationError
 
 from biodata_schema.components.configs import CatheterConfig
@@ -29,6 +30,7 @@ from biodata_schema.components.injection_procedures import (
     TarsVirusIdentifiers,
     ViralMaterial,
 )
+from biodata_schema.components.reagent import Reagent, Vaccine
 from biodata_schema.components.specimen_procedures import (
     HCRSeries,
     PlanarSection,
@@ -38,13 +40,22 @@ from biodata_schema.components.specimen_procedures import (
     SectionOrientation,
     SpecimenProcedure,
 )
-from biodata_schema.components.subject_procedures import BrainInjection, Injection, Surgery
+from biodata_schema.components.subject_procedures import (
+    BrainInjection,
+    ClinicalVisit,
+    Injection,
+    SelfAdministeredTreatment,
+    Surgery,
+    Treatment,
+)
 from biodata_schema.components.surgery_procedures import (
     CatheterImplant,
     Craniotomy,
     CraniotomyType,
     GenericSurgeryProcedure,
     GroundWireImplant,
+    SampleCollection,
+    SampleType,
 )
 from biodata_schema.core.procedures import Procedures
 from biodata_schema.utils.exceptions import OneOfError
@@ -892,3 +903,127 @@ class TestProcedures:
         assert [surgery.global_coordinate_system for surgery in combined.subject_procedures] == [BREGMA_ARI, BREGMA_RAS]
         assert "global_coordinate_system" not in combined.model_dump()
         assert Procedures.model_validate_json(combined.model_dump_json()) == combined
+
+    def test_self_administered_treatment(self):
+        """SelfAdministeredTreatment requires a start date and a therapeutic"""
+        with pytest.raises(ValidationError):
+            SelfAdministeredTreatment()
+
+        treatment = SelfAdministeredTreatment(
+            start_date=self.start_date,
+            end_date=date.fromisoformat("2020-10-20"),
+            therapeutic=Reagent(name="Drug A", source=Organization.OTHER),
+            dose=5.0,
+            dose_unit=MassUnit.MG,
+            notes="Administered daily",
+        )
+        assert treatment.therapeutic.name == "Drug A"
+
+        procedures = Procedures(subject_name="12345", subject_procedures=[treatment])
+        assert Procedures.model_validate_json(procedures.model_dump_json()) == procedures
+
+    def test_self_administered_treatment_dose_unit_accepts_mass_or_volume(self):
+        """dose_unit accepts either a mass or a volume unit"""
+        mass_treatment = SelfAdministeredTreatment(
+            start_date=self.start_date,
+            therapeutic=Reagent(name="Drug A", source=Organization.OTHER),
+            dose=5.0,
+            dose_unit=MassUnit.MG,
+        )
+        assert mass_treatment.dose_unit == MassUnit.MG
+
+        volume_treatment = SelfAdministeredTreatment(
+            start_date=self.start_date,
+            therapeutic=Reagent(name="Saline", source=Organization.OTHER),
+            dose=1.0,
+            dose_unit=VolumeUnit.ML,
+        )
+        assert volume_treatment.dose_unit == VolumeUnit.ML
+
+    def test_clinical_visit(self):
+        """ClinicalVisit requires a start date and supports samples, surveys, and diagnoses"""
+        with pytest.raises(ValidationError):
+            ClinicalVisit()
+
+        visit = ClinicalVisit(
+            start_date=self.start_date,
+            samples=[
+                SampleCollection(
+                    sample_type=SampleType.BLOOD,
+                    time=datetime(2020, 10, 10, 12, 0, 0, tzinfo=timezone.utc),
+                    specimen_name="12345_blood_001",
+                    collection_volume=1.0,
+                    collection_volume_unit=VolumeUnit.ML,
+                )
+            ],
+            surveys=["PHQ-9"],
+            diagnosis=[
+                HumanDiseaseModel(
+                    name="type 2 diabetes mellitus",
+                    registry=Registry.DOID,
+                    registry_identifier="DOID:9352",
+                )
+            ],
+            notes="Routine follow-up",
+        )
+        assert visit.samples[0].specimen_name == "12345_blood_001"
+        assert visit.diagnosis[0].name == "type 2 diabetes mellitus"
+
+        procedures = Procedures(subject_name="12345", subject_procedures=[visit])
+        assert Procedures.model_validate_json(procedures.model_dump_json()) == procedures
+
+    def test_clinical_visit_optional_fields_default_to_none(self):
+        """samples, surveys, diagnosis, and notes are optional on ClinicalVisit"""
+        visit = ClinicalVisit(start_date=self.start_date)
+        assert visit.samples is None
+        assert visit.surveys is None
+        assert visit.diagnosis is None
+        assert visit.notes is None
+        assert visit.treatment is None
+
+    def test_treatment(self):
+        """Treatment requires a therapeutic; dose and dose_unit are optional"""
+        with pytest.raises(ValidationError):
+            Treatment()
+
+        treatment = Treatment(therapeutic=Reagent(name="Drug A", source=Organization.OTHER))
+        assert treatment.dose is None
+        assert treatment.dose_unit is None
+        assert treatment.dose_schedule is None
+
+    def test_treatment_vaccine(self):
+        """Treatment therapeutic accepts a Vaccine and round-trips through JSON"""
+        with pytest.raises(ValidationError):
+            Vaccine(name="Flu shot", source=Organization.OTHER)
+
+        assert Vaccine(name="Flu shot", source=Organization.OTHER, strain="H1N1").vaccine_type is None
+
+        vaccine = Vaccine(name="Flu shot", source=Organization.OTHER, strain="H1N1", vaccine_type="inactivated")
+        treatment = Treatment(therapeutic=vaccine)
+        assert isinstance(treatment.therapeutic, Vaccine)
+
+        procedures = Procedures(
+            subject_name="12345", subject_procedures=[ClinicalVisit(start_date=self.start_date, treatment=[treatment])]
+        )
+        restored = Procedures.model_validate_json(procedures.model_dump_json())
+        assert restored == procedures
+        assert isinstance(restored.subject_procedures[0].treatment[0].therapeutic, Vaccine)
+
+    def test_clinical_visit_treatment(self):
+        """ClinicalVisit accepts a list of treatments"""
+        visit = ClinicalVisit(
+            start_date=self.start_date,
+            treatment=[
+                Treatment(
+                    therapeutic=Reagent(name="Drug A", source=Organization.OTHER),
+                    dose=5.0,
+                    dose_unit=MassUnit.MG,
+                    dose_schedule="once daily",
+                )
+            ],
+        )
+        assert visit.treatment[0].therapeutic.name == "Drug A"
+        assert visit.treatment[0].dose_schedule == "once daily"
+
+        procedures = Procedures(subject_name="12345", subject_procedures=[visit])
+        assert Procedures.model_validate_json(procedures.model_dump_json()) == procedures

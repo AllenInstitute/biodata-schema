@@ -26,7 +26,9 @@ class Reagent(DataModel):
 
     name: str = Field(..., title="Name")
     source: Organization.ONE_OF = Field(..., title="Source")
-    rrid: Optional[PIDName] = Field(default=None, title="Research Resource ID")
+    identifier: Optional[PIDName] = Field(
+        default=None, title="Identifier", description="Persistent ID from external database, such as RRID"
+    )
     lot_number: Optional[str] = Field(default=None, title="Lot number")
     expiration_date: Optional[date] = Field(default=None, title="Lot expiration date")
 
@@ -99,3 +101,10 @@ class FluorescentReagent(Reagent):
     excitation_wavelength: int = Field(..., title="Excitation wavelength (nm)")
     emission_wavelength: int = Field(..., title="Emission wavelength (nm)")
     wavelength_unit: SizeUnit = Field(default=SizeUnit.NM, title="Excitation wavelength unit")
+
+
+class Vaccine(Reagent):
+    """Description of a vaccine"""
+
+    strain: str = Field(..., title="Strain")
+    vaccine_type: Optional[str] = Field(default=None, title="Vaccine type")

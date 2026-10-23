@@ -39,6 +39,8 @@ class SampleType(str, Enum):
     """Sample type"""
 
     BLOOD = "Blood"
+    URINE = "Urine"
+    TISSUE = "Tissue"
     OTHER = "Other"
 
 
@@ -79,6 +81,20 @@ class CatheterImplant(DataModel):
         ...,
         title="Device configuration",
     )  # note: exact field name is used by a validator
+
+
+class SampleCollection(ProtocolMixin, DataModel):
+    """Description of a single sample collection"""
+
+    sample_type: SampleType = Field(..., title="Sample type")
+    sample_location: Optional[AnatomyModel] = Field(
+        default=None, title="Sample location", description="Anatomical location sample collected from"
+    )
+    time: AwareDatetimeWithDefault = Field(..., title="Collection time")
+    specimen_name: str = Field(..., title="Specimen name")
+    collection_volume: Optional[float] = Field(default=None, title="Collection volume")
+    collection_volume_unit: Optional[VolumeUnit] = Field(default=None, title="Collection volume unit")
+    collection_method: Optional[str] = Field(default=None, title="Collection method for terminal collection")
 
 
 class Anaesthetic(DataModel):
@@ -210,16 +226,6 @@ class BrainInjection(Injection):
         if dynamics_len != coords_len:
             raise ValueError("Unmatched list sizes for injection volumes and coordinate depths")
         return self
-
-
-class SampleCollection(DataModel):
-    """Description of a single sample collection"""
-
-    sample_type: SampleType = Field(..., title="Sample type")
-    time: AwareDatetimeWithDefault = Field(..., title="Collection time")
-    collection_volume: float = Field(..., title="Collection volume")
-    collection_volume_unit: VolumeUnit = Field(..., title="Collection volume unit")
-    collection_method: Optional[str] = Field(default=None, title="Collection method for terminal collection")
 
 
 class MyomatrixInsertion(ProtocolMixin, DataModel):

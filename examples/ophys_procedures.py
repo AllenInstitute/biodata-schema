@@ -175,7 +175,7 @@ p = Procedures(
                 ProbeReagent(
                     name="Chicken polyclonal to GFP",
                     source=Organization.ABCAM,
-                    rrid=PIDName(
+                    identifier=PIDName(
                         name="Chicken polyclonal to GFP", registry=Registry.RRID, registry_identifier="ab13970"
                     ),
                     lot_number="GR3361051-16",
@@ -199,7 +199,7 @@ p = Procedures(
                 FluorescentStain(
                     name="Alexa Fluor 488 goat anti-chicken IgY (H+L)",
                     source=Organization.THERMO_FISHER_SCIENTIFIC,
-                    rrid=PIDName(
+                    identifier=PIDName(
                         name="Alexa Fluor 488 goat anti-chicken IgY (H+L)",
                         registry=Registry.RRID,
                         registry_identifier="A11039",
