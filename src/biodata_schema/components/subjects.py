@@ -148,7 +148,6 @@ class HumanSubject(DataModel):
     )
     ethnicity: Optional[HumanAncestryModel] = Field(default=None, title="Ethnicity")
     race: Optional[HumanAncestryModel] = Field(default=None, title="Race")
-    
 
     @field_validator("species", mode="after")
     def validate_species_is_human(cls, v):
