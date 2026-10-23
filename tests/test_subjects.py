@@ -4,6 +4,7 @@ from datetime import datetime
 
 import pytest
 from biodata_models.cell_line import CellLineModel
+from biodata_models.human_ancestry import HumanAncestryModel
 from biodata_models.organizations import Organization
 from biodata_models.pid_names import PIDName
 from biodata_models.registries import Registry
@@ -107,6 +108,27 @@ class TestHumanSubject:
         )
 
         assert subject.species == Species.HUMAN
+
+    def test_ethnicity_and_race(self):
+        """Test ethnicity and race are optional and accept ancestry terms"""
+
+        subject = HumanSubject(sex=Sex.FEMALE, species=Species.HUMAN, year_of_birth=1990, source=Organization.AI)
+        assert subject.ethnicity is None
+        assert subject.race is None
+
+        ethnicity = HumanAncestryModel(name="Hispanic or Latino", registry_identifier="HANCESTRO:0005")
+        race = HumanAncestryModel(name="Asian", registry_identifier="HANCESTRO:0008")
+        subject = HumanSubject(
+            sex=Sex.FEMALE,
+            species=Species.HUMAN,
+            year_of_birth=1990,
+            source=Organization.AI,
+            ethnicity=ethnicity,
+            race=race,
+        )
+        assert subject.ethnicity == ethnicity
+        assert subject.race == race
+        assert HumanSubject.model_validate_json(subject.model_dump_json()) == subject
 
 
 class TestNonHumanPrimateSubject:
