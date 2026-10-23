@@ -26,7 +26,9 @@ class Reagent(DataModel):
 
     name: str = Field(..., title="Name")
     source: Organization.ONE_OF = Field(..., title="Source")
-    identifier: Optional[PIDName] = Field(default=None, title="Identifier", description="Persistent ID from external database, such as RRID")
+    identifier: Optional[PIDName] = Field(
+        default=None, title="Identifier", description="Persistent ID from external database, such as RRID"
+    )
     lot_number: Optional[str] = Field(default=None, title="Lot number")
     expiration_date: Optional[date] = Field(default=None, title="Lot expiration date")
 

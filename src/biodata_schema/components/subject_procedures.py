@@ -109,7 +109,9 @@ class Treatment(DataModel):
     therapeutic: Union[Reagent | Vaccine] = Field(..., title="Therapeutic")
     dose: Optional[float] = Field(default=None, title="Dose")
     dose_unit: Optional[Union[MassUnit, VolumeUnit]] = Field(default=None, title="Dose unit")
-    dose_schedule: Optional[str] = Field(default=None, title="Dose schedule", description="Details on treatment schedule, e.g. once daily")
+    dose_schedule: Optional[str] = Field(
+        default=None, title="Dose schedule", description="Details on treatment schedule, e.g. once daily"
+    )
 
 
 class SelfAdministeredTreatment(Treatment):
