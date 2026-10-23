@@ -110,14 +110,17 @@ class TestHumanSubject:
         assert subject.species == Species.HUMAN
 
     def test_ethnicity_and_race(self):
-        """Test ethnicity and race are optional and accept ancestry terms"""
+        """Test ethnicity and race are optional; race accepts a list of ancestry terms"""
 
         subject = HumanSubject(sex=Sex.FEMALE, species=Species.HUMAN, year_of_birth=1990, source=Organization.AI)
         assert subject.ethnicity is None
         assert subject.race is None
 
         ethnicity = HumanAncestryModel(name="Hispanic or Latino", registry_identifier="HANCESTRO:0005")
-        race = HumanAncestryModel(name="Asian", registry_identifier="HANCESTRO:0008")
+        race = [
+            HumanAncestryModel(name="Asian", registry_identifier="HANCESTRO:0008"),
+            HumanAncestryModel(name="White", registry_identifier="HANCESTRO:0005"),
+        ]
         subject = HumanSubject(
             sex=Sex.FEMALE,
             species=Species.HUMAN,

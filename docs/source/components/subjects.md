@@ -93,7 +93,7 @@ Description of a human subject
 | `year_of_birth` | `int` | Year of birth  |
 | `source` | [Organization](../biodata_models/organizations.md#organization) | Source (Where the subject was acquired from.) |
 | `ethnicity` | `Optional[biodata_models.human_ancestry.HumanAncestryModel]` | Ethnicity  |
-| `race` | `Optional[biodata_models.human_ancestry.HumanAncestryModel]` | Race  |
+| `race` | `Optional[List[biodata_models.human_ancestry.HumanAncestryModel]]` | Race  |
 
 
 ### LightCycle
