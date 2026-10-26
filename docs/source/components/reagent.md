@@ -19,24 +19,6 @@ Description of an inherently fluorescent marker. Note this was called Fluorescen
 | `expiration_date` | `Optional[datetime.date]` | Lot expiration date  |
 
 
-### ProbeStain
-
-Description of a fluorescent stain consisting of a probe associated with a fluorophore.
-Note this was called FluorescentStain in v2.0
-
-| Field | Type | Title (Description) |
-|-------|------|-------------|
-| `probe` | [GeneProbe](#geneprobe) or [ProteinProbe](#proteinprobe) or [SmallMoleculeProbe](#smallmoleculeprobe) | Target of the stain  |
-| `stain_type` | [StainType](../biodata_models/reagent.md#staintype) | Stain type  |
-| `fluorophore` | [Fluorophore](#fluorophore) | Fluorophore used in the stain  |
-| `initiator_name` | `Optional[str]` | Initiator for HCR probes  |
-| `name` | `str` | Name  |
-| `source` | [Organization](../biodata_models/organizations.md#organization) | Source  |
-| `identifier` | Optional[[PIDName](../biodata_models/pid_names.md#pidname)] | Identifier (Persistent ID from external database, such as RRID) |
-| `lot_number` | `Optional[str]` | Lot number  |
-| `expiration_date` | `Optional[datetime.date]` | Lot expiration date  |
-
-
 ### Fluorophore
 
 Flurophore used in HCR, Immunolabeling, etc
@@ -89,6 +71,24 @@ Description of a probe used as a reagent
 | Field | Type | Title (Description) |
 |-------|------|-------------|
 | `target` | [GeneProbe](#geneprobe) or [ProteinProbe](#proteinprobe) or [SmallMoleculeProbe](#smallmoleculeprobe) | Target  |
+| `name` | `str` | Name  |
+| `source` | [Organization](../biodata_models/organizations.md#organization) | Source  |
+| `identifier` | Optional[[PIDName](../biodata_models/pid_names.md#pidname)] | Identifier (Persistent ID from external database, such as RRID) |
+| `lot_number` | `Optional[str]` | Lot number  |
+| `expiration_date` | `Optional[datetime.date]` | Lot expiration date  |
+
+
+### ProbeStain
+
+Description of a fluorescent stain consisting of a probe associated with a fluorophore.
+Note this was called FluorescentStain in v2.0
+
+| Field | Type | Title (Description) |
+|-------|------|-------------|
+| `probe` | [GeneProbe](#geneprobe) or [ProteinProbe](#proteinprobe) or [SmallMoleculeProbe](#smallmoleculeprobe) | Target of the stain  |
+| `stain_type` | [StainType](../biodata_models/reagent.md#staintype) | Stain type  |
+| `fluorophore` | [Fluorophore](#fluorophore) | Fluorophore used in the stain  |
+| `initiator_name` | `Optional[str]` | Initiator for HCR probes  |
 | `name` | `str` | Name  |
 | `source` | [Organization](../biodata_models/organizations.md#organization) | Source  |
 | `identifier` | Optional[[PIDName](../biodata_models/pid_names.md#pidname)] | Identifier (Persistent ID from external database, such as RRID) |
