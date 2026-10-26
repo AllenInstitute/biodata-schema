@@ -184,12 +184,8 @@ class SpecimenProcedure(ProtocolListMixin, DataModel):
             )
         elif self.procedure_type == SpecimenProcedureType.HYBRIDIZATION_CHAIN_REACTION and not has_hcr_series:
             raise AssertionError("HCRSeries required if procedure_type is HCR.")
-        elif self.procedure_type == SpecimenProcedureType.IMMUNOLABELING and not (
-            has_probe_stain or has_protein_probe
-        ):
-            raise AssertionError(
-                "ProbeStain or ProbeReagent required if procedure_type is Immunolabeling."
-            )
+        elif self.procedure_type == SpecimenProcedureType.IMMUNOLABELING and not (has_probe_stain or has_protein_probe):
+            raise AssertionError("ProbeStain or ProbeReagent required if procedure_type is Immunolabeling.")
         elif self.procedure_type == SpecimenProcedureType.SECTIONING and not has_sectioning:
             raise AssertionError("Sectioning required if procedure_type is Sectioning.")
         elif self.procedure_type == SpecimenProcedureType.BARSEQ and not has_geneprobeset:
