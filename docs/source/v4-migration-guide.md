@@ -168,3 +168,50 @@ from biodata_schema.utils.data_name_patterns import (
 
 `DataDescription.group` has been removed. Remove it from existing data
 descriptions before validation; it is no longer copied by derivation helpers.
+
+## Subject procedures
+
+Bare `Injection` objects are no longer accepted in
+`Procedures.subject_procedures`. Use `NonSurgicalInjection`, or place the
+injection inside a `Surgery`. `Injection` is also no longer importable from
+`biodata_schema.core.procedures`; import it from
+`biodata_schema.components.injection_procedures`.
+
+### Sample collection
+
+`SampleCollection` now requires `specimen_name`. `collection_volume` and
+`collection_volume_unit` are optional. `SampleCollection` also gains
+`sample_location` and `protocol_id`, and `SampleType` adds `Urine` and `Tissue`.
+
+### Reagent identifiers
+
+`Reagent.rrid` is renamed to `identifier`, which holds a persistent ID from an
+external database such as an RRID. Rename the field in existing reagents,
+including subclasses such as `FluorescentReagent`.
+
+## Subject fields
+
+`MouseSubject.restrictions` has moved to `Subject.restrictions`, so it now
+applies to every subject type. Move the value out of `subject_details`.
+
+## Coordinate systems
+
+`Procedures.global_coordinate_system` is removed. Set `global_coordinate_system`
+on each `Surgery` or `PlanarSectioning` that uses coordinates instead.
+
+Global coordinate system fields on `Instrument`, `Acquisition`, `Surgery` and
+`PlanarSectioning` now default to `CoordinateSystem.NotApplicable`
+(`"Not applicable"`). `None` is no longer accepted, and `Instrument` no longer
+requires a coordinate system. Transforms that need a global frame are rejected
+when it is `NotApplicable`. Combining instruments with different coordinate
+systems no longer raises an error. See [coordinate systems](coordinate_systems.md)
+for details.
+
+## New in v4
+
+These additions do not require migration:
+
+- `Subject.cohort_name` (optional)
+- `HumanSubject.ethnicity` and `HumanSubject.race` (optional)
+- Subject procedures: `ClinicalVisit`, `SelfAdministeredTreatment`,
+  `Treatment` and `FoodRestriction`, plus the `Vaccine` reagent
