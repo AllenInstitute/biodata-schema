@@ -168,7 +168,6 @@ class SpecimenProcedure(ProtocolListMixin, DataModel):
 
         has_hcr_series = any(isinstance(detail, HCRSeries) for detail in self.procedure_details)
         has_probe_stain = any(isinstance(detail, ProbeStain) for detail in self.procedure_details)
-        has_fluorescent_stain = any(isinstance(detail, FluorescentStain) for detail in self.procedure_details)
         has_protein_probe = any(isinstance(detail, ProbeReagent) for detail in self.procedure_details)
         has_sectioning = any(
             (isinstance(detail, PlanarSectioning) or isinstance(detail, Sectioning))
@@ -186,10 +185,10 @@ class SpecimenProcedure(ProtocolListMixin, DataModel):
         elif self.procedure_type == SpecimenProcedureType.HYBRIDIZATION_CHAIN_REACTION and not has_hcr_series:
             raise AssertionError("HCRSeries required if procedure_type is HCR.")
         elif self.procedure_type == SpecimenProcedureType.IMMUNOLABELING and not (
-            has_probe_stain or has_protein_probe or has_fluorescent_stain
+            has_probe_stain or has_protein_probe
         ):
             raise AssertionError(
-                "ProbeStain, FluorescentStain or ProbeReagent required if procedure_type is Immunolabeling."
+                "ProbeStain or ProbeReagent required if procedure_type is Immunolabeling."
             )
         elif self.procedure_type == SpecimenProcedureType.SECTIONING and not has_sectioning:
             raise AssertionError("Sectioning required if procedure_type is Sectioning.")
