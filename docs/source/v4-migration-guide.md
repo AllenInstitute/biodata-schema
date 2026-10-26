@@ -187,7 +187,22 @@ injection inside a `Surgery`. `Injection` is also no longer importable from
 
 `Reagent.rrid` is renamed to `identifier`, which holds a persistent ID from an
 external database such as an RRID. Rename the field in existing reagents,
-including subclasses such as `FluorescentReagent`.
+including subclasses such as `FluorescentStain` (formerly `FluorescentReagent`).
+
+### Stain class names
+
+Two reagent classes in `biodata_schema.components.reagent` are renamed. Because
+`FluorescentStain` now refers to a different class, update existing code in
+this order:
+
+| v3 name | v4 name | Description |
+|---------|---------|-------------|
+| `FluorescentStain` | `ProbeStain` | A probe (gene, protein or small molecule) associated with a fluorophore |
+| `FluorescentReagent` | `FluorescentStain` | An inherently fluorescent marker |
+
+`HybridizationChainReaction.stains` is now a list of `ProbeStain`. In
+`SpecimenProcedure.procedure_details`, rename the entries and imports the same
+way.
 
 ## Subject fields
 

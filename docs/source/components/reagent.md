@@ -2,9 +2,9 @@
 
 ## Model definitions
 
-### FluorescentReagent
+### FluorescentStain
 
-Description of an inherently fluorescent marker. Note this class will change name in v3.0
+Description of an inherently fluorescent marker. Note this was called FluorescentReagent in v2.0
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
@@ -19,10 +19,10 @@ Description of an inherently fluorescent marker. Note this class will change nam
 | `expiration_date` | `Optional[datetime.date]` | Lot expiration date  |
 
 
-### FluorescentStain
+### ProbeStain
 
 Description of a fluorescent stain consisting of a probe associated with a fluorophore.
-Note this class will change names in v3.0
+Note this was called FluorescentStain in v2.0
 
 | Field | Type | Title (Description) |
 |-------|------|-------------|
