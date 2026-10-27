@@ -375,7 +375,7 @@ class TestProcedures:
                 protocol_id=["10"],
                 notes=None,
             )
-        assert "FluorescentStain or ProbeReagent required if procedure_type is Immunolabeling" in repr(e.value)
+        assert "ProbeStain or ProbeReagent required if procedure_type is Immunolabeling" in repr(e.value)
 
         with pytest.raises(ValidationError) as e:
             SpecimenProcedure(
