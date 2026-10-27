@@ -16,7 +16,7 @@ from biodata_schema.components.configs import ProbeConfig
 from biodata_schema.components.coordinates import Axis, CoordinateSystem, ReferenceCoordinateSystem, Translation
 from biodata_schema.components.devices import FiberProbe
 from biodata_schema.components.injection_procedures import InjectionDynamics, InjectionProfile, ViralMaterial
-from biodata_schema.components.reagent import FluorescentStain, Fluorophore, ProbeReagent, ProteinProbe
+from biodata_schema.components.reagent import Fluorophore, ProbeReagent, ProbeStain, ProteinProbe
 from biodata_schema.components.surgery_procedures import (
     Anaesthetic,
     BrainInjection,
@@ -196,7 +196,7 @@ p = Procedures(
             experimenters=["Scientist Smith"],
             protocol_id=["TO ENTER"],
             procedure_details=[
-                FluorescentStain(
+                ProbeStain(
                     name="Alexa Fluor 488 goat anti-chicken IgY (H+L)",
                     source=Organization.THERMO_FISHER_SCIENTIFIC,
                     identifier=PIDName(

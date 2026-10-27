@@ -18,10 +18,10 @@ from biodata_schema.base import (
 from biodata_schema.components.coordinates import Atlas, CoordinateSystem, CoordinateSystemOrNA, Translation
 from biodata_schema.components.identifiers import ProtocolListMixin
 from biodata_schema.components.reagent import (
-    FluorescentReagent,
     FluorescentStain,
     GeneProbeSet,
     ProbeReagent,
+    ProbeStain,
     Reagent,
     Solution,
 )
@@ -111,7 +111,7 @@ class HybridizationChainReaction(DataModel):
     round_index: int = Field(..., title="Round index")
     start_time: AwareDatetimeWithDefault = Field(..., title="Round start time")
     end_time: AwareDatetimeWithDefault = Field(..., title="Round end time")
-    stains: List[FluorescentStain] = Field(..., title="Stains")
+    stains: List[ProbeStain] = Field(..., title="Stains")
     probe_concentration: float = Field(..., title="Probe concentration (M)")
     probe_concentration_unit: str = Field(default="M", title="Probe concentration unit")
 
@@ -146,7 +146,7 @@ class SpecimenProcedure(ProtocolListMixin, DataModel):
 
     procedure_details: DiscriminatedList[
         HCRSeries
-        | FluorescentReagent
+        | ProbeStain
         | FluorescentStain
         | Sectioning
         | PlanarSectioning
@@ -167,8 +167,7 @@ class SpecimenProcedure(ProtocolListMixin, DataModel):
         """Adds a validation check on procedure_type"""
 
         has_hcr_series = any(isinstance(detail, HCRSeries) for detail in self.procedure_details)
-        has_fluorescent_stain = any(isinstance(detail, FluorescentStain) for detail in self.procedure_details)
-        has_fluorescent_reagent = any(isinstance(detail, FluorescentReagent) for detail in self.procedure_details)
+        has_probe_stain = any(isinstance(detail, ProbeStain) for detail in self.procedure_details)
         has_protein_probe = any(isinstance(detail, ProbeReagent) for detail in self.procedure_details)
         has_sectioning = any(
             (isinstance(detail, PlanarSectioning) or isinstance(detail, Sectioning))
@@ -176,7 +175,7 @@ class SpecimenProcedure(ProtocolListMixin, DataModel):
         )
         has_geneprobeset = any(isinstance(detail, GeneProbeSet) for detail in self.procedure_details)
 
-        if has_hcr_series + has_fluorescent_stain + has_sectioning + has_geneprobeset + has_protein_probe > 1:
+        if has_hcr_series + has_probe_stain + has_sectioning + has_geneprobeset + has_protein_probe > 1:
             raise AssertionError("SpecimenProcedure.procedure_details should only contain one type of model.")
 
         if self.procedure_type == SpecimenProcedureType.OTHER and not self.notes:
@@ -185,10 +184,8 @@ class SpecimenProcedure(ProtocolListMixin, DataModel):
             )
         elif self.procedure_type == SpecimenProcedureType.HYBRIDIZATION_CHAIN_REACTION and not has_hcr_series:
             raise AssertionError("HCRSeries required if procedure_type is HCR.")
-        elif self.procedure_type == SpecimenProcedureType.IMMUNOLABELING and not (
-            has_fluorescent_stain or has_protein_probe or has_fluorescent_reagent
-        ):
-            raise AssertionError("FluorescentStain or ProbeReagent required if procedure_type is Immunolabeling.")
+        elif self.procedure_type == SpecimenProcedureType.IMMUNOLABELING and not (has_probe_stain or has_protein_probe):
+            raise AssertionError("ProbeStain or ProbeReagent required if procedure_type is Immunolabeling.")
         elif self.procedure_type == SpecimenProcedureType.SECTIONING and not has_sectioning:
             raise AssertionError("Sectioning required if procedure_type is Sectioning.")
         elif self.procedure_type == SpecimenProcedureType.BARSEQ and not has_geneprobeset:

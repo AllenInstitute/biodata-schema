@@ -84,9 +84,9 @@ class ProbeReagent(Reagent):
     target: Union[GeneProbe, ProteinProbe, SmallMoleculeProbe] = Field(..., title="Target")
 
 
-class FluorescentStain(Reagent):
+class ProbeStain(Reagent):
     """Description of a fluorescent stain consisting of a probe associated with a fluorophore.
-    Note this class will change names in v3.0"""
+    Note this was called FluorescentStain in v2.0"""
 
     probe: Discriminated[GeneProbe | ProteinProbe | SmallMoleculeProbe] = Field(..., title="Target of the stain")
     stain_type: StainType = Field(..., title="Stain type")
@@ -94,8 +94,8 @@ class FluorescentStain(Reagent):
     initiator_name: Optional[str] = Field(default=None, title="Initiator for HCR probes")
 
 
-class FluorescentReagent(Reagent):
-    """Description of an inherently fluorescent marker. Note this class will change name in v3.0"""
+class FluorescentStain(Reagent):
+    """Description of an inherently fluorescent marker. Note this was called FluorescentReagent in v2.0"""
 
     stain_type: StainType = Field(..., title="Stain type")
     excitation_wavelength: int = Field(..., title="Excitation wavelength (nm)")
